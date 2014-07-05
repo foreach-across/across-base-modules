@@ -25,8 +25,8 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>across</groupId>
-			<artifactId>across-debug-web</artifactId>
+			<groupId>across-standard-modules</groupId>
+			<artifactId>debug-web</artifactId>
 			<version>${project.parent.version}</version>
 			<optional>true</optional>
 		</dependency>
