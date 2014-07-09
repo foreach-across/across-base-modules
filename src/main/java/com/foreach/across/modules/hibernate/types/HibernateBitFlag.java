@@ -66,7 +66,7 @@ public abstract class HibernateBitFlag implements UserType {
         }
     }
 
-    public <E extends Enum<E> & BitFlag> EnumSet<E> fromInteger( Integer identifier, Class<E> enumType ) {
+    private <E extends Enum<E> & BitFlag> EnumSet<E> fromInteger( Integer identifier, Class<E> enumType ) {
         EnumSet<E> result = EnumSet.noneOf( enumType );
         E[] enumValues = enumType.getEnumConstants();
         for( E enumValue : enumValues ) {
@@ -77,7 +77,7 @@ public abstract class HibernateBitFlag implements UserType {
         return result;
     }
 
-    public <E extends Enum<E> & BitFlag> int toInteger( Set<E> enumSet ) {
+    private <E extends Enum<E> & BitFlag> int toInteger( Set<E> enumSet ) {
         int result = 0;
         for( E enumValue : enumSet ) {
             result |= enumValue.getBitFlag();
