@@ -21,7 +21,7 @@ public class TestHibernateBitFlag
 
 	@Test
 	public void testConvertIntFieldToEnumSet() throws Exception {
-		assertEquals( null, mockResultSetAndTestValue( null ) );
+		assertEquals( EnumSet.noneOf( BitValues.class ), mockResultSetAndTestValue( null ) );
 		assertEquals( EnumSet.noneOf( BitValues.class ), mockResultSetAndTestValue( 0 ) );
 		assertEquals( EnumSet.of( BitValues.RED ), mockResultSetAndTestValue( 1 ) );
 		assertEquals( EnumSet.of( BitValues.GREEN ), mockResultSetAndTestValue( 2 ) );
@@ -37,6 +37,7 @@ public class TestHibernateBitFlag
 
 	@Test
 	public void testConvertEnumSetToInt() throws Exception {
+		mockResultSetAndTestValueToInt( 0, null );
 		mockResultSetAndTestValueToInt( 0, EnumSet.noneOf( BitValues.class ) );
 		mockResultSetAndTestValueToInt( 1, EnumSet.of( BitValues.RED ) );
 		mockResultSetAndTestValueToInt( 2, EnumSet.of( BitValues.GREEN ) );

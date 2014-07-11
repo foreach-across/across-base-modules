@@ -46,7 +46,7 @@ public abstract class HibernateBitFlag implements UserType {
         Integer identifier = ( Integer ) TYPE.get( rs, names[0], session );
 
         if ( rs.wasNull() ) {
-            return null;
+            return EnumSet.noneOf( clazz );
         }
         return fromInteger( identifier, clazz );
     }
@@ -55,12 +55,8 @@ public abstract class HibernateBitFlag implements UserType {
     @SuppressWarnings( "unchecked" )
     public void nullSafeSet( PreparedStatement st, Object value, int index, SessionImplementor session ) throws HibernateException, SQLException {
         try {
-            if ( value == null ) {
-                st.setNull( index, TYPE.sqlType() );
-            } else {
-                int result = toInteger( (Set) value );
-                TYPE.set( st, result, index, session );
-            }
+            int result = toInteger( (Set) value );
+            TYPE.set( st, result, index, session );
         } catch ( Exception e ) {
             throw new HibernateException( "Exception while getting ids from set", e );
         }
@@ -79,9 +75,11 @@ public abstract class HibernateBitFlag implements UserType {
 
     private <E extends Enum<E> & BitFlag> int toInteger( Set<E> enumSet ) {
         int result = 0;
-        for( E enumValue : enumSet ) {
-            result |= enumValue.getBitFlag();
-        }
+	    if( enumSet != null ) {
+		    for( E enumValue : enumSet ) {
+			    result |= enumValue.getBitFlag();
+		    }
+	    }
         return result;
     }
 
