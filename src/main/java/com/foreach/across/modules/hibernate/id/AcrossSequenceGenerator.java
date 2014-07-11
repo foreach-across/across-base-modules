@@ -19,7 +19,7 @@ import java.util.Properties;
  *
  * <p/>
  * <pre>
- *     &#064;GeneratedValue(strategy = GenerationType.TABLE, generator = "seq_um_user_id")
+ *     &#064;GeneratedValue(generator = "seq_um_user_id")
  * 	   &#064;GenericGenerator(
  * 			name = "seq_um_user_id",
  * 			strategy = "com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator",
@@ -41,6 +41,9 @@ import java.util.Properties;
  */
 public class AcrossSequenceGenerator extends TableGenerator
 {
+	// Keep this as a constant string!
+	public static final String STRATEGY = "com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator";
+
 	private String entityName;
 
 	private boolean supportPredefinedIds = true;
