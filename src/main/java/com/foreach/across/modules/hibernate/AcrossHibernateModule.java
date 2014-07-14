@@ -42,7 +42,7 @@ public class AcrossHibernateModule extends AcrossModule
 	public AcrossHibernateModule( DataSource dataSource ) {
 		this.dataSource = dataSource;
 	}
-git s
+
 	/**
 	 * @return Name of this module.  The spring bean should also be using this name.
 	 */
