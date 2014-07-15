@@ -8,7 +8,7 @@ import com.foreach.across.test.modules.hibernate.hibernate1.Hibernate1Module;
 import com.foreach.across.test.modules.hibernate.hibernate1.Product;
 import com.foreach.across.test.modules.hibernate.hibernate1.ProductRepository;
 import com.foreach.across.test.modules.hibernate.hibernate2.Hibernate2Module;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.HibernateException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
