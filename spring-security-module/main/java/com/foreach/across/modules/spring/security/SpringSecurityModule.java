@@ -28,6 +28,7 @@ public class SpringSecurityModule extends AcrossModule
 	public SpringSecurityModule() {
 		setExposeFilter(
 				new BeanFilterComposite(
+						defaultExposeFilter(),
 						new ClassBeanFilter(
 								FilterChainProxy.class,
 								WebInvocationPrivilegeEvaluator.class,
