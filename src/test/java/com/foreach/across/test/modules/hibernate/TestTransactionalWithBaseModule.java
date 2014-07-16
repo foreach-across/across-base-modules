@@ -8,7 +8,7 @@ import com.foreach.across.test.modules.hibernate.hibernate1.ProductRepository;
 import com.foreach.across.test.modules.hibernate.hibernate2.Hibernate2Module;
 import com.foreach.across.test.modules.hibernate.hibernate2.User;
 import com.foreach.across.test.modules.hibernate.hibernate2.UserRepository;
-import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.After;
