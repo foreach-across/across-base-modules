@@ -1,9 +1,9 @@
 package com.foreach.across.modules.ehcache;
 
+import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.context.AcrossSpringApplicationContext;
 import com.foreach.across.test.AcrossTestConfiguration;
-import com.foreach.across.test.AcrossTestContextConfigurer;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.Status;
@@ -22,8 +22,8 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 @ContextConfiguration(classes = ITEhcacheModule.Config.class)
-public class ITEhcacheModule {
-
+public class ITEhcacheModule
+{
 	@Autowired
 	private net.sf.ehcache.CacheManager cacheManager;
 
@@ -50,12 +50,12 @@ public class ITEhcacheModule {
 
 	@Configuration
 	@AcrossTestConfiguration
-	protected static class Config implements AcrossTestContextConfigurer
+	protected static class Config implements AcrossContextConfigurer
 	{
 		@Override
 		public void configure( AcrossContext context ) {
 			ApplicationContext applicationContext = context.getParentApplicationContext();
-			if( !(applicationContext instanceof AcrossSpringApplicationContext ) ) {
+			if ( !( applicationContext instanceof AcrossSpringApplicationContext ) ) {
 				EhcacheModule ehcacheModule = new EhcacheModule();
 				ehcacheModule.setConfigLocation( new ClassPathResource( "test-ehcache.xml" ) );
 				context.addModule( ehcacheModule );
