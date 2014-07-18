@@ -12,7 +12,7 @@
 		<span th:text="${feedback}">XX loggers have been updated.</span>
 	</div>
 
-	<form role="form" method="post" onsubmit="disableNonDirty(this)">
+	<form role="form" method="post" th:action="@{#}" onsubmit="disableNonDirty(this)">
 		<div class="form-group">
 			<input type="reset" value="Reset" class="btn btn-default"/>
 			<input type="submit" value="Save" class="btn btn-default"/>
