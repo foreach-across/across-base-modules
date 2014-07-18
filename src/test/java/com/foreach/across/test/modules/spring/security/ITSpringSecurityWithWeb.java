@@ -88,6 +88,11 @@ public class ITSpringSecurityWithWeb
 	}
 
 	@Configuration
+	protected static class OtherSpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter {
+
+	}
+
+	@Configuration
 	@AcrossTestWebConfiguration
 	protected static class Config implements AcrossContextConfigurer
 	{
@@ -99,6 +104,11 @@ public class ITSpringSecurityWithWeb
 		@Bean
 		public SpringSecurityWebConfigurer springSecurityWebConfigurer() {
 			return new SimpleSpringSecurityConfigurer();
+		}
+
+		@Bean
+		public OtherSpringSecurityConfigurer otherSpringSecurityConfigurer() {
+			return new OtherSpringSecurityConfigurer();
 		}
 
 		private SpringSecurityModule springSecurityModule() {
