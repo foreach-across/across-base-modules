@@ -11,7 +11,7 @@ import com.foreach.across.core.filters.BeanFilterComposite;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.core.filters.NamedBeanFilter;
 import com.foreach.across.modules.spring.security.config.ModuleGlobalMethodSecurityConfiguration;
-import com.foreach.across.modules.spring.security.config.SpringSecurityAcrossWebConfiguration;
+import com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration;
@@ -51,7 +51,7 @@ public class SpringSecurityModule extends AcrossModule
 
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-		contextConfigurers.add( new AnnotatedClassConfigurer( SpringSecurityAcrossWebConfiguration.class ) );
+		contextConfigurers.add( new AnnotatedClassConfigurer( AcrossWebSecurityConfiguration.class ) );
 	}
 
 	@Override

@@ -6,15 +6,18 @@ import com.foreach.across.core.context.AcrossContextUtils;
 import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
+import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer;
+import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
 import com.foreach.across.test.AcrossTestWebConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator;
 import org.springframework.test.annotation.DirtiesContext;
@@ -63,11 +66,25 @@ public class ITSpringSecurityWithWeb
 	}
 
 	/**
-	 * Add least one web security configurer should be injected in the SpringSecurityModule.
+	 * At least one SpringSecurityConfigurer should be present.
 	 */
 	@Configuration
-	protected static class SecurityConfig extends WebSecurityConfigurerAdapter
+	protected static class SimpleSpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
 	{
+		@Override
+		public void configure( AuthenticationManagerBuilder auth ) throws Exception {
+			auth.inMemoryAuthentication().withUser( "test" ).password( "test" ).roles( "test" );
+		}
+
+		@Override
+		public void configure( HttpSecurity http ) throws Exception {
+			http
+					.authorizeRequests()
+					.anyRequest().authenticated()
+					.and()
+					.formLogin().and()
+					.httpBasic();
+		}
 	}
 
 	@Configuration
@@ -79,11 +96,13 @@ public class ITSpringSecurityWithWeb
 			context.addModule( springSecurityModule() );
 		}
 
-		private SpringSecurityModule springSecurityModule() {
-			SpringSecurityModule module = new SpringSecurityModule();
-			module.addApplicationContextConfigurer( SecurityConfig.class );
+		@Bean
+		public SpringSecurityWebConfigurer springSecurityWebConfigurer() {
+			return new SimpleSpringSecurityConfigurer();
+		}
 
-			return module;
+		private SpringSecurityModule springSecurityModule() {
+			return new SpringSecurityModule();
 		}
 	}
 }
