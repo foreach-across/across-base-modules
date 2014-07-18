@@ -19,6 +19,7 @@ import org.springframework.util.Assert;
 
 /**
  * Enables Spring method security in modules, ensuring that the same AuthenticationManager is being used.
+ * This exposes an AuthenticationManager delegate in every module.
  */
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)

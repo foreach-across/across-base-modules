@@ -95,7 +95,7 @@ public class AcrossWebSecurityConfiguration
 			webSecurityConfigurers.add( wrapper );
 		}
 
-		if ( configurers.isEmpty() ) {
+		if ( webSecurityConfigurers.isEmpty() ) {
 			throw new IllegalStateException(
 					"At least one non-null instance of SpringSecurityWebConfigurer should be present in the Across context." );
 		}
