@@ -2,6 +2,7 @@ package com.foreach.across.test.modules.spring.security;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
+import com.foreach.across.core.annotations.OrderInModule;
 import com.foreach.across.core.context.AcrossContextUtils;
 import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
@@ -60,15 +61,16 @@ public class ITSpringSecurityWithWeb
 	@Test
 	public void exposedBeans() {
 		assertNotNull( filterChainProxy );
-		assertNotNull( webInvocationPrivilegeEvaluator );
 		assertNotNull( securityExpressionHandler );
 		assertNotNull( requestDataValueProcessor );
+		assertNotNull( webInvocationPrivilegeEvaluator );
 	}
 
 	/**
 	 * At least one SpringSecurityConfigurer should be present.
 	 */
 	@Configuration
+	@OrderInModule(2)
 	protected static class SimpleSpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
 	{
 		@Override
@@ -88,8 +90,13 @@ public class ITSpringSecurityWithWeb
 	}
 
 	@Configuration
-	protected static class OtherSpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter {
-
+	@OrderInModule(1)
+	protected static class OtherSpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
+	{
+		@Override
+		public void configure( HttpSecurity http ) throws Exception {
+			http.antMatcher( "/bla" ).authorizeRequests().anyRequest().denyAll();
+		}
 	}
 
 	@Configuration
