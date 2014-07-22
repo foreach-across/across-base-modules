@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.enhanced.OptimizerFactory;
 import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.type.Type;
 
@@ -16,7 +17,7 @@ import java.util.Properties;
  * Has support for manually defining an id value and inserting an entity with that value instead.
  * Note that the repository code should support this behavior correctly, and special care should be
  * taken to avoid manual ids interfering with the sequence values.
- *
+ * <p/>
  * <p/>
  * <pre>
  *     &#064;GeneratedValue(generator = "seq_um_user_id")
@@ -73,7 +74,14 @@ public class AcrossSequenceGenerator extends TableGenerator
 		props.put( INCREMENT_PARAM, "50" );
 		props.put( INITIAL_PARAM, "1" );
 
+		// Unless explicitly overruled, we use a pooled optimizer
+		props.put( OPT_PARAM, OptimizerFactory.StandardOptimizerDescriptor.POOLED );
+
 		// Extend with params
+		if ( params.containsKey( OPT_PARAM ) ) {
+			props.put( OPT_PARAM, params.getProperty( OPT_PARAM ) );
+		}
+
 		if ( params.contains( "initialValue" ) ) {
 			props.put( INITIAL_PARAM, String.valueOf( Integer.valueOf( params.getProperty( "initialValue" ) ) + 1 ) );
 		}
