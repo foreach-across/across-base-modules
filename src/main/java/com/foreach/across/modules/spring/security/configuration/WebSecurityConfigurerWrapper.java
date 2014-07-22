@@ -107,4 +107,12 @@ public class WebSecurityConfigurerWrapper extends WebSecurityConfigurerAdapter i
 			return method.invoke( builder, objects );
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "WebSecurityConfigurerWrapper{" +
+				"configurer=" + configurer +
+				", order=" + order +
+				'}';
+	}
 }
