@@ -75,7 +75,7 @@ public class AcrossSequenceGenerator extends TableGenerator
 		props.put( INITIAL_PARAM, "1" );
 
 		// Unless explicitly overruled, we use a pooled optimizer
-		props.put( OPT_PARAM, OptimizerFactory.StandardOptimizerDescriptor.POOLED );
+		props.put( OPT_PARAM, OptimizerFactory.StandardOptimizerDescriptor.POOLED.getExternalName() );
 
 		// Extend with params
 		if ( params.containsKey( OPT_PARAM ) ) {
