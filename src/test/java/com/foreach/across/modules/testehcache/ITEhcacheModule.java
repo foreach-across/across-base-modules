@@ -1,8 +1,8 @@
-package com.foreach.across.modules.ehcache;
+package com.foreach.across.modules.testehcache;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
-import com.foreach.across.core.context.AcrossSpringApplicationContext;
+import com.foreach.across.modules.ehcache.EhcacheModule;
 import com.foreach.across.test.AcrossTestConfiguration;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
@@ -10,7 +10,6 @@ import net.sf.ehcache.Status;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.annotation.DirtiesContext;
@@ -54,12 +53,9 @@ public class ITEhcacheModule
 	{
 		@Override
 		public void configure( AcrossContext context ) {
-			ApplicationContext applicationContext = context.getParentApplicationContext();
-			if ( !( applicationContext instanceof AcrossSpringApplicationContext ) ) {
-				EhcacheModule ehcacheModule = new EhcacheModule();
-				ehcacheModule.setConfigLocation( new ClassPathResource( "test-ehcache.xml" ) );
-				context.addModule( ehcacheModule );
-			}
+			EhcacheModule ehcacheModule = new EhcacheModule();
+			ehcacheModule.setConfigLocation( new ClassPathResource( "test-ehcache.xml" ) );
+			context.addModule( ehcacheModule );
 		}
 	}
 }
