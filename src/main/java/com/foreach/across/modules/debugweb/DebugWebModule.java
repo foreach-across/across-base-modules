@@ -11,6 +11,8 @@ import java.util.Set;
 @AcrossDepends(required = "AcrossWebModule")
 public class DebugWebModule extends AcrossModule
 {
+	public static final String NAME = "DebugWebModule";
+
 	private String rootPath = "/debug";
 
 	public void setRootPath( String rootPath ) {
@@ -26,7 +28,7 @@ public class DebugWebModule extends AcrossModule
 	 */
 	@Override
 	public String getName() {
-		return DebugWeb.MODULE;
+		return NAME;
 	}
 
 	@Override

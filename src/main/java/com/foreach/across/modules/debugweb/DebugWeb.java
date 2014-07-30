@@ -4,7 +4,7 @@ import com.foreach.across.modules.web.context.PrefixingPathContext;
 
 public final class DebugWeb extends PrefixingPathContext
 {
-	public static final String MODULE = "DebugWebModule";
+	public static final String MODULE = DebugWebModule.NAME;
 	public static final String VIEWS = "debugweb";
 
 	public static final String CSS_MAIN = "/css/debugweb/debugweb.css";
