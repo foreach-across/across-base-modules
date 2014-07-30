@@ -1,4 +1,4 @@
-package com.foreach.across.modules.testehcache;
+package com.foreach.across.modules.it.ehcache;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;

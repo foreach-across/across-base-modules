@@ -14,6 +14,8 @@ import java.util.Set;
 @AcrossDepends(optional = "DebugWebModule")
 public class EhcacheModule extends AcrossModule
 {
+	public static final String NAME = "EhcacheModule";
+
 	private Resource configLocation = new ClassPathResource( "ehcache.xml" );
 
 	public Resource getConfigLocation() {
@@ -29,7 +31,7 @@ public class EhcacheModule extends AcrossModule
 	 */
 	@Override
 	public String getName() {
-		return "EhcacheModule";
+		return NAME;
 	}
 
 	/**
