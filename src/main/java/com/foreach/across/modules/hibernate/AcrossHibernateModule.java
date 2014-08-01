@@ -8,6 +8,7 @@ import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
 import com.foreach.across.core.context.configurer.SingletonBeanConfigurer;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.modules.hibernate.config.HibernateConfiguration;
+import com.foreach.across.modules.hibernate.config.OpenSessionInViewInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.config.TransactionManagerConfiguration;
 import com.foreach.across.modules.hibernate.config.UnitOfWorkConfiguration;
 import com.foreach.across.modules.hibernate.provider.HasHibernatePackageProvider;
@@ -160,7 +161,8 @@ public class AcrossHibernateModule extends AcrossModule
 	 */
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-		contextConfigurers.add( new AnnotatedClassConfigurer( HibernateConfiguration.class ) );
+		contextConfigurers.add( new AnnotatedClassConfigurer( HibernateConfiguration.class,
+		                                                      OpenSessionInViewInterceptorConfiguration.class ) );
 	}
 
 	@Override

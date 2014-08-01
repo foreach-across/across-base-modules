@@ -11,7 +11,7 @@ public class TestAcrossHibernateModuleConventions extends AbstractAcrossModuleCo
 {
 	@Override
 	protected boolean hasSettings() {
-		return false;
+		return true;
 	}
 
 	@Override
