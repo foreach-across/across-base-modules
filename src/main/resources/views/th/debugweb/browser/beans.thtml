@@ -48,15 +48,28 @@
 		<tbody>
 		<tr th:each="beanInfo : ${contextBeans}" th:class="${beanInfo.exposed ? 'exposed success' : ''}"
 		    th:attr="data-spring-standard=${beanInfo.standardSpring}">
-			<td class="bean-name" th:text="${beanInfo.name}">bean name</td>
+			<td class="bean-name">
+				<span th:text="${beanInfo.name}">bean name</span>
+				<sup class="enhanced" th:if="${beanInfo.exposed}" th:title="${beanInfo.exposedInfo}">1</sup>
+				<sup class="enhanced" th:if="${beanInfo.exposedBean}" th:title="${beanInfo.exposedBeanInfo}">2</sup>
+			</td>
 			<td class="bean-scope" th:text="${beanInfo.singleton ? '' : beanInfo.scope}">scope</td>
 			<td class="bean-type">
 				<span th:text="${beanInfo.beanType}">bean type</span>
-				<span class="enhanced" th:if="${beanInfo.proxiedOrEnhanced}" title="The actual bean is either a proxy or cglib enhanced.">*</span>
+				<sup class="enhanced" th:if="${beanInfo.proxiedOrEnhanced}" title="The actual bean is either a proxy or cglib enhanced.">3</sup>
 			</td>
 		</tr>
 		</tbody>
 	</table>
+
+	<p>
+		<h4>Annotations</h4>
+		<ol>
+			<li>This bean is exposed to the parent ApplicationContext.</li>
+			<li>This bean is an exposed bean from an Across module.</li>
+			<li>The actual bean is either a proxy or cglib enhanced</li>
+		</ol>
+	</p>
 
 	<script type="text/javascript">
 		/*<![CDATA[*/

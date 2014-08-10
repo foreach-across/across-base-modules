@@ -1,9 +1,7 @@
 package com.foreach.across.modules.debugweb.controllers;
 
 import com.foreach.across.core.AcrossContext;
-import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.context.AcrossContextUtils;
-import com.foreach.across.core.context.ApplicationContextScanner;
+import com.foreach.across.core.context.ExposedBeanDefinition;
 import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.events.AcrossEvent;
 import com.foreach.across.core.events.AcrossEventPublisher;
@@ -15,19 +13,19 @@ import gigadot.rebound.Rebound;
 import net.engio.mbassy.listener.Handler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.*;
 import org.springframework.ui.Model;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
+
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -313,8 +311,7 @@ public class AcrossInfoController
 
 		if ( context.isEnabled() ) {
 
-			Set<String> exposed = context.isModule() ? getExposedBeanNames(
-					context.getModuleInfo().getModule() ) : Collections.<String>emptySet();
+			Map<String, ExposedBeanDefinition> exposed = getExposedBeans( context );
 
 			BeanFactory autowireCapableBeanFactory = context.getApplicationContext().getAutowireCapableBeanFactory();
 
@@ -330,7 +327,11 @@ public class AcrossInfoController
 				for ( String name : names ) {
 					BeanInfo info = new BeanInfo();
 					info.setName( name );
-					info.setExposed( exposed.contains( name ) );
+					info.setExposed( exposed.containsKey( name ) );
+
+					if ( info.isExposed() ) {
+						info.setExposedInfo( buildExposedInfo( exposed.get( name ) ) );
+					}
 
 					Class beanType = Object.class;
 					Class actual;
@@ -339,6 +340,12 @@ public class AcrossInfoController
 						BeanDefinition definition = beanFactory.getBeanDefinition( name );
 						info.setSingleton( definition.isSingleton() );
 						info.setScope( definition.getScope() );
+
+						if ( definition instanceof ExposedBeanDefinition ) {
+							info.setExposedBean( true );
+							info.setExposedBeanInfo( buildExposedBeanInfo( (ExposedBeanDefinition) definition ) );
+							info.setScope( "exposed" );
+						}
 
 						try {
 							if ( beanFactory.isSingleton( name ) ) {
@@ -394,6 +401,18 @@ public class AcrossInfoController
 		return beans;
 	}
 
+	private Map<String, ExposedBeanDefinition> getExposedBeans( ContextDebugInfo context ) {
+		if ( context.isModule() ) {
+			return context.getModuleInfo().getExposedBeanDefinitions();
+		}
+
+		if ( context.isAcrossContext() ) {
+			return context.getContextInfo().getExposedBeanDefinitions();
+		}
+
+		return Collections.emptyMap();
+	}
+
 	private void detectEventHandlers( BeanInfo beanInfo ) {
 		Object value = beanInfo.getInstance();
 
@@ -407,45 +426,21 @@ public class AcrossInfoController
 		}
 	}
 
-	private Set<String> getExposedBeanNames( AcrossModule module ) {
-		ApplicationContext ctx = AcrossContextUtils.getApplicationContext( module );
+	private String buildExposedBeanInfo( ExposedBeanDefinition exposedBeanDefinition ) {
+		if ( StringUtils.isBlank( exposedBeanDefinition.getModuleName() ) ) {
+			return String.format( "Exposed bean from context %s, original bean: %s",
+			                      exposedBeanDefinition.getContextId(),
+			                      exposedBeanDefinition.getOriginalBeanName() );
+		}
 
-		Map<String, Object> exposedSingletons =
-				ApplicationContextScanner.findSingletonsMatching( ctx, module.getExposeFilter() );
-		Map<String, BeanDefinition> exposedDefinitions =
-				ApplicationContextScanner.findBeanDefinitionsMatching( ctx, module.getExposeFilter() );
-
-		Set<String> exposedIds = new HashSet<String>();
-		exposedIds.addAll( exposedSingletons.keySet() );
-		exposedIds.addAll( exposedDefinitions.keySet() );
-
-		return exposedIds;
+		return String.format( "Exposed bean from module %s in context %s, original bean: %s",
+		                      exposedBeanDefinition.getModuleName(),
+		                      exposedBeanDefinition.getContextId(),
+		                      exposedBeanDefinition.getOriginalBeanName() );
 	}
 
-	public static class ModuleInfo
-	{
-		private AcrossModule module;
-		private List<BeanInfo> beans = new LinkedList<BeanInfo>();
-
-		public AcrossModule getModule() {
-			return module;
-		}
-
-		public void setModule( AcrossModule module ) {
-			this.module = module;
-		}
-
-		public void addBean( BeanInfo bean ) {
-			beans.add( bean );
-		}
-
-		public List<BeanInfo> getBeans() {
-			return beans;
-		}
-
-		public boolean isEnabled() {
-			return module.isEnabled();
-		}
+	private String buildExposedInfo( ExposedBeanDefinition exposedBeanDefinition ) {
+		return String.format( "Exposed with preferred beanName: %s", exposedBeanDefinition.getPreferredBeanName() );
 	}
 
 	public Collection<Method> detectHandlerMethods( Object value ) {
@@ -468,8 +463,8 @@ public class AcrossInfoController
 	public static class BeanInfo implements Comparable<BeanInfo>
 	{
 		private Object instance;
-		private boolean exposed, inherited, singleton, proxiedOrEnhanced, eventHandler;
-		private String name, scope, beanType;
+		private boolean exposed, exposedBean, inherited, singleton, proxiedOrEnhanced, eventHandler;
+		private String name, scope, beanType, exposedInfo, exposedBeanInfo;
 		private Collection<Method> handlerMethods;
 
 		public boolean isEventHandler() {
@@ -518,6 +513,30 @@ public class AcrossInfoController
 
 		public boolean isExposed() {
 			return exposed;
+		}
+
+		public boolean isExposedBean() {
+			return exposedBean;
+		}
+
+		public void setExposedBean( boolean exposedBean ) {
+			this.exposedBean = exposedBean;
+		}
+
+		public String getExposedInfo() {
+			return exposedInfo;
+		}
+
+		public void setExposedInfo( String exposedInfo ) {
+			this.exposedInfo = exposedInfo;
+		}
+
+		public String getExposedBeanInfo() {
+			return exposedBeanInfo;
+		}
+
+		public void setExposedBeanInfo( String exposedBeanInfo ) {
+			this.exposedBeanInfo = exposedBeanInfo;
 		}
 
 		public boolean isSingleton() {
