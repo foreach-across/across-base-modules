@@ -48,7 +48,9 @@
 			</tr>
 			<tr>
 				<th>Heap size</th>
-				<td th:text="*{#numbers.formatDecimal(statistics.getExtended().localHeapSizeInBytes().value() / 1024.0,1,2)} + ' KB'">0 KB</td>
+				<td th:text="*{#numbers.formatDecimal(statistics.getExtended().localHeapSizeInBytes().value() / 1024.0,1,2)} + ' KB'">
+					0 KB
+				</td>
 			</tr>
 		</table>
 	</div>
