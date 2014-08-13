@@ -102,7 +102,7 @@ public class AcrossSequenceGenerator extends TableGenerator
 		Serializable id = session.getEntityPersister( entityName, object )
 		                         .getClassMetadata().getIdentifier( object, session );
 
-		if ( supportPredefinedIds && id != null && !new Long( 0 ).equals( id ) ) {
+		if ( supportPredefinedIds && id != null && !Long.valueOf( 0 ).equals( id ) ) {
 			return id;
 		}
 
