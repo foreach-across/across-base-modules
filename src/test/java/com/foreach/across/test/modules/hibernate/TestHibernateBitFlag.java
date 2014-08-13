@@ -32,7 +32,8 @@ public class TestHibernateBitFlag
 		assertEquals( EnumSet.of( BitValues.RED, BitValues.GREEN, BitValues.BLUE ), mockResultSetAndTestValue( 7 ) );
 
 		// Invalid database values
-		assertEquals( EnumSet.of( BitValues.RED, BitValues.GREEN, BitValues.BLUE ), mockResultSetAndTestValue( Integer.MAX_VALUE ) );
+		assertEquals( EnumSet.of( BitValues.RED, BitValues.GREEN, BitValues.BLUE ), mockResultSetAndTestValue(
+				Integer.MAX_VALUE ) );
 	}
 
 	@Test
@@ -56,16 +57,18 @@ public class TestHibernateBitFlag
 		when( sessionImplementor.getFactory() ).thenReturn( sessionFactoryImplementor );
 		when( sessionFactoryImplementor.getDialect() ).thenReturn( new HSQLDialect() );
 		String[] names = new String[] { "someColumn" };
-		if( rowValue == null ) {
+		if ( rowValue == null ) {
 			when( resultSet.wasNull() ).thenReturn( true );
-		} else {
+		}
+		else {
 			when( resultSet.getInt( "someColumn" ) ).thenReturn( rowValue );
 		}
 
 		return userType.nullSafeGet( resultSet, names, sessionImplementor, new Object() );
 	}
 
-	private void mockResultSetAndTestValueToInt( Integer expectedValue, EnumSet<BitValues> rowValue ) throws SQLException {
+	private void mockResultSetAndTestValueToInt( Integer expectedValue,
+	                                             EnumSet<BitValues> rowValue ) throws SQLException {
 		TestHibernateBitFlagUserType userType = new TestHibernateBitFlagUserType();
 		PreparedStatement preparedStatement = mock( PreparedStatement.class );
 		SessionImplementor sessionImplementor = mock( SessionImplementor.class );
@@ -75,14 +78,14 @@ public class TestHibernateBitFlag
 
 		userType.nullSafeSet( preparedStatement, rowValue, 3, sessionImplementor );
 
-		verify( preparedStatement, times(1) ).setInt( eq( 3 ), eq( expectedValue ) );
+		verify( preparedStatement, times( 1 ) ).setInt( eq( 3 ), eq( expectedValue ) );
 	}
 
 	public static enum BitValues implements BitFlag
 	{
-		RED(1),
-		GREEN(2),
-		BLUE(4);
+		RED( 1 ),
+		GREEN( 2 ),
+		BLUE( 4 );
 
 		int bitFlag;
 
@@ -95,7 +98,8 @@ public class TestHibernateBitFlag
 		}
 	}
 
-	private static class TestHibernateBitFlagUserType extends HibernateBitFlag {
+	private static class TestHibernateBitFlagUserType extends HibernateBitFlag
+	{
 
 		public TestHibernateBitFlagUserType() {
 			super( BitValues.class );
