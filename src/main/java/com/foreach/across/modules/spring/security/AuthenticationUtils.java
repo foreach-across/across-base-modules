@@ -9,13 +9,16 @@ import java.util.Collection;
 
 public final class AuthenticationUtils
 {
-	private AuthenticationUtils() {}
+	private AuthenticationUtils() {
+	}
+
 	public static boolean hasAuthority( Authentication authentication, String authority ) {
-		if( authentication != null ) {
+		if ( authentication != null ) {
 			Collection<? extends GrantedAuthority> grantedAuthorities = authentication.getAuthorities();
-			if( !CollectionUtils.isEmpty( grantedAuthorities ) ) {
-				for( GrantedAuthority grantedAuthority : grantedAuthorities ) {
-					if( grantedAuthority != null && StringUtils.equals( grantedAuthority.getAuthority(), authority ) ) {
+			if ( !CollectionUtils.isEmpty( grantedAuthorities ) ) {
+				for ( GrantedAuthority grantedAuthority : grantedAuthorities ) {
+					if ( grantedAuthority != null && StringUtils.equals( grantedAuthority.getAuthority(),
+					                                                     authority ) ) {
 						return true;
 					}
 				}

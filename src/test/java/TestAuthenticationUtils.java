@@ -23,7 +23,7 @@ public class TestAuthenticationUtils
 	}
 
 	@Test
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public void testAuthorityWithAuthoritiesAndNullAuthorityReturnsFalse() throws Exception {
 		Authentication authentication = mock( Authentication.class );
 		Collection grantedAuthorities = Sets.newSet( null, new SimpleGrantedAuthority( "bla" ) );
@@ -32,7 +32,7 @@ public class TestAuthenticationUtils
 	}
 
 	@Test
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public void testAuthorityWithAuthoritiesAndNullAuthorityReturnsTrue() throws Exception {
 		Authentication authentication = mock( Authentication.class );
 		Collection grantedAuthorities = Sets.newSet( null, new SimpleGrantedAuthority( "bla" ) );
