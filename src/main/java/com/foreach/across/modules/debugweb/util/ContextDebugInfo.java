@@ -100,7 +100,8 @@ public class ContextDebugInfo
 
 	private static ContextDebugInfo createForContext( AcrossContextInfo context ) {
 		ApplicationContext applicationContext = context.getApplicationContext();
-		ContextDebugInfo debugInfo = new ContextDebugInfo( applicationContext.getDisplayName(), context.getApplicationContext() );
+		ContextDebugInfo debugInfo = new ContextDebugInfo( applicationContext.getDisplayName(),
+		                                                   context.getApplicationContext() );
 		debugInfo.setEnabled( true );
 		debugInfo.setContextInfo( context );
 

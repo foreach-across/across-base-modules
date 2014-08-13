@@ -74,7 +74,8 @@
 					<strong class="moduleIndex" th:text="${moduleInfoStat.count}"></strong>
 					<span th:text="${moduleInfo.name}"></span></td>
 				<td class="col-sm-3 text-center" th:text="${moduleInfo.moduleRole}"></td>
-				<td class="col-sm-2 text-center"><span th:unless="${moduleInfo.enabled}" class="label label-danger">disabled</span></td>
+				<td class="col-sm-2 text-center"><span th:unless="${moduleInfo.enabled}" class="label label-danger">disabled</span>
+				</td>
 			</tr>
 		</table>
 	</div>
@@ -96,7 +97,7 @@
 		<tr>
 			<th class="col-sm-2">Module</th>
 			<td>
-				<span th:text="${moduleInfo.name}"></span><br />
+				<span th:text="${moduleInfo.name}"></span><br/>
 				<small th:text="${moduleInfo.module.class.canonicalName}"></small>
 			</td>
 		</tr>

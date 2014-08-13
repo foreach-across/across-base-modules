@@ -17,7 +17,7 @@
 						        th:value="@{${@debugWeb.path('/across/browser/' + section + '/' + contextStat.index)}}"
 						        th:text="${context.isModule() ? '&raquo; ' + context.name : context.name}"
 						        th:selected="${context eq selectedContext}"
-								th:classappend="${!context.isEnabled()} ? 'disabled'">
+						        th:classappend="${!context.isEnabled()} ? 'disabled'">
 							selected context
 						</option>
 					</select>
