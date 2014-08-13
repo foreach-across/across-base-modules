@@ -458,7 +458,7 @@ public class AcrossInfoController
 		return methods;
 	}
 
-	@SuppressWarnings("EQ_COMPARETO_USE_OBJECT_EQUALS")
+	@SuppressWarnings("all")
 	public static class BeanInfo implements Comparable<BeanInfo>
 	{
 		private Object instance;
