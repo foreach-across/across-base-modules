@@ -2,9 +2,7 @@ package com.foreach.across.modules.spring.security.config;
 
 import com.foreach.across.core.annotations.PostRefresh;
 import com.foreach.across.core.annotations.Refreshable;
-import com.foreach.across.core.context.AcrossContextUtils;
-import com.foreach.across.core.context.info.AcrossContextInfo;
-import com.foreach.across.core.context.info.AcrossModuleInfo;
+import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +13,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.util.Assert;
 
 /**
  * Enables Spring method security in modules, ensuring that the same AuthenticationManager is being used.
@@ -26,12 +23,12 @@ import org.springframework.util.Assert;
 public class ModuleGlobalMethodSecurityConfiguration extends GlobalMethodSecurityConfiguration
 {
 	@Autowired
-	private AcrossContextInfo context;
+	private AcrossContextBeanRegistry contextBeanRegistry;
 
 	@Bean
 	@Refreshable
 	AuthenticationManager delegatingClientAuthenticationManager() {
-		return new DelegatingClientAuthenticationManager( context );
+		return new DelegatingClientAuthenticationManager( contextBeanRegistry );
 	}
 
 	@Override
@@ -41,11 +38,11 @@ public class ModuleGlobalMethodSecurityConfiguration extends GlobalMethodSecurit
 
 	private static final class DelegatingClientAuthenticationManager implements AuthenticationManager
 	{
-		private final AcrossContextInfo context;
+		private final AcrossContextBeanRegistry contextBeanRegistry;
 		private AuthenticationManager delegate;
 
-		private DelegatingClientAuthenticationManager( AcrossContextInfo context ) {
-			this.context = context;
+		private DelegatingClientAuthenticationManager( AcrossContextBeanRegistry contextBeanRegistry ) {
+			this.contextBeanRegistry = contextBeanRegistry;
 		}
 
 		@Override
@@ -59,11 +56,9 @@ public class ModuleGlobalMethodSecurityConfiguration extends GlobalMethodSecurit
 
 		@PostRefresh
 		public void refresh() {
-			AcrossModuleInfo springSecurityModule = context.getModuleInfo( SpringSecurityModule.NAME );
-			Assert.notNull( springSecurityModule );
-
-			delegate = AcrossContextUtils.getBeanOfType( springSecurityModule, AuthenticationManagerBuilder.class )
-			                             .getOrBuild();
+			delegate = contextBeanRegistry
+					.getBeanOfTypeFromModule( SpringSecurityModule.NAME, AuthenticationManagerBuilder.class )
+					.getOrBuild();
 		}
 	}
 

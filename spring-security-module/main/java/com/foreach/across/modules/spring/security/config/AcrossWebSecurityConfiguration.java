@@ -1,8 +1,7 @@
 package com.foreach.across.modules.spring.security.config;
 
-import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.core.context.AcrossContextUtils;
+import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer;
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapper;
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapperFactory;
@@ -39,7 +38,7 @@ public class AcrossWebSecurityConfiguration
 	private ApplicationContext applicationContext;
 
 	@Autowired
-	private AcrossContext context;
+	private AcrossContextBeanRegistry contextBeanRegistry;
 
 	@PostConstruct
 	public void registerThymeleafDialect() {
@@ -82,7 +81,7 @@ public class AcrossWebSecurityConfiguration
 	@Bean(name = "autowiredWebSecurityConfigurersIgnoreParents")
 	public Set<WebSecurityConfigurer> autowiredWebSecurityConfigurersIgnoreParents() {
 		Collection<SpringSecurityWebConfigurer> configurers =
-				AcrossContextUtils.getBeansOfType( context, SpringSecurityWebConfigurer.class, true );
+				contextBeanRegistry.getBeansOfType( SpringSecurityWebConfigurer.class, true );
 
 		WebSecurityConfigurerSet webSecurityConfigurers = new WebSecurityConfigurerSet();
 		webSecurityConfigurers.addAll( applicationContext.getBeansOfType( WebSecurityConfigurer.class ).values() );
