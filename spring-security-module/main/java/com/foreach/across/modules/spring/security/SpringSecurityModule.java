@@ -12,6 +12,7 @@ import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.core.filters.NamedBeanFilter;
 import com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration;
 import com.foreach.across.modules.spring.security.config.ModuleGlobalMethodSecurityConfiguration;
+import com.foreach.across.modules.spring.security.installers.AclSchemaInstaller;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration;
@@ -47,6 +48,11 @@ public class SpringSecurityModule extends AcrossModule
 	@Override
 	public String getDescription() {
 		return "Hooks up Spring Security.  Requires at least one custom WebSecurityConfigurer class to be added at runtime.";
+	}
+
+	@Override
+	public Object[] getInstallers() {
+		return new Object[] { AclSchemaInstaller.class };
 	}
 
 	@Override
