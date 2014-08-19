@@ -14,7 +14,6 @@ import java.util.Set;
 
 public abstract class HibernateBitFlag implements UserType
 {
-
 	private final IntegerType TYPE = IntegerType.INSTANCE;
 	private final Class clazz;
 
