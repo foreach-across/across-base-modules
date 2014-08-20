@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,10 +25,18 @@ public class ITSpringSecurityWithoutWeb
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
 
+	@Autowired(required = false)
+	private MutableAclService aclService;
+
 	@Test
 	public void authenticationManagerBuilderShouldExist() {
 		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME,
 		                                                            AuthenticationManagerBuilder.class ) );
+	}
+
+	@Test
+	public void aclServiceShouldExist() {
+		assertNotNull( aclService );
 	}
 
 	@Configuration

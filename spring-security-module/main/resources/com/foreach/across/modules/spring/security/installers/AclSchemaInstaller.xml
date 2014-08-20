@@ -14,7 +14,7 @@
 	</changeSet>
 
 	<!-- HSQLDB -->
-	<changeSet id="201408191339" author="arne" dbms="hsql">
+	<changeSet id="201408191339" author="arne" dbms="hsqldb">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="acl_sid"/>
