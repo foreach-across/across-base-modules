@@ -10,6 +10,7 @@ import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
 import com.foreach.across.core.filters.BeanFilterComposite;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.core.filters.NamedBeanFilter;
+import com.foreach.across.modules.spring.security.config.AclSecurityConfiguration;
 import com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration;
 import com.foreach.across.modules.spring.security.config.ModuleGlobalMethodSecurityConfiguration;
 import com.foreach.across.modules.spring.security.installers.AclSchemaInstaller;
@@ -57,7 +58,8 @@ public class SpringSecurityModule extends AcrossModule
 
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-		contextConfigurers.add( new AnnotatedClassConfigurer( AcrossWebSecurityConfiguration.class ) );
+		contextConfigurers.add( new AnnotatedClassConfigurer( AcrossWebSecurityConfiguration.class,
+		                                                      AclSecurityConfiguration.class ) );
 	}
 
 	@Override
