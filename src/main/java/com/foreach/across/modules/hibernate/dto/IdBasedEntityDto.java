@@ -1,5 +1,6 @@
 package com.foreach.across.modules.hibernate.dto;
 
+import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import org.springframework.beans.BeanUtils;
 
 import java.util.Objects;
@@ -9,7 +10,7 @@ import java.util.Objects;
  *
  * @author Arne Vandamme
  */
-public class IdBasedEntityDto<T>
+public class IdBasedEntityDto<T extends IdBasedEntity>
 {
     private long id;
     private Boolean newEntity;

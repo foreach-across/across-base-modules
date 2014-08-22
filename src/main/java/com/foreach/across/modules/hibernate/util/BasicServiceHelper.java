@@ -1,5 +1,6 @@
 package com.foreach.across.modules.hibernate.util;
 
+import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.hibernate.dto.IdBasedEntityDto;
 import com.foreach.across.modules.hibernate.repositories.BasicRepository;
 import org.springframework.beans.BeanUtils;
@@ -27,7 +28,7 @@ public class BasicServiceHelper
 	 * @see com.foreach.across.modules.hibernate.repositories.BasicRepository
 	 * @see com.foreach.across.modules.hibernate.repositories.BasicRepositoryImpl
 	 */
-	public static <T> T save( IdBasedEntityDto<T> dto, Class<T> entityClass, BasicRepository<T> repository ) {
+	public static <T extends IdBasedEntity> T save( IdBasedEntityDto<T> dto, Class<T> entityClass, BasicRepository<T> repository ) {
 		T entity;
 
 		if ( !dto.isNewEntity() ) {
