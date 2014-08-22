@@ -2,6 +2,7 @@ package com.foreach.across.modules.spring.security.config;
 
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.database.DatabaseInfo;
+import com.foreach.across.modules.spring.security.business.SecurityPrincipalSidRetrievalStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,10 @@ public class AclSecurityConfiguration
 
 	@Bean
 	public AclPermissionEvaluator aclPermissionEvaluator() {
-		return new AclPermissionEvaluator( aclService() );
+		AclPermissionEvaluator evaluator = new AclPermissionEvaluator( aclService() );
+		evaluator.setSidRetrievalStrategy( new SecurityPrincipalSidRetrievalStrategy() );
+
+		return evaluator;
 	}
 
 	@Bean
