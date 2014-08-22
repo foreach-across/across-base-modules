@@ -1,5 +1,8 @@
-package com.foreach.across.modules.spring.security.business;
+package com.foreach.across.modules.spring.security.strategy;
 
+import com.foreach.across.modules.spring.security.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.business.SecurityPrincipalHierarchy;
+import com.foreach.across.modules.spring.security.business.SecurityPrincipalSid;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.Sid;
@@ -16,7 +19,7 @@ import java.util.List;
  * General implementation of {@link org.springframework.security.acls.model.SidRetrievalStrategy}
  * supporting {@link com.foreach.across.modules.spring.security.business.SecurityPrincipal} and
  * {@link com.foreach.across.modules.spring.security.business.SecurityPrincipalHierarchy} implementations.
- *
+ * <p/>
  * All parent sids (eg. user groups the user principal belongs to) will be added right after the principal
  * sid but before any authorities.
  *
@@ -37,14 +40,14 @@ public class SecurityPrincipalSidRetrievalStrategy implements SidRetrievalStrate
 		List<Sid> sids = new ArrayList<>( authorities.size() + 1 + parents.size() );
 
 		if ( principal instanceof SecurityPrincipal ) {
-			sids.add( new PrincipalSid( ( (SecurityPrincipal) principal ).getPrincipalId() ) );
+			sids.add( new SecurityPrincipalSid( (SecurityPrincipal) principal ) );
 		}
 		else {
 			sids.add( new PrincipalSid( authentication ) );
 		}
 
 		for ( SecurityPrincipal parent : parents ) {
-			sids.add( new PrincipalSid( parent.getPrincipalId() ) );
+			sids.add( new SecurityPrincipalSid( parent ) );
 		}
 
 		for ( GrantedAuthority authority : authorities ) {
