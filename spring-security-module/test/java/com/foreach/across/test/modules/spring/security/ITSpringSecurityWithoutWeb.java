@@ -25,9 +25,6 @@ public class ITSpringSecurityWithoutWeb
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
 
-	@Autowired(required = false)
-	private MutableAclService aclService;
-
 	@Test
 	public void authenticationManagerBuilderShouldExist() {
 		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME,
@@ -36,7 +33,8 @@ public class ITSpringSecurityWithoutWeb
 
 	@Test
 	public void aclServiceShouldExist() {
-		assertNotNull( aclService );
+		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME,
+		                                                            MutableAclService.class ) );
 	}
 
 	@Configuration
