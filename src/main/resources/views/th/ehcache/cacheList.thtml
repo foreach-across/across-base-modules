@@ -54,6 +54,13 @@
 			</tr>
 		</table>
 	</div>
+
+    <div class="clearfix">
+    Cache manager providers:
+        <ul>
+            <li class="cachePeer" th:each="cacheManagerProvider : ${cacheManagerProviders}"><span th:text="${cacheManagerProvider}"></span></li>
+        </ul>
+    </div>
 </div>
 </body>
 </html>

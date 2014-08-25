@@ -14,6 +14,9 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.distribution.CacheManagerPeerProvider;
+import net.sf.ehcache.distribution.CachePeer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -22,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.rmi.RemoteException;
+import java.util.*;
 
 @DebugWebController
 @Refreshable
@@ -56,6 +59,9 @@ public class DebugEhcacheController
 
 		model.addAttribute( "cacheList", caches );
 
+		Map<String, CacheManagerPeerProvider> cacheManagerPeerProviders = cacheManager.getCacheManagerPeerProviders();
+		model.addAttribute( "cacheManagerProviders", cacheManagerPeerProviders.keySet() );
+
 		return "th/ehcache/cacheList";
 	}
 
@@ -72,7 +78,9 @@ public class DebugEhcacheController
 	}
 
 	@RequestMapping(value = "/ehcache/view", method = RequestMethod.GET)
-	public String showCache( @RequestParam("cache") String cacheName, Model model ) {
+	public String showCache( @RequestParam("cache") String cacheName,
+	                         @RequestParam(value = "listPeers", defaultValue = StringUtils.EMPTY ) String listPeers,
+	                         Model model ) {
 		Cache cache = cacheManager.getCache( cacheName );
 
 		Table table = new Table();
@@ -92,6 +100,30 @@ public class DebugEhcacheController
 
 		model.addAttribute( "cache", cache );
 		model.addAttribute( "cacheEntries", table );
+
+		if( StringUtils.equalsIgnoreCase( "true", listPeers ) ) {
+			List<String> cachePeers = new ArrayList<>();
+			Map<String,CacheManagerPeerProvider> cacheManagerPeerProviders = cacheManager.getCacheManagerPeerProviders();
+			for( Map.Entry<String, CacheManagerPeerProvider> cacheManagerPeerProviderEntry : cacheManagerPeerProviders.entrySet() ) {
+				List cachePeersList =  cacheManagerPeerProviderEntry.getValue().listRemoteCachePeers( cache );
+				for( Object object : cachePeersList ) {
+					if( object instanceof CachePeer ) {
+						CachePeer cachePeer = ( CachePeer ) object;
+						String cachePeerItem = cacheManagerPeerProviderEntry.getKey();
+						try {
+							cachePeerItem = ", " + cachePeer.getUrl() + " " + cachePeer.getGuid();
+						}
+						catch ( RemoteException e ) {
+							cachePeerItem += " - remote exception occurred";
+						}
+						cachePeers.add( cacheManagerPeerProviderEntry.getKey() + ", " + cachePeerItem );
+					}
+				}
+			}
+			model.addAttribute( "cachePeers", cachePeers );
+		} else  {
+			model.addAttribute( "cachePeers", "none" );
+		}
 
 		return "th/ehcache/cacheDetail";
 	}

@@ -3,6 +3,10 @@ div.cache {
   float: left;
 }
 
+.clearfix {
+  clear: both;
+}
+
 table.cache-details {
   border: solid 1px silver;
   margin: 10px;

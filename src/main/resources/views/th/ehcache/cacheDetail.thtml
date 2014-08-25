@@ -17,5 +17,20 @@
 	<div><span th:text="${cacheEntries.size()}">0</span> entries in the cache</div>
 	<table th:replace="th/across :: table (${cacheEntries})"/>
 </div>
+
+    <div class="clearfix row">
+    Cache peers - <a th:href="@{${@debugWeb.path('/ehcache/view')}(cache=${cache.name},listPeers=true)}">show</a>:
+        <div th:switch="${cachePeers}">
+            <p th:case="'none'"><div>Click 'show' to list the peers</div></p>
+            <p th:case="*">
+                <ul th:unless="${#lists.isEmpty(cachePeers)}">>
+                    <li class="cachePeer" th:each="cachePeer : ${cachePeers}"><span th:text="${cachePeer}"></span></li>
+                </ul>
+                <div th:if="${#lists.isEmpty(cachePeers)}">No cache peers</div>
+            </p>
+        </div>
+
+    </div>
+
 </body>
 </html>
