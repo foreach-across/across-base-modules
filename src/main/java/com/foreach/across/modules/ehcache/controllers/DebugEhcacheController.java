@@ -67,11 +67,17 @@ public class DebugEhcacheController
 
 	@RequestMapping(value = "/ehcache/flush", method = RequestMethod.GET)
 	public String flushCache( @RequestParam(value = "cache", required = false) String cacheName,
-	                          @RequestParam(value = "from", required = false) String from ) {
+	                          @RequestParam(value = "from", required = false) String from,
+	                          @RequestParam(value = "replicate", required = false, defaultValue = "false" ) String replicate) {
 		String[] cachesToFlush = cacheName == null ? cacheManager.getCacheNames() : new String[] { cacheName };
 
+
 		for ( String cache : cachesToFlush ) {
-			cacheManager.getCache( cache ).flush();
+			if( StringUtils.equalsIgnoreCase( replicate, "true" ) ) {
+				cacheManager.getCache( cache ).removeAll();
+			} else {
+				cacheManager.getCache( cache ).flush();
+			}
 		}
 
 		return debugWeb.redirect( "/ehcache?flushed=" + cachesToFlush.length );

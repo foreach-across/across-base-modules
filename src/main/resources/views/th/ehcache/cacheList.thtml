@@ -12,7 +12,8 @@
 	</div>
 
 	<div>
-		<a th:href="@{${@debugWeb.path('/ehcache/flush')}}" onclick="return confirm('Are you sure you want to flush all caches?');">flush</a>
+		<a th:href="@{${@debugWeb.path('/ehcache/flush')}}" onclick="return confirm('Are you sure you want to flush all caches?');">flush</a> -
+		<a th:href="@{${@debugWeb.path('/ehcache/flush')}(replicate=true)}" onclick="return confirm('Are you sure you want to flush all caches?');">flush and replicate</a> -
 		<a th:href="@{${@debugWeb.path('/ehcache')}}">refresh</a>
 	</div>
 
