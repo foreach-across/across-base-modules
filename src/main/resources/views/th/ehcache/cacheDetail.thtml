@@ -23,7 +23,7 @@
         <div th:switch="${cachePeers}">
             <p th:case="'none'"><div>Click 'show' to list the peers</div></p>
             <p th:case="*">
-                <ul th:unless="${#lists.isEmpty(cachePeers)}">>
+                <ul th:unless="${#lists.isEmpty(cachePeers)}">
                     <li class="cachePeer" th:each="cachePeer : ${cachePeers}"><span th:text="${cachePeer}"></span></li>
                 </ul>
                 <div th:if="${#lists.isEmpty(cachePeers)}">No cache peers</div>
