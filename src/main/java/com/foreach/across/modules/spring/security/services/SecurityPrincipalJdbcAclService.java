@@ -21,30 +21,4 @@ public class SecurityPrincipalJdbcAclService extends JdbcMutableAclService
 	                                        AclCache aclCache ) {
 		super( dataSource, lookupStrategy, aclCache );
 	}
-
-	/**
-	 * Custom implementation supporting the {@link com.foreach.across.modules.spring.security.business.SecurityPrincipalSid}.
-	 */
-	@Override
-	public MutableAcl createAcl( ObjectIdentity objectIdentity ) throws AlreadyExistsException {
-		Assert.notNull( objectIdentity, "Object Identity required" );
-
-		// Check this object identity hasn't already been persisted
-		if ( retrieveObjectIdentityPrimaryKey( objectIdentity ) != null ) {
-			throw new AlreadyExistsException( "Object identity '" + objectIdentity + "' already exists" );
-		}
-
-		// Need to retrieve the current principal, in order to know who "owns" this ACL (can be changed later on)
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		PrincipalSid sid = SecurityPrincipalSid.forAuthentication( auth );
-
-		// Create the acl_object_identity row
-		createObjectIdentity( objectIdentity, sid );
-
-		// Retrieve the ACL via superclass (ensures cache registration, proper retrieval etc)
-		Acl acl = readAclById( objectIdentity );
-		Assert.isInstanceOf( MutableAcl.class, acl, "MutableAcl should be been returned" );
-
-		return (MutableAcl) acl;
-	}
 }

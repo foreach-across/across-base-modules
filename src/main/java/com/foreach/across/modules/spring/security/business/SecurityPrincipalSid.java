@@ -11,7 +11,7 @@ import org.springframework.util.Assert;
 public class SecurityPrincipalSid extends PrincipalSid
 {
 	public SecurityPrincipalSid( SecurityPrincipal principal ) {
-		super( principal.getPrincipalId() );
+		super( principal.getPrincipalName() );
 	}
 
 	public static PrincipalSid forAuthentication( Authentication authentication ) {
