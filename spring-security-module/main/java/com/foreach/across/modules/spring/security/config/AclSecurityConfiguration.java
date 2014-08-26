@@ -2,7 +2,6 @@ package com.foreach.across.modules.spring.security.config;
 
 import com.foreach.across.core.database.DatabaseInfo;
 import com.foreach.across.modules.spring.security.services.SecurityPrincipalJdbcAclService;
-import com.foreach.across.modules.spring.security.strategy.SecurityPrincipalAclAuthorizationStrategy;
 import com.foreach.across.modules.spring.security.strategy.SecurityPrincipalSidRetrievalStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +11,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.acls.AclPermissionEvaluator;
-import org.springframework.security.acls.domain.AclAuthorizationStrategy;
-import org.springframework.security.acls.domain.ConsoleAuditLogger;
-import org.springframework.security.acls.domain.DefaultPermissionGrantingStrategy;
-import org.springframework.security.acls.domain.SpringCacheBasedAclCache;
+import org.springframework.security.acls.domain.*;
 import org.springframework.security.acls.jdbc.BasicLookupStrategy;
 import org.springframework.security.acls.jdbc.JdbcMutableAclService;
 import org.springframework.security.acls.jdbc.LookupStrategy;
@@ -137,7 +133,7 @@ public class AclSecurityConfiguration
 
 	@Bean
 	public AclAuthorizationStrategy aclAuthorizationStrategy() {
-		SecurityPrincipalAclAuthorizationStrategy strategy = new SecurityPrincipalAclAuthorizationStrategy(
+		AclAuthorizationStrategyImpl strategy = new AclAuthorizationStrategyImpl(
 				new SimpleGrantedAuthority( "manage user roles" )
 		);
 		strategy.setSidRetrievalStrategy( sidRetrievalStrategy() );
