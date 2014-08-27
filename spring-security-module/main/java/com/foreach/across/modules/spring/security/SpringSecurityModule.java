@@ -46,7 +46,6 @@ public class SpringSecurityModule extends AcrossModule
 	protected void setContext( AcrossContext context ) {
 		super.setContext( context );
 
-		context.addModule( new SpringSecurityAclModule() );
 		context.addModule( new SpringSecurityInfrastructureModule() );
 	}
 

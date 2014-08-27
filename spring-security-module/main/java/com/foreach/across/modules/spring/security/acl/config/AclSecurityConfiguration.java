@@ -1,6 +1,7 @@
 package com.foreach.across.modules.spring.security.acl.config;
 
 import com.foreach.across.core.database.DatabaseInfo;
+import com.foreach.across.modules.spring.security.acl.business.AclAuthorities;
 import com.foreach.across.modules.spring.security.acl.services.AclSecurityService;
 import com.foreach.across.modules.spring.security.acl.services.AclSecurityServiceImpl;
 import com.foreach.across.modules.spring.security.acl.services.SecurityPrincipalJdbcAclService;
@@ -141,7 +142,9 @@ public class AclSecurityConfiguration
 	@Bean
 	public AclAuthorizationStrategy aclAuthorizationStrategy() {
 		AclAuthorizationStrategyImpl strategy = new AclAuthorizationStrategyImpl(
-				new SimpleGrantedAuthority( "manage user roles" )
+				new SimpleGrantedAuthority( AclAuthorities.TAKE_OWNERSHIP ),
+				new SimpleGrantedAuthority( AclAuthorities.AUDIT_ACL ),
+				new SimpleGrantedAuthority( AclAuthorities.MODIFY_ACL )
 		);
 		strategy.setSidRetrievalStrategy( sidRetrievalStrategy() );
 
