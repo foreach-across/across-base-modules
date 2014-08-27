@@ -1,4 +1,4 @@
-package com.foreach.across.modules.spring.security.installers;
+package com.foreach.across.modules.spring.security.acl.installers;
 
 import com.foreach.across.core.annotations.Installer;
 import com.foreach.across.core.installers.AcrossLiquibaseInstaller;

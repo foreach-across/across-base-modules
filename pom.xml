@@ -22,6 +22,11 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
+			<groupId>across-standard-modules</groupId>
+			<artifactId>across-hibernate</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity3</artifactId>
 			<version>2.1.1.RELEASE</version>

@@ -1,4 +1,4 @@
-package com.foreach.across.modules.spring.security.business;
+package com.foreach.across.modules.spring.security.acl.business;
 
 import org.springframework.security.acls.domain.AbstractPermission;
 
