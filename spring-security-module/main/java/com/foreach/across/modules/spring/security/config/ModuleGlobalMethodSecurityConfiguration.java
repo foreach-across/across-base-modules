@@ -4,10 +4,12 @@ import com.foreach.across.core.annotations.PostRefresh;
 import com.foreach.across.core.annotations.Refreshable;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
+import com.foreach.across.modules.spring.security.acl.SpringSecurityAclModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.acls.AclPermissionEvaluator;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -28,6 +30,7 @@ public class ModuleGlobalMethodSecurityConfiguration extends GlobalMethodSecurit
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
 
+	/*
 	@Bean
 	@Refreshable
 	PermissionEvaluator permissionEvaluator() {
@@ -53,11 +56,11 @@ public class ModuleGlobalMethodSecurityConfiguration extends GlobalMethodSecurit
 			@PostRefresh
 			public void refresh() {
 				delegate = contextBeanRegistry
-						.getBeanOfTypeFromModule( SpringSecurityModule.NAME, PermissionEvaluator.class );
+						.getBeanOfTypeFromModule( SpringSecurityAclModule.NAME, AclPermissionEvaluator.class );
 			}
 		};
 	}
-
+*/
 	@Bean
 	@Refreshable
 	AuthenticationManager delegatingClientAuthenticationManager() {

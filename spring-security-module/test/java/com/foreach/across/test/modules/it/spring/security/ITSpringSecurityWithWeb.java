@@ -1,4 +1,4 @@
-package com.foreach.across.test.modules.spring.security;
+package com.foreach.across.test.modules.it.spring.security;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;

@@ -1,9 +1,12 @@
-package com.foreach.across.test.modules.spring.security;
+package com.foreach.across.test.modules.it.spring.security;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
+import com.foreach.across.modules.spring.security.acl.SpringSecurityAclModule;
+import com.foreach.across.modules.spring.security.acl.services.AclSecurityService;
+import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
 import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +28,12 @@ public class ITSpringSecurityWithoutWeb
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
 
+	@Autowired(required = false)
+	private AclSecurityService aclSecurityService;
+
+	@Autowired(required = false)
+	private SecurityPrincipalService securityPrincipalService;
+
 	@Test
 	public void authenticationManagerBuilderShouldExist() {
 		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME,
@@ -33,8 +42,14 @@ public class ITSpringSecurityWithoutWeb
 
 	@Test
 	public void aclServiceShouldExist() {
-		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME,
+		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityAclModule.NAME,
 		                                                            MutableAclService.class ) );
+		assertNotNull( aclSecurityService );
+	}
+
+	@Test
+	public void securityPrincipalServiceShouldExist() {
+		assertNotNull( securityPrincipalService );
 	}
 
 	@Configuration

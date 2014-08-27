@@ -1,8 +1,8 @@
-package com.foreach.across.modules.spring.security.strategy;
+package com.foreach.across.modules.spring.security.acl.strategy;
 
-import com.foreach.across.modules.spring.security.business.SecurityPrincipal;
-import com.foreach.across.modules.spring.security.business.SecurityPrincipalHierarchy;
-import com.foreach.across.modules.spring.security.business.SecurityPrincipalSid;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalHierarchy;
+import com.foreach.across.modules.spring.security.acl.business.SecurityPrincipalSid;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.Sid;
@@ -17,8 +17,8 @@ import java.util.List;
 
 /**
  * General implementation of {@link org.springframework.security.acls.model.SidRetrievalStrategy}
- * supporting {@link com.foreach.across.modules.spring.security.business.SecurityPrincipal} and
- * {@link com.foreach.across.modules.spring.security.business.SecurityPrincipalHierarchy} implementations.
+ * supporting {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal} and
+ * {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalHierarchy} implementations.
  * <p/>
  * All parent sids (eg. user groups the user principal belongs to) will be added right after the principal
  * sid but before any authorities.

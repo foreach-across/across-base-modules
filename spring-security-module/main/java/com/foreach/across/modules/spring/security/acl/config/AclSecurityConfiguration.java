@@ -1,8 +1,10 @@
-package com.foreach.across.modules.spring.security.config;
+package com.foreach.across.modules.spring.security.acl.config;
 
 import com.foreach.across.core.database.DatabaseInfo;
-import com.foreach.across.modules.spring.security.services.SecurityPrincipalJdbcAclService;
-import com.foreach.across.modules.spring.security.strategy.SecurityPrincipalSidRetrievalStrategy;
+import com.foreach.across.modules.spring.security.acl.services.AclSecurityService;
+import com.foreach.across.modules.spring.security.acl.services.AclSecurityServiceImpl;
+import com.foreach.across.modules.spring.security.acl.services.SecurityPrincipalJdbcAclService;
+import com.foreach.across.modules.spring.security.acl.strategy.SecurityPrincipalSidRetrievalStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +70,11 @@ public class AclSecurityConfiguration
 		}
 
 		return aclService;
+	}
+
+	@Bean
+	public AclSecurityService aclSecurityService() {
+		return new AclSecurityServiceImpl();
 	}
 
 	@Bean
