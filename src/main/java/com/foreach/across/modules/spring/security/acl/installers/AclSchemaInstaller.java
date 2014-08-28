@@ -6,7 +6,7 @@ import com.foreach.across.core.installers.AcrossLiquibaseInstaller;
 /**
  * @author Arne Vandamme
  */
-@Installer(description = "Installs the ACL database schema", version = 1)
+@Installer(description = "Installs the ACL database schema", version = 2)
 public class AclSchemaInstaller extends AcrossLiquibaseInstaller
 {
 }

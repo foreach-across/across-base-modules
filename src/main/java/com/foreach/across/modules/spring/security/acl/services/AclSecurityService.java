@@ -2,6 +2,7 @@ package com.foreach.across.modules.spring.security.acl.services;
 
 import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.spring.security.acl.business.AclPermission;
+import com.foreach.across.modules.spring.security.acl.business.AclSecurityEntity;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.springframework.security.acls.model.MutableAcl;
 import org.springframework.security.core.Authentication;
@@ -50,7 +51,13 @@ public interface AclSecurityService
 
 	void changeAclOwner( MutableAcl acl, SecurityPrincipal principal );
 
+	void changeAclParent( IdBasedEntity entity, IdBasedEntity parent );
+
+	void changeAclParent( MutableAcl acl, IdBasedEntity parent );
+
 	boolean hasPermission( Authentication authentication, IdBasedEntity entity, AclPermission permission );
 
 	boolean hasPermission( SecurityPrincipal principal, IdBasedEntity entity, AclPermission permission );
+
+	void setDefaultParentAcl( IdBasedEntity entity );
 }

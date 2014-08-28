@@ -8,10 +8,14 @@ import com.foreach.across.core.context.bootstrap.AcrossBootstrapConfig;
 import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
+import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.modules.hibernate.provider.HasHibernatePackageProvider;
+import com.foreach.across.modules.hibernate.provider.HibernatePackageProvider;
+import com.foreach.across.modules.hibernate.provider.PackagesToScanProvider;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.modules.spring.security.acl.config.AclSecurityConfiguration;
-import com.foreach.across.modules.spring.security.acl.config.modules.BasicRepositoryAclInterceptConfiguration;
 import com.foreach.across.modules.spring.security.acl.config.ModuleAclSecurityConfiguration;
+import com.foreach.across.modules.spring.security.acl.config.modules.AcrossHibernateModuleConfiguration;
 import com.foreach.across.modules.spring.security.acl.installers.AclSchemaInstaller;
 import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
 
@@ -25,7 +29,7 @@ import java.util.Set;
 		required = { SpringSecurityModule.NAME, SpringSecurityInfrastructureModule.NAME },
 		optional = "EhcacheModule"
 )
-public class SpringSecurityAclModule extends AcrossModule
+public class SpringSecurityAclModule extends AcrossModule implements HasHibernatePackageProvider
 {
 	public static final String NAME = "SpringSecurityAclModule";
 
@@ -42,7 +46,16 @@ public class SpringSecurityAclModule extends AcrossModule
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
 		contextConfigurers.add( new AnnotatedClassConfigurer( AclSecurityConfiguration.class,
-		                                                      BasicRepositoryAclInterceptConfiguration.class ) );
+		                                                      AcrossHibernateModuleConfiguration.class ) );
+	}
+
+	@Override
+	public HibernatePackageProvider getHibernatePackageProvider( AcrossHibernateModule hibernateModule ) {
+		if ( hibernateModule.getName().equals( "AcrossHibernateModule" ) ) {
+			return new PackagesToScanProvider( "com.foreach.across.modules.spring.security.acl.business" );
+		}
+
+		return null;
 	}
 
 	@Override

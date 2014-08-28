@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 import java.util.*;
@@ -26,16 +27,23 @@ import java.util.*;
 public class AclSecurityServiceImpl implements AclSecurityService
 {
 	@Autowired
-	private MutableAclService fetchedAclService;
+	private MutableAclService aclService;
 
 	@Autowired
-	private PermissionEvaluator fetchedAclPermissionEvaluator;
+	private PermissionEvaluator aclPermissionEvaluator;
+
+	private IdBasedEntity defaultParent;
+
+	@Override
+	public void setDefaultParentAcl( IdBasedEntity entity ) {
+		defaultParent = entity;
+	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public MutableAcl getAcl( IdBasedEntity entity ) {
 		try {
-			return (MutableAcl) aclService().readAclById( identity( entity ) );
+			return (MutableAcl) aclService.readAclById( identity( entity ) );
 		}
 		catch ( NotFoundException nfe ) {
 			return null;
@@ -45,35 +53,41 @@ public class AclSecurityServiceImpl implements AclSecurityService
 	@Transactional
 	@Override
 	public MutableAcl createAcl( IdBasedEntity entity ) {
-		return createAclWithParent( entity, null );
+		Assert.notNull( entity );
+
+		return createAclWithParent( entity, !entity.equals( defaultParent ) ? defaultParent : null );
 	}
 
 	@Transactional
 	@Override
 	public MutableAcl createAclWithParent( IdBasedEntity entity, IdBasedEntity parent ) {
-		MutableAclService aclService = aclService();
+		Assert.notNull( entity );
 
 		ObjectIdentity oi = identity( entity );
-
 		MutableAcl acl;
-
-		boolean update = false;
 
 		try {
 			acl = (MutableAcl) aclService.readAclById( oi );
+
+			changeAclParent( acl, parent );
+
+			return acl;
 		}
 		catch ( NotFoundException nfe ) {
 			acl = aclService.createAcl( oi );
-			update = true;
 		}
 
-		if ( parent != null && !parent.equals( acl.getParentAcl() ) ) {
-			Acl parentAcl = aclService.readAclById( identity( parent ) );
+		if ( parent != null ) {
+			Acl parentAcl = getAcl( parent );
+
+			if ( parentAcl == null ) {
+				parentAcl = createAcl( parent );
+			}
+
 			acl.setParent( parentAcl );
-			update = true;
 		}
 
-		return update ? aclService.updateAcl( acl ) : acl;
+		return aclService.updateAcl( acl );
 	}
 
 	@Transactional
@@ -149,7 +163,7 @@ public class AclSecurityServiceImpl implements AclSecurityService
 	}
 
 	private void updateAces( Sid sid, IdBasedEntity entity, Boolean grantAction, AclPermission... aclPermissions ) {
-		MutableAclService service = aclService();
+		MutableAclService service = aclService;
 
 		boolean shouldRevoke = grantAction == null;
 		ObjectIdentity objectIdentity = identity( entity );
@@ -160,7 +174,7 @@ public class AclSecurityServiceImpl implements AclSecurityService
 			acl = (MutableAcl) service.readAclById( objectIdentity );
 		}
 		catch ( NotFoundException nfe ) {
-			acl = fetchedAclService.createAcl( objectIdentity );
+			acl = aclService.createAcl( objectIdentity );
 		}
 
 		List<AccessControlEntry> aces = acl.getEntries();
@@ -181,7 +195,7 @@ public class AclSecurityServiceImpl implements AclSecurityService
 			}
 		}
 
-		fetchedAclService.updateAcl( acl );
+		aclService.updateAcl( acl );
 	}
 
 	private AccessControlEntry findAce( List<AccessControlEntry> aces, Sid sid, AclPermission permission ) {
@@ -196,13 +210,13 @@ public class AclSecurityServiceImpl implements AclSecurityService
 	@Transactional
 	@Override
 	public void deleteAcl( IdBasedEntity entity, boolean deleteChildren ) {
-		aclService().deleteAcl( identity( entity ), deleteChildren );
+		aclService.deleteAcl( identity( entity ), deleteChildren );
 	}
 
 	@Transactional
 	@Override
 	public MutableAcl updateAcl( MutableAcl acl ) {
-		return aclService().updateAcl( acl );
+		return aclService.updateAcl( acl );
 	}
 
 	@Transactional
@@ -212,10 +226,41 @@ public class AclSecurityServiceImpl implements AclSecurityService
 		updateAcl( acl );
 	}
 
+	@Transactional
+	@Override
+	public void changeAclParent( IdBasedEntity entity, IdBasedEntity parent ) {
+		changeAclParent( getAcl( entity ), parent );
+	}
+
+	@Transactional
+	@Override
+	public void changeAclParent( MutableAcl acl, IdBasedEntity parent ) {
+		if ( acl != null ) {
+			Acl parentAcl = acl.getParentAcl();
+
+			if ( parent == null && parentAcl != null ) {
+				acl.setParent( null );
+				updateAcl( acl );
+			}
+			else if ( parent != null ) {
+				Acl newParentAcl = getAcl( parent );
+
+				if ( newParentAcl == null ) {
+					newParentAcl = createAcl( parent );
+				}
+
+				if ( parentAcl == null || !parentAcl.getObjectIdentity().equals( newParentAcl.getObjectIdentity() ) ) {
+					acl.setParent( newParentAcl );
+					updateAcl( acl );
+				}
+			}
+		}
+	}
+
 	@Transactional(readOnly = true)
 	@Override
 	public boolean hasPermission( Authentication authentication, IdBasedEntity entity, AclPermission permission ) {
-		return aclPermissionEvaluator().hasPermission( authentication, entity, permission );
+		return aclPermissionEvaluator.hasPermission( authentication, entity, permission );
 	}
 
 	@Transactional(readOnly = true)
@@ -227,7 +272,7 @@ public class AclSecurityServiceImpl implements AclSecurityService
 
 		try {
 			// Lookup only ACLs for SIDs we're interested in
-			Acl acl = aclService().readAclById( identity( entity ), sids );
+			Acl acl = aclService.readAclById( identity( entity ), sids );
 
 			if ( acl.isGranted( aclPermissions, sids, false ) ) {
 				return true;
@@ -282,13 +327,5 @@ public class AclSecurityServiceImpl implements AclSecurityService
 
 	private ObjectIdentity identity( IdBasedEntity entity ) {
 		return new ObjectIdentityImpl( ClassUtils.getUserClass( entity.getClass() ), entity.getId() );
-	}
-
-	private MutableAclService aclService() {
-		return fetchedAclService;
-	}
-
-	private PermissionEvaluator aclPermissionEvaluator() {
-		return fetchedAclPermissionEvaluator;
 	}
 }

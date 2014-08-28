@@ -5,12 +5,13 @@ import com.foreach.across.modules.spring.security.acl.services.AclSecurityServic
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.Assert;
+
+import java.lang.reflect.ParameterizedType;
 
 /**
  * Base class for an interceptor hooked to {@link com.foreach.across.modules.hibernate.repositories.BasicRepository}
  * persistence methods.  Useful for creating ACLs when saving or deleting instances.
- *
+ * <p/>
  * Implementations will be picked up automatically by the
  * {@link com.foreach.across.modules.spring.security.acl.aop.BasicRepositoryAclInterceptor} if it is active.
  *
@@ -20,20 +21,14 @@ public abstract class IdBasedEntityAclInterceptor<T extends IdBasedEntity>
 {
 	private final Class<T> entityClass;
 
-	private AclSecurityService aclSecurityService;
+	protected final AclSecurityService aclSecurityService;
 
-	public IdBasedEntityAclInterceptor( Class<T> entityClass ) {
-		Assert.notNull( entityClass );
-
-		this.entityClass = entityClass;
-	}
-
-	public void setAclSecurityService( AclSecurityService aclSecurityService ) {
+	@SuppressWarnings("unchecked")
+	public IdBasedEntityAclInterceptor( AclSecurityService aclSecurityService ) {
 		this.aclSecurityService = aclSecurityService;
-	}
 
-	protected AclSecurityService aclSecurityService() {
-		return aclSecurityService;
+		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
+		this.entityClass = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
 	}
 
 	/**
