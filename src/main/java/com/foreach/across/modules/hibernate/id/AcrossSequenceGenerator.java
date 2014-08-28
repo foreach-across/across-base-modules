@@ -62,6 +62,8 @@ public class AcrossSequenceGenerator extends TableGenerator
 			throw new MappingException( "A sequenceName is required for a Across sequence generator" );
 		}
 
+		int allocationSize = 50;
+
 		Properties props = new Properties();
 		props.putAll( params );
 		props.put( SCHEMA, "" );
@@ -71,8 +73,8 @@ public class AcrossSequenceGenerator extends TableGenerator
 		props.put( SEGMENT_COLUMN_PARAM, AcrossSchemaConfiguration.SEQUENCE_NAME );
 		props.put( SEGMENT_VALUE_PARAM, pkColumnValue );
 		props.put( VALUE_COLUMN_PARAM, AcrossSchemaConfiguration.SEQUENCE_VALUE );
-		props.put( INCREMENT_PARAM, "50" );
-		props.put( INITIAL_PARAM, "1" );
+		props.put( INCREMENT_PARAM, String.valueOf( allocationSize ) );
+		props.put( INITIAL_PARAM, allocationSize + 1 );
 
 		// Unless explicitly overruled, we use a pooled optimizer
 		props.put( OPT_PARAM, OptimizerFactory.StandardOptimizerDescriptor.POOLED.getExternalName() );
@@ -82,12 +84,14 @@ public class AcrossSequenceGenerator extends TableGenerator
 			props.put( OPT_PARAM, params.getProperty( OPT_PARAM ) );
 		}
 
-		if ( params.contains( "initialValue" ) ) {
-			props.put( INITIAL_PARAM, String.valueOf( Integer.valueOf( params.getProperty( "initialValue" ) ) + 1 ) );
+		if ( params.contains( "allocationSize" ) ) {
+			allocationSize = Integer.valueOf( params.getProperty( "allocationSize" ) );
+			props.put( INCREMENT_PARAM, String.valueOf( allocationSize ) );
 		}
 
-		if ( params.contains( "allocationSize" ) ) {
-			props.put( INCREMENT_PARAM, String.valueOf( Integer.valueOf( params.getProperty( "allocationSize" ) ) ) );
+		if ( params.contains( "initialValue" ) ) {
+			props.put( INITIAL_PARAM, String.valueOf( Integer.valueOf( params.getProperty(
+					"initialValue" ) ) + allocationSize ) );
 		}
 
 		if ( params.contains( "supportPredefinedIds" ) ) {
