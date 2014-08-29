@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>across-standard-modules</groupId>
 		<artifactId>across-standard-modules</artifactId>
-		<version>1.0.3</version>
+		<version>1.0.4-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
