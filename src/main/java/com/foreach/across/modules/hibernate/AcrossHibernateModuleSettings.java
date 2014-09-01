@@ -20,7 +20,7 @@ public class AcrossHibernateModuleSettings extends AcrossModuleSettings
 	/**
 	 * Configure the order of the OpenSessionInViewInterceptor for this module (if created).
 	 * <p/>
-	 * Value: integer (default: {@link org.springframework.core.Ordered.HIGHEST_PRECEDENCE}
+	 * Value: integer (default: {@link org.springframework.core.Ordered#HIGHEST_PRECEDENCE}
 	 */
 	public static final String OPEN_SESSION_IN_VIEW_INTERCEPTOR_ORDER =
 			"acrossHibernate.openSessionInViewInterceptor.order";
