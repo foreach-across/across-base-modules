@@ -1,9 +1,13 @@
 package com.foreach.across.modules.hibernate;
 
+import com.foreach.across.core.AcrossModuleSettings;
+import com.foreach.across.core.AcrossModuleSettingsRegistry;
+import org.springframework.core.Ordered;
+
 /**
  * @author Arne Vandamme
  */
-public interface AcrossHibernateModuleSettings
+public class AcrossHibernateModuleSettings extends AcrossModuleSettings
 {
 	/**
 	 * Property to determine if an {@link org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor}
@@ -20,4 +24,12 @@ public interface AcrossHibernateModuleSettings
 	 */
 	public static final String OPEN_SESSION_IN_VIEW_INTERCEPTOR_ORDER =
 			"acrossHibernate.openSessionInViewInterceptor.order";
+
+	@Override
+	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
+		registry.register( OPEN_SESSION_IN_VIEW_INTERCEPTOR, Boolean.class, false,
+		                   "Should an OpenSessionInViewInterceptor be registered." );
+		registry.register( OPEN_SESSION_IN_VIEW_INTERCEPTOR_ORDER, Integer.class, Ordered.HIGHEST_PRECEDENCE,
+		                   "Configure the order of the OpenSessionInViewInterceptor for this module (if created)" );
+	}
 }

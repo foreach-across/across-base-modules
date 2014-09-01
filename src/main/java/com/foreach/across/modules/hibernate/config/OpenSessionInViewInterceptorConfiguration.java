@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -19,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * @author Arne Vandamme
  */
 @AcrossDepends(required = "AcrossWebModule")
-@AcrossCondition("${" + AcrossHibernateModuleSettings.OPEN_SESSION_IN_VIEW_INTERCEPTOR + ":false}")
+@AcrossCondition("${" + AcrossHibernateModuleSettings.OPEN_SESSION_IN_VIEW_INTERCEPTOR + "}")
 @Configuration
 public class OpenSessionInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
 {
@@ -27,12 +26,12 @@ public class OpenSessionInViewInterceptorConfiguration extends WebMvcConfigurerA
 	private SessionFactory sessionFactory;
 
 	@Autowired
-	private Environment environment;
+	private AcrossHibernateModuleSettings settings;
 
 	@Override
 	public int getOrder() {
-		return environment.getProperty( AcrossHibernateModuleSettings.OPEN_SESSION_IN_VIEW_INTERCEPTOR_ORDER,
-		                                Integer.class, Ordered.HIGHEST_PRECEDENCE );
+		return settings.getProperty( AcrossHibernateModuleSettings.OPEN_SESSION_IN_VIEW_INTERCEPTOR_ORDER,
+		                             Integer.class );
 	}
 
 	@Override
