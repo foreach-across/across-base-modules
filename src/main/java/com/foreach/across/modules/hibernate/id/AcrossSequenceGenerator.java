@@ -62,8 +62,6 @@ public class AcrossSequenceGenerator extends TableGenerator
 			throw new MappingException( "A sequenceName is required for a Across sequence generator" );
 		}
 
-		int allocationSize = 50;
-
 		Properties props = new Properties();
 		props.putAll( params );
 		props.put( SCHEMA, "" );
@@ -73,32 +71,42 @@ public class AcrossSequenceGenerator extends TableGenerator
 		props.put( SEGMENT_COLUMN_PARAM, AcrossSchemaConfiguration.SEQUENCE_NAME );
 		props.put( SEGMENT_VALUE_PARAM, pkColumnValue );
 		props.put( VALUE_COLUMN_PARAM, AcrossSchemaConfiguration.SEQUENCE_VALUE );
-		props.put( INCREMENT_PARAM, String.valueOf( allocationSize ) );
-		props.put( INITIAL_PARAM, allocationSize + 1 );
 
 		// Unless explicitly overruled, we use a pooled optimizer
-		props.put( OPT_PARAM, OptimizerFactory.StandardOptimizerDescriptor.POOLED.getExternalName() );
+		props.put( OPT_PARAM, OptimizerFactory.StandardOptimizerDescriptor.POOLED_LO.getExternalName() );
 
 		// Extend with params
 		if ( params.containsKey( OPT_PARAM ) ) {
 			props.put( OPT_PARAM, params.getProperty( OPT_PARAM ) );
 		}
 
-		if ( params.contains( "allocationSize" ) ) {
-			allocationSize = Integer.valueOf( params.getProperty( "allocationSize" ) );
-			props.put( INCREMENT_PARAM, String.valueOf( allocationSize ) );
-		}
+		int allocationSize = determineAllocationSize( params, 50 );
+		props.put( INCREMENT_PARAM, String.valueOf( allocationSize ) );
+		props.put( INITIAL_PARAM, String.valueOf( determineInitialValue( params, 1 ) ) );
 
-		if ( params.contains( "initialValue" ) ) {
-			props.put( INITIAL_PARAM, String.valueOf( Integer.valueOf( params.getProperty(
-					"initialValue" ) ) + allocationSize ) );
-		}
-
-		if ( params.contains( "supportPredefinedIds" ) ) {
+		if ( params.containsKey( "supportPredefinedIds" ) ) {
 			supportPredefinedIds = Boolean.valueOf( params.getProperty( "supportPredefinedIds" ) );
 		}
 
 		super.configure( type, props, dialect );
+	}
+
+	private int determineAllocationSize( Properties params, int defaultAllocationSize ) {
+		if ( params.containsKey( "allocationSize" ) ) {
+			return Integer.valueOf( params.getProperty( "allocationSize" ) );
+		}
+
+		return defaultAllocationSize;
+	}
+
+	private int determineInitialValue( Properties params, int defaultInitialValue ) {
+		if ( params.containsKey( "initialValue" ) ) {
+			int initialValue = Integer.valueOf( params.getProperty( "allocationSize" ) );
+
+			return initialValue < defaultInitialValue ? defaultInitialValue : initialValue;
+		}
+
+		return defaultInitialValue;
 	}
 
 	@Override
