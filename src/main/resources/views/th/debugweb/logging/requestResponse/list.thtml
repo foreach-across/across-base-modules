@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>List request-response log entries</title>
+</head>
+<body th:fragment="content">
+<div class="row debug-web-handlers" th:each="entry : ${logEntries}">
+	<div th:text="${entry.requestInfo}"></div>
+	<div th:text="${entry.responseData}"></div>
+</div>
+</body>
+</html>
