@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Request-response log detail</title>
+</head>
+<body th:fragment="content">
+
+<div th:if="${entry}">
+	<h4>Request - response details</h4>
+	<table class="table table-bordered">
+		<tr>
+			<th>Timestamp</th>
+			<td th:text="|${#dates.format(entry.started,'d MMM yyyy HH:mm:ss')} (duration: ${entry.duration} ms)|"></td>
+		</tr>
+		<tr>
+			<th>Remote Address</th>
+			<td th:text="${entry.callerInfo}"></td>
+		</tr>
+		<tr>
+			<th>Request URL</th>
+			<td th:text="${entry.url}"></td>
+		</tr>
+		<tr>
+			<th>Request Method</th>
+			<td th:text="${entry.requestMethod}"></td>
+		</tr>
+		<tr>
+			<th>Status Code</th>
+			<td th:text="${entry.responseStatus}"></td>
+		</tr>
+		<tr th:if="${entry.sessionId}">
+			<th>Session id</th>
+			<td th:text="${entry.sessionId}"></td>
+		</tr>
+
+	</table>
+
+	<h4>Request headers</h4>
+	<table class="table table-bordered">
+		<tr th:each="header : ${entry.requestHeaders}">
+			<td nowrap="nowrap" th:text="${header.key}"></td>
+			<td th:text="${header.value}"></td>
+		</tr>
+	</table>
+
+	<h4>Request cookies</h4>
+	<table class="table table-bordered">
+		<tr th:each="header : ${entry.requestCookies}">
+			<td nowrap="nowrap" th:text="${header.key}"></td>
+			<td th:text="${header.value}"></td>
+		</tr>
+	</table>
+
+	<h4>Request body</h4>
+	<pre th:text="${entry.requestData}"></pre>
+
+	<br />
+	<h4>Response headers</h4>
+	<table class="table table-bordered">
+		<tr th:if="${entry.responseContentType}">
+			<td>Content-Type</td>
+			<td th:text="${entry.responseContentType}"></td>
+		</tr>
+		<tr th:each="header : ${entry.responseHeaders}">
+			<td nowrap="nowrap" th:text="${header.key}"></td>
+			<td th:text="${header.value}"></td>
+		</tr>
+	</table>
+
+	<h4>Response body</h4>
+	<pre th:text="${entry.responseData}"></pre>
+
+</div>
+</body>
+</html>

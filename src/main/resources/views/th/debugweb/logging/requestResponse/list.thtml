@@ -4,9 +4,31 @@
 	<title>List request-response log entries</title>
 </head>
 <body th:fragment="content">
-<div class="row debug-web-handlers" th:each="entry : ${logEntries}">
-	<div th:text="${entry.requestInfo}"></div>
-	<div th:text="${entry.responseData}"></div>
-</div>
+
+	<div class="alert alert-warning">
+		Showing the last <span th:text="${maxEntries}"></span> kept log entries.
+	</div>
+
+	<table class="table table-striped">
+		<tr>
+			<th>Time</th>
+			<th>Remote ip</th>
+			<th>Method</th>
+			<th>URL</th>
+			<th>Status code</th>
+			<th>Duration</th>
+		</tr>
+		<tr th:each="entry : ${logEntries}">
+			<td th:text="${#dates.format(entry.started, 'HH:mm:ss')}"></td>
+			<td th:text="${entry.remoteIp}"></td>
+			<td th:text="${entry.requestMethod}">GET</td>
+			<td>
+				<a href="#" th:href="@{${@debugWeb.path('/logging/requestResponse/detail?id=' + entry.id)}}" th:text="${entry.uri}">url</a>
+			</td>
+			<td th:text="${entry.responseStatus}">200</td>
+			<td th:text="|${entry.duration} ms|"></td>
+		</tr>
+	</table>
+
 </body>
 </html>

@@ -3,6 +3,7 @@ package com.foreach.across.modules.debugweb.servlet.logging;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.UUID;
 
 public class RequestResponseLogRegistry
 {
@@ -31,5 +32,15 @@ public class RequestResponseLogRegistry
 
 	public Collection<RequestResponseLogEntry> getEntries() {
 		return new ArrayList<>( entries );
+	}
+
+	public RequestResponseLogEntry getEntry( UUID id ) {
+		for ( RequestResponseLogEntry entry : getEntries() ) {
+			if ( entry.getId().equals( id ) ) {
+				return entry;
+			}
+		}
+
+		return null;
 	}
 }

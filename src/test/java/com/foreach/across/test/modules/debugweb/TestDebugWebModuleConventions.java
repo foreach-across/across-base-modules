@@ -11,7 +11,7 @@ public class TestDebugWebModuleConventions extends AbstractAcrossModuleConventio
 {
 	@Override
 	protected boolean hasSettings() {
-		return false;
+		return true;
 	}
 
 	@Override

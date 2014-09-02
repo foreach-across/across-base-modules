@@ -4,22 +4,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 public class RequestResponseLogEntry
 {
 	private final UUID id;
 	private final long started, finished;
-	private LogRequestWrapper request;
-	private LogResponseWrapper response;
 
 	private String requestData, responseData;
 
-	private String sessionId, contentType, url, callerInfo, requestMethod;
+	private int responseStatus;
+	private String sessionId, responseContentType, contentType, url, uri, callerInfo, requestMethod, remoteIp,
+			responseCharacterEncoding;
 
 	private Map<String, String> requestCookies = new TreeMap<>();
 	private Map<String, String> requestHeaders = new TreeMap<>();
+	private Map<String, String> responseHeaders = new TreeMap<>();
 
 	public RequestResponseLogEntry( long started,
 	                                long finished,
@@ -31,12 +34,17 @@ public class RequestResponseLogEntry
 		this.finished = finished;
 
 		buildRequestInfo( request );
-		this.response = response;
-
+		buildResponseInfo( response );
 	}
 
 	private void buildRequestInfo( LogRequestWrapper request ) {
 		url = request.getRequestURL().toString();
+		uri = request.getRequestURI();
+
+		if ( !StringUtils.isBlank( request.getQueryString() ) ) {
+			url += "?" + request.getQueryString();
+		}
+
 		requestMethod = request.getMethod();
 		contentType = request.getContentType();
 
@@ -51,15 +59,77 @@ public class RequestResponseLogEntry
 		callerInfo = String.format( "%s @ %s:%s", StringUtils.defaultString( request.getRemoteUser(), "unknown" ),
 		                            request.getRemoteAddr(),
 		                            request.getRemotePort() );
+		remoteIp = request.getRemoteAddr();
 
-		for ( Cookie cookie : request.getCookies() ) {
-			requestCookies.put( cookie.getName(), cookie.getValue() );
+		Cookie[] cookies = request.getCookies();
+
+		if ( cookies != null ) {
+			for ( Cookie cookie : request.getCookies() ) {
+				requestCookies.put( cookie.getName(), cookie.getValue() );
+			}
+			requestHeaders.remove( "cookie" );
 		}
 
 		HttpSession session = request.getSession( false );
 
 		if ( session != null ) {
 			sessionId = session.getId();
+		}
+
+		if ( !isMultipart( request ) ) {
+			if ( request.payloadSize() > 1024 * 512 ) {
+				requestData = "Request data is too big: " + request.payloadSize() + " bytes";
+			}
+			else {
+				try {
+					String charEncoding =
+							request.getCharacterEncoding() != null ? request.getCharacterEncoding() :
+									"UTF-8";
+					requestData = new String( request.toByteArray(), charEncoding );
+				}
+				catch ( UnsupportedEncodingException usee ) {
+					requestData = "Unable to parse request payload.";
+				}
+			}
+		}
+		else {
+			requestData = "Request payload is multipart data.";
+		}
+
+		if ( StringUtils.isEmpty( requestData ) ) {
+			requestData = "no request payload";
+		}
+	}
+
+	private boolean isMultipart( HttpServletRequest request ) {
+		return request.getContentType() != null && request.getContentType().startsWith( "multipart/form-data" );
+	}
+
+	private void buildResponseInfo( LogResponseWrapper response ) {
+		responseStatus = response.getStatus();
+		responseContentType = response.getContentType();
+		responseCharacterEncoding = response.getCharacterEncoding();
+
+		for ( String headerName : response.getHeaderNames() ) {
+			responseHeaders.put( headerName, response.getHeader( headerName ) );
+		}
+
+		if ( response.payloadSize() > 1024 * 512 ) {
+			responseData = "Response data is too big: " + response.payloadSize() + " bytes";
+		}
+		else {
+			try {
+				String charEncoding =
+						response.getCharacterEncoding() != null ? response.getCharacterEncoding() : "UTF-8";
+				responseData = new String( response.toByteArray(), charEncoding );
+			}
+			catch ( UnsupportedEncodingException usee ) {
+				responseData = "Unable to parse response payload.";
+			}
+		}
+
+		if ( StringUtils.isEmpty( responseData ) ) {
+			responseData = "no response payload";
 		}
 	}
 
@@ -89,6 +159,30 @@ public class RequestResponseLogEntry
 
 	public Map<String, String> getRequestCookies() {
 		return requestCookies;
+	}
+
+	public int getResponseStatus() {
+		return responseStatus;
+	}
+
+	public String getResponseContentType() {
+		return responseContentType;
+	}
+
+	public String getUri() {
+		return uri;
+	}
+
+	public String getRemoteIp() {
+		return remoteIp;
+	}
+
+	public String getResponseCharacterEncoding() {
+		return responseCharacterEncoding;
+	}
+
+	public Map<String, String> getResponseHeaders() {
+		return responseHeaders;
 	}
 
 	public String getRequestInfo() {
@@ -131,13 +225,5 @@ public class RequestResponseLogEntry
 
 	public long getDuration() {
 		return finished - started;
-	}
-
-	public LogRequestWrapper getRequest() {
-		return request;
-	}
-
-	public LogResponseWrapper getResponse() {
-		return response;
 	}
 }

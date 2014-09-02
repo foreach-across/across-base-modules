@@ -25,7 +25,9 @@ public final class DebugWeb extends PrefixingPathContext
 	public static final String VIEW_APPLICATION_PROPERTIES = "th/debugweb/listApplicationProperties";
 	public static final String VIEW_THREADS = "th/debugweb/listThreads";
 	public static final String VIEW_MODULES = "th/debugweb/listAcrossModules";
-	public static final String VIEW_LOGGING_DETAILED_LIST = "th/debugweb/logging/requestResponse/list";
+
+	public static final String VIEW_LOGGING_REQUEST_RESPONSE_DETAIL = "th/debugweb/logging/requestResponse/detail";
+	public static final String VIEW_LOGGING_REQUEST_RESPONSE_LIST = "th/debugweb/logging/requestResponse/list";
 
 	public DebugWeb( String prefix ) {
 		super( prefix );
