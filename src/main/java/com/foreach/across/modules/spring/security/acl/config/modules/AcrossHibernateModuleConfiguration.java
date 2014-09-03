@@ -11,7 +11,6 @@ import com.foreach.across.modules.spring.security.acl.repositories.AclSecurityEn
 import com.foreach.across.modules.spring.security.acl.repositories.AclSecurityEntityRepositoryImpl;
 import com.foreach.across.modules.spring.security.acl.services.AclSecurityEntityService;
 import com.foreach.across.modules.spring.security.acl.services.AclSecurityEntityServiceImpl;
-import com.foreach.across.modules.spring.security.acl.services.AclSecurityService;
 import com.foreach.across.modules.spring.security.acl.support.IdBasedEntityAclInterceptor;
 import org.hibernate.SessionFactory;
 import org.springframework.aop.framework.ProxyFactory;
@@ -70,8 +69,8 @@ public class AcrossHibernateModuleConfiguration
 	}
 
 	@Bean
-	public AclSecurityEntityAclInterceptor aclSecurityEntityAclInterceptor( AclSecurityService aclSecurityService ) {
-		return new AclSecurityEntityAclInterceptor( aclSecurityService );
+	public AclSecurityEntityAclInterceptor aclSecurityEntityAclInterceptor() {
+		return new AclSecurityEntityAclInterceptor();
 	}
 
 	@Bean
