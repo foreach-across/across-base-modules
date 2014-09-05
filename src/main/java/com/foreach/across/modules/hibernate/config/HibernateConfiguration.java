@@ -7,7 +7,10 @@ import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.cfg.Environment;
+import org.hibernate.engine.jdbc.batch.internal.BatchBuilderInitiator;
 import org.hibernate.engine.jdbc.batch.internal.FixedBatchBuilderImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -16,24 +19,39 @@ import org.springframework.dao.annotation.PersistenceExceptionTranslationPostPro
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 
 import java.util.Map;
+import java.util.Properties;
 
 @Configuration
 public class HibernateConfiguration
 {
+	private static final Logger LOG = LoggerFactory.getLogger( HibernateConfiguration.class );
+
 	@Autowired
 	@Qualifier(AcrossModule.CURRENT_MODULE)
 	private AcrossHibernateModule module;
 
+	@Autowired
+	private org.springframework.core.env.Environment environment;
+
 	@Bean
 	@Exposed
 	public LocalSessionFactoryBean sessionFactory( HibernatePackage hibernatePackage ) {
-
 		String version = org.hibernate.Version.getVersionString();
 		if( StringUtils.startsWith( version, "4.2" ) ) {
-			// WORKAROUND bug: https://hibernate.atlassian.net/browse/HHH-8853
-			int batchSize = Integer.valueOf( module.getHibernateProperties().getProperty( Environment.STATEMENT_BATCH_SIZE, "0" ) );
-			FixedBatchBuilderImpl.setSize( batchSize );
-			module.setHibernateProperty( "hibernate.jdbc.batch.builder", FixedBatchBuilderImpl.class.getName() );
+			Properties hibernateProperties = module.getHibernateProperties();
+			if( hibernateProperties.getProperty( BatchBuilderInitiator.BUILDER ) != null || environment.getProperty( BatchBuilderInitiator.BUILDER  ) != null ) {
+				LOG.info( "Skipping workaround for https://hibernate.atlassian.net/browse/HHH-8853 because you have a custom builder" );
+			} else {
+				// WORKAROUND bug: https://hibernate.atlassian.net/browse/HHH-8853
+				String hibernateJdbcBatchSize = hibernateProperties.getProperty( Environment.STATEMENT_BATCH_SIZE );
+				int batchSize = 0;
+				if( hibernateJdbcBatchSize != null ) {
+					batchSize = Integer.valueOf( hibernateJdbcBatchSize );
+				}
+				LOG.info( "Enabling workaround for https://hibernate.atlassian.net/browse/HHH-8853 with batchsize: {}", batchSize );
+				FixedBatchBuilderImpl.setSize( batchSize );
+				module.setHibernateProperty( "hibernate.jdbc.batch.builder", FixedBatchBuilderImpl.class.getName() );
+			}
 		}
 
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
