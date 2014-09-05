@@ -1,5 +1,6 @@
 package com.foreach.across.modules.debugweb.servlet.logging;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -14,7 +15,8 @@ public class RequestResponseLogEntry
 	private final UUID id;
 	private final long started, finished;
 
-	private String requestData, responseData;
+	private String requestData, responseData, requestPayloadSize, responsePayloadSize;
+	private boolean requestDataTruncated, responseDataTruncated;
 
 	private int responseStatus;
 	private String sessionId, responseContentType, contentType, url, uri, callerInfo, requestMethod, remoteIp,
@@ -96,6 +98,8 @@ public class RequestResponseLogEntry
 			requestData = "Request payload is multipart data.";
 		}
 
+		requestDataTruncated = request.isMaximumReached();
+		requestPayloadSize = FileUtils.byteCountToDisplaySize( request.payloadSize() );
 		if ( StringUtils.isEmpty( requestData ) ) {
 			requestData = "no request payload";
 		}
@@ -128,6 +132,8 @@ public class RequestResponseLogEntry
 			}
 		}
 
+		responseDataTruncated = response.isMaximumReached();
+		responsePayloadSize = FileUtils.byteCountToDisplaySize( response.payloadSize() );
 		if ( StringUtils.isEmpty( responseData ) ) {
 			responseData = "no response payload";
 		}
@@ -225,5 +231,21 @@ public class RequestResponseLogEntry
 
 	public long getDuration() {
 		return finished - started;
+	}
+
+	public boolean isRequestDataTruncated() {
+		return requestDataTruncated;
+	}
+
+	public boolean isResponseDataTruncated() {
+		return responseDataTruncated;
+	}
+
+	public String getRequestPayloadSize() {
+		return requestPayloadSize;
+	}
+
+	public String getResponsePayloadSize() {
+		return responsePayloadSize;
 	}
 }

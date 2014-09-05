@@ -5,12 +5,11 @@ import org.apache.commons.io.input.TeeInputStream;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class LogRequestWrapper extends HttpServletRequestWrapper
 {
-	private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	private final FixedByteArrayOutputStream bos = new FixedByteArrayOutputStream( 100 * 1024 );
 
 	public LogRequestWrapper( HttpServletRequest req ) {
 		super( req );
@@ -29,8 +28,12 @@ public class LogRequestWrapper extends HttpServletRequestWrapper
 		};
 	}
 
-	public int payloadSize() {
-		return bos.size();
+	public long payloadSize() {
+		return bos.getRealSize();
+	}
+
+	public boolean isMaximumReached() {
+		return bos.isMaximumReached();
 	}
 
 	public byte[] toByteArray() {

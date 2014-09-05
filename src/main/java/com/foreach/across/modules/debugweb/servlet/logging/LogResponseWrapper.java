@@ -6,13 +6,12 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class LogResponseWrapper extends HttpServletResponseWrapper
 {
-	private ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	private FixedByteArrayOutputStream bos = new FixedByteArrayOutputStream( 100 * 1024 );
 	private PrintWriter writer = new PrintWriter( bos );
 
 	public LogResponseWrapper( HttpServletResponse response ) {
@@ -46,8 +45,12 @@ public class LogResponseWrapper extends HttpServletResponseWrapper
 		};
 	}
 
-	public int payloadSize() {
-		return bos.size();
+	public long payloadSize() {
+		return bos.getRealSize();
+	}
+
+	public boolean isMaximumReached() {
+		return bos.isMaximumReached();
 	}
 
 	public byte[] toByteArray() {
