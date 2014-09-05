@@ -1,9 +1,7 @@
 package com.foreach.across.modules.spring.security.infrastructure.config;
 
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
-import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalRetrievalStrategy;
-import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
-import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalServiceImpl;
+import com.foreach.across.modules.spring.security.infrastructure.services.*;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.AbstractLazyCreationTargetSource;
 import org.springframework.beans.factory.BeanCreationException;
@@ -26,6 +24,11 @@ public class SecurityPrincipalServiceConfiguration
 {
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
+
+	@Bean
+	public CurrentSecurityPrincipalProxy currentSecurityPrincipalProxy() {
+		return new CurrentSecurityPrincipalProxyImpl();
+	}
 
 	/**
 	 * Create a SecurityPrincipalService that fetches the retrieval strategy upon first use.
