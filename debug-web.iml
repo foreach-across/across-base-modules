@@ -5,6 +5,7 @@
       <configuration>
         <fileset id="fileset" name="Spring Application Context" removed="false">
           <file>file://$MODULE_DIR$/src/main/java/com/foreach/across/modules/debugweb/config/DebugWebMvcConfiguration.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/foreach/across/modules/debugweb/config/DebugWebLoggingConfiguration.java</file>
         </fileset>
       </configuration>
     </facet>
