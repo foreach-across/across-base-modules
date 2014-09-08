@@ -28,6 +28,7 @@ import java.util.Set;
 public class DebugWebModule extends AcrossModule
 {
 	public static final String NAME = "DebugWebModule";
+	public static final String RESOURCES = "debugweb";
 
 	private String rootPath = "/debug";
 
@@ -45,6 +46,11 @@ public class DebugWebModule extends AcrossModule
 	@Override
 	public String getName() {
 		return NAME;
+	}
+
+	@Override
+	public String getResourcesKey() {
+		return RESOURCES;
 	}
 
 	@Override
