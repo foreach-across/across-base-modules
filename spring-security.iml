@@ -6,6 +6,11 @@
         <fileset id="fileset" name="Spring Application Context" removed="false">
           <file>file://$MODULE_DIR$/src/main/java/com/foreach/across/modules/spring/security/config/ModuleGlobalMethodSecurityConfiguration.java</file>
           <file>file://$MODULE_DIR$/src/main/java/com/foreach/across/modules/spring/security/config/AcrossWebSecurityConfiguration.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/foreach/across/modules/spring/security/acl/config/AclSecurityConfiguration.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/foreach/across/modules/spring/security/acl/config/modules/AcrossHibernateModuleConfiguration.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/foreach/across/modules/spring/security/config/DynamicSecurityFilterConfiguration.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/foreach/across/modules/spring/security/acl/config/ModuleAclSecurityConfiguration.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/com/foreach/across/modules/spring/security/infrastructure/config/SecurityPrincipalServiceConfiguration.java</file>
         </fileset>
       </configuration>
     </facet>
