@@ -30,6 +30,7 @@ import java.util.Set;
 public class EhcacheModule extends AcrossModule
 {
 	public static final String NAME = "EhcacheModule";
+	public static final String RESOURCES = "ehcache";
 
 	private Resource configLocation = new ClassPathResource( "ehcache.xml" );
 
@@ -47,6 +48,11 @@ public class EhcacheModule extends AcrossModule
 	@Override
 	public String getName() {
 		return NAME;
+	}
+
+	@Override
+	public String getResourcesKey() {
+		return RESOURCES;
 	}
 
 	/**
