@@ -26,7 +26,7 @@ import java.util.Collection;
 
 public class BasicRepositoryImpl<T> implements BasicRepository<T>
 {
-	final Class<T> clazz;
+	private final Class<T> clazz;
 
 	@Autowired
 	private SessionFactory sessionFactory;
