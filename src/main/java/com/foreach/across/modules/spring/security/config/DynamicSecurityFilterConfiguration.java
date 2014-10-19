@@ -16,28 +16,18 @@
 package com.foreach.across.modules.spring.security.config;
 
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.core.annotations.Module;
-import com.foreach.across.core.context.info.AcrossModuleInfo;
-import com.foreach.across.modules.web.AcrossWebModule;
-import com.foreach.across.modules.web.AcrossWebModuleSettings;
+import com.foreach.across.modules.web.config.MultipartResolverConfiguration;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Conventions;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.DelegatingFilterProxy;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.support.MultipartFilter;
 
 import javax.servlet.*;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -58,16 +48,14 @@ public class DynamicSecurityFilterConfiguration extends AcrossWebDynamicServletC
 
 	public static final String DEFAULT_FILTER_NAME = "springSecurityFilterChain";
 
-	@Autowired
-	@Module(AcrossWebModule.NAME)
-	private AcrossModuleInfo webModuleInfo;
-
-	@Autowired
-	private ListableBeanFactory beanFactory;
-
 	@Override
 	protected void dynamicConfigurationAllowed( ServletContext servletContext ) throws ServletException {
 		LOG.info( "Auto-registering Spring security filter chain" );
+
+		if ( servletContext.getFilterRegistration( MultipartResolverConfiguration.FILTER_NAME ) == null ) {
+			LOG.warn(
+					"No multipartFilter appears to be registered - CSRF protection on multipart uploads might fail." );
+		}
 
 		beforeSpringSecurityFilterChain( servletContext );
 		if ( enableHttpSessionEventPublisher() ) {
@@ -251,23 +239,6 @@ public class DynamicSecurityFilterConfiguration extends AcrossWebDynamicServletC
 	 * @param servletContext the {@link ServletContext}
 	 */
 	protected void beforeSpringSecurityFilterChain( ServletContext servletContext ) {
-		AcrossWebModuleSettings webModuleSettings = (AcrossWebModuleSettings) webModuleInfo.getSettings();
-
-		if ( webModuleSettings.isAutoConfigureMultipartResolver() ) {
-			Map<String, MultipartResolver> resolvers = BeanFactoryUtils.beansOfTypeIncludingAncestors( beanFactory, MultipartResolver.class );
-
-			if ( resolvers.size() == 1 ) {
-				LOG.info( "Auto-registering MultipartFilter to support multipart security" );
-
-				MultipartFilter multipartFilter = new MultipartFilter();
-				multipartFilter.setMultipartResolverBeanName( resolvers.keySet().iterator().next() );
-
-				insertFilters( servletContext, multipartFilter );
-			}
-			else {
-				LOG.warn( "Unable to register MultipartFilter as the MultipartResolver bean name could not be determined" );
-			}
-		}
 	}
 
 	/**
