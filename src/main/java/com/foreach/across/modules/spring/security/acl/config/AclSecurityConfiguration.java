@@ -100,52 +100,7 @@ public class AclSecurityConfiguration
 	}
 
 	private Cache cacheInstance() {
-		if ( cacheManager != null ) {
-			return cacheManager.getCache( CACHE_NAME );
-		}
-
-		LOG.warn( "No cache suitable for ACL caching found - reverting to no caching.  If you want to use " +
-				          "ACL in your application, a CacheManager providing cache named {} is highly advised " +
-				          "for performance reasons.",
-		          CACHE_NAME );
-
-		return new Cache()
-		{
-			@Override
-			public String getName() {
-				return "noop";
-			}
-
-			@Override
-			public Object getNativeCache() {
-				return null;
-			}
-
-			@Override
-			public ValueWrapper get( Object key ) {
-				return null;
-			}
-
-			@Override
-			public <T> T get( Object key, Class<T> type ) {
-				return null;
-			}
-
-			@Override
-			public void put( Object key, Object value ) {
-
-			}
-
-			@Override
-			public void evict( Object key ) {
-
-			}
-
-			@Override
-			public void clear() {
-
-			}
-		};
+		return cacheManager.getCache( CACHE_NAME );
 	}
 
 	@Bean
