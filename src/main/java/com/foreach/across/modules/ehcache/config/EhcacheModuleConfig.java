@@ -17,6 +17,7 @@ package com.foreach.across.modules.ehcache.config;
 
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.Exposed;
+import com.foreach.across.core.cache.AcrossCompositeCacheManager;
 import com.foreach.across.modules.ehcache.EhcacheModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,18 +27,23 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
+
 /**
  * Declares the cache manager instance that is shared between all modules.
  */
 @Configuration
-@Exposed
 public class EhcacheModuleConfig
 {
 	@Autowired
 	@Qualifier(AcrossModule.CURRENT_MODULE)
 	private EhcacheModule ehcacheModule;
 
+	@Autowired
+	private AcrossCompositeCacheManager acrossCompositeCacheManager;
+
 	@Bean
+	@Exposed
 	public EhCacheManagerFactoryBean ehCacheManagerFactoryBean() {
 		EhCacheManagerFactoryBean ehCacheManagerFactoryBean = new EhCacheManagerFactoryBean();
 		ehCacheManagerFactoryBean.setConfigLocation( ehcacheModule.getConfigLocation() );
@@ -45,9 +51,11 @@ public class EhcacheModuleConfig
 	}
 
 	@Bean
-	public CacheManager cacheManager( net.sf.ehcache.CacheManager ehCacheCacheManager ) {
+	public CacheManager ehCacheManager( net.sf.ehcache.CacheManager ehCacheCacheManager ) {
 		EhCacheCacheManager cacheManager = new EhCacheCacheManager();
 		cacheManager.setCacheManager( ehCacheCacheManager );
+		// add ourselves to the global across cache manager
+		acrossCompositeCacheManager.setCacheManagers( Arrays.<CacheManager>asList( cacheManager ) );
 		return cacheManager;
 	}
 }

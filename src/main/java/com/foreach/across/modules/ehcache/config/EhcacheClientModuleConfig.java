@@ -15,7 +15,14 @@
  */
 package com.foreach.across.modules.ehcache.config;
 
+import com.foreach.across.core.cache.AcrossCompositeCacheManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.cache.interceptor.SimpleKeyGenerator;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
@@ -30,4 +37,23 @@ public class EhcacheClientModuleConfig
 	 * Order for the AOP interceptor.
 	 */
 	public static final int INTERCEPT_ORDER = Ordered.HIGHEST_PRECEDENCE + 10;
+
+	@Autowired
+	private AcrossCompositeCacheManager cacheManager;
+
+	@Bean
+	public CachingConfigurer cachingConfigurer() {
+		return new CachingConfigurer()
+		{
+			@Override
+			public CacheManager cacheManager() {
+				return cacheManager;
+			}
+
+			@Override
+			public KeyGenerator keyGenerator() {
+				return new SimpleKeyGenerator();
+			}
+		};
+	}
 }

@@ -25,11 +25,15 @@ import net.sf.ehcache.Status;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.junit.Assert.*;
 
@@ -38,20 +42,28 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = ITEhcacheModule.Config.class)
 public class ITEhcacheModule
 {
+
 	@Autowired
-	private net.sf.ehcache.CacheManager cacheManager;
+	private CacheManager cacheManager;
+
+	@Autowired
+	private net.sf.ehcache.CacheManager ehCacheManager;
 
 	@Test
 	public void bootstrapModule() {
 		assertNotNull( cacheManager );
-		assertEquals( Status.STATUS_ALIVE, cacheManager.getStatus() );
+		Collection<String> compositeCacheNames = cacheManager.getCacheNames();
 
-		String[] cacheNames = cacheManager.getCacheNames();
+		assertNotNull( ehCacheManager );
+		assertEquals( Status.STATUS_ALIVE, ehCacheManager.getStatus() );
+
+		String[] cacheNames = ehCacheManager.getCacheNames();
 		assertNotNull( cacheNames );
 		assertEquals( 1, cacheNames.length );
 		assertEquals( "oneElementCache", cacheNames[0] );
+		assertTrue( compositeCacheNames.containsAll( Arrays.asList( cacheNames ) ) );
 
-		Cache cache = cacheManager.getCache( "oneElementCache" );
+		Cache cache = ehCacheManager.getCache( "oneElementCache" );
 		assertNotNull( cache );
 
 		cache.put( new Element( "item1", "value1" ) );
