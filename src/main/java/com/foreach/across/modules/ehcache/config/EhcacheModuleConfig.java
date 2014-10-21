@@ -16,7 +16,6 @@
 package com.foreach.across.modules.ehcache.config;
 
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.cache.AcrossCompositeCacheManager;
 import com.foreach.across.modules.ehcache.EhcacheModule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,6 @@ public class EhcacheModuleConfig
 	private AcrossCompositeCacheManager acrossCompositeCacheManager;
 
 	@Bean
-	@Exposed
 	public EhCacheManagerFactoryBean ehCacheManagerFactoryBean() {
 		EhCacheManagerFactoryBean ehCacheManagerFactoryBean = new EhCacheManagerFactoryBean();
 		ehCacheManagerFactoryBean.setConfigLocation( ehcacheModule.getConfigLocation() );
