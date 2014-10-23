@@ -18,6 +18,7 @@ package com.foreach.across.modules.it.ehcache;
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.modules.ehcache.EhcacheModule;
+import com.foreach.across.modules.ehcache.EhcacheModuleSettings;
 import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +70,7 @@ public class ITEhcacheModule
 		@Override
 		public void configure( AcrossContext context ) {
 			EhcacheModule ehcacheModule = new EhcacheModule();
-			ehcacheModule.setConfigLocation( new ClassPathResource( "test-ehcache.xml" ) );
+			ehcacheModule.setProperty( EhcacheModuleSettings.CONFIGURATION_RESOURCE, new ClassPathResource( "test-ehcache.xml" ) );
 			context.addModule( ehcacheModule );
 		}
 	}

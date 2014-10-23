@@ -18,6 +18,7 @@ package com.foreach.across.modules.ehcache.config;
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.cache.AcrossCompositeCacheManager;
 import com.foreach.across.modules.ehcache.EhcacheModule;
+import com.foreach.across.modules.ehcache.EhcacheModuleSettings;
 import com.foreach.across.modules.ehcache.handlers.RegisterClientModuleConfigHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,10 +42,29 @@ public class EhcacheModuleConfig
 	@Autowired
 	private AcrossCompositeCacheManager acrossCompositeCacheManager;
 
+	@Autowired
+	private EhcacheModuleSettings ehcacheModuleSettings;
+
 	@Bean
-	public AcrossEhCacheManagerFactoryBean acrossEhCacheManagerFactoryBean() {
+	public AcrossEhCacheManagerFactoryBean acrossEhCacheManagerFactoryBean() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
 		AcrossEhCacheManagerFactoryBean ehCacheManagerFactoryBean = new AcrossEhCacheManagerFactoryBean();
-		ehCacheManagerFactoryBean.setConfigLocation( ehcacheModule.getConfig() );
+
+		Object configurationObject = ehcacheModuleSettings.getConfiguration();
+		if( configurationObject != null ) {
+			net.sf.ehcache.config.Configuration configuration;
+			if( configurationObject instanceof String ) {
+				Class<?> clazz = Class.forName( (String) configurationObject );
+				configuration = (net.sf.ehcache.config.Configuration) clazz.newInstance();
+			} else if( configurationObject instanceof net.sf.ehcache.config.Configuration ) {
+				configuration = ( net.sf.ehcache.config.Configuration) configurationObject;
+			} else {
+				throw new IllegalArgumentException( "unsupported configuration class" );
+			}
+			ehCacheManagerFactoryBean.setConfiguration( configuration );
+		} else {
+			ehCacheManagerFactoryBean.setConfigLocation( ehcacheModuleSettings.getResource() );
+		}
+
 		return ehCacheManagerFactoryBean;
 	}
 
