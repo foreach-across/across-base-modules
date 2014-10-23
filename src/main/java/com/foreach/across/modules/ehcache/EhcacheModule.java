@@ -19,7 +19,9 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.AcrossRole;
 import com.foreach.across.core.context.AcrossModuleRole;
+import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
+import com.foreach.across.modules.ehcache.config.EhcacheModuleConfig;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -70,6 +72,7 @@ public class EhcacheModule extends AcrossModule
 	 */
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-		super.registerDefaultApplicationContextConfigurers( contextConfigurers );
+		contextConfigurers.add( new AnnotatedClassConfigurer( EhcacheModuleConfig.class ) );
 	}
+
 }

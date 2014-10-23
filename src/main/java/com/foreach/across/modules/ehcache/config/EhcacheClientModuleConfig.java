@@ -37,23 +37,4 @@ public class EhcacheClientModuleConfig
 	 * Order for the AOP interceptor.
 	 */
 	public static final int INTERCEPT_ORDER = Ordered.HIGHEST_PRECEDENCE + 10;
-
-	@Autowired
-	private AcrossCompositeCacheManager cacheManager;
-
-	@Bean
-	public CachingConfigurer cachingConfigurer() {
-		return new CachingConfigurer()
-		{
-			@Override
-			public CacheManager cacheManager() {
-				return cacheManager;
-			}
-
-			@Override
-			public KeyGenerator keyGenerator() {
-				return new SimpleKeyGenerator();
-			}
-		};
-	}
 }

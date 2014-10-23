@@ -39,7 +39,6 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = ITEhcacheModule.Config.class)
 public class ITEhcacheModule
 {
-
 	@Autowired
 	private CacheManager cacheManager;
 
