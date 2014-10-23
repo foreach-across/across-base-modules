@@ -54,7 +54,7 @@ public class AclSecurityConfiguration
 	@Autowired
 	private DataSource dataSource;
 
-	@Autowired(required = false)
+	@Autowired
 	private CacheManager cacheManager;
 
 	@Bean
