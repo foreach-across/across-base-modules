@@ -28,8 +28,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Arrays;
-
 /**
  * Declares the cache manager instance that is shared between all modules.
  */
@@ -56,7 +54,7 @@ public class EhcacheModuleConfig
 		EhCacheCacheManager cacheManager = new EhCacheCacheManager();
 		cacheManager.setCacheManager( ehCacheCacheManager );
 		// add ourselves to the global across cache manager
-		acrossCompositeCacheManager.setCacheManagers( Arrays.<CacheManager>asList( cacheManager ) );
+		acrossCompositeCacheManager.addCacheManager( cacheManager );
 		return cacheManager;
 	}
 
