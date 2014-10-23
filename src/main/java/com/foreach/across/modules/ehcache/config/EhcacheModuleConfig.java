@@ -49,7 +49,7 @@ public class EhcacheModuleConfig
 	public AcrossEhCacheManagerFactoryBean acrossEhCacheManagerFactoryBean() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
 		AcrossEhCacheManagerFactoryBean ehCacheManagerFactoryBean = new AcrossEhCacheManagerFactoryBean();
 
-		Object configurationObject = ehcacheModuleSettings.getConfiguration();
+		Object configurationObject = ehcacheModuleSettings.getConfigurationResource();
 		if( configurationObject != null ) {
 			net.sf.ehcache.config.Configuration configuration;
 			if( configurationObject instanceof String ) {

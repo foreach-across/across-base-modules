@@ -28,17 +28,17 @@ public class EhcacheModuleSettings extends AcrossModuleSettings
 	@Override
 	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
 		registry.register( CONFIGURATION_RESOURCE, Resource.class, new ClassPathResource( "ehcache.xml" ),
-		                   "Default location of ehcache.xml file" );
+		                   "Resource representing the ehcache XML configuration file (defaults to: ehcache.xml)" );
 		registry.register( CONFIGURATION, Object.class,
 		                   null,
-		                   "Implementation class instance or class name" );
+		                   "Configuration class instance or class name" );
 	}
 
 	public Resource getResource() {
 		return getProperty( CONFIGURATION_RESOURCE, Resource.class );
 	}
 
-	public Object getConfiguration() {
+	public Object getConfigurationResource() {
 		return getProperty( CONFIGURATION, Object.class );
 	}
 }
