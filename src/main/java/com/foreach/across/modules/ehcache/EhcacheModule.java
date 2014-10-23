@@ -22,6 +22,7 @@ import com.foreach.across.core.context.AcrossModuleRole;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
 import com.foreach.across.modules.ehcache.config.EhcacheModuleConfig;
+import net.sf.ehcache.config.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -34,14 +35,38 @@ public class EhcacheModule extends AcrossModule
 	public static final String NAME = "EhcacheModule";
 	public static final String RESOURCES = "ehcache";
 
-	private Resource configLocation = new ClassPathResource( "ehcache.xml" );
+	private Resource configLocation;
+	private Configuration configuration;
 
-	public Resource getConfigLocation() {
-		return configLocation;
+	public Object getConfig() {
+		if( configLocation == null && configuration == null ) {
+			// Old behaviour is to fallback on the xml file
+			configLocation = new ClassPathResource( "ehcache.xml" );
+			return configLocation;
+		} else {
+			if( configLocation != null && configuration != null ) {
+				throw new IllegalArgumentException( "Cannot determine EhCache configuration" );
+			} else {
+				if( configLocation != null ) {
+					return configLocation;
+				} else {
+					return configuration;
+				}
+			}
+		}
+
 	}
 
 	public void setConfigLocation( Resource configLocation ) {
 		this.configLocation = configLocation;
+	}
+
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	public void setConfiguration( Configuration configuration ) {
+		this.configuration = configuration;
 	}
 
 	/**
