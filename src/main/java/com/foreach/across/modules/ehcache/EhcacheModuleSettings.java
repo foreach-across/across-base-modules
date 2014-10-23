@@ -34,11 +34,11 @@ public class EhcacheModuleSettings extends AcrossModuleSettings
 		                   "Configuration class instance or class name" );
 	}
 
-	public Resource getResource() {
+	public Resource getConfigurationResource() {
 		return getProperty( CONFIGURATION_RESOURCE, Resource.class );
 	}
 
-	public Object getConfigurationResource() {
+	public Object getConfiguration() {
 		return getProperty( CONFIGURATION, Object.class );
 	}
 }
