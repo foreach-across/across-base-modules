@@ -32,7 +32,7 @@ import javax.sql.DataSource;
  */
 public class SecurityPrincipalJdbcAclService extends JdbcMutableAclService
 {
-	@Autowired( required = false )
+	@Autowired
 	private CacheManager cacheManager;
 
 	private Cache cache = null;
@@ -45,24 +45,18 @@ public class SecurityPrincipalJdbcAclService extends JdbcMutableAclService
 
 	@PostConstruct
 	public void setupCache() {
-		if( cacheManager != null ) {
-			cache = cacheManager.getCache( AclSecurityConfiguration.CACHE_NAME );
-		}
+		cache = cacheManager.getCache( AclSecurityConfiguration.CACHE_NAME );
 	}
 
 	@Override
 	protected Long createOrRetrieveSidPrimaryKey( Sid sid, boolean allowCreate ) {
 		Long sidId;
-		if( cache != null ) {
-			Long cachedSid = cache.get( sid, Long.class );
-			if( cachedSid != null ) {
-				return cachedSid;
-			} else {
-				sidId = super.createOrRetrieveSidPrimaryKey( sid, allowCreate );
-				cache.put( sid, sidId );
-			}
+		Long cachedSid = cache.get( sid, Long.class );
+		if( cachedSid != null ) {
+			return cachedSid;
 		} else {
 			sidId = super.createOrRetrieveSidPrimaryKey( sid, allowCreate );
+			cache.put( sid, sidId );
 		}
 		return sidId;
 	}
@@ -70,16 +64,12 @@ public class SecurityPrincipalJdbcAclService extends JdbcMutableAclService
 	@Override
 	protected Long createOrRetrieveClassPrimaryKey( String type, boolean allowCreate ) {
 		Long classId;
-		if( cache != null ) {
-			Long cachedClassId = cache.get( type, Long.class );
-			if( cachedClassId != null ) {
-				return cachedClassId;
-			} else {
-				classId = super.createOrRetrieveClassPrimaryKey( type, allowCreate );
-				cache.put( type, classId );
-			}
+		Long cachedClassId = cache.get( type, Long.class );
+		if( cachedClassId != null ) {
+			return cachedClassId;
 		} else {
 			classId = super.createOrRetrieveClassPrimaryKey( type, allowCreate );
+			cache.put( type, classId );
 		}
 		return classId;
 	}
