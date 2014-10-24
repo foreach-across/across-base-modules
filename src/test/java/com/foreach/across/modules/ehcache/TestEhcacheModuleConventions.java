@@ -25,7 +25,7 @@ public class TestEhcacheModuleConventions extends AbstractAcrossModuleConvention
 {
 	@Override
 	protected boolean hasSettings() {
-		return false;
+		return true;
 	}
 
 	@Override
