@@ -16,7 +16,7 @@
 package com.foreach.across.modules.spring.security.config;
 
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.modules.web.config.MultipartResolverConfiguration;
+import com.foreach.across.modules.web.config.multipart.MultipartResolverConfiguration;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
