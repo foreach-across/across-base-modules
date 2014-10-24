@@ -15,13 +15,10 @@
  */
 package com.foreach.across.modules.ehcache.config;
 
-import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.cache.AcrossCompositeCacheManager;
-import com.foreach.across.modules.ehcache.EhcacheModule;
 import com.foreach.across.modules.ehcache.EhcacheModuleSettings;
 import com.foreach.across.modules.ehcache.handlers.RegisterClientModuleConfigHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -35,10 +32,6 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan("com.foreach.across.modules.ehcache.controllers")
 public class EhcacheModuleConfig
 {
-	@Autowired
-	@Qualifier(AcrossModule.CURRENT_MODULE)
-	private EhcacheModule ehcacheModule;
-
 	@Autowired
 	private AcrossCompositeCacheManager acrossCompositeCacheManager;
 
