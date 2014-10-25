@@ -23,6 +23,8 @@ public interface BasicRepository<T>
 
 	Collection<T> getAll();
 
+	Collection<T> getAllForIds( Collection<Long> ids );
+
 	void create( T object );
 
 	void update( T object );

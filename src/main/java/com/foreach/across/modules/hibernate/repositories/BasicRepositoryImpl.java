@@ -18,6 +18,7 @@ package com.foreach.across.modules.hibernate.repositories;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,14 +38,31 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 		this.clazz = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
 	}
 
+	/**
+	 * Creates a query for the distinct root entity.
+	 */
 	protected Criteria distinct() {
 		return session()
 				.createCriteria( clazz )
 				.setResultTransformer( Criteria.DISTINCT_ROOT_ENTITY );
 	}
 
+	/**
+	 * Creates a query for the distinct root entity with the default order applied.
+	 */
+	protected Criteria orderedDistinct() {
+		return ordered( distinct() );
+	}
+
 	protected Session session() {
 		return sessionFactory.getCurrentSession();
+	}
+
+	/**
+	 * Adds the default order to the criteria.
+	 */
+	protected Criteria ordered( Criteria criteria ) {
+		return criteria;
 	}
 
 	@Transactional(readOnly = true)
@@ -58,7 +76,16 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 	@Transactional(readOnly = true)
 	@Override
 	public Collection<T> getAll() {
-		return (Collection<T>) distinct().list();
+		return (Collection<T>) orderedDistinct().list();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Transactional(readOnly = true)
+	@Override
+	public Collection<T> getAllForIds( Collection<Long> ids ) {
+		return (Collection<T>) orderedDistinct()
+				.add( Restrictions.in( "id", ids ) )
+				.list();
 	}
 
 	@Transactional
