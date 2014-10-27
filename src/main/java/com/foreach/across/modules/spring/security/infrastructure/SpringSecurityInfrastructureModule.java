@@ -21,6 +21,9 @@ import com.foreach.across.core.annotations.AcrossRole;
 import com.foreach.across.core.context.AcrossModuleRole;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
+import com.foreach.across.core.filters.BeanFilterComposite;
+import com.foreach.across.core.filters.ClassBeanFilter;
+import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityPrincipalServiceConfiguration;
 
 import java.util.Set;
@@ -33,6 +36,14 @@ import java.util.Set;
 public class SpringSecurityInfrastructureModule extends AcrossModule
 {
 	public static final String NAME = "SpringSecurityInfrastructureModule";
+
+	public SpringSecurityInfrastructureModule() {
+		// Exposed the security infrastructure bean manually, but don't annotate it as that would also expose
+		// the separate security beans and we don't want that
+		setExposeFilter(
+			new BeanFilterComposite( defaultExposeFilter(), new ClassBeanFilter( SecurityInfrastructure.class ) )
+		);
+	}
 
 	@Override
 	public String getName() {
@@ -47,6 +58,12 @@ public class SpringSecurityInfrastructureModule extends AcrossModule
 
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-		addApplicationContextConfigurer( new AnnotatedClassConfigurer( SecurityPrincipalServiceConfiguration.class ) );
+		addApplicationContextConfigurer(
+				new AnnotatedClassConfigurer(
+						SecurityPrincipalServiceConfiguration.class,
+						SecurityInfrastructure.class
+
+				)
+		);
 	}
 }
