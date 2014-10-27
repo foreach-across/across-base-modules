@@ -19,20 +19,17 @@ import com.foreach.across.core.annotations.PostRefresh;
 import com.foreach.across.core.annotations.Refreshable;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
-import com.foreach.across.modules.spring.security.acl.SpringSecurityAclModule;
+import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.acls.AclPermissionEvaluator;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-
-import java.io.Serializable;
 
 /**
  * Enables Spring method security in modules, ensuring that the same AuthenticationManager is being used.
@@ -45,37 +42,47 @@ public class ModuleGlobalMethodSecurityConfiguration extends GlobalMethodSecurit
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
 
-	/*
-	@Bean
-	@Refreshable
-	PermissionEvaluator permissionEvaluator() {
-		return new PermissionEvaluator()
-		{
-			private PermissionEvaluator delegate;
-
-			@Override
-			public boolean hasPermission( Authentication authentication,
-			                              Object targetDomainObject,
-			                              Object permission ) {
-				return delegate.hasPermission( authentication, targetDomainObject, permission );
-			}
-
-			@Override
-			public boolean hasPermission( Authentication authentication,
-			                              Serializable targetId,
-			                              String targetType,
-			                              Object permission ) {
-				return delegate.hasPermission( authentication, targetId, targetType, permission );
-			}
-
-			@PostRefresh
-			public void refresh() {
-				delegate = contextBeanRegistry
-						.getBeanOfTypeFromModule( SpringSecurityAclModule.NAME, AclPermissionEvaluator.class );
-			}
-		};
+	@Autowired
+	private void setSecurityInfrastructure( SecurityInfrastructure securityInfrastructure ) {
+		super.setAuthenticationTrustResolver( securityInfrastructure.authenticationTrustResolver() );
 	}
-*/
+
+	@Override
+	public void setAuthenticationTrustResolver( AuthenticationTrustResolver trustResolver ) {
+		super.setAuthenticationTrustResolver( trustResolver );
+	}
+
+	/*
+		@Bean
+		@Refreshable
+		PermissionEvaluator permissionEvaluator() {
+			return new PermissionEvaluator()
+			{
+				private PermissionEvaluator delegate;
+
+				@Override
+				public boolean hasPermission( Authentication authentication,
+											  Object targetDomainObject,
+											  Object permission ) {
+					return delegate.hasPermission( authentication, targetDomainObject, permission );
+				}
+
+				@Override
+				public boolean hasPermission( Authentication authentication,
+											  Serializable targetId,
+											  String targetType,
+											  Object permission ) {
+					return delegate.hasPermission( authentication, targetId, targetType, permission );
+				}
+
+				@PostRefresh
+				public void refresh() {
+					delegate = contextBeanRegistry
+							.getBeanOfTypeFromModule( SpringSecurityAclModule.NAME, AclPermissionEvaluator.class );
+				}
+			};
+		}
+	*/
 	@Bean
 	@Refreshable
 	AuthenticationManager delegatingClientAuthenticationManager() {

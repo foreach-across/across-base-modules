@@ -20,12 +20,14 @@ import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer;
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapper;
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapperFactory;
+import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.util.ClassUtils;
@@ -115,6 +117,11 @@ public class AcrossWebSecurityConfiguration
 		}
 
 		return webSecurityConfigurers;
+	}
+
+	@Bean
+	public AuthenticationTrustResolver authenticationTrustResolver( SecurityInfrastructure securityInfrastructure ) {
+		return securityInfrastructure.authenticationTrustResolver();
 	}
 
 	@Bean
