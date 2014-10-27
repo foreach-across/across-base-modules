@@ -17,83 +17,46 @@ package com.foreach.across.test.modules.hibernate;
 
 import com.foreach.across.modules.hibernate.types.BitFlag;
 import com.foreach.across.modules.hibernate.types.HibernateBitFlag;
-import org.hibernate.dialect.HSQLDialect;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.junit.Test;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.EnumSet;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 
-public class TestHibernateBitFlag
+public class TestHibernateBitFlag extends AbstractBaseIdLookup
 {
 
 	@Test
 	public void testConvertIntFieldToEnumSet() throws Exception {
-		assertEquals( EnumSet.noneOf( BitValues.class ), mockResultSetAndTestValue( null ) );
-		assertEquals( EnumSet.noneOf( BitValues.class ), mockResultSetAndTestValue( 0 ) );
-		assertEquals( EnumSet.of( BitValues.RED ), mockResultSetAndTestValue( 1 ) );
-		assertEquals( EnumSet.of( BitValues.GREEN ), mockResultSetAndTestValue( 2 ) );
-		assertEquals( EnumSet.of( BitValues.RED, BitValues.GREEN ), mockResultSetAndTestValue( 3 ) );
-		assertEquals( EnumSet.of( BitValues.BLUE ), mockResultSetAndTestValue( 4 ) );
-		assertEquals( EnumSet.of( BitValues.BLUE, BitValues.RED ), mockResultSetAndTestValue( 5 ) );
-		assertEquals( EnumSet.of( BitValues.GREEN, BitValues.BLUE ), mockResultSetAndTestValue( 6 ) );
-		assertEquals( EnumSet.of( BitValues.RED, BitValues.GREEN, BitValues.BLUE ), mockResultSetAndTestValue( 7 ) );
+		TestHibernateBitFlagUserType userType = new TestHibernateBitFlagUserType();
+		assertEquals( EnumSet.noneOf( BitValues.class ), mockResultSetAndTestValue( userType, null ) );
+		assertEquals( EnumSet.noneOf( BitValues.class ), mockResultSetAndTestValue( userType, 0 ) );
+		assertEquals( EnumSet.of( BitValues.RED ), mockResultSetAndTestValue( userType, 1 ) );
+		assertEquals( EnumSet.of( BitValues.GREEN ), mockResultSetAndTestValue( userType, 2 ) );
+		assertEquals( EnumSet.of( BitValues.RED, BitValues.GREEN ), mockResultSetAndTestValue( userType, 3 ) );
+		assertEquals( EnumSet.of( BitValues.BLUE ), mockResultSetAndTestValue( userType, 4 ) );
+		assertEquals( EnumSet.of( BitValues.BLUE, BitValues.RED ), mockResultSetAndTestValue( userType, 5 ) );
+		assertEquals( EnumSet.of( BitValues.GREEN, BitValues.BLUE ), mockResultSetAndTestValue( userType, 6 ) );
+		assertEquals( EnumSet.of( BitValues.RED, BitValues.GREEN, BitValues.BLUE ), mockResultSetAndTestValue( userType, 7 ) );
 
 		// Invalid database values
 		assertEquals( EnumSet.of( BitValues.RED, BitValues.GREEN, BitValues.BLUE ), mockResultSetAndTestValue(
+				userType,
 				Integer.MAX_VALUE ) );
 	}
 
 	@Test
 	public void testConvertEnumSetToInt() throws Exception {
-		mockResultSetAndTestValueToInt( 0, null );
-		mockResultSetAndTestValueToInt( 0, EnumSet.noneOf( BitValues.class ) );
-		mockResultSetAndTestValueToInt( 1, EnumSet.of( BitValues.RED ) );
-		mockResultSetAndTestValueToInt( 2, EnumSet.of( BitValues.GREEN ) );
-		mockResultSetAndTestValueToInt( 3, EnumSet.of( BitValues.RED, BitValues.GREEN ) );
-		mockResultSetAndTestValueToInt( 4, EnumSet.of( BitValues.BLUE ) );
-		mockResultSetAndTestValueToInt( 5, EnumSet.of( BitValues.BLUE, BitValues.RED ) );
-		mockResultSetAndTestValueToInt( 6, EnumSet.of( BitValues.GREEN, BitValues.BLUE ) );
-		mockResultSetAndTestValueToInt( 7, EnumSet.of( BitValues.RED, BitValues.GREEN, BitValues.BLUE ) );
-	}
-
-	private Object mockResultSetAndTestValue( Integer rowValue ) throws SQLException {
 		TestHibernateBitFlagUserType userType = new TestHibernateBitFlagUserType();
-		ResultSet resultSet = mock( ResultSet.class );
-		SessionImplementor sessionImplementor = mock( SessionImplementor.class );
-		SessionFactoryImplementor sessionFactoryImplementor = mock( SessionFactoryImplementor.class );
-		when( sessionImplementor.getFactory() ).thenReturn( sessionFactoryImplementor );
-		when( sessionFactoryImplementor.getDialect() ).thenReturn( new HSQLDialect() );
-		String[] names = new String[] { "someColumn" };
-		if ( rowValue == null ) {
-			when( resultSet.wasNull() ).thenReturn( true );
-		}
-		else {
-			when( resultSet.getInt( "someColumn" ) ).thenReturn( rowValue );
-		}
-
-		return userType.nullSafeGet( resultSet, names, sessionImplementor, new Object() );
-	}
-
-	private void mockResultSetAndTestValueToInt( Integer expectedValue,
-	                                             EnumSet<BitValues> rowValue ) throws SQLException {
-		TestHibernateBitFlagUserType userType = new TestHibernateBitFlagUserType();
-		PreparedStatement preparedStatement = mock( PreparedStatement.class );
-		SessionImplementor sessionImplementor = mock( SessionImplementor.class );
-		SessionFactoryImplementor sessionFactoryImplementor = mock( SessionFactoryImplementor.class );
-		when( sessionImplementor.getFactory() ).thenReturn( sessionFactoryImplementor );
-		when( sessionFactoryImplementor.getDialect() ).thenReturn( new HSQLDialect() );
-
-		userType.nullSafeSet( preparedStatement, rowValue, 3, sessionImplementor );
-
-		verify( preparedStatement, times( 1 ) ).setInt( eq( 3 ), eq( expectedValue ) );
+		mockResultSetAndTestValueToInt( userType, 0, null );
+		mockResultSetAndTestValueToInt( userType, 0, EnumSet.noneOf( BitValues.class ) );
+		mockResultSetAndTestValueToInt( userType, 1, EnumSet.of( BitValues.RED ) );
+		mockResultSetAndTestValueToInt( userType, 2, EnumSet.of( BitValues.GREEN ) );
+		mockResultSetAndTestValueToInt( userType, 3, EnumSet.of( BitValues.RED, BitValues.GREEN ) );
+		mockResultSetAndTestValueToInt( userType, 4, EnumSet.of( BitValues.BLUE ) );
+		mockResultSetAndTestValueToInt( userType, 5, EnumSet.of( BitValues.BLUE, BitValues.RED ) );
+		mockResultSetAndTestValueToInt( userType, 6, EnumSet.of( BitValues.GREEN, BitValues.BLUE ) );
+		mockResultSetAndTestValueToInt( userType, 7, EnumSet.of( BitValues.RED, BitValues.GREEN, BitValues.BLUE ) );
 	}
 
 	public static enum BitValues implements BitFlag
@@ -102,18 +65,18 @@ public class TestHibernateBitFlag
 		GREEN( 2 ),
 		BLUE( 4 );
 
-		int bitFlag;
+		int id;
 
-		BitValues( int bitFlag ) {
-			this.bitFlag = bitFlag;
+		BitValues( int id ) {
+			this.id = id;
 		}
 
-		public int getBitFlag() {
-			return this.bitFlag;
+		public Integer getId() {
+			return this.id;
 		}
 	}
 
-	private static class TestHibernateBitFlagUserType extends HibernateBitFlag
+	private static class TestHibernateBitFlagUserType extends HibernateBitFlag<BitValues>
 	{
 
 		public TestHibernateBitFlagUserType() {

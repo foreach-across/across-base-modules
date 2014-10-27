@@ -20,18 +20,43 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.IntegerType;
 import org.hibernate.usertype.UserType;
 
+import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.EnumSet;
-import java.util.Set;
 
-public abstract class HibernateBitFlag<T extends BitFlag> extends HibernateIdLookup<T> implements UserType
+
+public abstract class HibernateIdLookup<T extends IdLookup> implements UserType
 {
 	private final IntegerType TYPE = IntegerType.INSTANCE;
+	private final Class<T> clazz;
 
-	public HibernateBitFlag( Class<T> clazz ) {
-		super( clazz );
+	public HibernateIdLookup( Class<T> clazz ) {
+		this.clazz = clazz;
+	}
+
+	protected Class getClazz() {
+		return clazz;
+	}
+
+	@Override
+	public int[] sqlTypes() {
+		return new int[] { TYPE.sqlType() };
+	}
+
+	@Override
+	public Class returnedClass() {
+		return clazz.getClass();
+	}
+
+	@Override
+	public boolean equals( Object x, Object y ) throws HibernateException {
+		return x == y;
+	}
+
+	@Override
+	public int hashCode( Object x ) throws HibernateException {
+		return x.hashCode();
 	}
 
 	@Override
@@ -41,10 +66,13 @@ public abstract class HibernateBitFlag<T extends BitFlag> extends HibernateIdLoo
 	                           Object owner ) throws HibernateException, SQLException {
 		Integer identifier = (Integer) TYPE.get( rs, names[0], session );
 
-		if ( rs.wasNull() ) {
-			return EnumSet.noneOf( getClazz() );
+		T[] enumValues = clazz.getEnumConstants();
+		for ( T enumValue : enumValues ) {
+			if ( enumValue.getId().equals( identifier ) ) {
+				return enumValue;
+			}
 		}
-		return fromInteger( identifier, getClazz() );
+		throw new HibernateException( "Could not find enum for value: " + identifier + " in clazz " + clazz );
 	}
 
 	@Override
@@ -54,32 +82,35 @@ public abstract class HibernateBitFlag<T extends BitFlag> extends HibernateIdLoo
 	                         int index,
 	                         SessionImplementor session ) throws HibernateException, SQLException {
 		try {
-			int result = toInteger( (Set) value );
-			TYPE.set( st, result, index, session );
+			TYPE.set( st, ((IdLookup<Integer>) value).getId(), index, session );
 		}
 		catch ( Exception e ) {
 			throw new HibernateException( "Exception while getting ids from set", e );
 		}
 	}
 
-	private <E extends Enum<E> & BitFlag> EnumSet<E> fromInteger( Integer identifier, Class<E> enumType ) {
-		EnumSet<E> result = EnumSet.noneOf( enumType );
-		E[] enumValues = enumType.getEnumConstants();
-		for ( E enumValue : enumValues ) {
-			if ( ( enumValue.getId() & identifier ) > 0 ) {
-				result.add( enumValue );
-			}
-		}
-		return result;
+	@Override
+	public Object deepCopy( Object value ) throws HibernateException {
+		return value;
 	}
 
-	private <E extends Enum<E> & BitFlag> int toInteger( Set<E> enumSet ) {
-		int result = 0;
-		if ( enumSet != null ) {
-			for ( E enumValue : enumSet ) {
-				result |= enumValue.getId();
-			}
-		}
-		return result;
+	@Override
+	public boolean isMutable() {
+		return false;
+	}
+
+	@Override
+	public Serializable disassemble( Object value ) throws HibernateException {
+		return (Serializable) value;
+	}
+
+	@Override
+	public Object assemble( Serializable cached, Object owner ) throws HibernateException {
+		return cached;
+	}
+
+	@Override
+	public Object replace( Object original, Object target, Object owner ) throws HibernateException {
+		return original;
 	}
 }

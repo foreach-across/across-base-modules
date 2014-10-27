@@ -15,7 +15,10 @@
  */
 package com.foreach.across.modules.hibernate.types;
 
-public interface BitFlag extends IdLookup<Integer>
+public interface IdLookup<I>
 {
-	Integer getId();
+	/**
+	 * Returns the unique id of type &ltI&gt; for this instance.
+	 */
+	I getId();
 }
