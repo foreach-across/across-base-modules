@@ -42,9 +42,9 @@ public abstract class HibernateBitFlag<T extends BitFlag> extends HibernateIdLoo
 		Integer identifier = (Integer) TYPE.get( rs, names[0], session );
 
 		if ( rs.wasNull() ) {
-			return EnumSet.noneOf( getClazz() );
+			return EnumSet.noneOf( super.returnedClass() );
 		}
-		return fromInteger( identifier, getClazz() );
+		return fromInteger( identifier, super.returnedClass() );
 	}
 
 	@Override

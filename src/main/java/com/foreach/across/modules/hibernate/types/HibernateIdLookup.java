@@ -35,10 +35,6 @@ public abstract class HibernateIdLookup<T extends IdLookup> implements UserType
 		this.clazz = clazz;
 	}
 
-	protected Class getClazz() {
-		return clazz;
-	}
-
 	@Override
 	public int[] sqlTypes() {
 		return new int[] { TYPE.sqlType() };
@@ -46,7 +42,7 @@ public abstract class HibernateIdLookup<T extends IdLookup> implements UserType
 
 	@Override
 	public Class returnedClass() {
-		return clazz.getClass();
+		return clazz;
 	}
 
 	@Override
@@ -66,6 +62,9 @@ public abstract class HibernateIdLookup<T extends IdLookup> implements UserType
 	                           Object owner ) throws HibernateException, SQLException {
 		Integer identifier = (Integer) TYPE.get( rs, names[0], session );
 
+		if( identifier == null ) {
+			return null;
+		}
 		T[] enumValues = clazz.getEnumConstants();
 		for ( T enumValue : enumValues ) {
 			if ( enumValue.getId().equals( identifier ) ) {
@@ -82,7 +81,11 @@ public abstract class HibernateIdLookup<T extends IdLookup> implements UserType
 	                         int index,
 	                         SessionImplementor session ) throws HibernateException, SQLException {
 		try {
-			TYPE.set( st, ((IdLookup<Integer>) value).getId(), index, session );
+			if( value != null ) {
+				TYPE.set( st, ((IdLookup<Integer>) value).getId(), index, session );
+			} else {
+				st.setNull( index, TYPE.sqlType() );
+			}
 		}
 		catch ( Exception e ) {
 			throw new HibernateException( "Exception while getting ids from set", e );

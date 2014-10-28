@@ -26,6 +26,7 @@ public class TestIdLookup extends AbstractBaseIdLookup
 	@Test
 	public void testConvertIntFieldToEnum() throws Exception {
 		TestHibernateIdLookupUserType userType = new TestHibernateIdLookupUserType();
+		assertEquals( null, mockResultSetAndTestValue( userType , null ) );
 		assertEquals( IntegerValues.ONE, mockResultSetAndTestValue( userType , 1 ) );
 		assertEquals( IntegerValues.TWO, mockResultSetAndTestValue( userType , 2 ) );
 		assertEquals( IntegerValues.THREE, mockResultSetAndTestValue( userType , 3 ) );
@@ -38,6 +39,7 @@ public class TestIdLookup extends AbstractBaseIdLookup
 		mockResultSetAndTestValueToInt( userType, 1, IntegerValues.ONE );
 		mockResultSetAndTestValueToInt( userType, 2, IntegerValues.TWO );
 		mockResultSetAndTestValueToInt( userType, 3, IntegerValues.THREE );
+		mockResultSetAndTestValueToInt( userType, null, null );
 	}
 
 	public static enum IntegerValues implements IdLookup<Integer>

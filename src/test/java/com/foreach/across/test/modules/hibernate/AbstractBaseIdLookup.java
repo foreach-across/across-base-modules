@@ -18,6 +18,7 @@ package com.foreach.across.test.modules.hibernate;
 import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.type.IntegerType;
 import org.hibernate.usertype.UserType;
 
 import java.sql.PreparedStatement;
@@ -57,6 +58,11 @@ public abstract class AbstractBaseIdLookup
 
 		userType.nullSafeSet( preparedStatement, rowValue, 3, sessionImplementor );
 
-		verify( preparedStatement, times( 1 ) ).setInt( eq( 3 ), eq( expectedValue ) );
+		if( expectedValue == null ) {
+			verify( preparedStatement, times( 1 ) ).setNull( eq( 3 ), eq( IntegerType.INSTANCE.sqlType() ) );
+		} else {
+			verify( preparedStatement, times( 1 ) ).setInt( eq( 3 ), eq( expectedValue ) );
+		}
+
 	}
 }
