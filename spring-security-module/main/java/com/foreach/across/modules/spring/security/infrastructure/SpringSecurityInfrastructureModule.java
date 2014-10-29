@@ -41,7 +41,7 @@ public class SpringSecurityInfrastructureModule extends AcrossModule
 		// Exposed the security infrastructure bean manually, but don't annotate it as that would also expose
 		// the separate security beans and we don't want that
 		setExposeFilter(
-			new BeanFilterComposite( defaultExposeFilter(), new ClassBeanFilter( SecurityInfrastructure.class ) )
+				new BeanFilterComposite( defaultExposeFilter(), new ClassBeanFilter( SecurityInfrastructure.class ) )
 		);
 	}
 
@@ -58,7 +58,7 @@ public class SpringSecurityInfrastructureModule extends AcrossModule
 
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-		addApplicationContextConfigurer(
+		contextConfigurers.add(
 				new AnnotatedClassConfigurer(
 						SecurityPrincipalServiceConfiguration.class,
 						SecurityInfrastructure.class
