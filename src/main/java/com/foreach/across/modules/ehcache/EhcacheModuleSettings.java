@@ -25,6 +25,9 @@ public class EhcacheModuleSettings extends AcrossModuleSettings
 	public static final String CONFIGURATION_RESOURCE = "ehcache.configuration.resource";
 	public static final String CONFIGURATION = "ehcache.configuration";
 
+	public static final String CACHE_MANAGER_IS_SHARED = "ehcache.cacheManager.shared";
+	public static final String CACHE_MANAGER_NAME = "ehcache.cacheManager.name";
+
 	@Override
 	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
 		registry.register( CONFIGURATION_RESOURCE, Resource.class, new ClassPathResource( "ehcache.xml" ),
@@ -32,6 +35,10 @@ public class EhcacheModuleSettings extends AcrossModuleSettings
 		registry.register( CONFIGURATION, Object.class,
 		                   null,
 		                   "Configuration class instance or class name" );
+		registry.register( CACHE_MANAGER_IS_SHARED, Boolean.class, true,
+		                   "Should the created CacheManager be shared at the ClassLoader level." );
+		registry.register( CACHE_MANAGER_NAME, String.class, null,
+		                   "Name of the CacheManager instance." );
 	}
 
 	public Resource getConfigurationResource() {
@@ -40,5 +47,13 @@ public class EhcacheModuleSettings extends AcrossModuleSettings
 
 	public Object getConfiguration() {
 		return getProperty( CONFIGURATION, Object.class );
+	}
+
+	public boolean isSharedCacheManager() {
+		return getProperty( CACHE_MANAGER_IS_SHARED, Boolean.class );
+	}
+
+	public String getCachemanagerName() {
+		return getProperty( CACHE_MANAGER_NAME, String.class );
 	}
 }

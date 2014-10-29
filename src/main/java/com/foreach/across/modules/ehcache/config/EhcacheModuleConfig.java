@@ -41,20 +41,25 @@ public class EhcacheModuleConfig
 	@Bean
 	public AcrossEhCacheManagerFactoryBean acrossEhCacheManagerFactoryBean() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
 		AcrossEhCacheManagerFactoryBean ehCacheManagerFactoryBean = new AcrossEhCacheManagerFactoryBean();
+		ehCacheManagerFactoryBean.setCacheManagerName( ehcacheModuleSettings.getCachemanagerName() );
+		ehCacheManagerFactoryBean.setShared( ehcacheModuleSettings.isSharedCacheManager() );
 
 		Object configurationObject = ehcacheModuleSettings.getConfiguration();
-		if( configurationObject != null ) {
+		if ( configurationObject != null ) {
 			net.sf.ehcache.config.Configuration configuration;
-			if( configurationObject instanceof String ) {
+			if ( configurationObject instanceof String ) {
 				Class<?> clazz = Class.forName( (String) configurationObject );
 				configuration = (net.sf.ehcache.config.Configuration) clazz.newInstance();
-			} else if( configurationObject instanceof net.sf.ehcache.config.Configuration ) {
-				configuration = ( net.sf.ehcache.config.Configuration) configurationObject;
-			} else {
+			}
+			else if ( configurationObject instanceof net.sf.ehcache.config.Configuration ) {
+				configuration = (net.sf.ehcache.config.Configuration) configurationObject;
+			}
+			else {
 				throw new IllegalArgumentException( "unsupported configuration class" );
 			}
 			ehCacheManagerFactoryBean.setConfiguration( configuration );
-		} else {
+		}
+		else {
 			ehCacheManagerFactoryBean.setConfigLocation( ehcacheModuleSettings.getConfigurationResource() );
 		}
 
