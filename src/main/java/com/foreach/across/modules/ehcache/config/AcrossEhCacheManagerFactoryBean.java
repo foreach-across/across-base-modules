@@ -31,7 +31,6 @@ import java.io.InputStream;
 
 public class AcrossEhCacheManagerFactoryBean implements FactoryBean<CacheManager>, InitializingBean, DisposableBean
 {
-
 	protected final Log logger = LogFactory.getLog( getClass() );
 
 	private Resource resource;
@@ -84,7 +83,7 @@ public class AcrossEhCacheManagerFactoryBean implements FactoryBean<CacheManager
 	 * CacheManager by the EhCacheManagerFactoryBean that actually created it.
 	 *
 	 * @see #setCacheManagerName
-	 * #see #setShared
+	 * @see #setShared
 	 * @see net.sf.ehcache.CacheManager#getCacheManager(String)
 	 * @see net.sf.ehcache.CacheManager#CacheManager()
 	 */
