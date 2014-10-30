@@ -19,18 +19,26 @@ import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
+import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalRetrievalStrategy;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
 import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
@@ -43,6 +51,12 @@ public class ITSpringSecurityWithoutWeb
 	@Autowired(required = false)
 	private SecurityPrincipalService securityPrincipalService;
 
+	@Autowired(required = false)
+	private CurrentSecurityPrincipalProxy currentPrincipal;
+
+	@Autowired
+	private SecurityPrincipalRetrievalStrategy principalRetrievalStrategy;
+
 	@Test
 	public void authenticationManagerBuilderShouldExist() {
 		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME,
@@ -52,6 +66,24 @@ public class ITSpringSecurityWithoutWeb
 	@Test
 	public void securityPrincipalServiceShouldExist() {
 		assertNotNull( securityPrincipalService );
+	}
+
+	@Test
+	public void currentSecurityPrincipalCanBeFetchedUsingTheRetrievalStrategy() {
+		assertNotNull( currentPrincipal );
+		assertFalse( currentPrincipal.isAuthenticated() );
+
+		Authentication auth = mock( Authentication.class );
+		when( auth.isAuthenticated() ).thenReturn( true );
+		when( auth.getPrincipal() ).thenReturn( "principalName" );
+
+		SecurityPrincipal principal = mock( SecurityPrincipal.class );
+		when( principalRetrievalStrategy.getPrincipalByName( "principalName" ) ).thenReturn( principal );
+
+		SecurityContextHolder.getContext().setAuthentication( auth );
+
+		assertTrue( currentPrincipal.isAuthenticated() );
+		assertSame( principal, currentPrincipal.getPrincipal() );
 	}
 
 	@Configuration
@@ -65,6 +97,11 @@ public class ITSpringSecurityWithoutWeb
 
 		private SpringSecurityModule springSecurityModule() {
 			return new SpringSecurityModule();
+		}
+
+		@Bean
+		public SecurityPrincipalRetrievalStrategy principalRetrievalStrategy() {
+			return mock( SecurityPrincipalRetrievalStrategy.class );
 		}
 	}
 }

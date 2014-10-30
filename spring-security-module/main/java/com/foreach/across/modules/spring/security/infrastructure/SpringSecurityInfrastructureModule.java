@@ -35,6 +35,7 @@ import java.util.Set;
 @AcrossDepends(optional = "EhcacheModule")
 public class SpringSecurityInfrastructureModule extends AcrossModule
 {
+	public static final String ACL_MODULE = "SpringSecurityAclModule";
 	public static final String NAME = "SpringSecurityInfrastructureModule";
 
 	public SpringSecurityInfrastructureModule() {

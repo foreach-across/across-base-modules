@@ -15,10 +15,6 @@
  */
 package com.foreach.across.modules.spring.security.infrastructure.services;
 
-import com.foreach.across.core.annotations.Refreshable;
-import com.foreach.across.modules.hibernate.business.IdBasedEntity;
-import com.foreach.across.modules.spring.security.acl.business.AclPermission;
-import com.foreach.across.modules.spring.security.acl.services.AclSecurityService;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +38,6 @@ import java.util.Collections;
  * @author Arne Vandamme
  */
 @Service
-@Refreshable
 public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincipalProxy
 {
 	private static final ThreadLocal<SecurityPrincipal> principal = new ThreadLocal<>();
@@ -50,9 +45,6 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 
 	@Autowired
 	private SecurityPrincipalService securityPrincipalService;
-
-	@Autowired(required = false)
-	private AclSecurityService aclSecurityService;
 
 	@Override
 	public boolean isAuthenticated() {
@@ -62,13 +54,6 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 	@Override
 	public boolean hasAuthority( String authority ) {
 		return isAuthenticated() && getPrincipal().getAuthorities().contains( new SimpleGrantedAuthority( authority ) );
-	}
-
-	@Override
-	public boolean hasAclPermission( IdBasedEntity entity, AclPermission permission ) {
-		return aclSecurityService != null
-				&& isAuthenticated()
-				&& aclSecurityService.hasPermission( getPrincipal(), entity, permission );
 	}
 
 	@Override
@@ -91,7 +76,7 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 		String loadedName = principalName.get();
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		if ( authentication.isAuthenticated() ) {
+		if ( authentication != null && authentication.isAuthenticated() ) {
 			if ( loadedName == null || !StringUtils.equals( loadedName, authentication.getName() ) ) {
 				principalName.set( authentication.getName() );
 
