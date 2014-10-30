@@ -26,7 +26,6 @@ import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
 import com.foreach.across.core.filters.BeanFilterComposite;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.core.filters.NamedBeanFilter;
-import com.foreach.across.modules.spring.security.acl.SpringSecurityAclModule;
 import com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration;
 import com.foreach.across.modules.spring.security.config.DynamicSecurityFilterConfiguration;
 import com.foreach.across.modules.spring.security.config.ModuleGlobalMethodSecurityConfiguration;
@@ -104,7 +103,7 @@ public class SpringSecurityModule extends AcrossModule
 
 	private boolean isSecurityModule( ModuleBootstrapConfig moduleBootstrapConfig ) {
 		switch ( moduleBootstrapConfig.getModuleName() ) {
-			case SpringSecurityAclModule.NAME:
+			case SpringSecurityInfrastructureModule.ACL_MODULE:
 			case SpringSecurityInfrastructureModule.NAME:
 				return true;
 			default:
