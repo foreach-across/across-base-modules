@@ -16,6 +16,7 @@
 package com.foreach.across.modules.ehcache.controllers;
 
 import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Refreshable;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
@@ -24,7 +25,6 @@ import com.foreach.across.modules.web.resource.WebResource;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
 import com.foreach.across.modules.web.table.Table;
 import com.foreach.across.modules.web.table.TableHeader;
-import net.engio.mbassy.listener.Handler;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
@@ -54,7 +54,7 @@ public class DebugEhcacheController
 	@Autowired(required = false)
 	private DebugWeb debugWeb;
 
-	@Handler
+	@Event
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder().item( "/ehcache", "Cache overview" );
 	}
@@ -83,14 +83,15 @@ public class DebugEhcacheController
 	@RequestMapping(value = "/ehcache/flush", method = RequestMethod.GET)
 	public String flushCache( @RequestParam(value = "cache", required = false) String cacheName,
 	                          @RequestParam(value = "from", required = false) String from,
-	                          @RequestParam(value = "replicate", required = false, defaultValue = "false" ) String replicate) {
+	                          @RequestParam(value = "replicate", required = false,
+	                                        defaultValue = "false") String replicate ) {
 		String[] cachesToFlush = cacheName == null ? cacheManager.getCacheNames() : new String[] { cacheName };
 
-
 		for ( String cache : cachesToFlush ) {
-			if( StringUtils.equalsIgnoreCase( replicate, "true" ) ) {
+			if ( StringUtils.equalsIgnoreCase( replicate, "true" ) ) {
 				cacheManager.getCache( cache ).removeAll();
-			} else {
+			}
+			else {
 				cacheManager.getCache( cache ).flush();
 			}
 		}
@@ -100,7 +101,7 @@ public class DebugEhcacheController
 
 	@RequestMapping(value = "/ehcache/view", method = RequestMethod.GET)
 	public String showCache( @RequestParam("cache") String cacheName,
-	                         @RequestParam(value = "listPeers", defaultValue = StringUtils.EMPTY ) String listPeers,
+	                         @RequestParam(value = "listPeers", defaultValue = StringUtils.EMPTY) String listPeers,
 	                         Model model ) {
 		Cache cache = cacheManager.getCache( cacheName );
 
@@ -122,14 +123,16 @@ public class DebugEhcacheController
 		model.addAttribute( "cache", cache );
 		model.addAttribute( "cacheEntries", table );
 
-		if( StringUtils.equalsIgnoreCase( "true", listPeers ) ) {
+		if ( StringUtils.equalsIgnoreCase( "true", listPeers ) ) {
 			List<String> cachePeers = new ArrayList<>();
-			Map<String,CacheManagerPeerProvider> cacheManagerPeerProviders = cacheManager.getCacheManagerPeerProviders();
-			for( Map.Entry<String, CacheManagerPeerProvider> cacheManagerPeerProviderEntry : cacheManagerPeerProviders.entrySet() ) {
-				List cachePeersList =  cacheManagerPeerProviderEntry.getValue().listRemoteCachePeers( cache );
-				for( Object object : cachePeersList ) {
-					if( object instanceof CachePeer ) {
-						CachePeer cachePeer = ( CachePeer ) object;
+			Map<String, CacheManagerPeerProvider> cacheManagerPeerProviders =
+					cacheManager.getCacheManagerPeerProviders();
+			for ( Map.Entry<String, CacheManagerPeerProvider> cacheManagerPeerProviderEntry : cacheManagerPeerProviders
+					.entrySet() ) {
+				List cachePeersList = cacheManagerPeerProviderEntry.getValue().listRemoteCachePeers( cache );
+				for ( Object object : cachePeersList ) {
+					if ( object instanceof CachePeer ) {
+						CachePeer cachePeer = (CachePeer) object;
 						String cachePeerItem = cacheManagerPeerProviderEntry.getKey();
 						try {
 							cachePeerItem = ", " + cachePeer.getUrl() + " " + cachePeer.getGuid();
@@ -142,7 +145,8 @@ public class DebugEhcacheController
 				}
 			}
 			model.addAttribute( "cachePeers", cachePeers );
-		} else  {
+		}
+		else {
 			model.addAttribute( "cachePeers", "none" );
 		}
 
