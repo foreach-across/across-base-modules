@@ -15,10 +15,10 @@
  */
 package com.foreach.across.modules.debugweb.servlet.logging;
 
+import com.foreach.across.core.annotations.Event;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
-import net.engio.mbassy.listener.Handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +39,7 @@ public class RequestResponseLogController
 	@Autowired(required = false)
 	private DebugWeb debugWeb;
 
-	@Handler
+	@Event
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder().group( "/logging/requestResponse", "Request - response logs" ).and()
 		     .item( "/logging/requestResponse/list", "Overview" ).and()

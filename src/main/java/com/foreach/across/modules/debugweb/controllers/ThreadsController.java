@@ -15,10 +15,10 @@
  */
 package com.foreach.across.modules.debugweb.controllers;
 
+import com.foreach.across.core.annotations.Event;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
-import net.engio.mbassy.listener.Handler;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -28,7 +28,7 @@ import java.util.List;
 @DebugWebController
 public class ThreadsController
 {
-	@Handler
+	@Event
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder().item( "/threadStack", "Threads and stack" );
 	}

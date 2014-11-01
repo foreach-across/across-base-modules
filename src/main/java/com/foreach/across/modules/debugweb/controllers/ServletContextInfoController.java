@@ -1,10 +1,10 @@
 package com.foreach.across.modules.debugweb.controllers;
 
+import com.foreach.across.core.annotations.Event;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.table.Table;
-import net.engio.mbassy.listener.Handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.ui.Model;
@@ -21,7 +21,7 @@ public class ServletContextInfoController
 	@Autowired
 	private ServletContext servletContext;
 
-	@Handler
+	@Event
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder()
 		     .group( "/servlet", "Servlet context" ).order( Ordered.HIGHEST_PRECEDENCE )
