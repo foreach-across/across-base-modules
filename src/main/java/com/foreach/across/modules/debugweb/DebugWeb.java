@@ -46,6 +46,7 @@ public final class DebugWeb extends PrefixingPathContext
 
 	public static final String VIEW_LOGGING_REQUEST_RESPONSE_DETAIL = "th/debugweb/logging/requestResponse/detail";
 	public static final String VIEW_LOGGING_REQUEST_RESPONSE_LIST = "th/debugweb/logging/requestResponse/list";
+	public static final String VIEW_LOGGING_REQUEST_RESPONSE_SETTINGS = "th/debugweb/logging/requestResponse/settings";
 
 	public DebugWeb( String prefix ) {
 		super( prefix );

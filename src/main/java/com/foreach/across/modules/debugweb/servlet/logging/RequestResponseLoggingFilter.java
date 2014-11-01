@@ -51,9 +51,17 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter
 		this.urlPathHelper = urlPathHelper;
 	}
 
+	public Collection<String> getIncludedPathPatterns() {
+		return includedPathPatterns;
+	}
+
 	public void setIncludedPathPatterns( Collection<String> includedPathPatterns ) {
 		Assert.notNull( includedPathPatterns );
 		this.includedPathPatterns = new HashSet<>( includedPathPatterns );
+	}
+
+	public Collection<String> getExcludedPathPatterns() {
+		return excludedPathPatterns;
 	}
 
 	public void setExcludedPathPatterns( Collection<String> excludedPathPatterns ) {
