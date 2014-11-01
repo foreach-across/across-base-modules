@@ -31,6 +31,10 @@ public class RequestResponseLogController
 {
 	@Autowired
 	private RequestResponseLogRegistry logRegistry;
+	@Autowired
+	private RequestResponseLoggingFilter logFilter;
+	@Autowired(required = false)
+	private DebugWeb debugWeb;
 
 	@Handler
 	public void buildMenu( DebugMenuEvent event ) {
@@ -42,6 +46,7 @@ public class RequestResponseLogController
 	@RequestMapping("/logging/requestResponse/list")
 	public String listEntries( Model model ) {
 		model.addAttribute( "maxEntries", logRegistry.getMaxEntries() );
+		model.addAttribute( "paused", logFilter.isPaused() );
 		model.addAttribute( "logEntries", logRegistry.getEntries() );
 
 		return DebugWeb.VIEW_LOGGING_REQUEST_RESPONSE_LIST;
@@ -52,5 +57,17 @@ public class RequestResponseLogController
 		model.addAttribute( "entry", logRegistry.getEntry( id ) );
 
 		return DebugWeb.VIEW_LOGGING_REQUEST_RESPONSE_DETAIL;
+	}
+
+	@RequestMapping("/logging/requestResponse/pause")
+	public String pauseLogger() {
+		logFilter.setPaused( true );
+		return debugWeb.redirect( "/logging/requestResponse/list" );
+	}
+
+	@RequestMapping("/logging/requestResponse/resume")
+	public String resumeLogger() {
+		logFilter.setPaused( false );
+		return debugWeb.redirect( "/logging/requestResponse/list" );
 	}
 }

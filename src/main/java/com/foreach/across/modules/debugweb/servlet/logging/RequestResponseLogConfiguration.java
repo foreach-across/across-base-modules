@@ -32,6 +32,7 @@ public class RequestResponseLogConfiguration
 	private Collection<String> excludedPathPatterns;
 	private Collection<String> urlFilterMappings = Collections.singleton( "/*" );
 	private Collection<String> servletNameFilterMappings = Collections.emptySet();
+	private boolean paused = false;
 
 	public int getMaxEntries() {
 		return maxEntries;
@@ -73,6 +74,14 @@ public class RequestResponseLogConfiguration
 	public void setServletNameFilterMappings( Collection<String> servletNameFilterMappings ) {
 		Assert.notNull( servletNameFilterMappings );
 		this.servletNameFilterMappings = servletNameFilterMappings;
+	}
+
+	public boolean isPaused() {
+		return paused;
+	}
+
+	public void setPaused( boolean paused ) {
+		this.paused = paused;
 	}
 }
 

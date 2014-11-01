@@ -21,7 +21,11 @@
 <body th:fragment="content">
 
 	<div class="alert alert-warning">
-		Showing the last <span th:text="${maxEntries}"></span> kept log entries.
+		Showing the last <span th:text="${maxEntries}"></span> kept log entries. <a href="#" th:if="${not paused}" th:href="@{${@debugWeb.path('/logging/requestResponse/pause')}}">Pause logger</a>.
+	</div>
+
+	<div th:if="${paused}" class="alert alert-danger">
+		The logger is paused! <a href="#" th:href="@{${@debugWeb.path('/logging/requestResponse/resume')}}" >Resume logger</a>.
 	</div>
 
 	<table class="table table-striped">

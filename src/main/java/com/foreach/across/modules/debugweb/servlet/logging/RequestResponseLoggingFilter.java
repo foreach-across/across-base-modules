@@ -39,9 +39,12 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter
 	private Collection<String> includedPathPatterns = Collections.emptyList();
 	private Collection<String> excludedPathPatterns = Collections.emptyList();
 
-	public RequestResponseLoggingFilter( RequestResponseLogRegistry logRegistry ) {
+	private boolean paused = false;
+
+	public RequestResponseLoggingFilter( RequestResponseLogRegistry logRegistry, boolean paused ) {
 		this.logRegistry = logRegistry;
 		urlPathHelper = new UrlPathHelper();
+		this.paused = paused;
 	}
 
 	public void setUrlPathHelper( UrlPathHelper urlPathHelper ) {
@@ -82,6 +85,9 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter
 	}
 
 	private boolean shouldLog( HttpServletRequest request ) {
+		if( paused ) {
+			return false;
+		}
 		String path = urlPathHelper.getLookupPathForRequest( request );
 
 		if ( !excludedPathPatterns.isEmpty() ) {
@@ -101,5 +107,13 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter
 		}
 
 		return includedPathPatterns.isEmpty();
+	}
+
+	public boolean isPaused() {
+		return paused;
+	}
+
+	public void setPaused( boolean paused ) {
+		this.paused = paused;
 	}
 }

@@ -65,7 +65,7 @@ public class DebugWebLoggingConfiguration extends AcrossWebDynamicServletConfigu
 	@Bean
 	@Lazy
 	public RequestResponseLoggingFilter requestResponseLoggingFilter() {
-		RequestResponseLoggingFilter filter = new RequestResponseLoggingFilter( requestResponseLogRegistry() );
+		RequestResponseLoggingFilter filter = new RequestResponseLoggingFilter( requestResponseLogRegistry(), logConfiguration().isPaused() );
 
 		if ( logConfiguration().getIncludedPathPatterns() != null ) {
 			filter.setIncludedPathPatterns( logConfiguration().getIncludedPathPatterns() );

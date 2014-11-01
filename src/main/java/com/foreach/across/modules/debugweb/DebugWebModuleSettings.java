@@ -25,6 +25,7 @@ import com.foreach.across.modules.debugweb.servlet.logging.RequestResponseLogCon
 public class DebugWebModuleSettings extends AcrossModuleSettings
 {
 	public static final String REQUEST_RESPONSE_LOG_ENABLED = "debugWeb.log.requestResponse.enabled";
+	public static final String REQUEST_RESPONSE_LOG_PAUSED = "debugWeb.log.requestResponse.paused";
 	public static final String REQUEST_RESPONSE_LOG_CONFIGURATION = "debugWeb.log.requestResponse.configuration";
 
 	@Override
@@ -34,6 +35,8 @@ public class DebugWebModuleSettings extends AcrossModuleSettings
 		registry.register( REQUEST_RESPONSE_LOG_CONFIGURATION, RequestResponseLogConfiguration.class,
 		                   new RequestResponseLogConfiguration(),
 		                   "Configuration settings for request/response details log." );
+		registry.register( REQUEST_RESPONSE_LOG_PAUSED, Boolean.class, false,
+		                   "If enabled, should this logger be paused or not." );
 	}
 
 	public boolean isRequestResponseLogEnabled() {
