@@ -38,6 +38,11 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 		this.clazz = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
 	}
 
+	@Override
+	public Class<T> getEntityClass() {
+		return clazz;
+	}
+
 	/**
 	 * Creates a query for the distinct root entity.
 	 */

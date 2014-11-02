@@ -19,6 +19,8 @@ import java.util.Collection;
 
 public interface BasicRepository<T>
 {
+	Class<T> getEntityClass();
+
 	T getById( long id );
 
 	Collection<T> getAll();
