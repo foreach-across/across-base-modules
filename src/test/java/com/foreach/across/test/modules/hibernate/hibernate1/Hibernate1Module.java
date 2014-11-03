@@ -16,10 +16,14 @@
 package com.foreach.across.test.modules.hibernate.hibernate1;
 
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
+import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
 import com.foreach.across.modules.hibernate.AcrossHibernateModule;
 import com.foreach.across.modules.hibernate.provider.HasHibernatePackageProvider;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageProvider;
 import com.foreach.across.modules.hibernate.provider.PackagesToScanProvider;
+
+import java.util.Set;
 
 public class Hibernate1Module extends AcrossModule implements HasHibernatePackageProvider
 {
@@ -31,6 +35,11 @@ public class Hibernate1Module extends AcrossModule implements HasHibernatePackag
 	@Override
 	public String getDescription() {
 		return null;
+	}
+
+	@Override
+	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
+		contextConfigurers.add( new ComponentScanConfigurer( getClass().getPackage().getName() ) );
 	}
 
 	/**
