@@ -102,7 +102,14 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 	@Transactional
 	@Override
 	public void update( T object ) {
-		session().update( object );
+		Session session = session();
+
+		if ( !session.contains( object ) ) {
+			session.merge( object );
+		}
+		else {
+			session.update( object );
+		}
 	}
 
 	@Transactional
