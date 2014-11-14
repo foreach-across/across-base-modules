@@ -28,6 +28,7 @@ import java.util.Collection;
 public class BasicRepositoryImpl<T> implements BasicRepository<T>
 {
 	private final Class<T> clazz;
+	private static final int MAX_RESULTS = 5000;
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -81,16 +82,18 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 	@Transactional(readOnly = true)
 	@Override
 	public Collection<T> getAll() {
-		return (Collection<T>) orderedDistinct().list();
+		// TODO: https://bitbucket.org/beforeach/across-standard-modules/issue/15/
+		return (Collection<T>) orderedDistinct().setFirstResult(0).setMaxResults( MAX_RESULTS ).list();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)
 	@Override
 	public Collection<T> getAllForIds( Collection<Long> ids ) {
+		// TODO: https://bitbucket.org/beforeach/across-standard-modules/issue/15/
 		return (Collection<T>) orderedDistinct()
 				.add( Restrictions.in( "id", ids ) )
-				.list();
+				.setFirstResult(0).setMaxResults( MAX_RESULTS ).list();
 	}
 
 	@Transactional
