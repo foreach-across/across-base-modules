@@ -16,6 +16,7 @@
 package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalHierarchy;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -38,7 +39,7 @@ import java.util.Collections;
  * @author Arne Vandamme
  */
 @Service
-public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincipalProxy
+public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincipalProxy, SecurityPrincipalHierarchy
 {
 	private static final ThreadLocal<SecurityPrincipal> principal = new ThreadLocal<>();
 	private static final ThreadLocal<String> principalName = new ThreadLocal<>();
@@ -69,7 +70,16 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 
 	@Override
 	public Collection<GrantedAuthority> getAuthorities() {
-		return isAuthenticated() ? Collections.<GrantedAuthority>emptyList() : getPrincipal().getAuthorities();
+		return isAuthenticated() ? getPrincipal().getAuthorities() : Collections.<GrantedAuthority>emptyList();
+	}
+
+	@Override
+	public Collection<SecurityPrincipal> getParentPrincipals() {
+		SecurityPrincipal principal = getPrincipal();
+
+		return principal instanceof SecurityPrincipalHierarchy
+				? ( (SecurityPrincipalHierarchy) principal ).getParentPrincipals()
+				: Collections.<SecurityPrincipal>emptyList();
 	}
 
 	private SecurityPrincipal loadPrincipal() {
@@ -105,6 +115,6 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 
 	@Override
 	public String toString() {
-		return isAuthenticated() ? "not-authenticated" : getPrincipal().toString();
+		return isAuthenticated() ? getPrincipal().toString() : "not-authenticated";
 	}
 }
