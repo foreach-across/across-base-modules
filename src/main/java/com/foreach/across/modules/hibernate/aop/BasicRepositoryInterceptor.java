@@ -18,14 +18,11 @@ package com.foreach.across.modules.hibernate.aop;
 import com.foreach.across.modules.hibernate.repositories.Undeletable;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Intercepts persistence calls on a {@link com.foreach.across.modules.hibernate.repositories.BasicRepository} to
@@ -35,8 +32,6 @@ import java.util.List;
  */
 public class BasicRepositoryInterceptor implements MethodInterceptor
 {
-	private static final Logger LOG = LoggerFactory.getLogger( BasicRepositoryInterceptor.class );
-
 	static final String CREATE = "create";
 	static final String UPDATE = "update";
 	static final String DELETE = "delete";
@@ -72,7 +67,7 @@ public class BasicRepositoryInterceptor implements MethodInterceptor
 	                                                              Collection<EntityInterceptor> interceptors ) {
 		Class<?> entityClass = ClassUtils.getUserClass( AopProxyUtils.ultimateTargetClass( entity ) );
 
-		Collection<EntityInterceptor> matchingInterceptors = new ArrayList<>(  );
+		Collection<EntityInterceptor> matchingInterceptors = new ArrayList<>();
 
 		for ( EntityInterceptor candidate : interceptors ) {
 			if ( candidate.getEntityClass().equals( entityClass ) ) {
@@ -88,7 +83,7 @@ public class BasicRepositoryInterceptor implements MethodInterceptor
 
 	@SuppressWarnings("unchecked")
 	private void callBefore( Collection<EntityInterceptor> interceptors, String methodName, Object entity ) {
-		for (EntityInterceptor interceptor : interceptors) {
+		for ( EntityInterceptor interceptor : interceptors ) {
 			switch ( methodName ) {
 				case CREATE:
 					interceptor.beforeCreate( entity );
@@ -105,7 +100,7 @@ public class BasicRepositoryInterceptor implements MethodInterceptor
 
 	@SuppressWarnings("unchecked")
 	private void callAfter( Collection<EntityInterceptor> interceptors, String methodName, Object entity ) {
-		for (EntityInterceptor interceptor : interceptors) {
+		for ( EntityInterceptor interceptor : interceptors ) {
 			switch ( methodName ) {
 				case CREATE:
 					interceptor.afterCreate( entity );

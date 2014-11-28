@@ -23,9 +23,9 @@ import java.util.Collections;
 
 /**
  * @author Andy Somers
- *
- * Convenience installer that creates the necessary columns for the default implementation
- * of the {@link com.foreach.across.modules.hibernate.business.Auditable} interface.
+ *         <p/>
+ *         Convenience installer that creates the necessary columns for the default implementation
+ *         of the {@link com.foreach.across.modules.hibernate.business.Auditable} interface.
  * @see com.foreach.across.modules.hibernate.business.AuditableEntity
  */
 public abstract class AuditableSchemaInstaller extends AcrossLiquibaseInstaller
