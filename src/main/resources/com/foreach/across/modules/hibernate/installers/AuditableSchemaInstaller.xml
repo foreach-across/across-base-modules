@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2014 the original author or authors
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<property name="table.auditable_table"/>
+
+	<changeSet id="add-created-by-${table.auditable_table}" author="asm">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="${table.auditable_table}" columnName="created_by"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="${table.auditable_table}">
+			<column name="created_by" type="java.sql.Types.VARCHAR(255)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="add-created-date-${table.auditable_table}" author="asm">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="${table.auditable_table}" columnName="created_date"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="${table.auditable_table}">
+			<column name="created_date" type="java.sql.Types.TIMESTAMP">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="add-last-modified-by-${table.auditable_table}" author="asm">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="${table.auditable_table}" columnName="last_modified_by"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="${table.auditable_table}">
+			<column name="last_modified_by" type="java.sql.Types.VARCHAR(255)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="add-last-modified-date-${table.auditable_table}" author="asm">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="${table.auditable_table}" columnName="last_modified_date"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="${table.auditable_table}">
+			<column name="last_modified_date" type="java.sql.Types.TIMESTAMP">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>
