@@ -15,43 +15,19 @@
  */
 package com.foreach.across.modules.hibernate.aop;
 
-import java.lang.reflect.ParameterizedType;
-
-/**
- * Base class for an interceptor hooked to {@link com.foreach.across.modules.hibernate.repositories.BasicRepository}
- * persistence methods.
- * <p/>
- * Implementations will be picked up automatically by the
- * {@link com.foreach.across.modules.hibernate.aop.BasicRepositoryInterceptor} if it is active.
- *
- * @author Arne Vandamme
- */
-public abstract class EntityInterceptor<T>
+public interface EntityInterceptor<T>
 {
-	protected final Class<T> entityClass;
+	Class<T> getEntityClass();
 
-	@SuppressWarnings("unchecked")
-	public EntityInterceptor() {
-		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
-		this.entityClass = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
-	}
+	void beforeCreate( T entity );
 
-	public Class<T> getEntityClass() {
-		return entityClass;
-	}
+	void afterCreate( T entity );
 
-	public void beforeCreate( T entity ) {
-	}
+	void beforeUpdate( T Entity );
 
-	public abstract void afterCreate( T entity );
+	void afterUpdate( T entity );
 
-	public void beforeUpdate( T Entity ) {
-	}
+	void beforeDelete( T entity, boolean isSoftDelete );
 
-	public abstract void afterUpdate( T entity );
-
-	public abstract void beforeDelete( T entity, boolean isSoftDelete );
-
-	public void afterDelete( T entity, boolean isSoftDelete ) {
-	}
+	void afterDelete( T entity, boolean isSoftDelete );
 }

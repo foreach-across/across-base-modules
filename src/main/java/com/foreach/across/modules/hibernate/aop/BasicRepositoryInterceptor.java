@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.hibernate.aop;
 
-import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.hibernate.repositories.Undeletable;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -24,7 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.util.ClassUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Intercepts persistence calls on a {@link com.foreach.across.modules.hibernate.repositories.BasicRepository} to
@@ -51,75 +52,71 @@ public class BasicRepositoryInterceptor implements MethodInterceptor
 		if ( BasicRepositoryPointcut.isEntityMethod( invocation.getMethod() ) ) {
 			Object entityObject = invocation.getArguments()[0];
 
-			if ( entityObject instanceof IdBasedEntity ) {
-				String methodName = invocation.getMethod().getName();
-				IdBasedEntity entity = (IdBasedEntity) entityObject;
-				EntityInterceptor interceptor = findInterceptorToApply( entity );
+			String methodName = invocation.getMethod().getName();
+			Collection<EntityInterceptor> interceptor = findInterceptorToApply( entityObject, interceptors );
 
-				if ( interceptor != null ) {
-					callBefore( interceptor, methodName, entity );
+			callBefore( interceptor, methodName, entityObject );
 
-					Object returnValue = invocation.proceed();
+			Object returnValue = invocation.proceed();
 
-					callAfter( interceptor, methodName, entity );
+			callAfter( interceptor, methodName, entityObject );
 
-					return returnValue;
-				}
-			}
-			else {
-				LOG.debug( "Not invoking ACL interceptor because the argument of {} was not an IdBasedEntity",
-				           invocation.getMethod() );
-			}
+			return returnValue;
 		}
 
 		return invocation.proceed();
 	}
 
 	@SuppressWarnings("unchecked")
-	private EntityInterceptor findInterceptorToApply( IdBasedEntity entity ) {
+	private Collection<EntityInterceptor> findInterceptorToApply( Object entity,
+	                                                              Collection<EntityInterceptor> interceptors ) {
 		Class<?> entityClass = ClassUtils.getUserClass( AopProxyUtils.ultimateTargetClass( entity ) );
 
-		EntityInterceptor fallback = null;
+		Collection<EntityInterceptor> matchingInterceptors = new ArrayList<>(  );
 
 		for ( EntityInterceptor candidate : interceptors ) {
 			if ( candidate.getEntityClass().equals( entityClass ) ) {
-				return candidate;
+				matchingInterceptors.add( candidate );
 			}
 			else if ( candidate.getEntityClass().isAssignableFrom( entityClass ) ) {
-				fallback = candidate;
+				matchingInterceptors.add( candidate );
 			}
 		}
 
-		return fallback;
+		return matchingInterceptors;
 	}
 
 	@SuppressWarnings("unchecked")
-	private void callBefore( EntityInterceptor interceptor, String methodName, IdBasedEntity entity ) {
-		switch ( methodName ) {
-			case CREATE:
-				interceptor.beforeCreate( entity );
-				break;
-			case UPDATE:
-				interceptor.beforeUpdate( entity );
-				break;
-			case DELETE:
-				interceptor.beforeDelete( entity, entity instanceof Undeletable );
-				break;
+	private void callBefore( Collection<EntityInterceptor> interceptors, String methodName, Object entity ) {
+		for (EntityInterceptor interceptor : interceptors) {
+			switch ( methodName ) {
+				case CREATE:
+					interceptor.beforeCreate( entity );
+					break;
+				case UPDATE:
+					interceptor.beforeUpdate( entity );
+					break;
+				case DELETE:
+					interceptor.beforeDelete( entity, entity instanceof Undeletable );
+					break;
+			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void callAfter( EntityInterceptor interceptor, String methodName, IdBasedEntity entity ) {
-		switch ( methodName ) {
-			case CREATE:
-				interceptor.afterCreate( entity );
-				break;
-			case UPDATE:
-				interceptor.afterUpdate( entity );
-				break;
-			case DELETE:
-				interceptor.afterDelete( entity, entity instanceof Undeletable );
-				break;
+	private void callAfter( Collection<EntityInterceptor> interceptors, String methodName, Object entity ) {
+		for (EntityInterceptor interceptor : interceptors) {
+			switch ( methodName ) {
+				case CREATE:
+					interceptor.afterCreate( entity );
+					break;
+				case UPDATE:
+					interceptor.afterUpdate( entity );
+					break;
+				case DELETE:
+					interceptor.afterDelete( entity, entity instanceof Undeletable );
+					break;
+			}
 		}
 	}
 }
