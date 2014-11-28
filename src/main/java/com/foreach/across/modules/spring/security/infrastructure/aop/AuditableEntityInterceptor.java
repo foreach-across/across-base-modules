@@ -18,15 +18,12 @@ package com.foreach.across.modules.spring.security.infrastructure.aop;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptorAdapter;
 import com.foreach.across.modules.hibernate.business.Auditable;
-import com.foreach.across.modules.hibernate.business.AuditableEntity;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -35,42 +32,45 @@ import java.util.Date;
  *
  * @author Wim Tibackx
  */
-@AcrossDepends(required = {"AcrossHibernateModule", "SpringSecurityAclModule"})
+@AcrossDepends(required = { "AcrossHibernateModule", "SpringSecurityAclModule" })
 public class AuditableEntityInterceptor extends EntityInterceptorAdapter<Auditable>
 {
 
 	@Override
-	public void  beforeCreate( Auditable entity ) {
-		entity.setCreatedDate( new Date( ) );
+	@SuppressWarnings("unchecked")
+	public void beforeCreate( Auditable entity ) {
+		entity.setCreatedDate( new Date() );
 		entity.setLastModifiedDate( new Date() );
-		if (isAuthenticated()) {
-			Collection<Type> types = TypeUtils.getTypeArguments( entity.getClass(), Auditable.class ) .values();
-			Object createdBy = getAuditableUser( (Class) types.iterator().next() );
+		if ( isAuthenticated() ) {
+			Object createdBy = getAuditableUser( entity );
 			entity.setCreatedBy( createdBy );
 			entity.setLastModifiedBy( createdBy );
 		}
 	}
 
-	private Object getAuditableUser( Class typeVariable ) {
+	@Override
+	@SuppressWarnings("unchecked")
+	public void beforeUpdate( Auditable entity ) {
+		entity.setLastModifiedDate( new Date() );
+		if ( isAuthenticated() ) {
+			Object lastModifiedBy = getAuditableUser( entity );
+			entity.setLastModifiedBy( lastModifiedBy );
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Object getAuditableUser( Auditable entity ) {
+		Collection<Type> types = TypeUtils.getTypeArguments( entity.getClass(), Auditable.class ).values();
+		Class typeVariable = (Class) types.iterator().next();
 		Object createdBy = null;
-		if (typeVariable.isAssignableFrom( String.class )) {
+		if ( typeVariable.isAssignableFrom( String.class ) ) {
 			createdBy = currentSecurityPrincipal().getPrincipalName();
 
-		} else if (typeVariable.isAssignableFrom( SecurityPrincipal.class )) {
+		}
+		else if ( typeVariable.isAssignableFrom( SecurityPrincipal.class ) ) {
 			createdBy = currentSecurityPrincipal();
 		}
 		return createdBy;
-	}
-
-	@Override
-	public void beforeUpdate( Auditable entity ) {
-		entity.setLastModifiedDate( new Date() );
-		if (isAuthenticated()) {
-			Object lastModifiedBy = getAuditableUser(  new ArrayList<>( TypeUtils.getTypeArguments( entity.getClass(),
-			                                                                                        Auditable.class )
-			                                                                     .values() ).get( 0 ).getClass() );
-			entity.setLastModifiedBy( lastModifiedBy );
-		}
 	}
 
 	/**
