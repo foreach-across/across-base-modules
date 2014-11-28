@@ -22,10 +22,8 @@ import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
 import com.foreach.across.core.context.configurer.SingletonBeanConfigurer;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
-import com.foreach.across.modules.hibernate.config.HibernateConfiguration;
-import com.foreach.across.modules.hibernate.config.OpenSessionInViewInterceptorConfiguration;
-import com.foreach.across.modules.hibernate.config.TransactionManagerConfiguration;
-import com.foreach.across.modules.hibernate.config.UnitOfWorkConfiguration;
+import com.foreach.across.modules.hibernate.config.*;
+import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HasHibernatePackageProvider;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageProvider;
@@ -177,7 +175,8 @@ public class AcrossHibernateModule extends AcrossModule
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
 		contextConfigurers.add( new AnnotatedClassConfigurer( HibernateConfiguration.class,
-		                                                      OpenSessionInViewInterceptorConfiguration.class ) );
+		                                                      OpenSessionInViewInterceptorConfiguration.class,
+		                                                      InterceptorConfiguration.class ) );
 	}
 
 	@Override
@@ -211,6 +210,12 @@ public class AcrossHibernateModule extends AcrossModule
 				// Activate transaction management
 				if ( isConfigureTransactionManagement() ) {
 					config.addApplicationContextConfigurer( new TransactionManagementConfigurer() );
+				}
+
+				if ( config.getBootstrapIndex() > currentModule.getBootstrapIndex() ) {
+					config.addApplicationContextConfigurer(
+							new AnnotatedClassConfigurer( ModuleBasicRepositoryInterceptorConfiguration.class )
+					);
 				}
 			}
 		}
