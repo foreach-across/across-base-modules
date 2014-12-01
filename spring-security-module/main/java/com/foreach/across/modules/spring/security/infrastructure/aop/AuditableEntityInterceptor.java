@@ -15,13 +15,12 @@
  */
 package com.foreach.across.modules.spring.security.infrastructure.aop;
 
-import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptorAdapter;
 import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
 import org.apache.commons.lang3.reflect.TypeUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -32,9 +31,10 @@ import java.util.Date;
  *
  * @author Wim Tibackx
  */
-@AcrossDepends(required = { "AcrossHibernateModule", "SpringSecurityAclModule" })
 public class AuditableEntityInterceptor extends EntityInterceptorAdapter<Auditable>
 {
+	@Autowired
+	private CurrentSecurityPrincipalProxy currentPrincipal;
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -43,7 +43,7 @@ public class AuditableEntityInterceptor extends EntityInterceptorAdapter<Auditab
 		entity.setCreatedDate( createdDate );
 		entity.setLastModifiedDate( createdDate );
 
-		Object createdBy = entity.getCreatedBy() == null ? ( isAuthenticated() ? getAuditableUser( entity ) : null ) : entity.getCreatedBy();
+		Object createdBy = entity.getCreatedBy() == null ? getAuditablePrincipal( entity ) : entity.getCreatedBy();
 		entity.setCreatedBy( createdBy );
 		entity.setLastModifiedBy( createdBy );
 	}
@@ -52,49 +52,24 @@ public class AuditableEntityInterceptor extends EntityInterceptorAdapter<Auditab
 	@SuppressWarnings("unchecked")
 	public void beforeUpdate( Auditable entity ) {
 		entity.setLastModifiedDate( new Date() );
-		if ( isAuthenticated() ) {
-			Object lastModifiedBy = getAuditableUser( entity );
-			entity.setLastModifiedBy( lastModifiedBy );
-		}
+
+		Object lastModifiedBy = getAuditablePrincipal( entity );
+		entity.setLastModifiedBy( lastModifiedBy );
 	}
 
 	@SuppressWarnings("unchecked")
-	private Object getAuditableUser( Auditable entity ) {
+	private Object getAuditablePrincipal( Auditable entity ) {
 		Collection<Type> types = TypeUtils.getTypeArguments( entity.getClass(), Auditable.class ).values();
 		Class typeVariable = (Class) types.iterator().next();
 		Object createdBy = null;
-		if ( typeVariable.isAssignableFrom( String.class ) ) {
-			createdBy = currentSecurityPrincipal().getPrincipalName();
 
+		if ( typeVariable.isAssignableFrom( String.class ) ) {
+			createdBy = currentPrincipal.getPrincipalName();
 		}
 		else if ( typeVariable.isAssignableFrom( SecurityPrincipal.class ) ) {
-			createdBy = currentSecurityPrincipal();
+			createdBy = currentPrincipal.getPrincipal();
 		}
+
 		return createdBy;
 	}
-
-	/**
-	 * @return The current SecurityPrincipal or null in case there is no instance of SecurityPrincipal attached.
-	 */
-	private SecurityPrincipal currentSecurityPrincipal() {
-		if ( isAuthenticated() ) {
-			Object principal = currentAuthentication().getPrincipal();
-
-			if ( principal instanceof SecurityPrincipal ) {
-				return (SecurityPrincipal) principal;
-			}
-		}
-
-		return null;
-	}
-
-	private boolean isAuthenticated() {
-		Authentication authentication = currentAuthentication();
-		return authentication != null && authentication.isAuthenticated();
-	}
-
-	private Authentication currentAuthentication() {
-		return SecurityContextHolder.getContext().getAuthentication();
-	}
-
 }
