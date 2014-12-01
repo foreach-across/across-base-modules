@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@AcrossDepends(required = {"AcrossHibernateModule", "SpringSecurityAclModule"})
+@AcrossDepends(required = "AcrossHibernateModule")
 public class AuditableConfiguration
 {
 	@Bean
