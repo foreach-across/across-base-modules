@@ -39,13 +39,13 @@ public class AuditableEntityInterceptor extends EntityInterceptorAdapter<Auditab
 	@Override
 	@SuppressWarnings("unchecked")
 	public void beforeCreate( Auditable entity ) {
-		entity.setCreatedDate( new Date() );
-		entity.setLastModifiedDate( new Date() );
-		if ( isAuthenticated() ) {
-			Object createdBy = getAuditableUser( entity );
-			entity.setCreatedBy( createdBy );
-			entity.setLastModifiedBy( createdBy );
-		}
+		Date createdDate = entity.getCreatedDate() == null ? new Date() : entity.getCreatedDate();
+		entity.setCreatedDate( createdDate );
+		entity.setLastModifiedDate( createdDate );
+
+		Object createdBy = entity.getCreatedBy() == null ? ( isAuthenticated() ? getAuditableUser( entity ) : null ) : entity.getCreatedBy();
+		entity.setCreatedBy( createdBy );
+		entity.setLastModifiedBy( createdBy );
 	}
 
 	@Override
