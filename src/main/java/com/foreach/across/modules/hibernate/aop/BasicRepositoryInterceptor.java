@@ -25,8 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Intercepts persistence calls on a {@link com.foreach.across.modules.hibernate.repositories.BasicRepository} to
- * allow external management of the ACL attached to it.
+ * Intercepts persistence calls on a {@link com.foreach.across.modules.hibernate.repositories.BasicRepository}.
  *
  * @author Arne Vandamme
  */
