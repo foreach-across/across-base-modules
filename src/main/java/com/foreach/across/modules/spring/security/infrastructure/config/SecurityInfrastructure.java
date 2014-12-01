@@ -15,6 +15,13 @@
  */
 package com.foreach.across.modules.spring.security.infrastructure.config;
 
+import com.foreach.across.core.annotations.AcrossEventHandler;
+import com.foreach.across.core.annotations.Event;
+import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
+import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
+import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
+import com.foreach.across.modules.spring.security.config.ModuleGlobalMethodSecurityConfiguration;
+import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
@@ -27,10 +34,30 @@ import org.springframework.security.authentication.AuthenticationTrustResolverIm
  * @author Arne Vandamme
  */
 @Configuration
+@AcrossEventHandler
 public class SecurityInfrastructure
 {
 	@Bean
 	public AuthenticationTrustResolver authenticationTrustResolver() {
 		return new AuthenticationTrustResolverImpl();
+	}
+
+	@Event
+	protected void registerModuleMethodSecurity( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
+		if ( !isSecurityModule( beforeBootstrapEvent.getBootstrapConfig() ) ) {
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer(
+					new AnnotatedClassConfigurer( ModuleGlobalMethodSecurityConfiguration.class )
+			);
+		}
+	}
+
+	private boolean isSecurityModule( ModuleBootstrapConfig moduleBootstrapConfig ) {
+		switch ( moduleBootstrapConfig.getModuleName() ) {
+			case SpringSecurityInfrastructureModule.ACL_MODULE:
+			case SpringSecurityInfrastructureModule.NAME:
+				return true;
+			default:
+				return false;
+		}
 	}
 }
