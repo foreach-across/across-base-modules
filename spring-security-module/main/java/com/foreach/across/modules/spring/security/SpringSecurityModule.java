@@ -82,14 +82,6 @@ public class SpringSecurityModule extends AcrossModule
 
 	@Override
 	public void prepareForBootstrap( ModuleBootstrapConfig currentModule, AcrossBootstrapConfig contextConfig ) {
-		for ( ModuleBootstrapConfig moduleBootstrapConfig : contextConfig.getModules() ) {
-			if ( moduleBootstrapConfig != currentModule && !isSecurityModule( moduleBootstrapConfig ) ) {
-				moduleBootstrapConfig.addApplicationContextConfigurer(
-						new AnnotatedClassConfigurer( ModuleGlobalMethodSecurityConfiguration.class )
-				);
-			}
-		}
-
 		// Fallback to regular authentication configuration in case there is no web context
 		if ( !contextConfig.hasModule( "AcrossWebModule" ) ) {
 			currentModule.addApplicationContextConfigurer(
@@ -98,16 +90,6 @@ public class SpringSecurityModule extends AcrossModule
 							ObjectPostProcessorConfiguration.class
 					)
 			);
-		}
-	}
-
-	private boolean isSecurityModule( ModuleBootstrapConfig moduleBootstrapConfig ) {
-		switch ( moduleBootstrapConfig.getModuleName() ) {
-			case SpringSecurityInfrastructureModule.ACL_MODULE:
-			case SpringSecurityInfrastructureModule.NAME:
-				return true;
-			default:
-				return false;
 		}
 	}
 }
