@@ -16,11 +16,13 @@
 package com.foreach.across.modules.hibernate.business;
 
 import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import java.util.Date;
 
 /**
  * @author Andy Somers
  */
+@MappedSuperclass
 public abstract class AuditableEntity implements Auditable<String>
 {
 	@Column(name = "created_by", nullable = true)

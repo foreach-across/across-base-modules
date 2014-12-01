@@ -16,6 +16,9 @@
 package com.foreach.across.modules.hibernate;
 
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.AcrossRole;
+import com.foreach.across.core.context.AcrossModuleRole;
 import com.foreach.across.core.context.bootstrap.AcrossBootstrapConfig;
 import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
@@ -38,6 +41,7 @@ import java.util.Set;
  * Activates hibernate support on all modules implementing HasHibernatePackageProvider
  * Will also activate Transactional support on the modules.
  */
+@AcrossRole(AcrossModuleRole.INFRASTRUCTURE)
 public class AcrossHibernateModule extends AcrossModule
 {
 	public static final String NAME = "AcrossHibernateModule";

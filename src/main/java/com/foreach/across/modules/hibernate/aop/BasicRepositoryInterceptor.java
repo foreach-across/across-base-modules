@@ -48,13 +48,13 @@ public class BasicRepositoryInterceptor implements MethodInterceptor
 			Object entityObject = invocation.getArguments()[0];
 
 			String methodName = invocation.getMethod().getName();
-			Collection<EntityInterceptor> interceptor = findInterceptorToApply( entityObject, interceptors );
+			Collection<EntityInterceptor> interceptors = findInterceptorsToApply( entityObject, this.interceptors );
 
-			callBefore( interceptor, methodName, entityObject );
+			callBefore( interceptors, methodName, entityObject );
 
 			Object returnValue = invocation.proceed();
 
-			callAfter( interceptor, methodName, entityObject );
+			callAfter( interceptors, methodName, entityObject );
 
 			return returnValue;
 		}
@@ -63,8 +63,8 @@ public class BasicRepositoryInterceptor implements MethodInterceptor
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection<EntityInterceptor> findInterceptorToApply( Object entity,
-	                                                              Collection<EntityInterceptor> interceptors ) {
+	private Collection<EntityInterceptor> findInterceptorsToApply( Object entity,
+	                                                               Collection<EntityInterceptor> interceptors ) {
 		Class<?> entityClass = ClassUtils.getUserClass( AopProxyUtils.ultimateTargetClass( entity ) );
 
 		Collection<EntityInterceptor> matchingInterceptors = new ArrayList<>();
