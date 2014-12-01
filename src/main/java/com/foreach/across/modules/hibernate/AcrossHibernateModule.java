@@ -42,6 +42,7 @@ import java.util.Set;
  * Will also activate Transactional support on the modules.
  */
 @AcrossRole(AcrossModuleRole.INFRASTRUCTURE)
+@AcrossDepends(optional = "EhcacheModule")
 public class AcrossHibernateModule extends AcrossModule
 {
 	public static final String NAME = "AcrossHibernateModule";
