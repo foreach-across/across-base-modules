@@ -26,13 +26,14 @@ import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.modules.spring.security.infrastructure.config.AuditableConfiguration;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityPrincipalServiceConfiguration;
+import org.springframework.core.Ordered;
 
 import java.util.Set;
 
 /**
  * @author Arne Vandamme
  */
-@AcrossRole(AcrossModuleRole.INFRASTRUCTURE)
+@AcrossRole(value = AcrossModuleRole.INFRASTRUCTURE, order = Ordered.HIGHEST_PRECEDENCE)
 @AcrossDepends(optional = "EhcacheModule")
 public class SpringSecurityInfrastructureModule extends AcrossModule
 {
