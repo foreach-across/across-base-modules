@@ -28,7 +28,6 @@ import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.core.filters.NamedBeanFilter;
 import com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration;
 import com.foreach.across.modules.spring.security.config.DynamicSecurityFilterConfiguration;
-import com.foreach.across.modules.spring.security.config.ModuleGlobalMethodSecurityConfiguration;
 import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
