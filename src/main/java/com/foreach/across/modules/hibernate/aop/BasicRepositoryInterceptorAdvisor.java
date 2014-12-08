@@ -16,7 +16,6 @@
 package com.foreach.across.modules.hibernate.aop;
 
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
-import com.foreach.across.modules.hibernate.aop.BasicRepositoryPointcut;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 
