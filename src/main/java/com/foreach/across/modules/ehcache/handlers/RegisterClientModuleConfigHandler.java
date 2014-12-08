@@ -20,7 +20,6 @@ import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.ehcache.config.EhcacheClientModuleConfig;
-import net.engio.mbassy.listener.Handler;
 import org.springframework.stereotype.Component;
 
 /**
