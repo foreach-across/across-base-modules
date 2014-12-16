@@ -15,14 +15,30 @@
  */
 package com.foreach.across.modules.debugweb.controllers;
 
+import com.foreach.across.modules.debugweb.DebugWeb;
+import com.foreach.across.modules.debugweb.DebugWebModuleSettings;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @DebugWebController
 public class DefaultDebugWebController
 {
-	@RequestMapping("")
+	@Autowired
+	private DebugWeb debugWeb;
+
+	@Autowired
+	private DebugWebModuleSettings settings;
+
+	@RequestMapping({ "", "/" })
 	public String landingPage() {
+		String path = settings.getDashboardPath();
+
+		if ( !StringUtils.equals( path, "/" ) ) {
+			return debugWeb.redirect( path );
+		}
+
 		return "";
 	}
 }

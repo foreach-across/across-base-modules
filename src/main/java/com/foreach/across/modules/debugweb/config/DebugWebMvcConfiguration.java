@@ -41,7 +41,6 @@ import javax.annotation.PostConstruct;
 /**
  * Declares a separate handler for debug mappings.
  */
-@ComponentScan({ "com.foreach.across.modules.debugweb.controllers" })
 @Configuration
 @Exposed
 public class DebugWebMvcConfiguration extends WebMvcConfigurerAdapter
