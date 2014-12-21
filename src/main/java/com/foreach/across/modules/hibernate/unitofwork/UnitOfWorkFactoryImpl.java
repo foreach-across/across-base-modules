@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.hibernate.unitofwork;
 
-import com.foreach.across.core.annotations.Refreshable;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -30,7 +29,6 @@ import java.util.concurrent.Callable;
 /**
  * @see com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory
  */
-@Refreshable
 public class UnitOfWorkFactoryImpl implements UnitOfWorkFactory
 {
 	private final Collection<SessionFactory> sessionFactories;

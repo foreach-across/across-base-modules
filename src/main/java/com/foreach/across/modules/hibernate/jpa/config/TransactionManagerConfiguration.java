@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.hibernate.config;
+package com.foreach.across.modules.hibernate.jpa.config;
 
 import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.AcrossEventHandler;
@@ -21,13 +21,15 @@ import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
-import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Configures PlatformTransactionManagers for use with @Transaction annotations.
@@ -42,10 +44,10 @@ public class TransactionManagerConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger( TransactionManagerConfiguration.class );
 
-	@Bean(name = HibernateConfiguration.TRANSACTION_MANAGER)
+	@Bean(name = HibernateJpaConfiguration.TRANSACTION_MANAGER)
 	@Exposed
-	public HibernateTransactionManager transactionManager( SessionFactory sessionFactory ) {
-		return new HibernateTransactionManager( sessionFactory );
+	public PlatformTransactionManager jpaTransactionManager( EntityManagerFactory entityManagerFactory ) {
+		return new JpaTransactionManager( entityManagerFactory );
 	}
 
 	@Event

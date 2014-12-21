@@ -13,21 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.hibernate.provider;
+package com.foreach.across.modules.hibernate.testmodules.hibernate1;
 
-import com.foreach.across.modules.hibernate.AcrossHibernateModule;
-
-/**
- * Interface to be used on AcrossModule instances to indicate they provide Hibernate packages.
- */
-@Deprecated
-public interface HasHibernatePackageProvider
+public interface ProductRepository
 {
-	/**
-	 * Returns the package provider associated with this implementation.
-	 *
-	 * @param hibernateModule AcrossHibernateModule that is requesting packages.
-	 * @return HibernatePackageProvider instance.
-	 */
-	HibernatePackageProvider getHibernatePackageProvider( AcrossHibernateModule hibernateModule );
+	Product getProductWithId( int id );
+
+	void save( Product product );
 }

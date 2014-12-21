@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.hibernate.config;
+package com.foreach.across.modules.hibernate.jpa.config;
 
 import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.Exposed;
+import com.foreach.across.modules.hibernate.jpa.unitofwork.JpaUnitOfWorkFactoryImpl;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
-import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactoryImpl;
-import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.Collections;
 
 /**
  * Configures a UnitOfWorkFactory for the current SessionFactory.
  */
-@AcrossCondition( "settings.createUnitOfWorkFactory" )
+@AcrossCondition("settings.createUnitOfWorkFactory")
 @Configuration
 public class UnitOfWorkConfiguration
 {
 	@Bean
 	@Exposed
-	public UnitOfWorkFactory unitOfWork( SessionFactory sessionFactory ) {
-		return new UnitOfWorkFactoryImpl( Collections.singleton( sessionFactory ) );
+	public UnitOfWorkFactory unitOfWork( EntityManagerFactory entityManagerFactory ) {
+		return new JpaUnitOfWorkFactoryImpl( Collections.singleton( entityManagerFactory ) );
 	}
 }

@@ -20,12 +20,22 @@ import java.util.*;
 /**
  * Represents a set of configuration items for Hibernate.
  */
-public class HibernatePackage
+public class HibernatePackage implements HibernatePackageRegistry
 {
+	private final String name;
+
 	private Collection<String> packagesToScan = new HashSet<String>();
 	private Collection<Class<?>> annotatedClasses = new HashSet<Class<?>>();
 	private Collection<String> mappingResources = new HashSet<String>();
 	private Map<String, String> tableAliases = new HashMap<>();
+
+	public HibernatePackage( String name ) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
 
 	public Class<?>[] getAnnotatedClasses() {
 		return annotatedClasses.toArray( new Class[annotatedClasses.size()] );
@@ -45,6 +55,13 @@ public class HibernatePackage
 
 	public void addPackageToScan( String... packageToScan ) {
 		packagesToScan.addAll( Arrays.asList( packageToScan ) );
+	}
+
+	@Override
+	public void addPackageToScan( Class... classes ) {
+		for ( Class c : classes ) {
+			addPackageToScan( c.getPackage().getName() );
+		}
 	}
 
 	public void addAnnotatedClass( Class<?>... annotatedClass ) {
