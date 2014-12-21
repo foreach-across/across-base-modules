@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.hibernate.config;
 
+import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactoryImpl;
@@ -27,6 +28,7 @@ import java.util.Collections;
 /**
  * Configures a UnitOfWorkFactory for the current SessionFactory.
  */
+@AcrossCondition( "settings.createUnitOfWorkFactory" )
 @Configuration
 public class UnitOfWorkConfiguration
 {

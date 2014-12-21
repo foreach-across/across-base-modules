@@ -23,10 +23,10 @@ import java.util.concurrent.Callable;
 /**
  * <p>A unit of work factory facilitates managing one or more sessions, without having
  * to explicitly know about the sessions themselves.</p>
- * <p>A UnitOfWorkFactory can be used to simulate OpenSessionInView behavior outside
- * a web request context.</p>
+ * <p>A UnitOfWorkFactory can be used to determine the open session/entity manager demarcations.</p>
  *
  * @see org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor
+ * @see org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor
  */
 public interface UnitOfWorkFactory
 {

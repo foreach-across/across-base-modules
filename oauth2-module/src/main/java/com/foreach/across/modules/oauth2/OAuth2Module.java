@@ -25,7 +25,9 @@ import com.foreach.across.core.filters.BeanFilterComposite;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.core.installers.AcrossSequencesInstaller;
 import com.foreach.across.modules.hibernate.AcrossHibernateModule;
-import com.foreach.across.modules.hibernate.provider.*;
+import com.foreach.across.modules.hibernate.provider.HibernatePackageConfiguringModule;
+import com.foreach.across.modules.hibernate.provider.HibernatePackageRegistry;
+import com.foreach.across.modules.hibernate.provider.TableAliasProvider;
 import com.foreach.across.modules.oauth2.config.OAuth2EndpointsConfiguration;
 import com.foreach.across.modules.oauth2.config.OAuth2RepositoriesConfiguration;
 import com.foreach.across.modules.oauth2.config.OAuth2SchemaConfiguration;
@@ -43,7 +45,7 @@ import org.springframework.security.oauth2.provider.endpoint.FrameworkEndpointHa
 import java.util.Set;
 
 @AcrossDepends(required = { UserModule.NAME, SpringSecurityModule.NAME })
-public class OAuth2Module extends AcrossModule implements HasHibernatePackageProvider, HasSchemaConfiguration
+public class OAuth2Module extends AcrossModule implements HibernatePackageConfiguringModule, HasSchemaConfiguration
 {
 
 	public static final String NAME = "Oauth2Module";
@@ -92,20 +94,12 @@ public class OAuth2Module extends AcrossModule implements HasHibernatePackagePro
 		);
 	}
 
-	/**
-	 * Returns the package provider associated with this implementation.
-	 *
-	 * @param hibernateModule AcrossHibernateModule that is requesting packages.
-	 * @return HibernatePackageProvider instance.
-	 */
-	public HibernatePackageProvider getHibernatePackageProvider( AcrossHibernateModule hibernateModule ) {
-		if ( StringUtils.equals( "AcrossHibernateModule", hibernateModule.getName() ) ) {
-			return new HibernatePackageProviderComposite(
-					new PackagesToScanProvider( "com.foreach.across.modules.oauth2.business" ),
-					new TableAliasProvider( schemaConfiguration.getTables() ) );
+	@Override
+	public void configureHibernatePackage( HibernatePackageRegistry hibernatePackage ) {
+		if ( StringUtils.equals( AcrossHibernateModule.NAME, hibernatePackage.getName() ) ) {
+			hibernatePackage.addPackageToScan( "com.foreach.across.modules.oauth2.business" );
+			hibernatePackage.add( new TableAliasProvider( schemaConfiguration.getTables() ) );
 		}
-
-		return null;
 	}
 
 	@Override

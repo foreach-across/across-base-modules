@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Role;
 @Configuration
 public class InterceptorConfiguration
 {
-
 	@Bean
 	public RefreshableRegistry<EntityInterceptor> idBasedEntityInterceptors() {
 		return new IncrementalRefreshableRegistry<>( EntityInterceptor.class, true );

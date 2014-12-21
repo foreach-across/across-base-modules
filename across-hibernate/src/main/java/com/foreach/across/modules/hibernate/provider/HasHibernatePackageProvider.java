@@ -20,6 +20,7 @@ import com.foreach.across.modules.hibernate.AcrossHibernateModule;
 /**
  * Interface to be used on AcrossModule instances to indicate they provide Hibernate packages.
  */
+@Deprecated
 public interface HasHibernatePackageProvider
 {
 	/**

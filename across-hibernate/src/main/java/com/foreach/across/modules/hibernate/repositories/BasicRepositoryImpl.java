@@ -83,7 +83,7 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 	@Override
 	public Collection<T> getAll() {
 		// TODO: https://bitbucket.org/beforeach/across-standard-modules/issue/15/
-		return (Collection<T>) orderedDistinct().setFirstResult(0).setMaxResults( MAX_RESULTS ).list();
+		return (Collection<T>) orderedDistinct().setFirstResult( 0 ).setMaxResults( MAX_RESULTS ).list();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -93,7 +93,7 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 		// TODO: https://bitbucket.org/beforeach/across-standard-modules/issue/15/
 		return (Collection<T>) orderedDistinct()
 				.add( Restrictions.in( "id", ids ) )
-				.setFirstResult(0).setMaxResults( MAX_RESULTS ).list();
+				.setFirstResult( 0 ).setMaxResults( MAX_RESULTS ).list();
 	}
 
 	@Transactional

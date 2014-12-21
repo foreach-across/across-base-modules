@@ -17,34 +17,59 @@ package com.foreach.across.modules.hibernate;
 
 import com.foreach.across.core.AcrossModuleSettings;
 import com.foreach.across.core.AcrossModuleSettingsRegistry;
+import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
 import org.springframework.core.Ordered;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Arne Vandamme
  */
 public class AcrossHibernateModuleSettings extends AcrossModuleSettings
 {
-	/**
-	 * Property to determine if an {@link org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor}
-	 * should be configured if the AcrossWebModule is active.
-	 * <p/>
-	 * Value: boolean (default: false)
-	 */
-	public static final String OPEN_SESSION_IN_VIEW_INTERCEPTOR = "acrossHibernate.openSessionInViewInterceptor";
-
-	/**
-	 * Configure the order of the OpenSessionInViewInterceptor for this module (if created).
-	 * <p/>
-	 * Value: integer (default: {@link org.springframework.core.Ordered#HIGHEST_PRECEDENCE}
-	 */
-	public static final String OPEN_SESSION_IN_VIEW_INTERCEPTOR_ORDER =
-			"acrossHibernate.openSessionInViewInterceptor.order";
+	public static final String HIBERNATE_PROPERTIES = "acrossHibernate.hibernateProperties";
+	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER = "acrossHibernate.persistenceContextInView.handler";
+	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER =
+			"acrossHibernate.persistenceContextInView.order";
+	public static final String CREATE_TRANSACTION_MANAGER = "acrossHibernate.transactionManager";
+	public static final String CREATE_UNITOFWORK_FACTORY = "acrossHibernate.unitOfWorkFactory";
 
 	@Override
 	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
-		registry.register( OPEN_SESSION_IN_VIEW_INTERCEPTOR, Boolean.class, false,
-		                   "Should an OpenSessionInViewInterceptor be registered." );
-		registry.register( OPEN_SESSION_IN_VIEW_INTERCEPTOR_ORDER, Integer.class, Ordered.HIGHEST_PRECEDENCE,
-		                   "Configure the order of the OpenSessionInViewInterceptor for this module (if created)" );
+
+		registry.register( CREATE_TRANSACTION_MANAGER, Boolean.class, true,
+		                   "Should a TransactionManager bean be created.  If true this will also enable support for " +
+				                   "@Transaction in all modules bootstrapping later." );
+		registry.register( CREATE_UNITOFWORK_FACTORY, Boolean.class, false,
+		                   "Should a UnitOfWorkFactory bean be created." );
+
+		registry.register( PERSISTENCE_CONTEXT_VIEW_HANDLER, PersistenceContextInView.class,
+		                   PersistenceContextInView.NONE,
+		                   "If a view layer is enabled, should an open session/entity manager be created for the entire " +
+				                   "request by using either a filter or an interceptor." );
+		registry.register( PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER, Integer.class, Ordered.HIGHEST_PRECEDENCE + 1,
+		                   "Configure the order of the persistence context view handler (if create)." );
+	}
+
+	public boolean isCreateTransactionManager() {
+		return getProperty( CREATE_TRANSACTION_MANAGER, Boolean.class );
+	}
+
+	public boolean isCreateUnitOfWorkFactory() {
+		return getProperty( CREATE_UNITOFWORK_FACTORY, Boolean.class );
+	}
+
+	public PersistenceContextInView getPersistenceContextInView() {
+		return getProperty( PERSISTENCE_CONTEXT_VIEW_HANDLER, PersistenceContextInView.class );
+	}
+
+	public int getPersistenceContextInViewOrder() {
+		return getProperty( PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER, Integer.class );
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getHibernateProperties() {
+		return getProperty( HIBERNATE_PROPERTIES, Map.class, new HashMap<String, Object>() );
 	}
 }
