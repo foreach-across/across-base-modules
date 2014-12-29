@@ -57,6 +57,9 @@ public class RequestLogFilter extends OncePerRequestFilter
 {
 	public static final String HEADER_REQUEST_ID = "Request-Reference";
 	public static final String LOG_REQUESTID = "requestId";
+	public static final String ATTRIBUTE_UNIQUE_ID = "_log_uniqueRequestId";
+	public static final String ATTRIBUTE_VIEW_NAME = "_log_resolvedViewName";
+	public static final String ATTRIBUTE_START_TIME = "_log_requestStartTime";
 
 	private final AtomicLong counter = new AtomicLong( System.currentTimeMillis() );
 
@@ -73,14 +76,17 @@ public class RequestLogFilter extends OncePerRequestFilter
 		MDC.put( LOG_REQUESTID, requestId );
 
 		response.setHeader( HEADER_REQUEST_ID, requestId );
+		request.setAttribute( ATTRIBUTE_UNIQUE_ID, requestId );
 
 		long startTime = System.currentTimeMillis();
+		request.setAttribute( ATTRIBUTE_START_TIME, startTime );
 
 		// TODO get view name
 		// Redirects won't have a modelAndView
 		String viewName = "";
 //		if ( modelAndView != null ) {
 //			viewName = determineViewName();
+//			request.setAttribute( ATTRIBUTE_VIEW_NAME, viewName );
 //		}
 
 		chain.doFilter( request, response );
