@@ -55,9 +55,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class RequestLogFilter extends OncePerRequestFilter
 {
-	public static final String ATTRIBUTE_START_TIME = "_log_requestStartTime";
-	public static final String ATTRIBUTE_UNIQUE_ID = "_log_uniqueRequestId";
-	public static final String ATTRIBUTE_VIEW_NAME = "_log_resolvedViewName";
 	public static final String HEADER_REQUEST_ID = "Request-Reference";
 	public static final String LOG_REQUESTID = "requestId";
 
@@ -76,19 +73,19 @@ public class RequestLogFilter extends OncePerRequestFilter
 		MDC.put( LOG_REQUESTID, requestId );
 
 		response.setHeader( HEADER_REQUEST_ID, requestId );
-		request.setAttribute( ATTRIBUTE_UNIQUE_ID, requestId );
-		request.setAttribute( ATTRIBUTE_START_TIME, System.currentTimeMillis() );
+
+		long startTime = System.currentTimeMillis();
 
 		// TODO get view name
 		// Redirects won't have a modelAndView
+		String viewName = "";
 //		if ( modelAndView != null ) {
-//			request.setAttribute( ATTRIBUTE_VIEW_NAME, modelAndView.getViewName() );
+//			viewName = determineViewName();
 //		}
 
 		chain.doFilter( request, response );
 
 		// Determine duration before sending the log
-		long startTime = (Long) request.getAttribute( ATTRIBUTE_START_TIME );
 		long duration = System.currentTimeMillis() - startTime;
 
 		// TODO get handler name
@@ -96,12 +93,11 @@ public class RequestLogFilter extends OncePerRequestFilter
 //		String handlerName = handlerName( handler );
 
 		StringBuilder buf = new StringBuilder();
-		buf.append( '[' ).append( request.getAttribute( ATTRIBUTE_UNIQUE_ID ) ).append( ']' ).append( '\t' ).append(
+		buf.append( '[' ).append( requestId ).append( ']' ).append( '\t' ).append(
 				request.getRemoteAddr() ).append( '\t' ).append( request.getMethod() ).append( '\t' ).append(
 				createUrlFromRequest( request ) ).append( '\t' ).append(
-				request.getServletPath() ).append(
-				'\t' ).append( handlerName ).append( '\t' ).append(
-				request.getAttribute( ATTRIBUTE_VIEW_NAME ) ).append( '\t' ).append( duration );
+				request.getServletPath() ).append( '\t' ).append( handlerName ).append( '\t' ).append(
+				viewName ).append( '\t' ).append( duration );
 
 		logger.debug( buf.toString() );
 

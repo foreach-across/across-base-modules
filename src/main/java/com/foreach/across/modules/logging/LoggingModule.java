@@ -21,7 +21,7 @@ import com.foreach.across.core.annotations.AcrossDepends;
 /**
  * @author Andy Somers
  */
-@AcrossDepends(required = "AcrossWebModule")
+@AcrossDepends(required = "AcrossWebModule", optional = "AcrossHibernateModule")
 public class LoggingModule extends AcrossModule
 {
 	public static final String NAME = "LoggingModule";
