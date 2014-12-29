@@ -17,14 +17,23 @@ package com.foreach.across.modules.logging;
 
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.modules.hibernate.provider.*;
+import com.foreach.across.modules.logging.installers.LoggingModuleSchemaInstaller;
+import com.foreach.across.modules.web.AcrossWebModule;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Andy Somers
  */
-@AcrossDepends(required = "AcrossWebModule", optional = {"AcrossHibernateModule", "DebugWebModule"})
-public class LoggingModule extends AcrossModule
+@AcrossDepends(
+		required = AcrossWebModule.NAME, 
+		optional = {"AcrossHibernateModule", "DebugWebModule"}
+)
+public class LoggingModule extends AcrossModule implements HasHibernatePackageProvider
 {
 	public static final String NAME = "LoggingModule";
+	public static final String RESOURCES = "logging";
 
 	@Override
 	public String getName() {
@@ -32,7 +41,34 @@ public class LoggingModule extends AcrossModule
 	}
 
 	@Override
+	public String getResourcesKey() {
+		return RESOURCES;
+	}
+
+	@Override
 	public String getDescription() {
 		return "Provide logging functionality.";
+	}
+
+	@Override
+	public Object[] getInstallers() {
+		return new Object[] {
+				LoggingModuleSchemaInstaller.class
+		};
+	}
+
+	/**
+	 * Returns the package provider associated with this implementation.
+	 *
+	 * @param hibernateModule AcrossHibernateModule that is requesting packages.
+	 * @return HibernatePackageProvider instance.
+	 */
+	public HibernatePackageProvider getHibernatePackageProvider( AcrossHibernateModule hibernateModule ) {
+		if ( StringUtils.equals( "AcrossHibernateModule", hibernateModule.getName() ) ) {
+			return new HibernatePackageProviderComposite(
+					new PackagesToScanProvider( "com.foreach.across.modules.logging.business" ) );
+		}
+
+		return null;
 	}
 }
