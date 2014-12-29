@@ -24,6 +24,13 @@ import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConf
  */
 public class LoggingModuleSettings extends AcrossModuleSettings
 {
+	/**
+	 * Name of the logger to be used when logging functional data to file.
+	 * <p/>
+	 * String, name of the logger in logback configuration.
+	 */
+	public static final String FUNCTIONAL_FILE_LOGGER = "loggingModule.functionalFileLogger";
+
 	public static final String REQUEST_RESPONSE_LOG_ENABLED = "logging.requestResponse.enabled";
 	public static final String REQUEST_RESPONSE_LOG_PAUSED = "logging.requestResponse.paused";
 	public static final String REQUEST_RESPONSE_LOG_CONFIGURATION = "logging.requestResponse.configuration";
@@ -37,10 +44,15 @@ public class LoggingModuleSettings extends AcrossModuleSettings
 		                   "Configuration settings for request/response details log." );
 		registry.register( REQUEST_RESPONSE_LOG_PAUSED, Boolean.class, false,
 		                   "If enabled, should this logger be paused or not." );
-
+		registry.register( FUNCTIONAL_FILE_LOGGER, String.class, "functional-logger",
+		                   "Name of the logger to be used when logging functional data to file." );
 	}
 
 	public boolean isRequestResponseLogEnabled() {
 		return getProperty( REQUEST_RESPONSE_LOG_ENABLED, Boolean.class );
+	}
+	
+	public String getFunctionalFileLogger() {
+		return getProperty( FUNCTIONAL_FILE_LOGGER, String.class );
 	}
 }
