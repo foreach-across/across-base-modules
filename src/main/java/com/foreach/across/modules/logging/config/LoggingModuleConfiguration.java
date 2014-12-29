@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.logging;
+package com.foreach.across.modules.logging.config;
 
-import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.AcrossDepends;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Andy Somers
  */
-@AcrossDepends(required = "AcrossWebModule", optional = {"AcrossHibernateModule", "DebugWebModule"})
-public class LoggingModule extends AcrossModule
+@Configuration
+@ComponentScan("com.foreach.across.modules.logging.controllers")
+public class LoggingModuleConfiguration
 {
-	public static final String NAME = "LoggingModule";
-
-	@Override
-	public String getName() {
-		return NAME;
-	}
-
-	@Override
-	public String getDescription() {
-		return "Provide logging functionality.";
-	}
 }
