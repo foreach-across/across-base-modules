@@ -36,11 +36,6 @@ public class DebugWebControllersConfiguration
 	}
 
 	@Bean
-	public LogController logController() {
-		return new LogController();
-	}
-
-	@Bean
 	public ServletContextInfoController servletContextInfoController() {
 		return new ServletContextInfoController();
 	}
