@@ -15,6 +15,8 @@
  */
 package com.foreach.across.modules.logging.services;
 
+import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.business.DatabaseStrategy;
 import com.foreach.across.modules.logging.business.LogLevel;
 import com.foreach.across.modules.logging.business.LogType;
 import com.foreach.across.modules.logging.business.TechnicalLogEvent;
@@ -47,15 +49,29 @@ public class TechnicalLogDBServiceTest
 	@Autowired
 	private TechnicalLogEventRepository technicalLogEventRepository;
 
+	@Autowired
+	private LoggingModuleSettings loggingModuleSettings;
+
 	@Before
 	public void resetMocks() {
-		reset( technicalLogEventRepository );
+		reset( technicalLogEventRepository, loggingModuleSettings );
 	}
 
 	@Test
 	public void technicalLogDBServiceSupportsOnlyTechnical() {
+		when( loggingModuleSettings.getTechnicalDBStrategy() ).thenReturn( DatabaseStrategy.ROLLING );
 		assertFalse( technicalLogDBService.supports( LogType.FUNCTIONAL ) );
 		assertTrue( technicalLogDBService.supports( LogType.TECHNICAL ) );
+	}
+
+	@Test
+	public void technicalLogDBServiceSupportsRollingAndSingleTableStrategy() {
+		when( loggingModuleSettings.getTechnicalDBStrategy() ).thenReturn( DatabaseStrategy.ROLLING );
+		assertTrue( technicalLogDBService.supports( LogType.TECHNICAL ) );
+		when( loggingModuleSettings.getTechnicalDBStrategy() ).thenReturn( DatabaseStrategy.SINGLE_TABLE );
+		assertTrue( technicalLogDBService.supports( LogType.TECHNICAL ) );
+		when( loggingModuleSettings.getTechnicalDBStrategy() ).thenReturn( DatabaseStrategy.NONE );
+		assertFalse( technicalLogDBService.supports( LogType.TECHNICAL ) );
 	}
 
 	@Test

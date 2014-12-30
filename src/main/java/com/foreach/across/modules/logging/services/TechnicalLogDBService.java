@@ -15,6 +15,8 @@
  */
 package com.foreach.across.modules.logging.services;
 
+import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.business.DatabaseStrategy;
 import com.foreach.across.modules.logging.business.LogType;
 import com.foreach.across.modules.logging.business.TechnicalLogEvent;
 import com.foreach.across.modules.logging.dto.LogEventDto;
@@ -29,9 +31,14 @@ public class TechnicalLogDBService implements LogDelegateService
 	@Autowired
 	private TechnicalLogEventRepository technicalLogEventRepository;
 
+	@Autowired
+	private LoggingModuleSettings loggingModuleSettings;
+
 	@Override
 	public boolean supports( LogType logType ) {
-		return logType == LogType.TECHNICAL;
+		return logType == LogType.TECHNICAL &&
+				( loggingModuleSettings.getTechnicalDBStrategy() == DatabaseStrategy.ROLLING ||
+						loggingModuleSettings.getTechnicalDBStrategy() == DatabaseStrategy.SINGLE_TABLE );
 	}
 
 	@Override

@@ -15,19 +15,25 @@
  */
 package com.foreach.across.modules.logging.services;
 
+import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.business.FileStrategy;
 import com.foreach.across.modules.logging.business.LogType;
 import com.foreach.across.modules.logging.dto.LogEventDto;
 import com.foreach.across.modules.logging.dto.TechnicalLogEventDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TechnicalLogFileService implements LogDelegateService
 {
+	@Autowired
+	private LoggingModuleSettings loggingModuleSettings;
+
 	@Override
 	public boolean supports( LogType logType ) {
-		return logType == LogType.TECHNICAL;
+		return logType == LogType.TECHNICAL && loggingModuleSettings.getTechnicalFileStrategy() == FileStrategy.LOGBACK;
 	}
 
 	@Override

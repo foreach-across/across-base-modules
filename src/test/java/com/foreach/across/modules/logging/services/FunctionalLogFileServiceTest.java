@@ -16,6 +16,7 @@
 package com.foreach.across.modules.logging.services;
 
 import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.business.FileStrategy;
 import com.foreach.across.modules.logging.business.LogType;
 import com.foreach.across.modules.logging.dto.FunctionalLogEventDto;
 import com.foreach.common.test.MockedLoader;
@@ -30,6 +31,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.PostConstruct;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
@@ -42,18 +45,31 @@ public class FunctionalLogFileServiceTest
 	@Autowired
 	private FunctionalLogFileService functionalLogFileService;
 
+	@Autowired
+	private LoggingModuleSettings loggingModuleSettings;
+
 	private static Logger mockLogger;
 
 	@Before
 	public void resetMocks() {
 		mockLogger = mock( Logger.class );
 		functionalLogFileService.setFunctionalLog( mockLogger );
+		reset( loggingModuleSettings );
 	}
 
 	@Test
 	public void functionalLogFileServiceSupportsOnlyFunctional() {
+		when( loggingModuleSettings.getFunctionalFileStrategy() ).thenReturn( FileStrategy.LOGBACK );
 		assertTrue( functionalLogFileService.supports( LogType.FUNCTIONAL ) );
 		assertFalse( functionalLogFileService.supports( LogType.TECHNICAL ) );
+	}
+
+	@Test
+	public void functionalLogFileServiceSupportsLogbackStrategy() {
+		when( loggingModuleSettings.getFunctionalFileStrategy() ).thenReturn( FileStrategy.LOGBACK );
+		assertTrue( functionalLogFileService.supports( LogType.FUNCTIONAL ) );
+		when( loggingModuleSettings.getFunctionalFileStrategy() ).thenReturn( FileStrategy.NONE );
+		assertFalse( functionalLogFileService.supports( LogType.FUNCTIONAL ) );
 	}
 
 	@Test
@@ -73,9 +89,13 @@ public class FunctionalLogFileServiceTest
 	@Configuration
 	static class Config
 	{
-		@Bean
-		public LoggingModuleSettings loggingModuleSettings() {
-			return new LoggingModuleSettings();
+		@Autowired
+		private LoggingModuleSettings loggingModuleSettings;
+
+		@PostConstruct
+		public void init() {
+			reset( loggingModuleSettings );
+			when( loggingModuleSettings.getFunctionalFileLogger() ).thenReturn( "foo" );
 		}
 
 		@Bean

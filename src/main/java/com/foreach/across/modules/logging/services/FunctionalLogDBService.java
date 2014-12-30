@@ -15,6 +15,8 @@
  */
 package com.foreach.across.modules.logging.services;
 
+import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.business.DatabaseStrategy;
 import com.foreach.across.modules.logging.business.FunctionalLogEvent;
 import com.foreach.across.modules.logging.business.LogType;
 import com.foreach.across.modules.logging.dto.LogEventDto;
@@ -29,9 +31,14 @@ public class FunctionalLogDBService implements LogDelegateService
 	@Autowired
 	private FunctionalLogEventRepository functionalLogEventRepository;
 
+	@Autowired
+	private LoggingModuleSettings loggingModuleSettings;
+
 	@Override
 	public boolean supports( LogType logType ) {
-		return logType == LogType.FUNCTIONAL;
+		return logType == LogType.FUNCTIONAL &&
+				( loggingModuleSettings.getFunctionalDBStrategy() == DatabaseStrategy.ROLLING ||
+						loggingModuleSettings.getFunctionalDBStrategy() == DatabaseStrategy.SINGLE_TABLE );
 	}
 
 	@Override

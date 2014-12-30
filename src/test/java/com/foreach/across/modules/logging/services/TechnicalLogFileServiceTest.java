@@ -15,6 +15,8 @@
  */
 package com.foreach.across.modules.logging.services;
 
+import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.business.FileStrategy;
 import com.foreach.across.modules.logging.business.LogType;
 import com.foreach.common.test.MockedLoader;
 import org.junit.Before;
@@ -29,6 +31,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = MockedLoader.class, classes = TechnicalLogFileServiceTest.Config.class)
@@ -38,15 +42,27 @@ public class TechnicalLogFileServiceTest
 	@Autowired
 	private TechnicalLogFileService technicalLogFileService;
 
+	@Autowired
+	private LoggingModuleSettings loggingModuleSettings;
+
 	@Before
 	public void resetMocks() {
-
+		reset( loggingModuleSettings );
 	}
 
 	@Test
 	public void technicalLogFileServiceSupportsOnlyTechnical() {
+		when( loggingModuleSettings.getTechnicalFileStrategy() ).thenReturn( FileStrategy.LOGBACK );
 		assertFalse( technicalLogFileService.supports( LogType.FUNCTIONAL ) );
 		assertTrue( technicalLogFileService.supports( LogType.TECHNICAL ) );
+	}
+
+	@Test
+	public void technicalLogFileServiceSupportsLogbackStrategy() {
+		when( loggingModuleSettings.getTechnicalFileStrategy() ).thenReturn( FileStrategy.LOGBACK );
+		assertTrue( technicalLogFileService.supports( LogType.TECHNICAL ) );
+		when( loggingModuleSettings.getTechnicalFileStrategy() ).thenReturn( FileStrategy.NONE );
+		assertFalse( technicalLogFileService.supports( LogType.TECHNICAL ) );
 	}
 
 	@Test

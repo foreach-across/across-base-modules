@@ -15,6 +15,8 @@
  */
 package com.foreach.across.modules.logging.services;
 
+import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.business.DatabaseStrategy;
 import com.foreach.across.modules.logging.business.FunctionalLogEvent;
 import com.foreach.across.modules.logging.business.LogType;
 import com.foreach.across.modules.logging.dto.FunctionalLogEventDto;
@@ -46,15 +48,29 @@ public class FunctionalLogDBServiceTest
 	@Autowired
 	private FunctionalLogEventRepository functionalLogEventRepository;
 
+	@Autowired
+	private LoggingModuleSettings loggingModuleSettings;
+
 	@Before
 	public void resetMocks() {
-		reset( functionalLogEventRepository );
+		reset( functionalLogEventRepository, loggingModuleSettings );
 	}
 
 	@Test
 	public void functionalLogDBServiceSupportsOnlyFunctional() {
+		when( loggingModuleSettings.getFunctionalDBStrategy() ).thenReturn( DatabaseStrategy.ROLLING );
 		assertTrue( functionalLogDBService.supports( LogType.FUNCTIONAL ) );
 		assertFalse( functionalLogDBService.supports( LogType.TECHNICAL ) );
+	}
+
+	@Test
+	public void functionalLogDBServiceSupportsRollingAndSingleTableStrategy() {
+		when( loggingModuleSettings.getFunctionalDBStrategy() ).thenReturn( DatabaseStrategy.ROLLING );
+		assertTrue( functionalLogDBService.supports( LogType.FUNCTIONAL ) );
+		when( loggingModuleSettings.getFunctionalDBStrategy() ).thenReturn( DatabaseStrategy.SINGLE_TABLE );
+		assertTrue( functionalLogDBService.supports( LogType.FUNCTIONAL ) );
+		when( loggingModuleSettings.getFunctionalDBStrategy() ).thenReturn( DatabaseStrategy.NONE );
+		assertFalse( functionalLogDBService.supports( LogType.FUNCTIONAL ) );
 	}
 
 	@Test

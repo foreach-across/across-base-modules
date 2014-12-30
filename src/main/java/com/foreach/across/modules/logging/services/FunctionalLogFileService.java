@@ -16,6 +16,7 @@
 package com.foreach.across.modules.logging.services;
 
 import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.business.FileStrategy;
 import com.foreach.across.modules.logging.business.LogType;
 import com.foreach.across.modules.logging.dto.LogEventDto;
 import org.slf4j.Logger;
@@ -44,7 +45,8 @@ public class FunctionalLogFileService implements LogDelegateService
 
 	@Override
 	public boolean supports( LogType logType ) {
-		return logType == LogType.FUNCTIONAL;
+		return logType == LogType.FUNCTIONAL && loggingModuleSettings
+				.getFunctionalFileStrategy() == FileStrategy.LOGBACK;
 	}
 
 	@Override
