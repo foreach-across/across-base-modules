@@ -30,7 +30,7 @@ public class TechnicalLogEvent extends LogEvent
 	@Column(name = "message", nullable = false)
 	private String message;
 
-	@Column(name = "level", nullable = false)
+	@Column(name = "log_level", nullable = false)
 	@Type(type = HibernateLogLevel.CLASS_NAME)
 	private LogLevel level;
 

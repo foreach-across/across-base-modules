@@ -70,7 +70,7 @@
 			<column name="message" type="java.sql.Types.LONGVARCHAR">
 				<constraints nullable="false"/>
 			</column>
-			<column name="level" type="java.sql.Types.INTEGER">
+			<column name="log_level" type="java.sql.Types.INTEGER">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
