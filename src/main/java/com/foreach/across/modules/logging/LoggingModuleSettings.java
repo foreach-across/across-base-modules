@@ -41,7 +41,7 @@ public class LoggingModuleSettings extends AcrossModuleSettings
 	 * Which strategy should be used for logging to the database.
 	 * <p/>
 	 * Enum (@see com.foreach.across.modules.logging.business.DatabaseStrategy)
-	 * DEFAULT: ROLLING
+	 * DEFAULT: NONE
 	 */
 	public static final String FUNCTIONAL_DB_STRATEGY = "loggingModule.functionalDBStrategy";
 	public static final String TECHNICAL_DB_STRATEGY = "loggingModule.technicalDBStrategy";
@@ -85,9 +85,9 @@ public class LoggingModuleSettings extends AcrossModuleSettings
 		registry.register( FUNCTIONAL_FILE_LOGGER, String.class, "functional-logger",
 		                   "Name of the logger to be used when logging functional data to file." );
 
-		registry.register( FUNCTIONAL_DB_STRATEGY, DatabaseStrategy.class, DatabaseStrategy.ROLLING,
+		registry.register( FUNCTIONAL_DB_STRATEGY, DatabaseStrategy.class, DatabaseStrategy.NONE,
 		                   "Which strategy should be used for functional logging to the database." );
-		registry.register( TECHNICAL_DB_STRATEGY, DatabaseStrategy.class, DatabaseStrategy.ROLLING,
+		registry.register( TECHNICAL_DB_STRATEGY, DatabaseStrategy.class, DatabaseStrategy.NONE,
 		                   "Which strategy should be used for technical logging to the database." );
 
 		registry.register( FUNCTIONAL_DB_ROLLING_SCHEDULE, String.class, "0 0 0 1 * *",
@@ -104,7 +104,6 @@ public class LoggingModuleSettings extends AcrossModuleSettings
 		                   "The amount of time covered by one table (except for the rolling table)." );
 		registry.register( TECHNICAL_DB_ROLLING_TIME_SPAN, String.class, "P1M",
 		                   "The amount of time covered by one table (except for the rolling table)." );
-		//TODO SOME OF THESE HAVE TO BE VALIDATED!
 	}
 
 	public boolean isRequestResponseLogEnabled() {

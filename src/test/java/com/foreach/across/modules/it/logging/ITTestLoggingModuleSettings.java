@@ -78,6 +78,8 @@ public class ITTestLoggingModuleSettings
 
 	@Test(expected = AcrossException.class)
 	public void settingInvalidCronAsFunctionalScheduleFailsBootstrap() {
+		loggingModule.setProperty( LoggingModuleSettings.FUNCTIONAL_DB_STRATEGY, DatabaseStrategy.ROLLING );
+		loggingModule.setProperty( LoggingModuleSettings.TECHNICAL_DB_STRATEGY, DatabaseStrategy.ROLLING );
 		loggingModule.setProperty( LoggingModuleSettings.FUNCTIONAL_DB_ROLLING_SCHEDULE, "foo" );
 
 		LoggingService loggingService = bootstrapWithParent();
@@ -86,6 +88,8 @@ public class ITTestLoggingModuleSettings
 
 	@Test(expected = AcrossException.class)
 	public void settingInvalidDurationAsFunctionalTimestampFailsBootstrap() {
+		loggingModule.setProperty( LoggingModuleSettings.FUNCTIONAL_DB_STRATEGY, DatabaseStrategy.ROLLING );
+		loggingModule.setProperty( LoggingModuleSettings.TECHNICAL_DB_STRATEGY, DatabaseStrategy.ROLLING );
 		loggingModule.setProperty( LoggingModuleSettings.FUNCTIONAL_DB_ROLLING_TIME_SPAN, "foo" );
 
 		LoggingService loggingService = bootstrapWithParent();
@@ -94,6 +98,8 @@ public class ITTestLoggingModuleSettings
 
 	@Test(expected = AcrossException.class)
 	public void settingInvalidCronAsTechnicalScheduleFailsBootstrap() {
+		loggingModule.setProperty( LoggingModuleSettings.FUNCTIONAL_DB_STRATEGY, DatabaseStrategy.ROLLING );
+		loggingModule.setProperty( LoggingModuleSettings.TECHNICAL_DB_STRATEGY, DatabaseStrategy.ROLLING );
 		loggingModule.setProperty( LoggingModuleSettings.TECHNICAL_DB_ROLLING_SCHEDULE, "foo" );
 
 		LoggingService loggingService = bootstrapWithParent();
@@ -102,6 +108,8 @@ public class ITTestLoggingModuleSettings
 
 	@Test(expected = AcrossException.class)
 	public void settingInvalidDurationAsTechnicalTimestampFailsBootstrap() {
+		loggingModule.setProperty( LoggingModuleSettings.FUNCTIONAL_DB_STRATEGY, DatabaseStrategy.ROLLING );
+		loggingModule.setProperty( LoggingModuleSettings.TECHNICAL_DB_STRATEGY, DatabaseStrategy.ROLLING );
 		loggingModule.setProperty( LoggingModuleSettings.TECHNICAL_DB_ROLLING_TIME_SPAN, "foo" );
 
 		LoggingService loggingService = bootstrapWithParent();

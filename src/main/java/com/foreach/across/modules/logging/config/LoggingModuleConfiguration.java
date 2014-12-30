@@ -15,9 +15,13 @@
  */
 package com.foreach.across.modules.logging.config;
 
+import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossException;
+import com.foreach.across.core.context.info.AcrossContextInfo;
+import com.foreach.across.modules.hibernate.AcrossHibernateModule;
 import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.business.DatabaseStrategy;
+import com.foreach.across.modules.logging.business.LogType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -34,41 +38,54 @@ import javax.xml.datatype.DatatypeFactory;
 public class LoggingModuleConfiguration
 {
 	@Autowired
+	private AcrossContext acrossContext;
+
+	@Autowired
+	private AcrossContextInfo acrossContextInfo;
+
+	@Autowired
 	private LoggingModuleSettings loggingModuleSettings;
 
 	@PostConstruct
 	public void checkSettingsValidity() {
 		if ( loggingModuleSettings.getFunctionalDBStrategy() == DatabaseStrategy.ROLLING ) {
-			try {
-				CronSequenceGenerator cronSeq = new CronSequenceGenerator(
-						loggingModuleSettings.getFunctionalDBRollingSchedule() );
-			}
-			catch ( IllegalArgumentException e ) {
-				throw new AcrossException( "Functional DB Rolling Schedule specified was not valid.", e );
-			}
-			try {
-				DatatypeFactory.newInstance().newDuration( loggingModuleSettings.getFunctionalDBRollingTimeSpan() );
-			}
-			catch ( Exception e ) {
-				throw new AcrossException( "Oops", e );
-			}
-			//Test Schedule and TimeSpan
+			validateRollingSchedule( loggingModuleSettings.getFunctionalDBRollingSchedule(), LogType.FUNCTIONAL );
+			validateRollingTimeSpan( loggingModuleSettings.getFunctionalDBRollingTimeSpan(), LogType.FUNCTIONAL );
 		}
+
 		if ( loggingModuleSettings.getTechnicalDBStrategy() == DatabaseStrategy.ROLLING ) {
-			try {
-				CronSequenceGenerator cronSeq = new CronSequenceGenerator(
-						loggingModuleSettings.getTechnicalDBRollingSchedule() );
+			validateRollingSchedule( loggingModuleSettings.getTechnicalDBRollingSchedule(), LogType.TECHNICAL );
+			validateRollingTimeSpan( loggingModuleSettings.getTechnicalDBRollingTimeSpan(), LogType.TECHNICAL );
+		}
+
+		if ( acrossContext.getModule( AcrossHibernateModule.NAME ) == null ) {
+			if ( loggingModuleSettings.getFunctionalDBStrategy() != DatabaseStrategy.NONE ||
+					loggingModuleSettings.getTechnicalDBStrategy() != DatabaseStrategy.NONE ) {
+				throw new AcrossException(
+						"The current settings for the LoggingModule rely on database, yet the AcrossHibernateModule is not enabled." );
 			}
-			catch ( IllegalArgumentException e ) {
-				throw new AcrossException( "Technical DB Rolling Schedule specified was not valid.", e );
-			}
-			try {
-				DatatypeFactory.newInstance().newDuration( loggingModuleSettings.getTechnicalDBRollingTimeSpan() );
-			}
-			catch ( Exception e ) {
-				throw new AcrossException( "Oops", e );
-			}
-			//Test Schedule and TimeSpan
+		}
+	}
+
+	private void validateRollingSchedule( String rollingSchedule, LogType logType ) {
+		try {
+			new CronSequenceGenerator( rollingSchedule );
+		}
+		catch ( IllegalArgumentException e ) {
+			String errorMsg = String.format( "%s DB Rolling Schedule specified was not valid : \"%s\".", logType,
+			                                 rollingSchedule );
+			throw new AcrossException( errorMsg, e );
+		}
+	}
+
+	private void validateRollingTimeSpan( String rollingTimeSpan, LogType logType ) {
+		try {
+			DatatypeFactory.newInstance().newDuration( rollingTimeSpan );
+		}
+		catch ( Exception e ) {
+			String errorMsg = String.format( "%s DB Timespan specified was not valid : \"%s\".", logType,
+			                                 rollingTimeSpan );
+			throw new AcrossException( errorMsg, e );
 		}
 	}
 }
