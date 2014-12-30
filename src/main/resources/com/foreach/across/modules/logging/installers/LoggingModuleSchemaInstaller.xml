@@ -53,7 +53,7 @@
 			<column name="entityId" type="java.sql.Types.BIGINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="user" type="java.sql.Types.VARCHAR(255)">
+			<column name="log_user" type="java.sql.Types.VARCHAR(255)">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>

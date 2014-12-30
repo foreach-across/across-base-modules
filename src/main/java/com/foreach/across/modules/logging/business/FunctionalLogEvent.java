@@ -19,7 +19,7 @@ public class FunctionalLogEvent extends LogEvent
 	@Column(name = "entityId", nullable = false)
 	private long entityId;
 
-	@Column(name = "user", nullable = false)
+	@Column(name = "log_user", nullable = false)
 	private String user;
 
 	public String getAction() {
