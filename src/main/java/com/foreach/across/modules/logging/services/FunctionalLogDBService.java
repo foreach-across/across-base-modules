@@ -23,8 +23,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
-
 @Service
 public class FunctionalLogDBService implements LogDelegateService
 {
@@ -40,33 +38,14 @@ public class FunctionalLogDBService implements LogDelegateService
 	public void log( LogEventDto dto ) {
 		FunctionalLogEvent entity;
 
-		if ( !dto.isNewEntity() ) {
-			entity = functionalLogEventRepository.getById( dto.getId() );
-
-			if ( entity == null ) {
-				throw new EntityNotFoundException( String.format( "No %s with id %s",
-				                                                  FunctionalLogEvent.class.getSimpleName(),
-				                                                  dto.getId() ) );
-			}
+		try {
+			entity = FunctionalLogEvent.class.newInstance();
 		}
-		else {
-			try {
-				entity = FunctionalLogEvent.class.newInstance();
-			}
-			catch ( InstantiationException | IllegalAccessException e ) {
-				throw new RuntimeException( e );
-			}
+		catch ( InstantiationException | IllegalAccessException e ) {
+			throw new RuntimeException( e );
 		}
 
 		BeanUtils.copyProperties( dto, entity );
-
-		if ( dto.isNewEntity() ) {
-			functionalLogEventRepository.create( entity );
-		}
-		else {
-			functionalLogEventRepository.update( entity );
-		}
-
-		dto.copyFrom( entity );
+		functionalLogEventRepository.create( entity );
 	}
 }

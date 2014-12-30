@@ -38,6 +38,10 @@ public class FunctionalLogFileService implements LogDelegateService
 		functionalLog = LoggerFactory.getLogger( loggingModuleSettings.getFunctionalFileLogger() );
 	}
 
+	public void setFunctionalLog( Logger functionalLog ) {
+		this.functionalLog = functionalLog;
+	}
+
 	@Override
 	public boolean supports( LogType logType ) {
 		return logType == LogType.FUNCTIONAL;

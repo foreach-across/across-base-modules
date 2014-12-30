@@ -15,12 +15,19 @@
  */
 package com.foreach.across.modules.logging.dto;
 
+import com.foreach.across.modules.logging.business.LogType;
+
 public class FunctionalLogEventDto extends LogEventDto
 {
 	private String action;
 	private String entity;
 	private long entityId;
 	private String user;
+
+	public FunctionalLogEventDto() {
+		super();
+		setLogType( LogType.FUNCTIONAL );
+	}
 
 	public String getAction() {
 		return action;

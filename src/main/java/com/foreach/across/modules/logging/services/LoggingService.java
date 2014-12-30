@@ -17,10 +17,13 @@ package com.foreach.across.modules.logging.services;
 
 import com.foreach.across.modules.logging.business.LogLevel;
 
+import java.util.Collection;
 import java.util.Map;
 
 public interface LoggingService
 {
+	void setDelegates( Collection<LogDelegateService> delegates );
+
 	void logFunctional( String action, Class entity, Long entityId, String user, Map<String, Object> data );
 
 	void logTechnical( String message, Class sender, LogLevel level, Map<String, Object> data );

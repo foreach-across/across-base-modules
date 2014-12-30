@@ -16,12 +16,18 @@
 package com.foreach.across.modules.logging.dto;
 
 import com.foreach.across.modules.logging.business.LogLevel;
+import com.foreach.across.modules.logging.business.LogType;
 
 public class TechnicalLogEventDto extends LogEventDto
 {
 	private String message;
 	private LogLevel level;
 	private Class sender;
+
+	public TechnicalLogEventDto() {
+		super();
+		setLogType( LogType.TECHNICAL );
+	}
 
 	public String getMessage() {
 		return message;

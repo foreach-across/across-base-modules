@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 @Service
@@ -36,7 +35,6 @@ public class LoggingServiceImpl implements LoggingService
 {
 	private final Logger LOG = LoggerFactory.getLogger( getClass() );
 
-	@Autowired
 	private Collection<LogDelegateService> logDelegateServices;
 
 	private ObjectMapper jsonObjectMapper;
@@ -47,14 +45,19 @@ public class LoggingServiceImpl implements LoggingService
 	}
 
 	@Override
+	@Autowired
+	public void setDelegates( Collection<LogDelegateService> delegates ) {
+		this.logDelegateServices = delegates;
+	}
+
+	@Override
 	public void logFunctional( String action, Class entity, Long entityId, String user, Map<String, Object> data ) {
 		FunctionalLogEventDto eventDto = new FunctionalLogEventDto();
-		eventDto.setTime( new Date() );
 		eventDto.setAction( action );
 		eventDto.setEntity( entity.getName() );
 		eventDto.setEntityId( entityId );
 		eventDto.setUser( user );
-		if ( data != null && data.size() > 1 ) {
+		if ( data != null && data.size() > 0 ) {
 			try {
 				eventDto.setData( jsonObjectMapper.writeValueAsString( data ) );
 			}
@@ -73,10 +76,17 @@ public class LoggingServiceImpl implements LoggingService
 	@Override
 	public void logTechnical( String message, Class sender, LogLevel level, Map<String, Object> data ) {
 		TechnicalLogEventDto dto = new TechnicalLogEventDto();
-		dto.setTime( new Date() );
 		dto.setMessage( message );
 		dto.setLevel( level );
 		dto.setSender( sender );
+		if ( data != null && data.size() > 0 ) {
+			try {
+				dto.setData( jsonObjectMapper.writeValueAsString( data ) );
+			}
+			catch ( JsonProcessingException e ) {
+				LOG.error( "Couldn't serialize functional log event data", e );
+			}
+		}
 
 		for ( LogDelegateService delegateService : logDelegateServices ) {
 			if ( delegateService.supports( LogType.TECHNICAL ) ) {

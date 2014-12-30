@@ -23,9 +23,13 @@ import java.util.Date;
 
 public class LogEventDto extends IdBasedEntityDto<LogEvent>
 {
-	private Date time = new Date();
+	private Date time;
 	private String data;
 	private LogType logType;
+
+	public LogEventDto() {
+		setTime( new Date() );
+	}
 
 	public Date getTime() {
 		return time;
