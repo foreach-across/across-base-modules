@@ -15,8 +15,16 @@
  */
 package com.foreach.across.modules.logging.config;
 
+import com.foreach.across.core.AcrossException;
+import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.business.DatabaseStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.support.CronSequenceGenerator;
+
+import javax.annotation.PostConstruct;
+import javax.xml.datatype.DatatypeFactory;
 
 /**
  * @author Andy Somers
@@ -25,4 +33,42 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan("com.foreach.across.modules.logging.controllers")
 public class LoggingModuleConfiguration
 {
+	@Autowired
+	private LoggingModuleSettings loggingModuleSettings;
+
+	@PostConstruct
+	public void checkSettingsValidity() {
+		if ( loggingModuleSettings.getFunctionalDBStrategy() == DatabaseStrategy.ROLLING ) {
+			try {
+				CronSequenceGenerator cronSeq = new CronSequenceGenerator(
+						loggingModuleSettings.getFunctionalDBRollingSchedule() );
+			}
+			catch ( IllegalArgumentException e ) {
+				throw new AcrossException( "Functional DB Rolling Schedule specified was not valid.", e );
+			}
+			try {
+				DatatypeFactory.newInstance().newDuration( loggingModuleSettings.getFunctionalDBRollingTimeSpan() );
+			}
+			catch ( Exception e ) {
+				throw new AcrossException( "Oops", e );
+			}
+			//Test Schedule and TimeSpan
+		}
+		if ( loggingModuleSettings.getTechnicalDBStrategy() == DatabaseStrategy.ROLLING ) {
+			try {
+				CronSequenceGenerator cronSeq = new CronSequenceGenerator(
+						loggingModuleSettings.getTechnicalDBRollingSchedule() );
+			}
+			catch ( IllegalArgumentException e ) {
+				throw new AcrossException( "Technical DB Rolling Schedule specified was not valid.", e );
+			}
+			try {
+				DatatypeFactory.newInstance().newDuration( loggingModuleSettings.getTechnicalDBRollingTimeSpan() );
+			}
+			catch ( Exception e ) {
+				throw new AcrossException( "Oops", e );
+			}
+			//Test Schedule and TimeSpan
+		}
+	}
 }
