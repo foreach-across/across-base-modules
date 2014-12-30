@@ -13,15 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.logging.services;
+package com.foreach.across.modules.logging.business;
 
-import com.foreach.across.modules.logging.business.LogLevel;
+import com.foreach.across.modules.hibernate.types.IdLookup;
 
-import java.util.Map;
-
-public interface LoggingService
+public enum LogLevel implements IdLookup<Integer>
 {
-	void logFunctional( String action, Class entity, Long entityId, String user, Map<String, Object> data );
+	ERROR( 1 ),
+	WARN( 2 ),
+	INFO( 4 ),
+	DEBUG( 8 ),
+	TRACE( 16 );
 
-	void logTechnical( String message, Class sender, LogLevel level, Map<String, Object> data );
+	private int id;
+
+	LogLevel( int id ) {
+		this.id = id;
+	}
+
+	@Override
+	public Integer getId() {
+		return id;
+	}
 }

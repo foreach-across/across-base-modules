@@ -63,7 +63,21 @@
 		                         referencedTableName="lm_log_event" referencedColumnNames="id"/>
 
 
-		<!-- TODO TECHNICAL -->
+		<createTable tableName="lm_technical_log_event">
+			<column name="id" type="java.sql.Types.BIGINT">
+				<constraints nullable="false" primaryKey="true"/>
+			</column>
+			<column name="message" type="java.sql.Types.LONGVARCHAR">
+				<constraints nullable="false"/>
+			</column>
+			<column name="level" type="java.sql.Types.INTEGER">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
+		<addForeignKeyConstraint baseTableName="lm_technical_log_event" baseColumnNames="id"
+		                         constraintName="lm_technical_log_event_id"
+		                         referencedTableName="lm_log_event" referencedColumnNames="id"/>
 	</changeSet>
 
 </databaseChangeLog>

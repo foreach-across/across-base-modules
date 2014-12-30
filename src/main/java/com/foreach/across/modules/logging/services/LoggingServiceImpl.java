@@ -17,8 +17,10 @@ package com.foreach.across.modules.logging.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foreach.across.modules.logging.business.LogLevel;
 import com.foreach.across.modules.logging.business.LogType;
 import com.foreach.across.modules.logging.dto.FunctionalLogEventDto;
+import com.foreach.across.modules.logging.dto.TechnicalLogEventDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +66,21 @@ public class LoggingServiceImpl implements LoggingService
 		for ( LogDelegateService delegateService : logDelegateServices ) {
 			if ( delegateService.supports( LogType.FUNCTIONAL ) ) {
 				delegateService.log( eventDto );
+			}
+		}
+	}
+
+	@Override
+	public void logTechnical( String message, Class sender, LogLevel level, Map<String, Object> data ) {
+		TechnicalLogEventDto dto = new TechnicalLogEventDto();
+		dto.setTime( new Date() );
+		dto.setMessage( message );
+		dto.setLevel( level );
+		dto.setSender( sender );
+
+		for ( LogDelegateService delegateService : logDelegateServices ) {
+			if ( delegateService.supports( LogType.TECHNICAL ) ) {
+				delegateService.log( dto );
 			}
 		}
 	}

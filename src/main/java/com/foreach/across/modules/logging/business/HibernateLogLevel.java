@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.logging.services;
+package com.foreach.across.modules.logging.business;
 
-import com.foreach.across.modules.logging.business.LogLevel;
+import com.foreach.across.modules.hibernate.types.HibernateIdLookup;
 
-import java.util.Map;
-
-public interface LoggingService
+public class HibernateLogLevel extends HibernateIdLookup<LogLevel>
 {
-	void logFunctional( String action, Class entity, Long entityId, String user, Map<String, Object> data );
+	public static final String CLASS_NAME = "com.foreach.across.modules.logging.business.HibernateLogLevel";
 
-	void logTechnical( String message, Class sender, LogLevel level, Map<String, Object> data );
+	public HibernateLogLevel() {
+		super( LogLevel.class );
+	}
 }

@@ -16,10 +16,7 @@
 package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.modules.logging.repositories.FunctionalLogEventRepository;
-import com.foreach.across.modules.logging.repositories.FunctionalLogEventRepositoryImpl;
-import com.foreach.across.modules.logging.repositories.LogEventRepository;
-import com.foreach.across.modules.logging.repositories.LogEventRepositoryImpl;
+import com.foreach.across.modules.logging.repositories.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,5 +32,10 @@ public class LogRepositoriesHibernateConfig
 	@Bean
 	public FunctionalLogEventRepository functionalLogEventRepository() {
 		return new FunctionalLogEventRepositoryImpl();
+	}
+
+	@Bean
+	public TechnicalLogEventRepository technicalLogEventRepository() {
+		return new TechnicalLogEventRepositoryImpl();
 	}
 }

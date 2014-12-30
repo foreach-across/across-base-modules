@@ -13,15 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.logging.services;
+package com.foreach.across.modules.logging.dto;
 
 import com.foreach.across.modules.logging.business.LogLevel;
 
-import java.util.Map;
-
-public interface LoggingService
+public class TechnicalLogEventDto extends LogEventDto
 {
-	void logFunctional( String action, Class entity, Long entityId, String user, Map<String, Object> data );
+	private String message;
+	private LogLevel level;
+	private Class sender;
 
-	void logTechnical( String message, Class sender, LogLevel level, Map<String, Object> data );
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage( String message ) {
+		this.message = message;
+	}
+
+	public LogLevel getLevel() {
+		return level;
+	}
+
+	public void setLevel( LogLevel level ) {
+		this.level = level;
+	}
+
+	public Class getSender() {
+		return sender;
+	}
+
+	public void setSender( Class sender ) {
+		this.sender = sender;
+	}
+
+	@Override
+	public String toString() {
+		return String.format( "%s. Extra data: %s", this.getMessage(), this.getData() );
+	}
 }

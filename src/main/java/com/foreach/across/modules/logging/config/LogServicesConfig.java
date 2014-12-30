@@ -16,10 +16,7 @@
 package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.annotations.Exposed;
-import com.foreach.across.modules.logging.services.FunctionalLogFileService;
-import com.foreach.across.modules.logging.services.LogDelegateService;
-import com.foreach.across.modules.logging.services.LoggingService;
-import com.foreach.across.modules.logging.services.LoggingServiceImpl;
+import com.foreach.across.modules.logging.services.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,5 +32,10 @@ public class LogServicesConfig
 	@Bean
 	public LogDelegateService functionalLogFileService() {
 		return new FunctionalLogFileService();
+	}
+
+	@Bean
+	public LogDelegateService technicalLogFileService() {
+		return new TechnicalLogFileService();
 	}
 }

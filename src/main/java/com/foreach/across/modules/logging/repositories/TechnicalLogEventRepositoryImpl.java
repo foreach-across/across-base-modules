@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.logging.services;
+package com.foreach.across.modules.logging.repositories;
 
-import com.foreach.across.modules.logging.business.LogLevel;
+import com.foreach.across.modules.hibernate.repositories.BasicRepositoryImpl;
+import com.foreach.across.modules.logging.business.TechnicalLogEvent;
 
-import java.util.Map;
-
-public interface LoggingService
+public class TechnicalLogEventRepositoryImpl extends BasicRepositoryImpl<TechnicalLogEvent> implements TechnicalLogEventRepository
 {
-	void logFunctional( String action, Class entity, Long entityId, String user, Map<String, Object> data );
-
-	void logTechnical( String message, Class sender, LogLevel level, Map<String, Object> data );
 }
