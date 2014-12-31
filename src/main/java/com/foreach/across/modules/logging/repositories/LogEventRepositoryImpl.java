@@ -16,10 +16,59 @@
 package com.foreach.across.modules.logging.repositories;
 
 import com.foreach.across.modules.hibernate.repositories.BasicRepositoryImpl;
+import com.foreach.across.modules.logging.business.FunctionalLogEvent;
 import com.foreach.across.modules.logging.business.LogEvent;
+import com.foreach.across.modules.logging.business.LogType;
+import com.foreach.across.modules.logging.business.TechnicalLogEvent;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
+
+import java.util.Collection;
 
 @Repository
 public class LogEventRepositoryImpl extends BasicRepositoryImpl<LogEvent> implements LogEventRepository
 {
+	@Override
+	public Collection<LogEvent> getAll() {
+		Criteria criteria = distinct();
+		criteria = orderByTimeDesc( criteria );
+		return criteria.list();
+	}
+
+	@Override
+	public Collection<LogEvent> getAllOfType( LogType logType ) {
+		Criteria criteria = distinct().add( Restrictions.eq( "class", getSpecificBusinessClass( logType ) ) );
+		criteria = orderByTimeDesc( criteria );
+		return criteria.list();
+	}
+
+	@Override
+	public Collection<LogEvent> getAmountOfType( LogType logType, int numberOfLastResults ) {
+		Criteria criteria = distinct().add( Restrictions.eq( "class", getSpecificBusinessClass( logType ) ) )
+		                              .setMaxResults( numberOfLastResults );
+		criteria = orderByTimeDesc( criteria );
+		return criteria.list();
+	}
+
+	@Override
+	public Collection<LogEvent> getAmount( int numberOfLastResults ) {
+		Criteria criteria = distinct().setMaxResults( numberOfLastResults );
+		criteria = orderByTimeDesc( criteria );
+		return criteria.list();
+	}
+
+	private Criteria orderByTimeDesc( Criteria c ) {
+		return c.addOrder( Order.desc( "time" ) );
+	}
+
+	private Class<? extends LogEvent> getSpecificBusinessClass( LogType logType ) {
+		if ( logType == LogType.FUNCTIONAL ) {
+			return FunctionalLogEvent.class;
+		}
+		else {
+			return TechnicalLogEvent.class;
+		}
+	}
 }

@@ -16,9 +16,7 @@
 package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.modules.logging.services.FunctionalLogDBService;
-import com.foreach.across.modules.logging.services.LogDelegateService;
-import com.foreach.across.modules.logging.services.TechnicalLogDBService;
+import com.foreach.across.modules.logging.services.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,5 +32,10 @@ public class LogServicesHibernateConfig
 	@Bean
 	public LogDelegateService technicalLogDBService() {
 		return new TechnicalLogDBService();
+	}
+
+	@Bean
+	public LogDBReaderService logDBReaderService() {
+		return new LogDBReaderServiceImpl();
 	}
 }

@@ -21,7 +21,11 @@ import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.modules.hibernate.AcrossHibernateModule;
 import com.foreach.across.modules.logging.LoggingModule;
+import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.business.*;
 import com.foreach.across.modules.logging.services.*;
+import com.foreach.across.modules.web.AcrossWebModule;
+import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +36,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 @WebAppConfiguration
-@ContextConfiguration(classes = { ITLoggingModule.Config.class, ITLoggingModuleWithHibernate.Config.class })
+@ContextConfiguration(classes = { ITLoggingModuleWithHibernate.Config.class })
 public class ITLoggingModuleWithHibernate
 {
 	@Autowired
@@ -62,6 +67,9 @@ public class ITLoggingModuleWithHibernate
 	@Autowired
 	private TechnicalLogDBService technicalLogDBService;
 
+	@Autowired
+	private LogDBReaderService logDBReaderService;
+
 	@Test
 	public void verifyBootstrapped() {
 		assertNotNull( loggingService );
@@ -78,12 +86,78 @@ public class ITLoggingModuleWithHibernate
 		assertEquals( logDelegateServices.size(), 4 );
 	}
 
+	@Test
+	public void logDBReaderServiceReturnsTheCorrectLogs() {
+		loggingService.logFunctional( "foo", getClass(), 1L, "user@example.com", null );
+		loggingService.logTechnical( "A message", getClass(), LogLevel.INFO, null );
+
+		Collection<LogEvent> allA = logDBReaderService.getEvents();
+		Collection<LogEvent> funcA = logDBReaderService.getEvents( LogType.FUNCTIONAL );
+		Collection<LogEvent> techA = logDBReaderService.getEvents( LogType.TECHNICAL );
+
+		assertEquals( 1, funcA.size() );
+		assertEquals( 1, techA.size() );
+		assertEquals( 2, allA.size() );
+		assertTrue( allA.containsAll( funcA ) );
+		assertTrue( allA.containsAll( techA ) );
+		funcA.removeAll( techA );
+		assertEquals( 1, funcA.size() );
+
+		assertTrue( ( (FunctionalLogEvent) funcA.iterator().next() ).getAction().equals( "foo" ) );
+		assertTrue( ( (TechnicalLogEvent) techA.iterator().next() ).getMessage().equals( "A message" ) );
+
+		loggingService.logFunctional( "bar", getClass(), 2L, "user2@example.com", null );
+		loggingService.logTechnical( "Another message", getClass(), LogLevel.WARN, null );
+
+		Collection<LogEvent> allB = logDBReaderService.getEvents();
+		Collection<LogEvent> funcB = logDBReaderService.getEvents( LogType.FUNCTIONAL );
+		Collection<LogEvent> techB = logDBReaderService.getEvents( LogType.TECHNICAL );
+		Collection<LogEvent> limitedB = logDBReaderService.getEvents( 2 );
+		Collection<LogEvent> funcLimitedB = logDBReaderService.getEvents( LogType.FUNCTIONAL, 1 );
+		Collection<LogEvent> techLimitedB = logDBReaderService.getEvents( LogType.TECHNICAL, 1 );
+
+		assertEquals( 2, funcB.size() );
+		assertEquals( 2, techB.size() );
+		assertEquals( 4, allB.size() );
+		assertEquals( 1, funcLimitedB.size() );
+		assertEquals( 1, techLimitedB.size() );
+		assertEquals( 2, limitedB.size() );
+
+		assertTrue( allB.containsAll( funcB ) );
+		assertTrue( allB.containsAll( techB ) );
+		assertTrue( funcB.containsAll( funcLimitedB ) );
+		assertTrue( techB.containsAll( techLimitedB ) );
+		assertTrue( allB.containsAll( limitedB ) );
+
+		funcLimitedB.removeAll( techLimitedB );
+		assertEquals( 1, funcA.size() );
+
+		Iterator<LogEvent> funcBIt = funcB.iterator();
+		Iterator<LogEvent> techBIt = techB.iterator();
+		assertTrue( ( (FunctionalLogEvent) funcBIt.next() ).getAction().equals( "bar" ) );
+		assertTrue( ( (TechnicalLogEvent) techBIt.next() ).getMessage().equals( "Another message" ) );
+		assertTrue( ( (FunctionalLogEvent) funcBIt.next() ).getAction().equals( "foo" ) );
+		assertTrue( ( (TechnicalLogEvent) techBIt.next() ).getMessage().equals( "A message" ) );
+		assertTrue( ( (FunctionalLogEvent) funcLimitedB.iterator().next() ).getAction().equals( "bar" ) );
+		assertTrue( ( (TechnicalLogEvent) techLimitedB.iterator().next() ).getMessage().equals( "Another message" ) );
+	}
+
 	@Configuration
+	@AcrossTestConfiguration
 	static class Config implements AcrossContextConfigurer
 	{
 		@Override
 		public void configure( AcrossContext context ) {
 			context.addModule( new AcrossHibernateModule() );
+			context.addModule( new AcrossWebModule() );
+			context.addModule( loggingModule() );
+		}
+
+		private LoggingModule loggingModule() {
+			LoggingModule loggingModule = new LoggingModule();
+			loggingModule.setProperty( LoggingModuleSettings.FUNCTIONAL_DB_STRATEGY, DatabaseStrategy.SINGLE_TABLE );
+			loggingModule.setProperty( LoggingModuleSettings.TECHNICAL_DB_STRATEGY, DatabaseStrategy.SINGLE_TABLE );
+			return loggingModule;
 		}
 	}
 }

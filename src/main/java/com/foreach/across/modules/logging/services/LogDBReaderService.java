@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.logging.repositories;
+package com.foreach.across.modules.logging.services;
 
-import com.foreach.across.modules.hibernate.repositories.BasicRepository;
 import com.foreach.across.modules.logging.business.LogEvent;
 import com.foreach.across.modules.logging.business.LogType;
 
 import java.util.Collection;
 
-public interface LogEventRepository extends BasicRepository<LogEvent>
+public interface LogDBReaderService
 {
-	Collection<LogEvent> getAllOfType( LogType logType );
+	Collection<LogEvent> getEvents();
 
-	Collection<LogEvent> getAmountOfType( LogType logType, int numberOfLastResults );
+	Collection<LogEvent> getEvents( LogType logType );
 
-	Collection<LogEvent> getAmount( int numberOfLastResults );
+	Collection<LogEvent> getEvents( LogType logType, int numberOfLastResults );
+
+	Collection<LogEvent> getEvents( int numberOfLastResults );
 }

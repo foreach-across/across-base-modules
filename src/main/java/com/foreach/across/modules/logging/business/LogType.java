@@ -5,8 +5,9 @@ public enum LogType
 	FUNCTIONAL,
 	TECHNICAL;
 
-	public interface Constants {
-		String FUNCTIONAL="1";
-		String TECHNICAL="2";
+	public interface Constants
+	{
+		String FUNCTIONAL = "1";
+		String TECHNICAL = "2";
 	}
 }

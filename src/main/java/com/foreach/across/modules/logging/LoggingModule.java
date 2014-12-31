@@ -17,6 +17,7 @@ package com.foreach.across.modules.logging;
 
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.installers.AcrossSequencesInstaller;
 import com.foreach.across.modules.hibernate.AcrossHibernateModule;
 import com.foreach.across.modules.hibernate.provider.HasHibernatePackageProvider;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageProvider;
@@ -30,8 +31,8 @@ import org.apache.commons.lang3.StringUtils;
  * @author Andy Somers
  */
 @AcrossDepends(
-		required = AcrossWebModule.NAME, 
-		optional = {"AcrossHibernateModule", "DebugWebModule"}
+		required = AcrossWebModule.NAME,
+		optional = { "AcrossHibernateModule", "DebugWebModule" }
 )
 public class LoggingModule extends AcrossModule implements HasHibernatePackageProvider
 {
@@ -56,6 +57,7 @@ public class LoggingModule extends AcrossModule implements HasHibernatePackagePr
 	@Override
 	public Object[] getInstallers() {
 		return new Object[] {
+				new AcrossSequencesInstaller(),
 				LoggingModuleSchemaInstaller.class
 		};
 	}
