@@ -16,6 +16,7 @@
 package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.modules.logging.services.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +36,7 @@ public class LogServicesHibernateConfig
 	}
 
 	@Bean
+	@Exposed
 	public LogDBReaderService logDBReaderService() {
 		return new LogDBReaderServiceImpl();
 	}
