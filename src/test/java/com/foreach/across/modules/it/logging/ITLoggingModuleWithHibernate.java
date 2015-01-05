@@ -28,6 +28,7 @@ import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
@@ -87,7 +88,7 @@ public class ITLoggingModuleWithHibernate
 	}
 
 	@Test
-	public void logDBReaderServiceReturnsTheCorrectLogs() {
+	public void logDBReaderServiceReturnsTheCorrectLogs() throws InterruptedException {
 		loggingService.logFunctional( "foo", getClass(), 1L, "user@example.com", null );
 		loggingService.logTechnical( "A message", getClass(), LogLevel.INFO, null );
 
@@ -105,6 +106,8 @@ public class ITLoggingModuleWithHibernate
 
 		assertTrue( ( (FunctionalLogEvent) funcA.iterator().next() ).getAction().equals( "foo" ) );
 		assertTrue( ( (TechnicalLogEvent) techA.iterator().next() ).getMessage().equals( "A message" ) );
+
+		Thread.sleep( 1000 ); //If we don't sleep, we can't properly test order.
 
 		loggingService.logFunctional( "bar", getClass(), 2L, "user2@example.com", null );
 		loggingService.logTechnical( "Another message", getClass(), LogLevel.WARN, null );
