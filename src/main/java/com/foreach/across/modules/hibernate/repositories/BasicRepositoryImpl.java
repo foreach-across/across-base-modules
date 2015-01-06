@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
+import java.util.List;
 
 public class BasicRepositoryImpl<T> implements BasicRepository<T>
 {
@@ -81,17 +82,17 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 	@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)
 	@Override
-	public Collection<T> getAll() {
+	public List<T> findAll() {
 		// TODO: https://bitbucket.org/beforeach/across-standard-modules/issue/15/
-		return (Collection<T>) orderedDistinct().setFirstResult( 0 ).setMaxResults( MAX_RESULTS ).list();
+		return (List<T>) orderedDistinct().setFirstResult( 0 ).setMaxResults( MAX_RESULTS ).list();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)
 	@Override
-	public Collection<T> getAllForIds( Collection<Long> ids ) {
+	public java.util.List<T> findAll( Collection<Long> ids ) {
 		// TODO: https://bitbucket.org/beforeach/across-standard-modules/issue/15/
-		return (Collection<T>) orderedDistinct()
+		return (List<T>) orderedDistinct()
 				.add( Restrictions.in( "id", ids ) )
 				.setFirstResult( 0 ).setMaxResults( MAX_RESULTS ).list();
 	}

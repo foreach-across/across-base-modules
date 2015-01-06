@@ -20,5 +20,5 @@ package com.foreach.across.modules.hibernate.business;
  */
 public interface IdBasedEntity
 {
-	long getId();
+	Long getId();
 }

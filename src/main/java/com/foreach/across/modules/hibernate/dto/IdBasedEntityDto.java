@@ -25,6 +25,7 @@ import java.util.Objects;
  *
  * @author Arne Vandamme
  */
+@Deprecated
 public class IdBasedEntityDto<T extends IdBasedEntity>
 {
     private long id;
