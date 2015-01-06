@@ -18,9 +18,9 @@ package com.foreach.across.modules.it.user;
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.database.SchemaConfiguration;
-import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.properties.PropertiesModule;
-import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
+import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.modules.user.UserModule;
 import com.foreach.across.modules.user.business.User;
 import com.foreach.across.modules.user.business.UserRestriction;
@@ -70,18 +70,18 @@ public class ITUserModuleRenamedTables
 	{
 		@Override
 		public void configure( AcrossContext context ) {
-			context.addModule( acrossHibernateModule() );
+			context.addModule( acrossHibernateJpaModule() );
 			context.addModule( userModule() );
 			context.addModule( propertiesModule() );
-			context.addModule( new SpringSecurityInfrastructureModule() );
+			context.addModule( new SpringSecurityModule() );
 		}
 
 		private PropertiesModule propertiesModule() {
 			return new PropertiesModule();
 		}
 
-		private AcrossHibernateModule acrossHibernateModule() {
-			return new AcrossHibernateModule();
+		private AcrossHibernateJpaModule acrossHibernateJpaModule() {
+			return new AcrossHibernateJpaModule();
 		}
 
 		private UserModule userModule() {

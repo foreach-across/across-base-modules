@@ -35,31 +35,31 @@ public class OAuth2ServiceImpl implements OAuth2Service
 
 	@Override
 	public Collection<OAuth2Client> getOAuth2Clients() {
-		return oAuth2ClientRepository.getAll();
+		return oAuth2ClientRepository.findAll();
 	}
 
 	@Override
 	public Collection<OAuth2Scope> getOAuth2Scopes() {
-		return oAuth2ScopeRepository.getAll();
+		return oAuth2ScopeRepository.findAll();
 	}
 
 	@Override
-	public void save( OAuth2Scope oAuth2Scope ) {
-		oAuth2ScopeRepository.save( oAuth2Scope );
+	public OAuth2Scope saveScope( OAuth2Scope oAuth2Scope ) {
+		return oAuth2ScopeRepository.save( oAuth2Scope );
 	}
 
 	@Override
 	public OAuth2Scope getScopeById( long id ) {
-		return oAuth2ScopeRepository.getById( id );
+		return oAuth2ScopeRepository.findOne( id );
 	}
 
 	@Override
-	public void save( OAuth2Client oAuth2Client ) {
-		oAuth2ClientRepository.save( oAuth2Client );
+	public OAuth2Client saveClient( OAuth2Client oAuth2Client ) {
+		return oAuth2ClientRepository.save( oAuth2Client );
 	}
 
 	@Override
 	public OAuth2Client getClientById( String clientId ) {
-		return oAuth2ClientRepository.getByClientId( clientId );
+		return oAuth2ClientRepository.findByClientId( clientId );
 	}
 }

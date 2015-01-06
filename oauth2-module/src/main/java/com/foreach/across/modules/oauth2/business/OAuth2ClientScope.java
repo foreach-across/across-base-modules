@@ -29,7 +29,6 @@ import java.util.Objects;
 		                                           joinColumns = @JoinColumn(name = "scope_id")) })
 public class OAuth2ClientScope implements Comparable
 {
-
 	@EmbeddedId
 	private OAuth2ClientScopeId pk = new OAuth2ClientScopeId();
 

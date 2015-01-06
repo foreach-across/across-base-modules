@@ -16,8 +16,9 @@
 package com.foreach.across.modules.user.business;
 
 import com.foreach.across.modules.hibernate.business.Auditable;
+import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
-import com.foreach.across.modules.spring.security.infrastructure.business.AbstractSecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import com.foreach.across.modules.user.converters.FieldUtils;
 import org.hibernate.annotations.BatchSize;
@@ -39,8 +40,9 @@ import java.util.*;
 		name = "principal_type",
 		discriminatorType = DiscriminatorType.STRING
 )
-public abstract class BasicSecurityPrincipal extends AbstractSecurityPrincipal
-		implements IdBasedSecurityPrincipal, Auditable<String>
+public abstract class BasicSecurityPrincipal<T extends SettableIdBasedEntity<?>>
+		extends SettableIdBasedEntity<T>
+		implements SecurityPrincipal, Auditable<String>
 {
 	@Id
 	@GeneratedValue(generator = "seq_um_principal_id")
@@ -52,7 +54,7 @@ public abstract class BasicSecurityPrincipal extends AbstractSecurityPrincipal
 					@org.hibernate.annotations.Parameter(name = "allocationSize", value = "10")
 			}
 	)
-	private long id;
+	private Long id;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@BatchSize(size = 50)
@@ -64,10 +66,13 @@ public abstract class BasicSecurityPrincipal extends AbstractSecurityPrincipal
 
 	@Column(name = "created_by", nullable = true)
 	private String createdBy;
+
 	@Column(name = "created_date", nullable = true)
 	private Date createdDate;
+
 	@Column(name = "last_modified_by", nullable = true)
 	private String lastModifiedBy;
+
 	@Column(name = "last_modified_date", nullable = true)
 	private Date lastModifiedDate;
 
@@ -84,11 +89,11 @@ public abstract class BasicSecurityPrincipal extends AbstractSecurityPrincipal
 	}
 
 	@Override
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId( long id ) {
+	public void setId( Long id ) {
 		this.id = id;
 	}
 
@@ -181,6 +186,11 @@ public abstract class BasicSecurityPrincipal extends AbstractSecurityPrincipal
 		}
 
 		return authorities;
+	}
+
+	@Override
+	public final String toString() {
+		return getPrincipalName();
 	}
 
 	@Override

@@ -22,7 +22,7 @@ import com.foreach.across.modules.hibernate.installers.AuditableSchemaInstaller;
 /**
  * @author Andy Somers
  */
-@AcrossDepends(optional = "AcrossHibernateModule")
+@AcrossDepends(required = "AcrossHibernateJpaModule")
 @Installer(description = "Adds the auditable columns to the acl_entity table", version = 1)
 public class AclEntityAuditableInstaller extends AuditableSchemaInstaller
 {

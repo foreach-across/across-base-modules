@@ -23,13 +23,13 @@ import com.foreach.across.core.context.bootstrap.AcrossBootstrapConfig;
 import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
-import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageConfiguringModule;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.modules.spring.security.acl.config.AclSecurityConfiguration;
 import com.foreach.across.modules.spring.security.acl.config.ModuleAclSecurityConfiguration;
-import com.foreach.across.modules.spring.security.acl.config.modules.AcrossHibernateModuleConfiguration;
+import com.foreach.across.modules.spring.security.acl.config.modules.AcrossHibernateJpaModuleConfiguration;
 import com.foreach.across.modules.spring.security.acl.config.modules.AdminWebModuleConfiguration;
 import com.foreach.across.modules.spring.security.acl.config.modules.SpringSecurityInfrastructureModuleConfiguration;
 import com.foreach.across.modules.spring.security.acl.installers.AclEntityAuditableInstaller;
@@ -45,7 +45,7 @@ import java.util.Set;
 @AcrossRole(AcrossModuleRole.INFRASTRUCTURE)
 @AcrossDepends(
 		required = { SpringSecurityModule.NAME, SpringSecurityInfrastructureModule.NAME },
-		optional = { "AcrossHibernateModule", "EhcacheModule" }
+		optional = { "AcrossHibernateJpaModule", "EhcacheModule" }
 )
 public class SpringSecurityAclModule extends AcrossModule implements HibernatePackageConfiguringModule
 {
@@ -64,13 +64,13 @@ public class SpringSecurityAclModule extends AcrossModule implements HibernatePa
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
 		contextConfigurers.add( new AnnotatedClassConfigurer( AclSecurityConfiguration.class,
-		                                                      AcrossHibernateModuleConfiguration.class,
+		                                                      AcrossHibernateJpaModuleConfiguration.class,
 		                                                      AdminWebModuleConfiguration.class ) );
 	}
 
 	@Override
 	public void configureHibernatePackage( HibernatePackageRegistry hibernatePackage ) {
-		if ( StringUtils.equals( AcrossHibernateModule.NAME, hibernatePackage.getName() ) ) {
+		if ( StringUtils.equals( AcrossHibernateJpaModule.NAME, hibernatePackage.getName() ) ) {
 			hibernatePackage.addPackageToScan( "com.foreach.across.modules.spring.security.acl.business" );
 		}
 	}

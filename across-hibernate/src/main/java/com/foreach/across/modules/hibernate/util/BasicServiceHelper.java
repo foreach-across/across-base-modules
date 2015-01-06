@@ -19,6 +19,7 @@ import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.hibernate.dto.IdBasedEntityDto;
 import com.foreach.across.modules.hibernate.repositories.BasicRepository;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.repository.CrudRepository;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -28,6 +29,13 @@ import javax.persistence.EntityNotFoundException;
 public class BasicServiceHelper
 {
 	private BasicServiceHelper() {
+	}
+
+	public static <T> T save( T dto, CrudRepository<T, ?> repository ) {
+		T saved = repository.save( dto );
+		BeanUtils.copyProperties( saved, dto );
+
+		return saved;
 	}
 
 	/**

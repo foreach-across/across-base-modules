@@ -47,7 +47,7 @@ public class EntityFormFactory
 							EntityConfiguration itemEntityType = entityRegistry.getEntityByClass( itemType );
 
 							if ( itemEntityType != null ) {
-								possibleValues = itemEntityType.getRepository().getAll();
+								possibleValues = itemEntityType.getRepository().findAll();
 							}
 						}
 
@@ -60,7 +60,7 @@ public class EntityFormFactory
 							descriptor.getPropertyType() );
 
 					form.addElement(
-							new SelectFormElement( entityRegistry, descriptor, itemEntityType.getRepository().getAll() )
+							new SelectFormElement( entityRegistry, descriptor, itemEntityType.getRepository().findAll() )
 					);
 				}
 				else {
@@ -105,7 +105,7 @@ public class EntityFormFactory
 							EntityConfiguration itemEntityType = entityRegistry.getEntityByClass( itemType );
 
 							if ( itemEntityType != null ) {
-								possibleValues = itemEntityType.getRepository().getAll();
+								possibleValues = itemEntityType.getRepository().findAll();
 							}
 						}
 
@@ -118,7 +118,7 @@ public class EntityFormFactory
 							descriptor.getPropertyType() );
 
 					form.addElement(
-							new SelectFormElement( entityRegistry, descriptor, itemEntityType.getRepository().getAll() )
+							new SelectFormElement( entityRegistry, descriptor, itemEntityType.getRepository().findAll() )
 					);
 				}
 				else {

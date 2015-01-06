@@ -16,7 +16,6 @@
 package com.foreach.across.modules.user.services;
 
 import com.foreach.across.modules.user.business.MachinePrincipal;
-import com.foreach.across.modules.user.dto.MachinePrincipalDto;
 
 import java.util.Collection;
 
@@ -31,5 +30,5 @@ public interface MachinePrincipalService
 
 	MachinePrincipal getMachinePrincipalByName( String name );
 
-	MachinePrincipal save( MachinePrincipalDto machinePrincipalDto );
+	MachinePrincipal save( MachinePrincipal machinePrincipalDto );
 }

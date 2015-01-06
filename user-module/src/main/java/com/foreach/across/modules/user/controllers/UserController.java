@@ -22,7 +22,6 @@ import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.user.UserModuleSettings;
 import com.foreach.across.modules.user.business.User;
 import com.foreach.across.modules.user.business.UserRestriction;
-import com.foreach.across.modules.user.dto.UserDto;
 import com.foreach.across.modules.user.services.RoleService;
 import com.foreach.across.modules.user.services.UserService;
 import com.foreach.across.modules.user.services.UserValidator;
@@ -77,7 +76,7 @@ public class UserController
 	public String createUser( Model model ) {
 		model.addAttribute( "entityMenu", menuFactory.buildMenu( new EntityAdminMenu<>( User.class ) ) );
 		model.addAttribute( "existing", false );
-		model.addAttribute( "user", new UserDto() );
+		model.addAttribute( "user", new User() );
 		model.addAttribute( "roles", roleService.getRoles() );
 		model.addAttribute( "userRestrictions", EnumSet.allOf( UserRestriction.class ) );
 
@@ -87,7 +86,7 @@ public class UserController
 	@RequestMapping("/{id}")
 	public String editUser( @PathVariable("id") long id, AdminMenu adminMenu, Model model ) {
 		User user = userService.getUserById( id );
-		UserDto userDto = userService.createUserDto( user );
+		User userDto = user.toDto();
 
 		breadcrumb( adminMenu, userDto );
 
@@ -101,7 +100,7 @@ public class UserController
 	}
 
 	@RequestMapping(value = { "/create", "/{id}" }, method = RequestMethod.POST)
-	public String saveUser( @ModelAttribute("user") @Valid UserDto user,
+	public String saveUser( @ModelAttribute("user") @Valid User user,
 	                        BindingResult bindingResult,
 	                        RedirectAttributes re,
 	                        AdminMenu adminMenu,
@@ -116,9 +115,9 @@ public class UserController
 		else {
 			User existing = null;
 
-			if ( !user.isNewEntity() ) {
+			if ( !user.isNew() ) {
 				existing = userService.getUserById( user.getId() );
-				breadcrumb( adminMenu, userService.createUserDto( existing ) );
+				breadcrumb( adminMenu, existing );
 			}
 
 			model.addAttribute( "entityMenu", menuFactory.buildMenu( new EntityAdminMenu<>( User.class, existing ) ) );
@@ -133,8 +132,8 @@ public class UserController
 		}
 	}
 
-	private void breadcrumb( AdminMenu adminMenu, UserDto user ) {
-		if ( !user.isNewEntity() ) {
+	private void breadcrumb( AdminMenu adminMenu, User user ) {
+		if ( !user.isNew() ) {
 			adminMenu.getLowestSelectedItem()
 			         .addItem( "/selectedUser",
 			                   userModuleSettings.isUseEmailAsUsername() ? user.getEmail() : user.getUsername() )

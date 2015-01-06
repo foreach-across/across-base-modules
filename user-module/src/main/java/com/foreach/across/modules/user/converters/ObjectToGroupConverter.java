@@ -16,7 +16,6 @@
 package com.foreach.across.modules.user.converters;
 
 import com.foreach.across.modules.user.business.Group;
-import com.foreach.across.modules.user.dto.GroupDto;
 import com.foreach.across.modules.user.services.GroupService;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
@@ -33,18 +32,6 @@ public class ObjectToGroupConverter implements Converter<Object, Group>
 
 	@Override
 	public Group convert( Object source ) {
-		if ( source instanceof Group ) {
-			return (Group) source;
-		}
-
-		if ( source instanceof GroupDto ) {
-			GroupDto dto = (GroupDto) source;
-
-			if ( !dto.isNewEntity() ) {
-				return groupService.getGroupById( dto.getId() );
-			}
-		}
-
 		long groupId = conversionService.convert( source, Long.class );
 
 		if ( groupId != 0 ) {

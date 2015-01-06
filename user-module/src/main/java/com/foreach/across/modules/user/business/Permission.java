@@ -15,13 +15,17 @@
  */
 package com.foreach.across.modules.user.business;
 
+import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
 import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -32,7 +36,9 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = UserSchemaConfiguration.TABLE_PERMISSION)
-public class Permission implements GrantedAuthority, Comparable<GrantedAuthority>, Serializable
+public class Permission
+		extends SettableIdBasedEntity<Permission>
+		implements GrantedAuthority, Comparable<GrantedAuthority>, Serializable
 {
 	@Id
 	@GeneratedValue(generator = "seq_um_permission_id")
@@ -46,12 +52,14 @@ public class Permission implements GrantedAuthority, Comparable<GrantedAuthority
 	)
 	private long id;
 
+	@NotBlank
 	@Column(name = "name", nullable = false, unique = true)
 	private String name;
 
 	@Column(name = "description")
 	private String description;
 
+	@NotNull
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "permission_group_id")
 	private PermissionGroup group;
@@ -68,11 +76,11 @@ public class Permission implements GrantedAuthority, Comparable<GrantedAuthority
 		this.description = description;
 	}
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId( long id ) {
+	public void setId( Long id ) {
 		this.id = id;
 	}
 
@@ -132,6 +140,14 @@ public class Permission implements GrantedAuthority, Comparable<GrantedAuthority
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+	@Override
+	public Permission toDto() {
+		Permission permission = new Permission();
+		BeanUtils.copyProperties( this, permission );
+
+		return permission;
 	}
 
 	private void writeObject( ObjectOutputStream oos ) throws IOException {

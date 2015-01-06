@@ -44,11 +44,11 @@ public class TestGroupAclInterceptor
 	@Test
 	public void testAclCreatedWithConfigEnabled() {
 		Group group = new Group();
-		group.setId( -1 );
+		group.setId( -1L );
 		group.setName( "Foo" );
 
 		AclSecurityEntity groups = new AclSecurityEntity();
-		groups.setId( -1 );
+		groups.setId( -1L );
 		groups.setName( "groups" );
 
 		when( userModuleSettings.isEnableDefaultAcls() ).thenReturn( true );
@@ -63,7 +63,7 @@ public class TestGroupAclInterceptor
 	@Test
 	public void testAclNotCreatedWithConfigDisabled() {
 		Group group = new Group();
-		group.setId( -1 );
+		group.setId( -1L );
 		group.setName( "Foo" );
 
 		when( userModuleSettings.isEnableDefaultAcls() ).thenReturn( false );
@@ -76,7 +76,7 @@ public class TestGroupAclInterceptor
 	@Test
 	public void testAclDeleted() {
 		Group group = new Group();
-		group.setId( -1 );
+		group.setId( -1L );
 		group.setName( "Foo" );
 
 		when( userModuleSettings.isEnableDefaultAcls() ).thenReturn( true );
@@ -90,7 +90,7 @@ public class TestGroupAclInterceptor
 	@Test
 	public void testAclNotDeletedWithConfigDisabled() {
 		Group group = new Group();
-		group.setId( -1 );
+		group.setId( -1L );
 		group.setName( "Foo" );
 
 		when( userModuleSettings.isEnableDefaultAcls() ).thenReturn( false );

@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClientDetailsServiceImpl implements ClientDetailsService
 {
-
 	@Autowired
 	private OAuth2Service oAuth2Service;
 

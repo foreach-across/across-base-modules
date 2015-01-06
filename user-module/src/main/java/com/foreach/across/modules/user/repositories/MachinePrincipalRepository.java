@@ -15,13 +15,13 @@
  */
 package com.foreach.across.modules.user.repositories;
 
-import com.foreach.across.modules.hibernate.repositories.BasicRepository;
 import com.foreach.across.modules.user.business.MachinePrincipal;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author Arne Vandamme
  */
-public interface MachinePrincipalRepository extends BasicRepository<MachinePrincipal>
+public interface MachinePrincipalRepository extends JpaRepository<MachinePrincipal, Long>
 {
-	MachinePrincipal getByName( String name );
+	MachinePrincipal findByName( String name );
 }

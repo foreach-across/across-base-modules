@@ -15,13 +15,13 @@
  */
 package com.foreach.across.modules.spring.security.acl.repositories;
 
-import com.foreach.across.modules.hibernate.repositories.BasicRepository;
 import com.foreach.across.modules.spring.security.acl.business.AclSecurityEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author Arne Vandamme
  */
-public interface AclSecurityEntityRepository extends BasicRepository<AclSecurityEntity>
+public interface AclSecurityEntityRepository extends JpaRepository<AclSecurityEntity, Long>
 {
-	AclSecurityEntity getByName( String name );
+	AclSecurityEntity findByName( String name );
 }

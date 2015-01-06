@@ -21,7 +21,7 @@ import com.foreach.across.modules.user.services.GroupAclInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@AcrossDepends(required = { "SpringSecurityAclModule", "AcrossHibernateModule" })
+@AcrossDepends(required = "SpringSecurityAclModule")
 @Configuration
 public class UserSpringSecurityAclConfiguration
 {

@@ -15,12 +15,13 @@
  */
 package com.foreach.across.modules.spring.security.acl.business;
 
-import com.foreach.across.modules.hibernate.business.AuditableEntity;
-import com.foreach.across.modules.hibernate.business.IdBasedEntity;
+import com.foreach.across.modules.hibernate.business.SettableIdAuditableEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * Represents a generic named entity that can be used for ACL control.
@@ -33,7 +34,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "acl_entity")
-public class AclSecurityEntity extends AuditableEntity implements IdBasedEntity
+public class AclSecurityEntity extends SettableIdAuditableEntity<AclSecurityEntity>
 {
 	@Id
 	@GeneratedValue(generator = "seq_acl_entity_id")
@@ -45,7 +46,7 @@ public class AclSecurityEntity extends AuditableEntity implements IdBasedEntity
 					@org.hibernate.annotations.Parameter(name = "allocationSize", value = "1")
 			}
 	)
-	private long id;
+	private Long id;
 
 	@Column(name = "name", unique = true, nullable = false)
 	private String name;
@@ -54,11 +55,13 @@ public class AclSecurityEntity extends AuditableEntity implements IdBasedEntity
 	@JoinColumn(name = "parent_id")
 	private AclSecurityEntity parent;
 
-	public long getId() {
+	@Override
+	public Long getId() {
 		return id;
 	}
 
-	public void setId( long id ) {
+	@Override
+	public void setId( Long id ) {
 		this.id = id;
 	}
 
@@ -79,6 +82,14 @@ public class AclSecurityEntity extends AuditableEntity implements IdBasedEntity
 	}
 
 	@Override
+	public AclSecurityEntity toDto() {
+		AclSecurityEntity entity = new AclSecurityEntity();
+		BeanUtils.copyProperties( this, entity );
+
+		return entity;
+	}
+
+	@Override
 	public boolean equals( Object o ) {
 		if ( this == o ) {
 			return true;
@@ -89,7 +100,7 @@ public class AclSecurityEntity extends AuditableEntity implements IdBasedEntity
 
 		AclSecurityEntity that = (AclSecurityEntity) o;
 
-		return id == that.id;
+		return Objects.equals( id, that.id );
 	}
 
 	@Override

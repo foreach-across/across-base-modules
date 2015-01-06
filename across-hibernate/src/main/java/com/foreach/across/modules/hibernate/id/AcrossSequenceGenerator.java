@@ -16,6 +16,7 @@
 package com.foreach.across.modules.hibernate.id;
 
 import com.foreach.across.core.database.AcrossSchemaConfiguration;
+import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
@@ -54,6 +55,7 @@ import java.util.Properties;
  * </ul>
  *
  * @see com.foreach.across.core.installers.AcrossSequencesInstaller
+ * @see com.foreach.across.modules.hibernate.business.SettableIdBasedEntity
  */
 public class AcrossSequenceGenerator extends TableGenerator
 {
@@ -129,8 +131,16 @@ public class AcrossSequenceGenerator extends TableGenerator
 		Serializable id = session.getEntityPersister( entityName, object )
 		                         .getClassMetadata().getIdentifier( object, session );
 
-		if ( supportPredefinedIds && id != null && !Long.valueOf( 0 ).equals( id ) ) {
-			return id;
+		if ( supportPredefinedIds ) {
+			if ( id != null && !Long.valueOf( 0 ).equals( id ) ) {
+				return id;
+			}
+			else if ( object instanceof SettableIdBasedEntity ) {
+				id = ((SettableIdBasedEntity) object ).getNewEntityId();
+				if ( id != null && !Long.valueOf( 0 ).equals( id ) ) {
+					return id;
+				}
+			}
 		}
 
 		return super.generate( session, object );

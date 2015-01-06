@@ -25,15 +25,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * Base class for an interceptor hooked to {@link com.foreach.across.modules.hibernate.repositories.BasicRepository}
+ * Base class for an interceptor hooked to repository
  * persistence methods.  Useful for creating ACLs when saving or deleting instances.
  * <p/>
- * Implementations will be picked up automatically by the
- * {@link com.foreach.across.modules.hibernate.aop.BasicRepositoryInterceptor} if it is active.
+ * Implementations will be picked up automatically by the AcrossHibernateModule or AcrossHibernateJpaModule
+ * if one of them is active.
  *
  * @author Arne Vandamme
  */
-@AcrossDepends(required = "AcrossHibernateModule")
+@AcrossDepends(optional = { "AcrossHibernateModule", "AcrossHibernateJpaModule" })
 public abstract class IdBasedEntityAclInterceptor<T extends IdBasedEntity> extends EntityInterceptorAdapter<T>
 {
 	@Autowired

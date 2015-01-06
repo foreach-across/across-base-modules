@@ -15,8 +15,10 @@
  */
 package com.foreach.across.modules.user.services;
 
+import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
 import com.foreach.across.modules.user.business.Permission;
 import com.foreach.across.modules.user.business.PermissionGroup;
+import com.foreach.across.modules.user.repositories.PermissionGroupRepository;
 import com.foreach.across.modules.user.repositories.PermissionRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,20 +33,26 @@ public class PermissionServiceImpl implements PermissionService
 	@Autowired
 	private PermissionRepository permissionRepository;
 
+	@Autowired
+	private PermissionGroupRepository permissionGroupRepository;
+
+	@Transactional(HibernateJpaConfiguration.TRANSACTION_MANAGER)
 	@Override
 	public Permission definePermission( String name, String description, String groupName ) {
-		PermissionGroup group = permissionRepository.getPermissionGroup( groupName );
+		PermissionGroup group = getPermissionGroup( groupName );
 
 		if ( group == null ) {
-			group = new PermissionGroup();
-			group.setName( groupName );
+			PermissionGroup dto = new PermissionGroup();
+			dto.setName( groupName );
+			dto.setTitle( groupName );
 
-			permissionRepository.save( group );
+			group = saveGroup( dto );
 		}
 
 		return definePermission( name, description, group );
 	}
 
+	@Transactional(HibernateJpaConfiguration.TRANSACTION_MANAGER)
 	@Override
 	public Permission definePermission( String name, String description, PermissionGroup group ) {
 		Permission permission = new Permission( name, description );
@@ -55,62 +63,70 @@ public class PermissionServiceImpl implements PermissionService
 		return permission;
 	}
 
-	@Transactional
+	@Transactional(HibernateJpaConfiguration.TRANSACTION_MANAGER)
 	@Override
-	public void definePermission( Permission permission ) {
-		Permission existing = permissionRepository.getPermission( permission.getName() );
+	public Permission definePermission( Permission permissionDto ) {
+		Permission existing = permissionRepository.findByName( permissionDto.getName() );
 
 		if ( existing != null ) {
-			existing.setName( permission.getName() );
-			existing.setDescription( permission.getDescription() );
-			existing.setGroup( permission.getGroup() );
+			existing.setName( permissionDto.getName() );
+			existing.setDescription( permissionDto.getDescription() );
+			existing.setGroup( permissionDto.getGroup() );
 
-			permissionRepository.save( existing );
+			existing = permissionRepository.save( existing );
 
-			BeanUtils.copyProperties( existing, permission );
+			BeanUtils.copyProperties( existing, permissionDto );
 		}
 		else {
-			permissionRepository.save( permission );
+			existing = permissionRepository.save( permissionDto );
 		}
+
+		return existing;
 	}
 
 	@Override
 	public Collection<PermissionGroup> getPermissionGroups() {
-		return permissionRepository.getPermissionGroups();
+		return permissionGroupRepository.findAll();
 	}
 
 	@Override
 	public PermissionGroup getPermissionGroup( String name ) {
-		return permissionRepository.getPermissionGroup( name );
+		return permissionGroupRepository.findByName( name );
 	}
 
 	@Override
-	public void save( PermissionGroup group ) {
-		permissionRepository.save( group );
+	public PermissionGroup saveGroup( PermissionGroup dto ) {
+		PermissionGroup saved = permissionGroupRepository.save( dto );
+		BeanUtils.copyProperties( saved, dto );
+
+		return saved;
 	}
 
 	@Override
-	public void delete( PermissionGroup group ) {
-		permissionRepository.delete( group );
+	public void deleteGroup( PermissionGroup group ) {
+		permissionGroupRepository.delete( group );
 	}
 
 	@Override
 	public Collection<Permission> getPermissions() {
-		return permissionRepository.getPermissions();
+		return permissionRepository.findAll();
 	}
 
 	@Override
 	public Permission getPermission( String name ) {
-		return permissionRepository.getPermission( name );
+		return permissionRepository.findByName( name );
 	}
 
 	@Override
-	public void save( Permission permission ) {
-		permissionRepository.save( permission );
+	public Permission savePermission( Permission permission ) {
+		Permission saved = permissionRepository.save( permission );
+		BeanUtils.copyProperties( saved, permission );
+
+		return saved;
 	}
 
 	@Override
-	public void delete( Permission permission ) {
+	public void deletePermission( Permission permission ) {
 		permissionRepository.delete( permission );
 	}
 }

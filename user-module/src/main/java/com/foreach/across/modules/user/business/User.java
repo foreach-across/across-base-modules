@@ -15,24 +15,26 @@
  */
 package com.foreach.across.modules.user.business;
 
-import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.hibernate.repositories.Undeletable;
 import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import com.foreach.across.modules.user.converters.HibernateUserRestriction;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Type;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
 @Entity
 @DiscriminatorValue("user")
 @Table(name = UserSchemaConfiguration.TABLE_USER)
-public class User extends GroupedPrincipal implements IdBasedEntity, UserDetails, Undeletable
+public class User extends GroupedPrincipal<User> implements UserDetails, Undeletable
 {
 	@Column(nullable = false, name = "username")
 	private String username;
@@ -67,8 +69,8 @@ public class User extends GroupedPrincipal implements IdBasedEntity, UserDetails
 	}
 
 	public void setUsername( String username ) {
-		this.username = username;
-		setPrincipalName( username );
+		this.username = StringUtils.lowerCase( username );
+		setPrincipalName( this.username );
 	}
 
 	public String getFirstName() {
@@ -100,7 +102,7 @@ public class User extends GroupedPrincipal implements IdBasedEntity, UserDetails
 	}
 
 	public void setEmail( String email ) {
-		this.email = email;
+		this.email = StringUtils.lowerCase( email );
 	}
 
 	public String getPassword() {
@@ -132,11 +134,15 @@ public class User extends GroupedPrincipal implements IdBasedEntity, UserDetails
 	}
 
 	public void setRestrictions( Set<UserRestriction> restrictions ) {
-		this.restrictions = restrictions;
+		this.restrictions = restrictions != null ? restrictions : Collections.<UserRestriction>emptySet();
 	}
 
 	public boolean hasRestriction( UserRestriction restriction ) {
 		return getRestrictions().contains( restriction );
+	}
+
+	public boolean hasRestrictions() {
+		return !restrictions.isEmpty();
 	}
 
 	@Override
@@ -159,4 +165,13 @@ public class User extends GroupedPrincipal implements IdBasedEntity, UserDetails
 		return !restrictions.contains( UserRestriction.DISABLED )
 				&& !restrictions.contains( UserRestriction.REQUIRES_CONFIRMATION );
 	}
+
+	@Override
+	public User toDto() {
+		User user = new User();
+		BeanUtils.copyProperties( this, user, "password" );
+
+		return user;
+	}
+
 }

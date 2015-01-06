@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.user.business;
 
+import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalHierarchy;
 import com.foreach.across.modules.user.config.UserSchemaConfiguration;
@@ -31,7 +32,9 @@ import java.util.*;
  * @author Arne Vandamme
  */
 @MappedSuperclass
-public abstract class GroupedPrincipal extends BasicSecurityPrincipal implements SecurityPrincipalHierarchy
+public abstract class GroupedPrincipal<T extends SettableIdBasedEntity<?>>
+		extends BasicSecurityPrincipal<T>
+		implements SecurityPrincipalHierarchy
 {
 	@ManyToMany(fetch = FetchType.EAGER)
 	@BatchSize(size = 50)

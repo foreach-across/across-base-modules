@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.user.installers;
 
-import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.Installer;
 import com.foreach.across.core.database.SchemaConfiguration;
 import com.foreach.across.modules.hibernate.installers.AuditableSchemaInstaller;
@@ -24,7 +23,6 @@ import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 /**
  * @author Andy Somers
  */
-@AcrossDepends(optional = "AcrossHibernateModule")
 @Installer(description = "Adds the auditable columns to the um_principal table", version = 1)
 public class BasicSecurityPrincipalAuditableInstaller extends AuditableSchemaInstaller
 {

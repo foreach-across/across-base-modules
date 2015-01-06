@@ -15,12 +15,13 @@
  */
 package com.foreach.across.modules.user.business;
 
-import com.foreach.across.modules.hibernate.business.IdBasedEntity;
+import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
 import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -30,7 +31,8 @@ import java.util.TreeSet;
 
 @Entity
 @Table(name = UserSchemaConfiguration.TABLE_ROLE)
-public class Role implements GrantedAuthority, Comparable<GrantedAuthority>, Serializable, IdBasedEntity
+public class Role extends SettableIdBasedEntity<Role>
+		implements GrantedAuthority, Comparable<GrantedAuthority>, Serializable
 {
 	@Id
 	@GeneratedValue(generator = "seq_um_role_id")
@@ -70,11 +72,13 @@ public class Role implements GrantedAuthority, Comparable<GrantedAuthority>, Ser
 		this.description = description;
 	}
 
-	public long getId() {
+	@Override
+	public Long getId() {
 		return id;
 	}
 
-	public void setId( long id ) {
+	@Override
+	public void setId( Long id ) {
 		this.id = id;
 	}
 
@@ -124,6 +128,14 @@ public class Role implements GrantedAuthority, Comparable<GrantedAuthority>, Ser
 
 	public boolean hasPermission( Permission permission ) {
 		return getPermissions().contains( permission );
+	}
+
+	@Override
+	public Role toDto() {
+		Role role = new Role();
+		BeanUtils.copyProperties( this, role );
+
+		return role;
 	}
 
 	@Override

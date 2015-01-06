@@ -23,7 +23,6 @@ import com.foreach.across.modules.spring.security.acl.SpringSecurityAclModule;
 import com.foreach.across.modules.spring.security.acl.business.AclAuthorities;
 import com.foreach.across.modules.spring.security.acl.business.AclPermission;
 import com.foreach.across.modules.spring.security.acl.business.AclSecurityEntity;
-import com.foreach.across.modules.spring.security.acl.dto.AclSecurityEntityDto;
 import com.foreach.across.modules.spring.security.acl.services.AclSecurityEntityService;
 import com.foreach.across.modules.spring.security.acl.services.AclSecurityService;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
@@ -76,7 +75,7 @@ public class AclPermissionsInstaller
 		AclSecurityEntity systemAcl = aclSecurityEntityService.getSecurityEntityByName( "system" );
 
 		if ( systemAcl == null ) {
-			AclSecurityEntityDto dto = new AclSecurityEntityDto();
+			AclSecurityEntity dto = new AclSecurityEntity();
 			dto.setName( "system" );
 
 			systemAcl = aclSecurityEntityService.save( dto );
@@ -101,10 +100,11 @@ public class AclPermissionsInstaller
 
 		// Update permission group for ACL permissions
 		PermissionGroup group = permissionService.getPermissionGroup( SpringSecurityAclModule.NAME );
-		group.setTitle( "Module: " + SpringSecurityAclModule.NAME );
-		group.setDescription( "Permissions for managing ACL security." );
+		PermissionGroup dto = group.toDto();
+		dto.setTitle( "Module: " + SpringSecurityAclModule.NAME );
+		dto.setDescription( "Permissions for managing ACL security." );
 
-		permissionService.save( group );
+		permissionService.saveGroup( dto );
 
 		// Add permissions to the admin role if it exists
 		Role adminRole = roleService.getRole( "ROLE_ADMIN" );
@@ -120,13 +120,14 @@ public class AclPermissionsInstaller
 	public void createGroupsAclSecurityEntity() {
 		AclSecurityEntity existing = aclSecurityEntityService.getSecurityEntityByName( "groups" );
 
-		if (existing == null) {
-			AclSecurityEntityDto dto = new AclSecurityEntityDto();
+		if ( existing == null ) {
+			AclSecurityEntity dto = new AclSecurityEntity();
 			dto.setName( "groups" );
 			dto.setParent( aclSecurityEntityService.getSecurityEntityByName( "system" ) );
 
 			existing = aclSecurityEntityService.save( dto );
-			aclSecurityService.createAclWithParent( existing, aclSecurityEntityService.getSecurityEntityByName( "system" ) );
+			aclSecurityService.createAclWithParent( existing, aclSecurityEntityService.getSecurityEntityByName(
+					"system" ) );
 			aclSecurityService.allow( "manage groups", existing, AclPermission.READ, AclPermission.WRITE );
 		}
 	}

@@ -15,24 +15,16 @@
  */
 package com.foreach.across.modules.oauth2.config;
 
-import com.foreach.across.modules.oauth2.repositories.OAuth2ClientRepository;
-import com.foreach.across.modules.oauth2.repositories.OAuth2ClientRepositoryImpl;
-import com.foreach.across.modules.oauth2.repositories.OAuth2ScopeRepository;
-import com.foreach.across.modules.oauth2.repositories.OAuth2ScopeRepositoryImpl;
-import org.springframework.context.annotation.Bean;
+import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
+import com.foreach.across.modules.oauth2.OAuth2Module;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
+@EnableJpaRepositories(
+		transactionManagerRef = HibernateJpaConfiguration.TRANSACTION_MANAGER,
+		basePackageClasses = OAuth2Module.class
+)
 public class OAuth2RepositoriesConfiguration
 {
-	@Bean
-	public OAuth2ClientRepository oAuth2ClientRepository() {
-		return new OAuth2ClientRepositoryImpl();
-	}
-
-	@Deprecated
-	@Bean
-	public OAuth2ScopeRepository oAuth2Repository() {
-		return new OAuth2ScopeRepositoryImpl();
-	}
 }

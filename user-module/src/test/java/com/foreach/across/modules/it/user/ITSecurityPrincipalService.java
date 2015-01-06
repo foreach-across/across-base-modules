@@ -20,8 +20,6 @@ import com.foreach.across.modules.user.business.Group;
 import com.foreach.across.modules.user.business.GroupProperties;
 import com.foreach.across.modules.user.business.User;
 import com.foreach.across.modules.user.business.UserProperties;
-import com.foreach.across.modules.user.dto.GroupDto;
-import com.foreach.across.modules.user.dto.UserDto;
 import com.foreach.across.modules.user.services.GroupService;
 import com.foreach.across.modules.user.services.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -119,14 +117,14 @@ public class ITSecurityPrincipalService
 	}
 
 	private Group createGroup( String name ) {
-		GroupDto dto = new GroupDto();
+		Group dto = new Group();
 		dto.setName( name );
 
 		return groupService.save( dto );
 	}
 
 	private User createUser( String username ) {
-		UserDto user = new UserDto();
+		User user = new User();
 		user.setUsername( username );
 		user.setEmail( UUID.randomUUID() + "@test.com" );
 		user.setPassword( "test" );

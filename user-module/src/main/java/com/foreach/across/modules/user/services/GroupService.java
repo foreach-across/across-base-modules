@@ -17,7 +17,6 @@ package com.foreach.across.modules.user.services;
 
 import com.foreach.across.modules.user.business.Group;
 import com.foreach.across.modules.user.business.GroupProperties;
-import com.foreach.across.modules.user.dto.GroupDto;
 
 import java.util.Collection;
 
@@ -30,13 +29,11 @@ public interface GroupService
 
 	Group getGroupById( long id );
 
-	Group save( GroupDto groupDto );
+	Group save( Group groupDto );
 
 	void delete( long groupId );
 
 	GroupProperties getProperties( Group group );
-
-	GroupProperties getProperties( GroupDto groupDto );
 
 	void saveProperties( GroupProperties groupProperties );
 

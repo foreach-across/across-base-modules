@@ -19,11 +19,9 @@ import com.foreach.across.modules.hibernate.aop.EntityInterceptorAdapter;
 import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
-import org.apache.commons.lang3.reflect.TypeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.TypeDescriptor;
 
-import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -59,14 +57,15 @@ public class AuditableEntityInterceptor extends EntityInterceptorAdapter<Auditab
 
 	@SuppressWarnings("unchecked")
 	private Object getAuditablePrincipal( Auditable entity ) {
-		Collection<Type> types = TypeUtils.getTypeArguments( entity.getClass(), Auditable.class ).values();
-		Class typeVariable = (Class) types.iterator().next();
+		Class auditorType = TypeDescriptor.forObject( entity )
+		                                  .upcast( Auditable.class )
+		                                  .getResolvableType().getGeneric( 0 ).getRawClass();
 		Object createdBy = null;
 
-		if ( typeVariable.isAssignableFrom( String.class ) ) {
+		if ( auditorType.isAssignableFrom( String.class ) ) {
 			createdBy = currentPrincipal.getPrincipalName();
 		}
-		else if ( typeVariable.isAssignableFrom( SecurityPrincipal.class ) ) {
+		else if ( auditorType.isAssignableFrom( SecurityPrincipal.class ) ) {
 			createdBy = currentPrincipal.getPrincipal();
 		}
 

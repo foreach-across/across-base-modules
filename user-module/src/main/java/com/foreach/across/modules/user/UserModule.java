@@ -22,7 +22,7 @@ import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
 import com.foreach.across.core.database.HasSchemaConfiguration;
 import com.foreach.across.core.database.SchemaConfiguration;
 import com.foreach.across.core.installers.AcrossSequencesInstaller;
-import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageConfiguringModule;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageRegistry;
 import com.foreach.across.modules.hibernate.provider.TableAliasProvider;
@@ -34,7 +34,8 @@ import com.foreach.across.modules.user.installers.*;
 import org.apache.commons.lang3.StringUtils;
 
 @AcrossDepends(
-		required = { AcrossHibernateModule.NAME, PropertiesModule.NAME, SpringSecurityInfrastructureModule.NAME },
+		required = { AcrossHibernateJpaModule.NAME, PropertiesModule.NAME,
+		             SpringSecurityInfrastructureModule.NAME },
 		optional = { "AdminWebModule", SpringSecurityInfrastructureModule.ACL_MODULE, "EntityModule" }
 )
 public class UserModule extends AcrossModule implements HibernatePackageConfiguringModule, HasSchemaConfiguration
@@ -66,15 +67,15 @@ public class UserModule extends AcrossModule implements HibernatePackageConfigur
 				new GroupPropertiesSchemaInstaller( schemaConfiguration ),
 				new UserPropertiesSchemaInstaller( schemaConfiguration ),
 				new UserSchemaInstaller( schemaConfiguration ),
+				new BasicSecurityPrincipalAuditableInstaller( schemaConfiguration ),
 				DefaultUserInstaller.class,
-				AclPermissionsInstaller.class,
-				new BasicSecurityPrincipalAuditableInstaller( schemaConfiguration )
+				AclPermissionsInstaller.class
 		};
 	}
 
 	@Override
 	public void configureHibernatePackage( HibernatePackageRegistry hibernatePackage ) {
-		if ( StringUtils.equals( AcrossHibernateModule.NAME, hibernatePackage.getName() ) ) {
+		if ( StringUtils.equals( AcrossHibernateJpaModule.NAME, hibernatePackage.getName() ) ) {
 			hibernatePackage.addPackageToScan( "com.foreach.across.modules.user.business" );
 			hibernatePackage.add( new TableAliasProvider( schemaConfiguration.getTables() ) );
 		}

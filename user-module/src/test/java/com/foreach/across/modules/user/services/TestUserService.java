@@ -18,7 +18,6 @@ package com.foreach.across.modules.user.services;
 import com.foreach.across.modules.user.business.Role;
 import com.foreach.across.modules.user.business.User;
 import com.foreach.across.modules.user.business.UserRestriction;
-import com.foreach.across.modules.user.dto.UserDto;
 import com.foreach.across.modules.user.repositories.UserRepository;
 import com.foreach.common.test.MockedLoader;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +27,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.internal.util.collections.Sets;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,13 +65,21 @@ public class TestUserService
 	@Before
 	public void resetMocks() {
 		reset( userRepository );
+
+		when( userRepository.save( any( User.class ) ) ).thenAnswer( new Answer<User>()
+		{
+			@Override
+			public User answer( InvocationOnMock invocationOnMock ) throws Throwable {
+				return (User) invocationOnMock.getArguments()[0];
+			}
+		} );
 	}
 
 	@Test
 	public void createUserDto() throws Exception {
 		User user = new User();
 
-		user.setId( 1561 );
+		user.setId( 1561L );
 		user.setFirstName( "first name" );
 		user.setLastName( "last name" );
 		user.setUsername( "username" );
@@ -88,9 +97,9 @@ public class TestUserService
 
 		user.setRoles( Sets.newSet( role_1 ) );
 
-		UserDto userDto = userService.createUserDto( user );
+		User userDto = user.toDto();
 
-		assertEquals( 1561, user.getId() );
+		assertEquals( Long.valueOf( 1561L ), user.getId() );
 		assertEquals( "first name", userDto.getFirstName() );
 		assertEquals( "last name", userDto.getLastName() );
 		assertEquals( "username", userDto.getUsername() );
@@ -98,7 +107,7 @@ public class TestUserService
 		assertEquals( "testcase@foreach.com", userDto.getEmail() );
 		assertEquals( null, userDto.getPassword() );
 
-		assertEquals( true, userDto.getDeleted() );
+		assertEquals( true, userDto.isDeleted() );
 		assertEquals( true, userDto.getEmailConfirmed() );
 		assertEquals( EnumSet.of( UserRestriction.CREDENTIALS_EXPIRED ), userDto.getRestrictions() );
 		assertEquals( true, userDto.hasRestrictions() );
@@ -111,7 +120,7 @@ public class TestUserService
 
 	@Test
 	public void displayNameIsGeneratedFromFirstAndLastIfNotSpecified() {
-		UserDto dto = new UserDto();
+		User dto = new User();
 		dto.setFirstName( "first" );
 		dto.setLastName( "last" );
 		dto.setUsername( "user" );
@@ -121,7 +130,7 @@ public class TestUserService
 		userService.save( dto );
 
 		ArgumentCaptor<User> argument = ArgumentCaptor.forClass( User.class );
-		verify( userRepository ).create( argument.capture() );
+		verify( userRepository ).save( argument.capture() );
 
 		User savedUser = argument.getValue();
 		assertEquals( "first", savedUser.getFirstName() );
@@ -131,7 +140,7 @@ public class TestUserService
 
 	@Test
 	public void passwordGetsEncryptedIfSet() {
-		UserDto dto = new UserDto();
+		User dto = new User();
 		dto.setFirstName( "first" );
 		dto.setLastName( "last" );
 		dto.setUsername( "username" );
@@ -141,7 +150,7 @@ public class TestUserService
 		userService.save( dto );
 
 		ArgumentCaptor<User> argument = ArgumentCaptor.forClass( User.class );
-		verify( userRepository ).create( argument.capture() );
+		verify( userRepository ).save( argument.capture() );
 
 		User savedUser = argument.getValue();
 		assertNotEquals( dto.getPassword(), savedUser.getPassword() );
@@ -150,7 +159,7 @@ public class TestUserService
 
 	@Test
 	public void usernameIsRequired() {
-		UserDto dto = new UserDto();
+		User dto = new User();
 		dto.setPassword( "my-password" );
 
 		try {
@@ -168,7 +177,7 @@ public class TestUserService
 
 	@Test
 	public void emailIsValidatedWhenSet() {
-		UserDto dto = new UserDto();
+		User dto = new User();
 		dto.setUsername( "someusername" );
 		dto.setEmail( "bademailaddress" );
 		dto.setPassword( "my-password" );
@@ -189,7 +198,7 @@ public class TestUserService
 
 	@Test(expected = UserModuleException.class)
 	public void aNewUserAlwaysRequiresPassword() {
-		UserDto dto = new UserDto();
+		User dto = new User();
 		dto.setFirstName( "first" );
 		dto.setLastName( "last" );
 		dto.setUsername( "email" );
@@ -199,7 +208,7 @@ public class TestUserService
 
 	@Test
 	public void emailAndUserNameAreConvertedToLowerCase() {
-		UserDto userDto = new UserDto();
+		User userDto = new User();
 		userDto.setUsername( "AdMiN" );
 		userDto.setEmail( "oThEr@EmAiL.EDU" );
 		userDto.setPassword( "198(1!è!(§!ç(§ç" );
@@ -207,7 +216,7 @@ public class TestUserService
 		userService.save( userDto );
 
 		ArgumentCaptor<User> argument = ArgumentCaptor.forClass( User.class );
-		verify( userRepository ).create( argument.capture() );
+		verify( userRepository ).save( argument.capture() );
 
 		User createdUser = argument.getValue();
 		assertEquals( "admin", createdUser.getUsername() );
@@ -216,7 +225,7 @@ public class TestUserService
 
 	@Test
 	public void emailWithSpacesThrowsValidationError() {
-		UserDto userDto = new UserDto();
+		User userDto = new User();
 		userDto.setUsername( "admin" );
 		userDto.setEmail( " oT hEr@EmA iL.EDU  " );
 		userDto.setPassword( "198(1!è!(§!ç(§ç" );
@@ -234,7 +243,7 @@ public class TestUserService
 
 	@Test
 	public void userNameWithSpacesThrowsValidationError() {
-		UserDto userDto = new UserDto();
+		User userDto = new User();
 		userDto.setUsername( "  A dM iN" );
 		userDto.setEmail( "other@email.edu" );
 		userDto.setPassword( "198(1!è!(§!ç(§ç" );
@@ -253,22 +262,22 @@ public class TestUserService
 	@Test
 	public void passwordIsNotModifiedIfNotSet() {
 		User existing = new User();
-		existing.setId( 321 );
+		existing.setId( 321L );
 		existing.setUsername( "uname" );
 		existing.setEmail( "uname@test.com" );
 		existing.setPassword( "my-existing-password" );
 
-		UserDto update = new UserDto();
+		User update = new User();
 		update.setId( existing.getId() );
 		update.setUsername( "other" );
 		update.setEmail( "other@email.com" );
 
-		when( userRepository.getById( 321 ) ).thenReturn( existing );
+		when( userRepository.findOne( 321L ) ).thenReturn( existing );
 
 		userService.save( update );
 
 		ArgumentCaptor<User> argument = ArgumentCaptor.forClass( User.class );
-		verify( userRepository ).update( argument.capture() );
+		verify( userRepository ).save( argument.capture() );
 
 		User savedUser = argument.getValue();
 		assertSame( existing, savedUser );
@@ -279,9 +288,8 @@ public class TestUserService
 
 	@Test
 	public void updatingUserWithZeroIdIsNotAllowed() {
-		UserDto dto = new UserDto();
-		dto.setId( 0 );
-		dto.setNewEntity( false );
+		User dto = new User();
+		dto.setNewEntityId( 0L );
 
 		boolean failed = false;
 
@@ -293,13 +301,13 @@ public class TestUserService
 		}
 
 		assertTrue( failed );
-		verify( userRepository, never() ).getById( any( Long.class ) );
+		verify( userRepository, never() ).findOne( any( Long.class ) );
 	}
 
 	@Test
 	public void updatingUserThatDoesNotExistWillFail() {
-		UserDto dto = new UserDto();
-		dto.setId( 132 );
+		User dto = new User();
+		dto.setId( 132L );
 
 		boolean failed = false;
 
@@ -311,7 +319,7 @@ public class TestUserService
 		}
 
 		assertTrue( failed );
-		verify( userRepository ).getById( 132 );
+		verify( userRepository ).findOne( 132L );
 	}
 
 	@Configuration

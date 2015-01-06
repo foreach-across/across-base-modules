@@ -16,7 +16,6 @@
 package com.foreach.across.modules.user.converters;
 
 import com.foreach.across.modules.user.business.User;
-import com.foreach.across.modules.user.dto.UserDto;
 import com.foreach.across.modules.user.services.UserService;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
@@ -33,19 +32,6 @@ public class ObjectToUserConverter implements Converter<Object, User>
 
 	@Override
 	public User convert( Object source ) {
-
-		if ( source instanceof User ) {
-			return (User) source;
-		}
-
-		if ( source instanceof UserDto ) {
-			UserDto dto = (UserDto) source;
-
-			if ( !dto.isNewEntity() ) {
-				return userService.getUserById( dto.getId() );
-			}
-		}
-
 		long userId = conversionService.convert( source, Long.class );
 
 		if ( userId != 0 ) {

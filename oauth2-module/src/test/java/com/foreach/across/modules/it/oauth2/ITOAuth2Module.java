@@ -18,7 +18,7 @@ package com.foreach.across.modules.it.oauth2;
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.annotations.Exposed;
-import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.oauth2.OAuth2Module;
 import com.foreach.across.modules.oauth2.services.OAuth2Service;
 import com.foreach.across.modules.properties.PropertiesModule;
@@ -76,7 +76,7 @@ public class ITOAuth2Module
 	{
 		@Override
 		public void configure( AcrossContext context ) {
-			context.addModule( acrossHibernateModule() );
+			context.addModule( acrossHibernateJpaModule() );
 			context.addModule( userModule() );
 			context.addModule( oauth2Module() );
 			context.addModule( propertiesModule() );
@@ -87,8 +87,8 @@ public class ITOAuth2Module
 			return new PropertiesModule();
 		}
 
-		private AcrossHibernateModule acrossHibernateModule() {
-			return new AcrossHibernateModule();
+		private AcrossHibernateJpaModule acrossHibernateJpaModule() {
+			return new AcrossHibernateJpaModule();
 		}
 
 		private UserModule userModule() {

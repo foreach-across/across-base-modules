@@ -8,7 +8,6 @@ import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenuEvent;
 import com.foreach.across.modules.user.business.Group;
 import com.foreach.across.modules.user.business.GroupedPrincipal;
-import com.foreach.across.modules.user.dto.GroupDto;
 import com.foreach.across.modules.user.services.GroupService;
 import com.foreach.across.modules.user.services.RoleService;
 import com.foreach.across.modules.web.menu.MenuFactory;
@@ -42,7 +41,8 @@ public class GroupController
 	protected void registerGroupsTab( EntityAdminMenuEvent<GroupedPrincipal> menu ) {
 		if ( menu.isForUpdate() ) {
 			menu.builder().item( "groups", "Groups",
-			                     "/entities/" + ( menu.getEntityClass().getSimpleName().toLowerCase() ) + "/" + menu.getEntity().getId() + "/groups" );
+			                     "/entities/" + ( menu.getEntityClass().getSimpleName().toLowerCase() ) + "/" + menu
+					                     .getEntity().getId() + "/groups" );
 		}
 	}
 
@@ -57,7 +57,7 @@ public class GroupController
 	public String createEntity( Model model ) {
 		model.addAttribute( "entityMenu", menuFactory.buildMenu( new EntityAdminMenu<>( Group.class ) ) );
 		model.addAttribute( "existing", false );
-		model.addAttribute( "group", new GroupDto() );
+		model.addAttribute( "group", new Group() );
 		model.addAttribute( "roles", roleService.getRoles() );
 
 		return "th/user/groups/edit";
@@ -72,17 +72,17 @@ public class GroupController
 		adminMenu.getLowestSelectedItem().addItem( "/selectedGroup", group.getName() ).setSelected( true );
 
 		model.addAttribute( "existing", true );
-		model.addAttribute( "group", GroupDto.fromGroup( group ) );
+		model.addAttribute( "group", group.toDto() );
 		model.addAttribute( "roles", roleService.getRoles() );
 
 		return "th/user/groups/edit";
 	}
 
 	@RequestMapping(value = { "/create", "/{groupId}" }, method = RequestMethod.POST)
-	public String saveEntity( @ModelAttribute("group") GroupDto groupDto, RedirectAttributes re ) {
+	public String saveEntity( @ModelAttribute("group") Group groupDto, RedirectAttributes re ) {
 		Group existing = null;
 
-		if ( !groupDto.isNewEntity() ) {
+		if ( !groupDto.isNew() ) {
 			existing = groupService.getGroupById( groupDto.getId() );
 		}
 

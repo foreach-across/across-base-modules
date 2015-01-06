@@ -23,8 +23,6 @@ import com.foreach.across.modules.user.business.MachinePrincipal;
 import com.foreach.across.modules.user.business.PermissionGroup;
 import com.foreach.across.modules.user.business.Role;
 import com.foreach.across.modules.user.business.User;
-import com.foreach.across.modules.user.dto.MachinePrincipalDto;
-import com.foreach.across.modules.user.dto.UserDto;
 import com.foreach.across.modules.user.services.MachinePrincipalService;
 import com.foreach.across.modules.user.services.PermissionService;
 import com.foreach.across.modules.user.services.RoleService;
@@ -52,17 +50,17 @@ public class DefaultUserInstaller
 
 	@InstallerMethod
 	public void install() {
+		createSystemAccount();
 		createPermissionGroups();
 		createPermissionsAndRoles();
 		createUser();
-		createSystemAccount();
 	}
 
 	private void createSystemAccount() {
 		MachinePrincipal machine = machinePrincipalService.getMachinePrincipalByName( "system" );
 
 		if ( machine == null ) {
-			MachinePrincipalDto dto = new MachinePrincipalDto();
+			MachinePrincipal dto = new MachinePrincipal();
 			dto.setName( "system" );
 
 			machinePrincipalService.save( dto );
@@ -73,12 +71,12 @@ public class DefaultUserInstaller
 		PermissionGroup group = permissionService.getPermissionGroup( UserModule.NAME );
 
 		if ( group == null ) {
-			group = new PermissionGroup();
-			group.setName( UserModule.NAME );
-			group.setTitle( "Module: " + UserModule.NAME );
-			group.setDescription( "Basic user and user management related permissions." );
+			PermissionGroup dto = new PermissionGroup();
+			dto.setName( UserModule.NAME );
+			dto.setTitle( "Module: " + UserModule.NAME );
+			dto.setDescription( "Basic user and user management related permissions." );
 
-			permissionService.save( group );
+			permissionService.saveGroup( dto );
 		}
 	}
 
@@ -117,7 +115,7 @@ public class DefaultUserInstaller
 		User existing = userService.getUserByUsername( "admin" );
 
 		if ( existing == null ) {
-			UserDto user = new UserDto();
+			User user = new User();
 			user.setUsername( "admin" );
 			user.setPassword( "admin" );
 			user.setFirstName( "" );

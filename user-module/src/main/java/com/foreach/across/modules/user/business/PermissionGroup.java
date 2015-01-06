@@ -15,11 +15,13 @@
  */
 package com.foreach.across.modules.user.business;
 
+import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
 import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -27,7 +29,7 @@ import java.util.TreeSet;
 
 @Entity
 @Table(name = UserSchemaConfiguration.TABLE_PERMISSION_GROUP)
-public class PermissionGroup
+public class PermissionGroup extends SettableIdBasedEntity<PermissionGroup>
 {
 	@Id
 	@GeneratedValue(generator = "seq_um_permission_group_id")
@@ -54,11 +56,11 @@ public class PermissionGroup
 	@BatchSize(size = 50)
 	private Set<Permission> permissions = new TreeSet<>();
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId( long id ) {
+	public void setId( Long id ) {
 		this.id = id;
 	}
 
@@ -95,6 +97,14 @@ public class PermissionGroup
 	}
 
 	@Override
+	public PermissionGroup toDto() {
+		PermissionGroup dto = new PermissionGroup();
+		BeanUtils.copyProperties( this, dto );
+
+		return dto;
+	}
+
+	@Override
 	public boolean equals( Object o ) {
 		if ( this == o ) {
 			return true;
@@ -117,7 +127,6 @@ public class PermissionGroup
 		return name != null ? name.hashCode() : 0;
 	}
 
-	@Override
 	public String toString() {
 		return "PermissionGroup{" +
 				"name='" + name + '\'' +

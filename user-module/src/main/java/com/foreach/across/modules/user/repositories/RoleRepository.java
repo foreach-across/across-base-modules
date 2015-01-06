@@ -15,12 +15,10 @@
  */
 package com.foreach.across.modules.user.repositories;
 
-import com.foreach.across.modules.hibernate.repositories.BasicRepository;
 import com.foreach.across.modules.user.business.Role;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RoleRepository extends BasicRepository<Role>
+public interface RoleRepository extends JpaRepository<Role, Long>
 {
-	Role getRole( String name );
-
-	void save( Role role );
+	Role findByName( String name );
 }

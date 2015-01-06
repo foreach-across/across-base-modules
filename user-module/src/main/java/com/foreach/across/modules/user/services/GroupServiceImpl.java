@@ -15,12 +15,13 @@
  */
 package com.foreach.across.modules.user.services;
 
+import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
 import com.foreach.across.modules.hibernate.util.BasicServiceHelper;
 import com.foreach.across.modules.user.business.Group;
 import com.foreach.across.modules.user.business.GroupProperties;
-import com.foreach.across.modules.user.dto.GroupDto;
 import com.foreach.across.modules.user.repositories.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,24 +42,23 @@ public class GroupServiceImpl implements GroupService
 
 	@Override
 	public Collection<Group> getGroups() {
-		return groupRepository.getAll();
+		return groupRepository.findAll( new Sort( Sort.Direction.ASC, "name" ) );
 	}
 
 	@Override
 	public Group getGroupById( long id ) {
-		return groupRepository.getById( id );
-	}
-
-	@Transactional
-	@Override
-	public Group save( GroupDto groupDto ) {
-		return BasicServiceHelper.save( groupDto, Group.class, groupRepository );
+		return groupRepository.findOne( id );
 	}
 
 	@Override
-	@Transactional
+	public Group save( Group groupDto ) {
+		return BasicServiceHelper.save( groupDto, groupRepository );
+	}
+
+	@Override
+	@Transactional(HibernateJpaConfiguration.TRANSACTION_MANAGER)
 	public void delete( long groupId ) {
-		Group group = groupRepository.getById( groupId );
+		Group group = groupRepository.findOne( groupId );
 		deleteProperties( groupId );
 		groupRepository.delete( group );
 	}
@@ -66,11 +66,6 @@ public class GroupServiceImpl implements GroupService
 	@Override
 	public GroupProperties getProperties( Group group ) {
 		return groupPropertiesService.getProperties( group.getId() );
-	}
-
-	@Override
-	public GroupProperties getProperties( GroupDto groupDto ) {
-		return groupPropertiesService.getProperties( groupDto.getId() );
 	}
 
 	@Override
@@ -88,7 +83,7 @@ public class GroupServiceImpl implements GroupService
 		groupPropertiesService.deleteProperties( groupId );
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true, value = HibernateJpaConfiguration.TRANSACTION_MANAGER)
 	@Override
 	public Collection<Group> getGroupsWithPropertyValue( String propertyName, Object propertyValue ) {
 		Collection<Long> groupIds = groupPropertiesService.getEntityIdsForPropertyValue( propertyName, propertyValue );
@@ -97,6 +92,6 @@ public class GroupServiceImpl implements GroupService
 			return Collections.emptyList();
 		}
 
-		return groupRepository.getAllForIds( groupIds );
+		return groupRepository.findAll( groupIds );
 	}
 }

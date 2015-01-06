@@ -24,7 +24,7 @@ import com.foreach.across.core.database.SchemaConfiguration;
 import com.foreach.across.core.filters.BeanFilterComposite;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.core.installers.AcrossSequencesInstaller;
-import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageConfiguringModule;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageRegistry;
 import com.foreach.across.modules.hibernate.provider.TableAliasProvider;
@@ -96,7 +96,7 @@ public class OAuth2Module extends AcrossModule implements HibernatePackageConfig
 
 	@Override
 	public void configureHibernatePackage( HibernatePackageRegistry hibernatePackage ) {
-		if ( StringUtils.equals( AcrossHibernateModule.NAME, hibernatePackage.getName() ) ) {
+		if ( StringUtils.equals( AcrossHibernateJpaModule.NAME, hibernatePackage.getName() ) ) {
 			hibernatePackage.addPackageToScan( "com.foreach.across.modules.oauth2.business" );
 			hibernatePackage.add( new TableAliasProvider( schemaConfiguration.getTables() ) );
 		}

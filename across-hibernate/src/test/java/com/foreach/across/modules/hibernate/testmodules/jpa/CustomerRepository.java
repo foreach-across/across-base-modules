@@ -36,4 +36,9 @@ public class CustomerRepository
 	public Object getUnwrappedEntityManager() {
 		return em.getDelegate();
 	}
+
+	@Transactional(HibernateJpaConfiguration.TRANSACTION_MANAGER)
+	public void delete( Customer customer ) {
+		em.remove( em.find( Customer.class, customer.getId() ) );
+	}
 }

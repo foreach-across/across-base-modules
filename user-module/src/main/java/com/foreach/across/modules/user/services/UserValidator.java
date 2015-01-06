@@ -18,7 +18,6 @@ package com.foreach.across.modules.user.services;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
 import com.foreach.across.modules.user.business.User;
-import com.foreach.across.modules.user.dto.UserDto;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.internal.constraintvalidators.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +38,10 @@ public class UserValidator implements Validator
 	@Override
 	public void validate( Object target, Errors errors ) {
 		if ( supports( target.getClass() ) ) {
-			UserDto userDto = (UserDto) target;
+			User userDto = (User) target;
 			if ( userService.isRequireEmailUnique() ) {
 				User userByEmail = userService.getUserByEmail( userDto.getEmail() );
-				if ( userByEmail != null && userByEmail.getId() != userDto.getId() ) {
+				if ( userByEmail != null && !userByEmail.getId().equals( userDto.getId() ) ) {
 					errors.reject( null, "email already exists" );
 				}
 			}
@@ -84,12 +83,12 @@ public class UserValidator implements Validator
 		}
 	}
 
-	private boolean isSamePrincipal( SecurityPrincipal principal, UserDto user ) {
-		return principal instanceof User && ( (User) principal ).getId() == user.getId();
+	private boolean isSamePrincipal( SecurityPrincipal principal, User user ) {
+		return principal instanceof User && ( (User) principal ).getId().equals( user.getId() );
 	}
 
 	@Override
 	public boolean supports( Class<?> clazz ) {
-		return UserDto.class.isAssignableFrom( clazz );
+		return User.class.isAssignableFrom( clazz );
 	}
 }

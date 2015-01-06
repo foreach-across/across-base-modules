@@ -15,16 +15,18 @@
  */
 package com.foreach.across.modules.user.services;
 
+import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
 import com.foreach.across.modules.user.UserModuleSettings;
-import com.foreach.across.modules.user.business.Group;
 import com.foreach.across.modules.user.business.User;
 import com.foreach.across.modules.user.business.UserProperties;
-import com.foreach.across.modules.user.dto.UserDto;
 import com.foreach.across.modules.user.repositories.UserRepository;
+import com.mysema.query.types.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,43 +82,38 @@ public class UserServiceImpl implements UserService
 
 	@Override
 	public Collection<User> getUsers() {
-		return userRepository.getAll();
+		return userRepository.findAll();
 	}
 
 	@Override
 	public User getUserById( long id ) {
-		return userRepository.getById( id );
+		return userRepository.findOne( id );
 	}
 
 	@Override
 	public User getUserByEmail( String email ) {
-		return userRepository.getByEmail( email );
+		return userRepository.findByEmail( email );
 	}
 
 	@Override
 	public User getUserByUsername( String username ) {
-		return userRepository.getByUsername( username );
+		return userRepository.findByUsername( username );
 	}
 
 	@Override
-	public UserDto createUserDto( User user ) {
-		return new UserDto( user );
-	}
-
-	@Override
-	@Transactional
-	public User save( UserDto userDto ) {
+	@Transactional(HibernateJpaConfiguration.TRANSACTION_MANAGER)
+	public User save( User userDto ) {
 		User user;
 
 		boolean isPrincipalRename = false;
 		String oldPrincipalName = null;
 
-		if ( userDto.isNewEntity() ) {
-			user = new User();
-
+		if ( userDto.isNew() ) {
 			if ( StringUtils.isBlank( userDto.getPassword() ) ) {
 				throw new UserModuleException( "A new user always requires a non-blank password to be set." );
 			}
+
+			user = new User();
 		}
 		else {
 			long existingUserId = userDto.getId();
@@ -140,14 +137,14 @@ public class UserServiceImpl implements UserService
 			}
 
 			// Update username to new email if it is modified and username was the old email
-			if ( !userDto.isNewEntity()
+			if ( !userDto.isNew()
 					&& !StringUtils.equals( userDto.getEmail(), user.getEmail() )
 					&& StringUtils.equals( userDto.getUsername(), user.getEmail() ) ) {
 				userDto.setUsername( userDto.getEmail() );
 			}
 		}
 
-		if ( !userDto.isNewEntity() && !StringUtils.equalsIgnoreCase( userDto.getUsername(), user.getUsername() ) ) {
+		if ( !userDto.isNew() && !StringUtils.equalsIgnoreCase( userDto.getUsername(), user.getUsername() ) ) {
 			isPrincipalRename = true;
 			oldPrincipalName = user.getPrincipalName();
 		}
@@ -173,26 +170,21 @@ public class UserServiceImpl implements UserService
 			user.setDisplayName( String.format( "%s %s", user.getFirstName(), user.getLastName() ).trim() );
 		}
 
-		if ( userDto.isNewEntity() ) {
-			userRepository.create( user );
-		}
-		else {
-			userRepository.update( user );
-		}
+		User saved = userRepository.save( user );
 
-		userDto.copyFrom( user );
+		BeanUtils.copyProperties( saved, userDto, "password" );
 
 		if ( isPrincipalRename ) {
 			securityPrincipalService.publishRenameEvent( oldPrincipalName, user.getPrincipalName() );
 		}
 
-		return user;
+		return saved;
 	}
 
 	@Override
-	@Transactional
+	@Transactional(HibernateJpaConfiguration.TRANSACTION_MANAGER)
 	public void delete( long userId ) {
-		User user = userRepository.getById( userId );
+		User user = userRepository.findOne( userId );
 		deleteProperties( userId );
 		userRepository.delete( user );
 	}
@@ -213,16 +205,11 @@ public class UserServiceImpl implements UserService
 	}
 
 	@Override
-	public UserProperties getProperties( UserDto userDto ) {
-		return userPropertiesService.getProperties( userDto.getId() );
-	}
-
-	@Override
 	public void saveProperties( UserProperties userProperties ) {
 		userPropertiesService.saveProperties( userProperties );
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional(value = HibernateJpaConfiguration.TRANSACTION_MANAGER, readOnly = true)
 	@Override
 	public Collection<User> getUsersWithPropertyValue( String propertyName, Object propertyValue ) {
 		Collection<Long> userIds = userPropertiesService.getEntityIdsForPropertyValue( propertyName, propertyValue );
@@ -231,11 +218,16 @@ public class UserServiceImpl implements UserService
 			return Collections.emptyList();
 		}
 
-		return userRepository.getAllForIds( userIds );
+		return userRepository.findAll( userIds );
 	}
 
 	@Override
-	public Collection<User> getUsersInGroup( Group group ) {
-		return userRepository.getUsersInGroup( group );
+	public Collection<User> findUsers( Predicate predicate ) {
+		return (Collection<User>) userRepository.findAll( predicate );
+	}
+
+	@Override
+	public Page<User> findUsers( Predicate predicate, Pageable pageable ) {
+		return userRepository.findAll( predicate, pageable );
 	}
 }

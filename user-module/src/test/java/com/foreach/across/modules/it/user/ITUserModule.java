@@ -19,17 +19,13 @@ import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
-import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.properties.PropertiesModule;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.modules.spring.security.acl.business.AclAuthorities;
 import com.foreach.across.modules.user.UserModule;
 import com.foreach.across.modules.user.business.*;
-import com.foreach.across.modules.user.dto.UserDto;
-import com.foreach.across.modules.user.services.GroupAclInterceptor;
-import com.foreach.across.modules.user.services.MachinePrincipalService;
-import com.foreach.across.modules.user.services.RoleService;
-import com.foreach.across.modules.user.services.UserService;
+import com.foreach.across.modules.user.services.*;
 import com.foreach.across.test.AcrossTestConfiguration;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
@@ -37,10 +33,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Page;
+import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Collection;
 import java.util.EnumSet;
 
 import static org.junit.Assert.*;
@@ -50,6 +49,9 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = ITUserModule.Config.class)
 public class ITUserModule
 {
+	@Autowired
+	private GroupService groupService;
+
 	@Autowired
 	private UserService userService;
 
@@ -102,7 +104,7 @@ public class ITUserModule
 
 	@Test
 	public void newlyCreatedUsersHavePositiveIds() {
-		UserDto user = new UserDto();
+		User user = new User();
 		user.setUsername( RandomStringUtils.random( 10, 33, 127, false, false ) );
 		user.setEmail( RandomStringUtils.randomAlphanumeric( 63 ) + "@" + RandomStringUtils.randomAlphanumeric(
 				63 ) + ".com" );
@@ -128,9 +130,8 @@ public class ITUserModule
 		User existing = userService.getUserById( -100 );
 		assertNull( existing );
 
-		UserDto user = new UserDto();
-		user.setNewEntity( true );
-		user.setId( -100 );
+		User user = new User();
+		user.setNewEntityId( -100L );
 		user.setUsername( "test-user:-100" );
 		user.setEmail( "negemail@test.com" );
 		user.setPassword( "test password" );
@@ -178,13 +179,98 @@ public class ITUserModule
 		assertEquals( "test", fetched.getValue( "admin" ) );
 	}
 
+	@Test
+	public void queryDslUserFinding() {
+		QUser user = QUser.user;
+
+		Page<User> found = userService.findUsers( user.email.eq( "some@email.com" ), new QPageRequest( 0, 10 ) );
+		assertEquals( 0, found.getTotalElements() );
+		assertEquals( 0, found.getTotalPages() );
+
+		User created = new User();
+		created.setUsername( "some@email.com" );
+		created.setEmail( "some@email.com" );
+		created.setPassword( "test password" );
+		created.setFirstName( "Test" );
+		created.setLastName( "User 2" );
+		created.setDisplayName( "Display name for test user" );
+
+		created = userService.save( created );
+
+		found = userService.findUsers( user.email.eq( "some@email.com" ), new QPageRequest( 0, 10 ) );
+		assertEquals( 1, found.getTotalElements() );
+		assertEquals( 1, found.getTotalPages() );
+		assertEquals( created, found.getContent().get( 0 ) );
+
+		found = userService.findUsers( user.lastName.startsWithIgnoreCase( "user" ), new QPageRequest( 0, 10 ) );
+		assertTrue( found.getTotalElements() >= 1 );
+		assertEquals( 1, found.getTotalPages() );
+		assertTrue( found.getContent().contains( created ) );
+
+		found = userService.findUsers( user.email.eq( "none@email.com" ), new QPageRequest( 0, 10 ) );
+		assertEquals( 0, found.getTotalElements() );
+		assertEquals( 0, found.getTotalPages() );
+	}
+
+	@Test
+	public void usersInGroups() {
+		Group groupOne = new Group();
+		groupOne.setName( RandomStringUtils.randomAlphanumeric( 20 ) );
+		groupOne = groupService.save( groupOne );
+
+		Group groupTwo = new Group();
+		groupTwo.setName( groupOne.getName() + "2" );
+		groupTwo = groupService.save( groupTwo );
+
+		Group groupThree = new Group();
+		groupThree.setName( groupOne.getName() + "3" );
+		groupThree = groupService.save( groupThree );
+
+		User userInGroupOne = new User();
+		userInGroupOne.setUsername( "groupOne@email.com" );
+		userInGroupOne.setEmail( "groupOne@email.com" );
+		userInGroupOne.setPassword( "test password" );
+		userInGroupOne.setFirstName( "Test" );
+		userInGroupOne.setLastName( "User 2" );
+		userInGroupOne.setDisplayName( "Display name for test user" );
+		userInGroupOne.addGroup( groupOne );
+
+		userInGroupOne = userService.save( userInGroupOne );
+
+		User userInBoth = new User();
+		userInBoth.setUsername( "userInBoth@email.com" );
+		userInBoth.setEmail( "userInBoth@email.com" );
+		userInBoth.setPassword( "test password" );
+		userInBoth.setFirstName( "Test" );
+		userInBoth.setLastName( "User 2" );
+		userInBoth.setDisplayName( "Display name for test user" );
+		userInBoth.addGroup( groupOne );
+		userInBoth.addGroup( groupTwo );
+
+		userInBoth = userService.save( userInBoth );
+
+		QUser user = QUser.user;
+
+		Collection<User> found = userService.findUsers( user.groups.contains( groupOne ) );
+		assertEquals( 2, found.size() );
+		assertTrue( found.contains( userInGroupOne ) );
+		assertTrue( found.contains( userInBoth ) );
+
+		found = userService.findUsers( user.groups.contains( groupTwo ) );
+		assertEquals( 1, found.size() );
+		assertTrue( found.contains( userInBoth ) );
+
+		found = userService.findUsers( user.groups.contains( groupThree ).and( user.groups.contains( groupOne ) ));
+		assertTrue( found.isEmpty() );
+	}
+
 	@Configuration
 	@AcrossTestConfiguration
 	static class Config implements AcrossContextConfigurer
 	{
 		@Override
 		public void configure( AcrossContext context ) {
-			context.addModule( acrossHibernateModule() );
+			context.addModule( new AcrossHibernateJpaModule() );
 			context.addModule( userModule() );
 			context.addModule( propertiesModule() );
 			context.addModule( new SpringSecurityModule() );
@@ -192,10 +278,6 @@ public class ITUserModule
 
 		private PropertiesModule propertiesModule() {
 			return new PropertiesModule();
-		}
-
-		private AcrossHibernateModule acrossHibernateModule() {
-			return new AcrossHibernateModule();
 		}
 
 		private UserModule userModule() {

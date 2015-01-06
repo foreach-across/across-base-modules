@@ -16,13 +16,14 @@
 package com.foreach.across.modules.user.services;
 
 import com.foreach.across.modules.user.business.User;
-import com.foreach.across.modules.user.dto.UserDto;
 import com.foreach.across.modules.user.repositories.UserRepository;
 import com.foreach.common.test.MockedLoader;
 import org.hibernate.validator.internal.constraintvalidators.EmailValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,13 +54,21 @@ public class TestUserServiceWithEmailAsUserName
 	@Before
 	public void resetMocks() {
 		reset( userRepository );
+
+		when( userRepository.save( any( User.class ) ) ).thenAnswer( new Answer<User>()
+		{
+			@Override
+			public User answer( InvocationOnMock invocationOnMock ) throws Throwable {
+				return (User) invocationOnMock.getArguments()[0];
+			}
+		} );
 	}
 
 	@Test
 	public void creatingUserFailsWhenEmailAlreadyExists() throws Exception {
 
-		int firstUserId = 498;
-		UserDto userDto = new UserDto();
+		long firstUserId = 498L;
+		User userDto = new User();
 		userDto.setId( firstUserId );
 		userDto.setEmail( "498@email.com" );
 
@@ -67,9 +76,10 @@ public class TestUserServiceWithEmailAsUserName
 		user.setId( firstUserId );
 
 		User otherUser = new User();
+		otherUser.setId( 123L );
 
-		when( userRepository.getById( firstUserId ) ).thenReturn( user );
-		when( userRepository.getByEmail( "498@email.com" ) ).thenReturn( otherUser );
+		when( userRepository.findOne( firstUserId ) ).thenReturn( user );
+		when( userRepository.findByEmail( "498@email.com" ) ).thenReturn( otherUser );
 
 		try {
 			userService.save( userDto );
@@ -86,7 +96,7 @@ public class TestUserServiceWithEmailAsUserName
 
 	@Test
 	public void creatingUserFailsWhenEmailIsNotSpecified() throws Exception {
-		UserDto userDto = new UserDto();
+		User userDto = new User();
 		userDto.setPassword( "password" );
 		try {
 			userService.save( userDto );
@@ -103,7 +113,7 @@ public class TestUserServiceWithEmailAsUserName
 
 	@Test
 	public void creatingUserWithUsernameIsStillAllowed() throws Exception {
-		UserDto userDto = new UserDto();
+		User userDto = new User();
 		userDto.setUsername( "someusername" );
 		userDto.setPassword( "password" );
 		userDto.setEmail( "test@email.com" );
@@ -113,7 +123,7 @@ public class TestUserServiceWithEmailAsUserName
 
 	@Test
 	public void creatingOrUpdatingSetsEmailAsUsername() throws Exception {
-		UserDto userDto = new UserDto();
+		User userDto = new User();
 		userDto.setPassword( "password" );
 		userDto.setEmail( "test@there.com" );
 

@@ -15,44 +15,16 @@
  */
 package com.foreach.across.modules.user.config;
 
-import com.foreach.across.modules.user.repositories.*;
-import org.springframework.context.annotation.Bean;
+import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
+import com.foreach.across.modules.user.UserModule;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
+@EnableJpaRepositories(
+		transactionManagerRef = HibernateJpaConfiguration.TRANSACTION_MANAGER,
+		basePackageClasses = UserModule.class
+)
 public class UserRepositoriesConfiguration
 {
-	@Bean
-	public GroupRepository groupRepository() {
-		return new GroupRepositoryImpl();
-	}
-
-	@Bean
-	public PermissionRepository permissionRepository() {
-		return new PermissionRepositoryImpl();
-	}
-
-	@Bean
-	public RoleRepository roleRepository() {
-		return new RoleRepositoryImpl();
-	}
-
-	@Bean
-	public UserRepository userRepository() {
-		return new UserRepositoryImpl();
-	}
-
-	@Bean
-	public MachinePrincipalRepository machinePrincipalRepository() {
-		return new MachinePrincipalRepositoryImpl();
-	}
-
-	/**
-	 * Will be picked up by the {@link com.foreach.across.modules.spring.security.infrastructure.config.SecurityPrincipalServiceConfiguration}
-	 * in the SpringSecurityInfrastructureModule.
-	 */
-	@Bean
-	public SecurityPrincipalRepository securityPrincipalRepository() {
-		return new SecurityPrincipalRepositoryImpl();
-	}
 }

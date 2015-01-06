@@ -16,6 +16,7 @@
 package com.foreach.across.modules.hibernate.repositories;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface BasicRepository<T>
 {
@@ -23,9 +24,9 @@ public interface BasicRepository<T>
 
 	T getById( long id );
 
-	Collection<T> getAll();
+	List<T> findAll();
 
-	Collection<T> getAllForIds( Collection<Long> ids );
+	List<T> findAll( Collection<Long> ids );
 
 	void create( T object );
 

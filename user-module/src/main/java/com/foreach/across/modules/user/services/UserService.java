@@ -15,10 +15,11 @@
  */
 package com.foreach.across.modules.user.services;
 
-import com.foreach.across.modules.user.business.Group;
 import com.foreach.across.modules.user.business.User;
 import com.foreach.across.modules.user.business.UserProperties;
-import com.foreach.across.modules.user.dto.UserDto;
+import com.mysema.query.types.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 
@@ -36,9 +37,7 @@ public interface UserService
 
 	User getUserByUsername( String username );
 
-	UserDto createUserDto( User user );
-
-	User save( UserDto user );
+	User save( User user );
 
 	void delete( long id );
 
@@ -50,9 +49,9 @@ public interface UserService
 
 	UserProperties getProperties( User user );
 
-	UserProperties getProperties( UserDto userDto );
-
 	Collection<User> getUsersWithPropertyValue( String propertyName, Object propertyValue );
 
-	Collection<User> getUsersInGroup( Group group );
+	Collection<User> findUsers( Predicate predicate );
+
+	Page<User> findUsers( Predicate predicate, Pageable pageable );
 }

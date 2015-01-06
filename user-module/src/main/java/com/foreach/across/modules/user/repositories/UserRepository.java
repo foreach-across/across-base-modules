@@ -15,17 +15,18 @@
  */
 package com.foreach.across.modules.user.repositories;
 
-import com.foreach.across.modules.hibernate.repositories.BasicRepository;
 import com.foreach.across.modules.user.business.Group;
 import com.foreach.across.modules.user.business.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 import java.util.Collection;
 
-public interface UserRepository extends BasicRepository<User>
+public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User>
 {
-	User getByUsername( String userName );
+	User findByUsername( String userName );
 
-	User getByEmail( String email );
+	User findByEmail( String email );
 
-	Collection<User> getUsersInGroup( Group group );
+	Collection<User> findAllByGroups( Group group );
 }

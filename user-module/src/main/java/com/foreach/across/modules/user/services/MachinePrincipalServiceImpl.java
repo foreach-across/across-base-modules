@@ -17,11 +17,10 @@ package com.foreach.across.modules.user.services;
 
 import com.foreach.across.modules.hibernate.util.BasicServiceHelper;
 import com.foreach.across.modules.user.business.MachinePrincipal;
-import com.foreach.across.modules.user.dto.MachinePrincipalDto;
 import com.foreach.across.modules.user.repositories.MachinePrincipalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
@@ -36,22 +35,21 @@ public class MachinePrincipalServiceImpl implements MachinePrincipalService
 
 	@Override
 	public Collection<MachinePrincipal> getMachinePrincipals() {
-		return machinePrincipalRepository.getAll();
+		return machinePrincipalRepository.findAll( new Sort( Sort.Direction.ASC, "name" ) );
 	}
 
 	@Override
 	public MachinePrincipal getMachinePrincipalById( long id ) {
-		return machinePrincipalRepository.getById( id );
+		return machinePrincipalRepository.findOne( id );
 	}
 
 	@Override
 	public MachinePrincipal getMachinePrincipalByName( String name ) {
-		return machinePrincipalRepository.getByName( name );
+		return machinePrincipalRepository.findByName( name );
 	}
 
-	@Transactional
 	@Override
-	public MachinePrincipal save( MachinePrincipalDto machinePrincipalDto ) {
-		return BasicServiceHelper.save( machinePrincipalDto, MachinePrincipal.class, machinePrincipalRepository );
+	public MachinePrincipal save( MachinePrincipal machinePrincipalDto ) {
+		return BasicServiceHelper.save( machinePrincipalDto, machinePrincipalRepository );
 	}
 }

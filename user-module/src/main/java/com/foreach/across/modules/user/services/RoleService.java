@@ -36,7 +36,7 @@ public interface RoleService
 	 *
 	 * @param role Role entity that should exist.
 	 */
-	void defineRole( Role role );
+	Role defineRole( Role role );
 
 	/**
 	 * Get all defined Roles.
@@ -58,7 +58,7 @@ public interface RoleService
 	 *
 	 * @param role Entity to save.
 	 */
-	void save( Role role );
+	Role save( Role role );
 
 	/**
 	 * Delete the given Role entity.

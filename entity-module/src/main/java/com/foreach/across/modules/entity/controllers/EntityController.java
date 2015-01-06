@@ -41,7 +41,7 @@ public class EntityController
 		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
 
 		model.addAttribute( "entityConfig", entityConfiguration );
-		model.addAttribute( "entities", entityConfiguration.getRepository().getAll() );
+		model.addAttribute( "entities", entityConfiguration.getRepository().findAll() );
 
 		return "th/entity/list";
 	}

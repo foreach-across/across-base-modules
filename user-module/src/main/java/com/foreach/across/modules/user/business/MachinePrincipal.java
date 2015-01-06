@@ -17,6 +17,7 @@ package com.foreach.across.modules.user.business;
 
 import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -31,7 +32,7 @@ import javax.persistence.Table;
 @Entity
 @DiscriminatorValue("machine")
 @Table(name = UserSchemaConfiguration.TABLE_MACHINE_PRINCIPAL)
-public class MachinePrincipal extends GroupedPrincipal implements Comparable<MachinePrincipal>
+public class MachinePrincipal extends GroupedPrincipal<MachinePrincipal> implements Comparable<MachinePrincipal>
 {
 	@Column(name = "name")
 	private String name;
@@ -43,6 +44,14 @@ public class MachinePrincipal extends GroupedPrincipal implements Comparable<Mac
 	public void setName( String name ) {
 		this.name = name;
 		setPrincipalName( name );
+	}
+
+	@Override
+	public MachinePrincipal toDto() {
+		MachinePrincipal machinePrincipal = new MachinePrincipal();
+		BeanUtils.copyProperties( this, machinePrincipal );
+
+		return machinePrincipal;
 	}
 
 	@Override

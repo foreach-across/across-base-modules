@@ -49,7 +49,7 @@ public interface PermissionService
 	 *
 	 * @param permission Permission entity that should exist.
 	 */
-	void definePermission( Permission permission );
+	Permission definePermission( Permission permission );
 
 	/**
 	 * Get all defined permission groups.
@@ -69,16 +69,17 @@ public interface PermissionService
 	/**
 	 * Save the PermissionGroup entity.
 	 *
-	 * @param group Entity to save.
+	 * @param dto Entity to save.
+	 * @return Persisted entity.
 	 */
-	void save( PermissionGroup group );
+	PermissionGroup saveGroup( PermissionGroup dto );
 
 	/**
 	 * Delete the PermissionGroup entity.
 	 *
 	 * @param group Entity to delete.
 	 */
-	void delete( PermissionGroup group );
+	void deleteGroup( PermissionGroup group );
 
 	/**
 	 * Get all defined permissions.
@@ -100,12 +101,12 @@ public interface PermissionService
 	 *
 	 * @param permission Entity to save.
 	 */
-	void save( Permission permission );
+	Permission savePermission( Permission permission );
 
 	/**
 	 * Delete the Permission entity.
 	 *
 	 * @param permission Entity to delete.
 	 */
-	void delete( Permission permission );
+	void deletePermission( Permission permission );
 }

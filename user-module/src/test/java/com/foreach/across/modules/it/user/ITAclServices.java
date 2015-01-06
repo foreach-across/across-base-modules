@@ -38,8 +38,6 @@ import com.foreach.across.modules.user.UserModuleSettings;
 import com.foreach.across.modules.user.business.Group;
 import com.foreach.across.modules.user.business.Role;
 import com.foreach.across.modules.user.business.User;
-import com.foreach.across.modules.user.dto.GroupDto;
-import com.foreach.across.modules.user.dto.UserDto;
 import com.foreach.across.modules.user.services.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
@@ -137,10 +135,9 @@ public class ITAclServices
 		Group group = groupService.getGroupById( -999 );
 
 		if ( group == null ) {
-			GroupDto dto = new GroupDto();
+			Group dto = new Group();
 			dto.setName( RandomStringUtils.randomAscii( 20 ) );
-			dto.setId( -999 );
-			dto.setNewEntity( true );
+			dto.setNewEntityId( -999L );
 
 			for ( String role : roles ) {
 				dto.addRole( roleService.getRole( role ) );
@@ -158,7 +155,7 @@ public class ITAclServices
 	}
 
 	private User createRandomUser( Collection<Group> groups, Collection<String> roles ) {
-		UserDto user = new UserDto();
+		User user = new User();
 		user.setUsername( UUID.randomUUID().toString() );
 		user.setEmail( UUID.randomUUID().toString() + "@test.com" );
 		user.setPassword( "test" );
@@ -348,7 +345,7 @@ public class ITAclServices
 	@Test
 	public void testGroups() {
 		logon( userOne );
-		GroupDto group1 = new GroupDto();
+		Group group1 = new Group();
 		group1.setName( "Test-group" );
 		Group savedGroup = groupService.save( group1 );
 
@@ -374,7 +371,7 @@ public class ITAclServices
 		//Not sure if I should be doing this here...
 		acrossContextInfo.getModuleInfo( UserModule.NAME ).getModule().setProperty(
 				UserModuleSettings.ENABLE_DEFAULT_ACLS, false );
-		GroupDto group2Dto = new GroupDto();
+		Group group2Dto = new Group();
 		group2Dto.setName( "Test-group-2" );
 		Group savedGroup2 = groupService.save( group2Dto );
 
@@ -402,7 +399,7 @@ public class ITAclServices
 		assertNotNull( lastModifiedDate );
 		assertNotNull( createdUser.getLastModifiedBy() );
 
-		UserDto createdUserDto = new UserDto( createdUser );
+		User createdUserDto = createdUser.toDto();
 		createdUserDto.setLastName( "foo" );
 		userService.save( createdUserDto );
 
@@ -472,7 +469,7 @@ public class ITAclServices
 			this.id = id;
 		}
 
-		public long getId() {
+		public Long getId() {
 			return id;
 		}
 	}

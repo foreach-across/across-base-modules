@@ -93,7 +93,7 @@ public class TestOAuth2JdbcTokenStore
 		roles.add( thirdRole );
 		clientDetails.setRoles( roles );
 
-		clientDetails.setId( 516 );
+		clientDetails.setId( 516L );
 		Set<String> authorityTypes = new HashSet<>();
 		authorityTypes.add( "authority one" );
 		authorityTypes.add( "authority two" );
@@ -171,7 +171,7 @@ public class TestOAuth2JdbcTokenStore
 		roles.add( userRole );
 		user.setRoles( roles );
 
-		user.setId( 777 );
+		user.setId( 777L );
 
 		when( userDetailsService.loadUserByUsername( "testusername" ) ).thenReturn( user );
 		when( clientDetailsService.loadClientByClientId( "testClientId" ) ).thenReturn( client );

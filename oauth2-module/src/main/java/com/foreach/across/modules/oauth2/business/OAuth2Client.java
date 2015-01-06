@@ -19,6 +19,7 @@ import com.foreach.across.modules.oauth2.config.OAuth2SchemaConfiguration;
 import com.foreach.across.modules.user.business.BasicSecurityPrincipal;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cascade;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.oauth2.provider.ClientDetails;
 
 import javax.persistence.*;
@@ -27,7 +28,7 @@ import java.util.*;
 @Entity
 @DiscriminatorValue("oauth2client")
 @Table(name = OAuth2SchemaConfiguration.TABLE_CLIENT)
-public class OAuth2Client extends BasicSecurityPrincipal implements ClientDetails
+public class OAuth2Client extends BasicSecurityPrincipal<OAuth2Client> implements ClientDetails
 {
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "pk.oAuth2Client", cascade = CascadeType.ALL)
 	private Set<OAuth2ClientScope> oAuth2ClientScopes = new TreeSet<OAuth2ClientScope>();
@@ -182,5 +183,13 @@ public class OAuth2Client extends BasicSecurityPrincipal implements ClientDetail
 
 	public void setoAuth2ClientScopes( Set<OAuth2ClientScope> oAuth2ClientScopes ) {
 		this.oAuth2ClientScopes = oAuth2ClientScopes;
+	}
+
+	@Override
+	public OAuth2Client toDto() {
+		OAuth2Client client = new OAuth2Client();
+		BeanUtils.copyProperties( this, client );
+
+		return client;
 	}
 }

@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.user.services;
 
+import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
 import com.foreach.across.modules.user.business.Permission;
 import com.foreach.across.modules.user.business.Role;
 import com.foreach.across.modules.user.repositories.PermissionRepository;
@@ -52,7 +53,7 @@ public class RoleServiceImpl implements RoleService
 		Set<Permission> permissions = new TreeSet<>();
 
 		for ( String permissionName : permissionNames ) {
-			Permission permission = permissionRepository.getPermission( permissionName );
+			Permission permission = permissionRepository.findByName( permissionName );
 			Assert.notNull( permission, "Invalid permission: " + permissionName );
 
 			permissions.add( permission );
@@ -60,17 +61,15 @@ public class RoleServiceImpl implements RoleService
 
 		role.setPermissions( permissions );
 
-		defineRole( role );
-
-		return role;
+		return defineRole( role );
 	}
 
 	@Override
-	public void defineRole( Role role ) {
-		Role existing = roleRepository.getRole( role.getName() );
+	public Role defineRole( Role role ) {
+		Role existing = roleRepository.findByName( role.getName() );
 
 		if ( existing != null ) {
-			if( existing.getPermissions().size() != role.getPermissions().size() ) {
+			if ( existing.getPermissions().size() != role.getPermissions().size() ) {
 				Collection<Permission> difference = CollectionUtils.disjunction( existing.getPermissions(),
 				                                                                 role.getPermissions() );
 				Collection<String> permissionNames = CollectionUtils.collect( difference,
@@ -83,32 +82,36 @@ public class RoleServiceImpl implements RoleService
 				                                                              },
 				                                                              new ArrayList<String>()
 				);
-				                        LOG.error( "Cannot redefine role '{}' because it would loose the permissions: '{}', you should .addPermission() instead", role,
-				                                   StringUtils.join( permissionNames, ", " ) );
+				LOG.error(
+						"Cannot redefine role '{}' because it would loose the permissions: '{}', you should .addPermission() instead",
+						role,
+						StringUtils.join( permissionNames, ", " ) );
 			}
+
+			return existing;
 		}
 		else {
-			roleRepository.save( role );
+			return roleRepository.save( role );
 		}
 	}
 
 	@Override
 	public Collection<Role> getRoles() {
-		return roleRepository.getAll();
+		return roleRepository.findAll();
 	}
 
 	@Override
 	public Role getRole( String name ) {
-		return roleRepository.getRole( name );
+		return roleRepository.findByName( name );
 	}
 
-	@Transactional
+	@Transactional(HibernateJpaConfiguration.TRANSACTION_MANAGER)
 	@Override
-	public void save( Role role ) {
+	public Role save( Role role ) {
 		Set<Permission> actualPermissions = new TreeSet<>();
 
 		for ( Permission permission : role.getPermissions() ) {
-			Permission existing = permissionRepository.getPermission( permission.getName() );
+			Permission existing = permissionRepository.findByName( permission.getName() );
 
 			if ( existing == null ) {
 				throw new RuntimeException( "No permission defined with name: " + permission.getName() );
@@ -119,7 +122,7 @@ public class RoleServiceImpl implements RoleService
 
 		role.setPermissions( actualPermissions );
 
-		roleRepository.save( role );
+		return roleRepository.save( role );
 	}
 
 	@Override
