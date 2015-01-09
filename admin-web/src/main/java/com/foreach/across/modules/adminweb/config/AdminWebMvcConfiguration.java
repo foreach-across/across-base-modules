@@ -29,7 +29,7 @@ import com.foreach.across.modules.adminweb.menu.AdminMenu;
 import com.foreach.across.modules.adminweb.menu.AdminMenuBuilder;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenuBuilder;
-import com.foreach.across.modules.adminweb.resource.BootstrapWebResourcePackage;
+import com.foreach.across.modules.adminweb.resource.AdminBootstrapWebResourcePackage;
 import com.foreach.across.modules.adminweb.resource.JQueryWebResourcePackage;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import com.foreach.across.modules.web.mvc.PrefixingRequestMappingHandlerMapping;
@@ -114,7 +114,7 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 		{
 			@Override
 			protected void registerWebResources( WebResourceRegistry registry ) {
-				registry.addPackage( BootstrapWebResourcePackage.NAME );
+				registry.addPackage( AdminBootstrapWebResourcePackage.NAME );
 				registry.addWithKey( WebResource.CSS, AdminWeb.MODULE, AdminWeb.LAYOUT_TEMPLATE_CSS,
 				                     WebResource.VIEWS );
 			}
@@ -138,8 +138,8 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 		webResourcePackageManager.register( JQueryWebResourcePackage.NAME,
 		                                    new JQueryWebResourcePackage(
 				                                    !developmentMode.isActive() ) );
-		webResourcePackageManager.register( BootstrapWebResourcePackage.NAME,
-		                                    new BootstrapWebResourcePackage(
+		webResourcePackageManager.register( AdminBootstrapWebResourcePackage.NAME,
+		                                    new AdminBootstrapWebResourcePackage(
 				                                    !developmentMode.isActive() ) );
 
 		return webResourcePackageManager;

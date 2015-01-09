@@ -24,38 +24,50 @@ import java.util.Arrays;
 /**
  * Boostrap css, requires jquery as well.
  */
-public class BootstrapWebResourcePackage extends SimpleWebResourcePackage
+public class AdminBootstrapWebResourcePackage extends SimpleWebResourcePackage
 {
-	public static final String NAME = "bootstrap";
+	public static final String NAME = "bootstrap-adminweb";
 
-	public BootstrapWebResourcePackage( boolean minified ) {
+	public AdminBootstrapWebResourcePackage( boolean minified ) {
 		this( minified, "3.1.1" );
 	}
 
-	public BootstrapWebResourcePackage( boolean minified, String version ) {
+	public AdminBootstrapWebResourcePackage( boolean minified, String version ) {
 		if ( minified ) {
 			setWebResources( Arrays.asList( new WebResource( WebResource.CSS, NAME,
-			                                                 "//netdna.bootstrapcdn.com/bootstrap/" + version + "/css/bootstrap.min.css",
-			                                                 WebResource.EXTERNAL ),
+			                                                 "/css/adminweb/styles-light-theme.css",
+			                                                 WebResource.VIEWS ),
 //			                                new WebResource( WebResource.CSS, NAME + "-theme",
 //			                                                 "//netdna.bootstrapcdn.com/bootstrap/" + version + "/css/bootstrap-theme.min.css",
 //			                                                 WebResource.EXTERNAL ),
                                             new WebResource( WebResource.JAVASCRIPT_PAGE_END, NAME,
                                                              "//netdna.bootstrapcdn.com/bootstrap/" + version + "/js/bootstrap.min.js",
-                                                             WebResource.EXTERNAL )
+                                                             WebResource.EXTERNAL ),
+                                            new WebResource( WebResource.JAVASCRIPT_PAGE_END, NAME + "-main",
+                                                             "/js/adminweb/main.js",
+                                                             WebResource.VIEWS ),
+                                            new WebResource( WebResource.JAVASCRIPT_PAGE_END, NAME + "-ie10-viewport",
+                                                             "/js/adminweb/ie10-viewport-bug-workaround.js",
+                                                             WebResource.VIEWS )
 			                 )
 			);
 		}
 		else {
 			setWebResources( Arrays.asList( new WebResource( WebResource.CSS, NAME,
-			                                                 "//netdna.bootstrapcdn.com/bootstrap/" + version + "/css/bootstrap.css",
-			                                                 WebResource.EXTERNAL ),
+			                                                 "/css/adminweb/styles-light-theme.css",
+			                                                 WebResource.VIEWS ),
 //			                                new WebResource( WebResource.CSS, NAME + "-theme",
 //			                                                 "//netdna.bootstrapcdn.com/bootstrap/" + version + "/css/bootstrap-theme.css",
 //			                                                 WebResource.EXTERNAL ),
                                             new WebResource( WebResource.JAVASCRIPT_PAGE_END, NAME,
                                                              "//netdna.bootstrapcdn.com/bootstrap/" + version + "/js/bootstrap.js",
-                                                             WebResource.EXTERNAL )
+                                                             WebResource.EXTERNAL ),
+                                            new WebResource( WebResource.JAVASCRIPT_PAGE_END, NAME + "-main",
+                                                             "/js/adminweb/main.js",
+                                                             WebResource.VIEWS ),
+                                            new WebResource( WebResource.JAVASCRIPT_PAGE_END, NAME + "-ie10-viewport",
+                                                             "/js/adminweb/ie10-viewport-bug-workaround.js",
+                                                             WebResource.VIEWS )
 			                 )
 			);
 		}

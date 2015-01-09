@@ -29,7 +29,7 @@
 	<li th:each="err : ${#fields.errors('${user.*}')}" th:text="${err}"/>
 </ul>
 
-<form method="post" th:action="@{${@adminWeb.path('/users/' + (user.newEntity ? 'create' : user.id))}}" th:object="${user}">
+<form method="post" th:action="@{${@adminWeb.path('/users/' + (user.new ? 'create' : user.id))}}" th:object="${user}">
 	<input type="hidden" th:field="*{id}"/>
 
 	<span th:text="*{id}">1</span>
