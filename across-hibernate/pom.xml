@@ -26,10 +26,6 @@
 
 	<artifactId>across-hibernate</artifactId>
 
-	<properties>
-		<spring.data.version>1.7.1.RELEASE</spring.data.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>across</groupId>
@@ -44,7 +40,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
-			<version>${spring.data.version}</version>
+			<version>${spring.data.jpa.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>

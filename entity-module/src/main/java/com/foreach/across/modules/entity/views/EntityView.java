@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.services;
+package com.foreach.across.modules.entity.views;
 
-import com.foreach.across.modules.entity.config.EntityConfiguration;
-
-import java.util.Collection;
+import org.springframework.ui.Model;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @author Arne Vandamme
  */
-public interface EntityRegistry
+public class EntityView extends ModelAndView
 {
-	Collection<EntityConfiguration> getEntities();
-
-	boolean contains( Class entityType );
-
-	EntityConfiguration getEntityConfiguration( Class entityType );
+	public void addModel( Model model ) {
+		addAllObjects( model.asMap() );
+	}
 }

@@ -5,7 +5,7 @@ import com.foreach.across.core.annotations.Event;
 import com.foreach.across.modules.adminweb.menu.AdminMenuEvent;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenuEvent;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
-import com.foreach.across.modules.entity.services.EntityRegistry;
+import com.foreach.across.modules.entity.services.EntityRegistryImpl;
 import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.web.menu.PathBasedMenuBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +16,7 @@ import org.springframework.core.Ordered;
 public class MenuEventsHandler
 {
 	@Autowired
-	private EntityRegistry entityRegistry;
+	private EntityRegistryImpl entityRegistry;
 
 	@Event
 	public void adminMenu( AdminMenuEvent adminMenuEvent ) {
@@ -37,13 +37,13 @@ public class MenuEventsHandler
 
 		if ( menu.isForUpdate() ) {
 			builder.item(
-					"/entities/" + ( menu.getEntityClass().getSimpleName().toLowerCase() ) + "/" + menu.getEntity()
+					"/entities/" + ( menu.getEntityType().getSimpleName().toLowerCase() ) + "/" + menu.getEntity()
 					                                                                                   .getId(),
 					"General" )
 			       .order( Ordered.HIGHEST_PRECEDENCE );
 		}
 		else {
-			builder.item( "/entities/" + ( menu.getEntityClass().getSimpleName().toLowerCase() ) + "/create",
+			builder.item( "/entities/" + ( menu.getEntityType().getSimpleName().toLowerCase() ) + "/create",
 			              "General" )
 			       .order( Ordered.HIGHEST_PRECEDENCE );
 		}

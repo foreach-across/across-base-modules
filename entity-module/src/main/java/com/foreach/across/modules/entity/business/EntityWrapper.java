@@ -23,10 +23,10 @@ public class EntityWrapper
 		return entityConfiguration.getIdGenerator().getId( entity );
 	}
 
+
 	public String getEntityLabel() {
 		return entityConfiguration.getLabelGenerator().getLabel( entity );
 	}
-
 	/**
 	 * @return The entity instance that is being wrapped.
 	 */

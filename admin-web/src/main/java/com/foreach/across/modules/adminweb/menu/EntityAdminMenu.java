@@ -21,7 +21,7 @@ public class EntityAdminMenu<T> extends Menu
 		this.entity = entity;
 	}
 
-	public Class<T> getEntityClass() {
+	public Class<T> getEntityType() {
 		return entityClass;
 	}
 

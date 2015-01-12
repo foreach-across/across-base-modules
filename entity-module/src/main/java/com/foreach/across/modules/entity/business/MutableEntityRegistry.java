@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.services;
+package com.foreach.across.modules.entity.business;
 
 import com.foreach.across.modules.entity.config.EntityConfiguration;
-
-import java.util.Collection;
+import com.foreach.across.modules.entity.services.EntityRegistry;
 
 /**
  * @author Arne Vandamme
  */
-public interface EntityRegistry
+public interface MutableEntityRegistry extends EntityRegistry
 {
-	Collection<EntityConfiguration> getEntities();
-
-	boolean contains( Class entityType );
-
-	EntityConfiguration getEntityConfiguration( Class entityType );
+	void register( EntityConfiguration entityConfiguration );
 }

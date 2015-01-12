@@ -29,6 +29,8 @@
 		<querydsl.version>3.5.1</querydsl.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<spring.data.jpa.version>1.7.1.RELEASE</spring.data.jpa.version>
+		<spring.data.commons.version>1.9.1.RELEASE</spring.data.commons.version>
 	</properties>
 
 	<repositories>
@@ -230,6 +232,11 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-collections4</artifactId>
 				<version>4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-commons</artifactId>
+				<version>${spring.data.commons.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

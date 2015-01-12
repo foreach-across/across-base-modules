@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.services;
+package com.foreach.across.modules.entity.views.model;
 
 import com.foreach.across.modules.entity.config.EntityConfiguration;
-
-import java.util.Collection;
+import com.foreach.across.modules.entity.views.EntityView;
 
 /**
  * @author Arne Vandamme
  */
-public interface EntityRegistry
+public interface ModelBuilder
 {
-	Collection<EntityConfiguration> getEntities();
-
-	boolean contains( Class entityType );
-
-	EntityConfiguration getEntityConfiguration( Class entityType );
+	void build( EntityConfiguration entityConfiguration, EntityView entityView );
 }

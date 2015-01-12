@@ -8,7 +8,7 @@ import com.foreach.across.modules.entity.business.EntityForm;
 import com.foreach.across.modules.entity.business.EntityWrapper;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
-import com.foreach.across.modules.entity.services.EntityRegistry;
+import com.foreach.across.modules.entity.services.EntityRegistryImpl;
 import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import org.springframework.beans.BeanUtils;
@@ -30,7 +30,7 @@ public class EntitySaveController
 	private AdminWeb adminWeb;
 
 	@Autowired
-	private EntityRegistry entityRegistry;
+	private EntityRegistryImpl entityRegistry;
 
 	@Autowired
 	private EntityFormFactory formFactory;
@@ -53,7 +53,7 @@ public class EntitySaveController
 	) throws Exception {
 		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
 
-		Object entity = entityConfiguration.getEntityClass().newInstance();
+		Object entity = entityConfiguration.getEntityType().newInstance();
 
 		if ( entityId != null && entityId != 0 ) {
 			Object original = entityConfiguration.getRepository().getById( entityId );
@@ -96,7 +96,7 @@ public class EntitySaveController
 				model.addAttribute( "entityMenu",
 				                    menuFactory.buildMenu(
 						                    new EntityAdminMenu(
-								                    entityConfiguration.getEntityClass(),
+								                    entityConfiguration.getEntityType(),
 								                    originalEntity.getEntity()
 						                    )
 				                    )
@@ -105,7 +105,7 @@ public class EntitySaveController
 			else {
 				model.addAttribute( "entityMenu",
 				                    menuFactory.buildMenu(
-						                    new EntityAdminMenu( entityConfiguration.getEntityClass() )
+						                    new EntityAdminMenu( entityConfiguration.getEntityType() )
 				                    )
 				);
 			}

@@ -13,7 +13,7 @@ import com.foreach.across.modules.entity.business.FormElement;
 import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
-import com.foreach.across.modules.entity.services.EntityRegistry;
+import com.foreach.across.modules.entity.services.EntityRegistryImpl;
 import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.properties.business.EntityProperties;
 import com.foreach.across.modules.properties.config.EntityPropertiesDescriptor;
@@ -41,7 +41,7 @@ public class EntityPropertiesController
 	private AdminWeb adminWeb;
 
 	@Autowired
-	private EntityRegistry entityRegistry;
+	private EntityRegistryImpl entityRegistry;
 
 	@Autowired
 	private EntityFormFactory formFactory;
@@ -51,10 +51,10 @@ public class EntityPropertiesController
 
 	@Event
 	protected void registerCustomPropertiesTab( EntityAdminMenuEvent<IdBasedEntity> menu ) {
-		if ( menu.isForUpdate() && hasProperties( menu.getEntityClass() ) ) {
+		if ( menu.isForUpdate() && hasProperties( menu.getEntityType() ) ) {
 			menu.builder().item( "properties",
 			                     "Properties",
-			                     "/entities/" + ( menu.getEntityClass().getSimpleName().toLowerCase() ) + "/"
+			                     "/entities/" + ( menu.getEntityType().getSimpleName().toLowerCase() ) + "/"
 					                     + menu.getEntity().getId()
 					                     + "/properties" )
 			    .order( Ordered.HIGHEST_PRECEDENCE + 1 );
@@ -98,7 +98,7 @@ public class EntityPropertiesController
 		Object original = entityConfiguration.getRepository().getById( entityId );
 
 		model.addAttribute( "entityConfig", entityConfiguration );
-		model.addAttribute( "properties", loadProperties( entityConfiguration.getEntityClass(), entityId ) );
+		model.addAttribute( "properties", loadProperties( entityConfiguration.getEntityType(), entityId ) );
 
 		return entityConfiguration.wrap( original );
 	}
@@ -120,7 +120,7 @@ public class EntityPropertiesController
 		model.addAttribute( "entityMenu",
 		                    menuFactory.buildMenu(
 				                    new EntityAdminMenu(
-						                    entityConfiguration.getEntityClass(),
+						                    entityConfiguration.getEntityType(),
 						                    entity.getEntity()
 				                    )
 		                    )
@@ -128,7 +128,7 @@ public class EntityPropertiesController
 
 		Collection<FormPropertyDescriptor> descriptors = new ArrayList<>();
 
-		EntityPropertiesDescriptor descriptor = getDescriptor( entityConfiguration.getEntityClass() );
+		EntityPropertiesDescriptor descriptor = getDescriptor( entityConfiguration.getEntityType() );
 
 		for ( String propertyName : descriptor.registry().getRegisteredProperties() ) {
 			FormPropertyDescriptor d = new FormPropertyDescriptor();

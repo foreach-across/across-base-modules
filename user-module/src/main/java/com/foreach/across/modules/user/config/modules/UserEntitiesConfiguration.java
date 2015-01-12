@@ -22,7 +22,7 @@ public class UserEntitiesConfiguration implements EntityConfigurer
 
 	@Override
 	public void configure( EntityConfiguration configuration ) {
-		configuration.setLabelGenerator( PropertyLabelGenerator.forProperty( configuration.getEntityClass(),
+		configuration.setLabelGenerator( PropertyLabelGenerator.forProperty( configuration.getEntityType(),
 		                                                                     "description" ) );
 
 		configuration.setIdGenerator( new EntityIdGenerator()

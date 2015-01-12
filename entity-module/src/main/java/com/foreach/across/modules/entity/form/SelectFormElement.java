@@ -2,7 +2,7 @@ package com.foreach.across.modules.entity.form;
 
 import com.foreach.across.modules.entity.business.FormElement;
 import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
-import com.foreach.across.modules.entity.services.EntityRegistry;
+import com.foreach.across.modules.entity.services.EntityRegistryImpl;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
@@ -10,14 +10,14 @@ import java.util.Collection;
 
 public class SelectFormElement implements FormElement
 {
-	private final EntityRegistry registry;
+	private final EntityRegistryImpl registry;
 	private Object entity;
 	private Collection<?> possibleValues;
 
 	private String name, label;
 	private Object value;
 
-	public SelectFormElement( EntityRegistry registry,
+	public SelectFormElement( EntityRegistryImpl registry,
 	                          PropertyDescriptor propertyDescriptor,
 	                          Collection<?> possibleValues ) {
 		this.registry = registry;
@@ -27,7 +27,7 @@ public class SelectFormElement implements FormElement
 		setLabel( propertyDescriptor.getDisplayName() );
 	}
 
-	public SelectFormElement( EntityRegistry registry,
+	public SelectFormElement( EntityRegistryImpl registry,
 	                          FormPropertyDescriptor propertyDescriptor,
 	                          Collection<?> possibleValues ) {
 		this.registry = registry;

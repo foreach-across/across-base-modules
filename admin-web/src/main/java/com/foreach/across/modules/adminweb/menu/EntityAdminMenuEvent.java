@@ -7,11 +7,11 @@ import org.springframework.core.ResolvableType;
 public class EntityAdminMenuEvent<T> extends BuildMenuEvent<EntityAdminMenu<T>>
 {
 	public EntityAdminMenuEvent( EntityAdminMenu<T> menu, PathBasedMenuBuilder menuBuilder ) {
-		super( menu, menuBuilder, ResolvableType.forClass( menu.getEntityClass() ) );
+		super( menu, menuBuilder, ResolvableType.forClass( menu.getEntityType() ) );
 	}
 
-	public Class<T> getEntityClass() {
-		return getMenu().getEntityClass();
+	public Class<T> getEntityType() {
+		return getMenu().getEntityType();
 	}
 
 	public T getEntity() {

@@ -1,5 +1,7 @@
 package com.foreach.across.modules.entity.business;
 
+import com.foreach.across.modules.entity.util.EntityUtils;
+
 import java.beans.PropertyDescriptor;
 
 public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
@@ -74,5 +76,10 @@ public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
 
 	public void setHidden( boolean hidden ) {
 		this.hidden = hidden;
+	}
+
+	@Override
+	public Object getValue( Object entity ) {
+		return EntityUtils.getPropertyValue( getPropertyDescriptor(), entity );
 	}
 }

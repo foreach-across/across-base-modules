@@ -19,7 +19,7 @@ import java.util.Collections;
 public class EntityFormFactory
 {
 	@Autowired
-	private EntityRegistry entityRegistry;
+	private EntityRegistryImpl entityRegistry;
 
 	public EntityForm create( Collection<FormPropertyDescriptor> descriptors ) {
 		EntityForm form = new EntityForm();
@@ -73,7 +73,7 @@ public class EntityFormFactory
 	}
 
 	public EntityForm create( EntityConfiguration entityConfiguration ) {
-		Class entityClass = entityConfiguration.getEntityClass();
+		Class entityClass = entityConfiguration.getEntityType();
 
 		PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors( entityClass );
 

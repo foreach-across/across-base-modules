@@ -21,4 +21,6 @@ public interface EntityPropertyDescriptor
 	 * @return The backing PropertyDescriptor.
 	 */
 	PropertyDescriptor getPropertyDescriptor();
+
+	Object getValue( Object entity );
 }

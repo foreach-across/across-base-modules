@@ -41,7 +41,7 @@ public class GroupController
 	protected void registerGroupsTab( EntityAdminMenuEvent<GroupedPrincipal> menu ) {
 		if ( menu.isForUpdate() ) {
 			menu.builder().item( "groups", "Groups",
-			                     "/entities/" + ( menu.getEntityClass().getSimpleName().toLowerCase() ) + "/" + menu
+			                     "/entities/" + ( menu.getEntityType().getSimpleName().toLowerCase() ) + "/" + menu
 					                     .getEntity().getId() + "/groups" );
 		}
 	}

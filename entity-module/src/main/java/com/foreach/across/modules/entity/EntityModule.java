@@ -4,7 +4,6 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
 
 @AcrossDepends(
-		required = { "AcrossHibernateModule" },
 		optional = { "AdminWebModule" }
 )
 public class EntityModule extends AcrossModule
