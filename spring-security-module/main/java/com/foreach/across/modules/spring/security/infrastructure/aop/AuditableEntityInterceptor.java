@@ -59,7 +59,7 @@ public class AuditableEntityInterceptor extends EntityInterceptorAdapter<Auditab
 	private Object getAuditablePrincipal( Auditable entity ) {
 		Class auditorType = TypeDescriptor.forObject( entity )
 		                                  .upcast( Auditable.class )
-		                                  .getResolvableType().getGeneric( 0 ).getRawClass();
+		                                  .getResolvableType().getGeneric( 0 ).resolve();
 		Object createdBy = null;
 
 		if ( auditorType.isAssignableFrom( String.class ) ) {
