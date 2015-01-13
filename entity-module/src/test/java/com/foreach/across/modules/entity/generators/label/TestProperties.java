@@ -1,24 +1,22 @@
 package com.foreach.across.modules.entity.generators.label;
 
-import com.foreach.across.modules.entity.business.DefaultEntityPropertyRegistry;
-import com.foreach.across.modules.entity.business.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.business.EntityPropertyFilters;
-import com.foreach.across.modules.entity.business.EntityPropertyRegistry;
-import org.junit.Ignore;
+import com.foreach.across.modules.entity.business.*;
+import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestProperties
 {
 	@Test
 	public void propertiesAreDetected() {
-		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class );
+		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class, null );
 
-		assertEquals( 6, registry.size() );
+		List<EntityPropertyDescriptor> descriptors = registry.getProperties();
+
+		assertEquals( 6, descriptors.size() );
 		assertTrue( registry.contains( "id" ) );
 		assertTrue( registry.contains( "name" ) );
 		assertTrue( registry.contains( "displayName" ) );
@@ -29,7 +27,7 @@ public class TestProperties
 
 	@Test
 	public void defaultOrderCanBeSpecified() {
-		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class );
+		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class, null );
 		registry.setDefaultOrder( "name", "displayName", "someValue", "class", "id" );
 
 		List<EntityPropertyDescriptor> descriptors = registry.getProperties();
@@ -45,7 +43,7 @@ public class TestProperties
 
 	@Test
 	public void defaultOrderIsAccordingToDeclarationIfNotSpecified() {
-		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class );
+		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class, null );
 
 		List<EntityPropertyDescriptor> descriptors = registry.getProperties();
 		assertEquals( 6, descriptors.size() );
@@ -59,7 +57,7 @@ public class TestProperties
 
 	@Test
 	public void customIncludeFilterKeepsTheDefaultOrder() {
-		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class );
+		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class, null );
 		List<EntityPropertyDescriptor> descriptors = registry.getProperties(
 				EntityPropertyFilters.include( "name", "id", "displayName" )
 		);
@@ -86,7 +84,7 @@ public class TestProperties
 
 	@Test
 	public void defaultFilterIsAlwaysApplied() {
-		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class );
+		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class, null );
 		registry.setDefaultFilter( EntityPropertyFilters.exclude( "class" ) );
 
 		List<EntityPropertyDescriptor> descriptors = registry.getProperties();
@@ -107,10 +105,10 @@ public class TestProperties
 
 	@Test
 	public void filterWithCustomOrder() {
-		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class );
+		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class, null );
 		List<EntityPropertyDescriptor> descriptors = registry.getProperties(
 				EntityPropertyFilters.include( "name", "id", "displayName" ),
-		        EntityPropertyFilters.order( "displayName", "id", "name" )
+				EntityPropertyFilters.order( "displayName", "id", "name" )
 		);
 
 		assertEquals( 3, descriptors.size() );
@@ -121,7 +119,7 @@ public class TestProperties
 
 	@Test
 	public void orderedIncludeFilter() {
-		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class );
+		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class, null );
 		List<EntityPropertyDescriptor> descriptors = registry.getProperties(
 				EntityPropertyFilters.includeOrdered( "name", "id", "displayName" )
 		);
@@ -132,16 +130,76 @@ public class TestProperties
 		assertEquals( "displayName", descriptors.get( 2 ).getName() );
 	}
 
-	@Ignore
 	@Test
 	public void includeNestedProperties() {
-		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class );
+		EntityPropertyRegistries registries = new EntityPropertyRegistries();
+		EntityPropertyRegistry registry = registries.getRegistry( Customer.class );
+
 		List<EntityPropertyDescriptor> descriptors = registry.getProperties(
 				EntityPropertyFilters.includeOrdered( "name", "address.street" )
 		);
+
+		assertEquals( 2, descriptors.size() );
+		assertEquals( "name", descriptors.get( 0 ).getName() );
+		assertEquals( "address.street", descriptors.get( 1 ).getName() );
 	}
 
-	private static class Address {
+	@Test
+	public void valueFetchersAreCreated() {
+		EntityPropertyRegistries registries = new EntityPropertyRegistries();
+		EntityPropertyRegistry registry = registries.getRegistry( Customer.class );
+
+		Customer customer = new Customer();
+		customer.setName( "some name" );
+		customer.setSomeValue( "some value" );
+		customer.setId( 123 );
+
+		Address address = new Address();
+		address.setStreet( "my street" );
+		address.setNumber( 666 );
+
+		customer.setAddress( address );
+
+		assertEquals( "some name", fetch( registry, customer, "name" ) );
+		assertEquals( "some name (123)", fetch( registry, customer, "displayName" ) );
+		assertEquals( "my street", fetch( registry, customer, "address.street" ) );
+		assertNull( registry.getProperty( "address.size()" ) );
+	}
+
+	@Test
+	public void customPropertyAndValueFetcher() {
+		EntityPropertyRegistries registries = new EntityPropertyRegistries();
+		EntityPropertyRegistry parent = registries.getRegistry( Customer.class );
+		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry( parent );
+
+		SimpleEntityPropertyDescriptor calculated = new SimpleEntityPropertyDescriptor();
+		calculated.setName( "address.size()" );
+		calculated.setValueFetcher( new SpelValueFetcher( "address.size()" ) );
+		registry.register( calculated );
+
+		Customer customer = new Customer();
+		customer.setName( "some name" );
+		customer.setSomeValue( "some value" );
+		customer.setId( 123 );
+
+		Address address = new Address();
+		address.setStreet( "my street" );
+		address.setNumber( 666 );
+		customer.setAddress( address );
+
+		assertEquals( "some name", fetch( registry, customer, "name" ) );
+		assertEquals( "some name (123)", fetch( registry, customer, "displayName" ) );
+		assertEquals( "my street", fetch( registry, customer, "address.street" ) );
+		assertEquals( 9, fetch( registry, customer, "address.size()" ) );
+	}
+
+	@SuppressWarnings("unchecked")
+	private Object fetch( EntityPropertyRegistry registry, Object entity, String propertyName ) {
+		return registry.getProperty( propertyName ).getValueFetcher().getValue( entity );
+	}
+
+	public static class Address
+	{
 		private String street;
 		private int number;
 
@@ -160,8 +218,13 @@ public class TestProperties
 		public void setNumber( int number ) {
 			this.number = number;
 		}
+
+		public int size() {
+			return street.length();
+		}
 	}
-	private abstract static class BaseCustomer
+
+	public abstract static class BaseCustomer
 	{
 		private long id;
 
@@ -174,7 +237,7 @@ public class TestProperties
 		}
 	}
 
-	private static class Customer extends BaseCustomer
+	public static class Customer extends BaseCustomer
 	{
 		private String name;
 		private Address address;

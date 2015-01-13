@@ -1,6 +1,6 @@
 package com.foreach.across.modules.entity.business;
 
-import java.beans.PropertyDescriptor;
+import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
 
 public interface EntityPropertyDescriptor
 {
@@ -17,10 +17,19 @@ public interface EntityPropertyDescriptor
 
 	boolean isHidden();
 
-	/**
-	 * @return The backing PropertyDescriptor.
-	 */
-	PropertyDescriptor getPropertyDescriptor();
+	Class<?> getPropertyType();
 
-	Object getValue( Object entity );
+	/**
+	 * @return Associated instance that can fetch the property value from an instance.
+	 */
+	ValueFetcher getValueFetcher();
+
+	/**
+	 * Creates a new instance that is the result of merging the other descriptor into this one:
+	 * properties set on the other descriptor will override this one.
+	 *
+	 * @param other EntityPropertyDescriptor to be merged into this one.
+	 * @return New descriptor representing the merged instance.
+	 */
+	EntityPropertyDescriptor merge( EntityPropertyDescriptor other );
 }

@@ -35,7 +35,7 @@
 	<tbody>
 	<tr th:each="entity,entityStats:${entities}" th:with="wrapped=${entityConfig.wrap(entity)}">
 		<td th:text="${entityStats.count}"></td>
-		<td th:each="prop : ${props}" th:text="${prop.getValue(entity)}">value</td>
+		<td th:each="prop : ${props}" th:text="${prop.getValueFetcher().getValue(entity)}">value</td>
 		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfig.path + '/' + wrapped.id)}}">edit</a></td>
 	</tr>
 	</tbody>

@@ -1,6 +1,8 @@
 package com.foreach.across.modules.entity.business;
 
-import com.foreach.across.modules.entity.util.EntityUtils;
+import com.foreach.across.modules.entity.views.helpers.PropertyDescriptorValueFetcher;
+import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
+import org.springframework.beans.BeanUtils;
 
 import java.beans.PropertyDescriptor;
 
@@ -9,17 +11,8 @@ public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
 	private String name, displayName;
 	private boolean readable, writable, hidden;
 
-	private PropertyDescriptor descriptor;
-
-	public SimpleEntityPropertyDescriptor( PropertyDescriptor descriptor ) {
-		this.descriptor = descriptor;
-
-		name = descriptor.getName();
-		displayName = descriptor.getDisplayName();
-		writable = descriptor.getWriteMethod() != null;
-		readable = descriptor.getReadMethod() != null;
-		hidden = descriptor.isHidden();
-	}
+	private ValueFetcher valueFetcher;
+	private Class<?> propertyType;
 
 	/**
 	 * @return Property name.
@@ -40,15 +33,6 @@ public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
 
 	public void setDisplayName( String displayName ) {
 		this.displayName = displayName;
-	}
-
-	@Override
-	public PropertyDescriptor getPropertyDescriptor() {
-		return descriptor;
-	}
-
-	public void setDescriptor( PropertyDescriptor descriptor ) {
-		this.descriptor = descriptor;
 	}
 
 	@Override
@@ -78,8 +62,67 @@ public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
 		this.hidden = hidden;
 	}
 
+	public void setValueFetcher( ValueFetcher valueFetcher ) {
+		this.valueFetcher = valueFetcher;
+
+		if ( valueFetcher != null ) {
+			readable = true;
+		}
+	}
+
 	@Override
-	public Object getValue( Object entity ) {
-		return EntityUtils.getPropertyValue( getPropertyDescriptor(), entity );
+	public Class<?> getPropertyType() {
+		return propertyType;
+	}
+
+	public void setPropertyType( Class<?> propertyType ) {
+		this.propertyType = propertyType;
+	}
+
+	@Override
+	public ValueFetcher getValueFetcher() {
+		return valueFetcher;
+	}
+
+	@Override
+	public EntityPropertyDescriptor merge( EntityPropertyDescriptor other ) {
+		SimpleEntityPropertyDescriptor descriptor = new SimpleEntityPropertyDescriptor();
+		BeanUtils.copyProperties( this, descriptor );
+
+		descriptor.setWritable( other.isWritable() );
+		descriptor.setReadable( other.isReadable() );
+		descriptor.setHidden( other.isHidden() );
+
+		if ( other.getPropertyType() != null ) {
+			descriptor.setPropertyType( other.getPropertyType() );
+		}
+		if ( other.getValueFetcher() != null ) {
+			descriptor.setValueFetcher( other.getValueFetcher() );
+		}
+		if ( other.getName() != null ) {
+			descriptor.setName( other.getName() );
+		}
+		if ( other.getDisplayName() != null ) {
+			descriptor.setDisplayName( other.getDisplayName() );
+		}
+
+		return null;
+	}
+
+	public static SimpleEntityPropertyDescriptor forPropertyDescriptor( PropertyDescriptor prop ) {
+		SimpleEntityPropertyDescriptor descriptor = new SimpleEntityPropertyDescriptor();
+
+		descriptor.setName( prop.getName() );
+		descriptor.setDisplayName( prop.getDisplayName() );
+		descriptor.setWritable( prop.getWriteMethod() != null );
+		descriptor.setReadable( prop.getReadMethod() != null );
+		descriptor.setHidden( prop.isHidden() );
+		descriptor.setPropertyType( prop.getPropertyType() );
+
+		if ( descriptor.isReadable() ) {
+			descriptor.setValueFetcher( new PropertyDescriptorValueFetcher( prop ) );
+		}
+
+		return descriptor;
 	}
 }

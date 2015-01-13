@@ -34,7 +34,7 @@ public class EntityConfiguration implements Comparable<EntityConfiguration>
 		labelGenerator = new ToStringLabelGenerator();
 		idGenerator = new DefaultIdGenerator();
 
-		propertyRegistry = new DefaultEntityPropertyRegistry( entityClass );
+		propertyRegistry = new DefaultEntityPropertyRegistry( entityClass, null );
 	}
 
 	public EntityConfiguration( BasicRepository repository ) {

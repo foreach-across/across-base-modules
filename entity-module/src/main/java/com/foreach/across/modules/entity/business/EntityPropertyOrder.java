@@ -4,7 +4,7 @@ import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class EntityPropertyOrder implements Comparator<EntityPropertyDescriptor>
@@ -12,7 +12,7 @@ public class EntityPropertyOrder implements Comparator<EntityPropertyDescriptor>
 	private final Map<String, Integer> order;
 
 	public EntityPropertyOrder( String... ordered ) {
-		order = new HashMap<>();
+		order = new LinkedHashMap<>();
 
 		for ( int i = 0; i < ordered.length; i++ ) {
 			order.put( ordered[i], i + 1 );

@@ -1,37 +1,45 @@
 package com.foreach.across.modules.entity.business;
 
+import com.foreach.across.modules.entity.views.helpers.NestedValueFetcher;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class DefaultEntityPropertyRegistry implements EntityPropertyRegistry
+public class DefaultEntityPropertyRegistry extends EntityPropertyRegistrySupport
 {
+	private final EntityPropertyRegistries registries;
 	private final Class<?> entityType;
 
-	private final Map<String, EntityPropertyDescriptor> descriptorMap = new HashMap<>();
-
-	private EntityPropertyFilter defaultFilter;
-
 	private EntityPropertyOrder declarationOrder = null;
-	private Comparator<EntityPropertyDescriptor> defaultOrder = null;
 
 	public DefaultEntityPropertyRegistry( Class<?> entityType ) {
-		this.entityType = entityType;
-
-		for ( PropertyDescriptor descriptor : BeanUtils.getPropertyDescriptors( entityType ) ) {
-			descriptorMap.put( descriptor.getName(), new SimpleEntityPropertyDescriptor( descriptor ) );
-		}
-
-		declarationOrder = buildDeclarationOrder();
-		defaultOrder = declarationOrder;
+		this( entityType, null );
 	}
 
-	private EntityPropertyOrder buildDeclarationOrder() {
+	public DefaultEntityPropertyRegistry( Class<?> entityType, EntityPropertyRegistries registries ) {
+		this.entityType = entityType;
+		this.registries = registries;
+
+		Map<String, PropertyDescriptor> scannedDescriptors = new HashMap<>();
+
+		for ( PropertyDescriptor descriptor : BeanUtils.getPropertyDescriptors( entityType ) ) {
+			register( SimpleEntityPropertyDescriptor.forPropertyDescriptor( descriptor ) );
+			scannedDescriptors.put( descriptor.getName(), descriptor );
+		}
+
+		declarationOrder = buildDeclarationOrder( scannedDescriptors );
+		super.setDefaultOrder( declarationOrder );
+	}
+
+	private EntityPropertyOrder buildDeclarationOrder( Map<String, PropertyDescriptor> scannedDescriptors ) {
 		final Map<String, Integer> order = new HashMap<>();
 
 		ReflectionUtils.doWithFields( entityType, new ReflectionUtils.FieldCallback()
@@ -46,7 +54,7 @@ public class DefaultEntityPropertyRegistry implements EntityPropertyRegistry
 					declaringClassOffset -= 1000;
 				}
 
-				if ( descriptorMap.containsKey( field.getName() ) ) {
+				if ( contains( field.getName() ) ) {
 					order.put( field.getName(), declaringClassOffset + order.size() + 1 );
 				}
 			}
@@ -74,9 +82,9 @@ public class DefaultEntityPropertyRegistry implements EntityPropertyRegistry
 		} );
 
 		// For every property without declared order, use the read method first, write method second to determine order
-		for ( EntityPropertyDescriptor entityPropertyDescriptor : descriptorMap.values() ) {
+		for ( EntityPropertyDescriptor entityPropertyDescriptor : getRegisteredDescriptors() ) {
 			if ( !order.containsKey( entityPropertyDescriptor.getName() ) ) {
-				PropertyDescriptor propertyDescriptor = entityPropertyDescriptor.getPropertyDescriptor();
+				PropertyDescriptor propertyDescriptor = scannedDescriptors.get( entityPropertyDescriptor.getName() );
 
 				if ( propertyDescriptor != null ) {
 					Method lookupMethod = propertyDescriptor.getReadMethod();
@@ -99,13 +107,8 @@ public class DefaultEntityPropertyRegistry implements EntityPropertyRegistry
 	}
 
 	@Override
-	public void setDefaultFilter( EntityPropertyFilter filter ) {
-		defaultFilter = filter;
-	}
-
-	@Override
-	public void setDefaultOrder( String... propertyNames ) {
-		defaultOrder = EntityPropertyOrder.composite( new EntityPropertyOrder( propertyNames ), declarationOrder );
+	public void setDefaultOrder( Comparator<EntityPropertyDescriptor> defaultOrder ) {
+		super.setDefaultOrder( EntityPropertyOrder.composite( defaultOrder, declarationOrder ) );
 	}
 
 	@Override
@@ -114,52 +117,59 @@ public class DefaultEntityPropertyRegistry implements EntityPropertyRegistry
 	}
 
 	@Override
-	public List<EntityPropertyDescriptor> getProperties( EntityPropertyFilter filter ) {
-		Assert.notNull( filter );
+	public EntityPropertyDescriptor getProperty( String propertyName ) {
+		EntityPropertyDescriptor descriptor = super.getProperty( propertyName );
 
-		if ( filter instanceof EntityPropertyFilters.OrderedIncludingEntityPropertyFilter ) {
-			return getProperties( filter, (EntityPropertyFilters.OrderedIncludingEntityPropertyFilter) filter );
-		}
+		if ( descriptor == null && registries != null ) {
+			// Find a registered shizzle
+			String rootProperty = findRootProperty( propertyName );
 
-		return fetchProperties( filter, defaultOrder );
-	}
+			if ( rootProperty != null ) {
+				EntityPropertyDescriptor rootDescriptor = super.getProperty( rootProperty );
 
-	@Override
-	public List<EntityPropertyDescriptor> getProperties( EntityPropertyFilter filter,
-	                                                     Comparator<EntityPropertyDescriptor> comparator ) {
-		Assert.notNull( filter );
-		Assert.notNull( comparator );
+				if ( rootDescriptor != null && rootDescriptor.getPropertyType() != null ) {
+					EntityPropertyRegistry subRegistry = registries.getRegistry( rootDescriptor.getPropertyType() );
 
-		return fetchProperties( filter, EntityPropertyOrder.composite( comparator, defaultOrder ) );
-	}
+					if ( subRegistry != null ) {
+						EntityPropertyDescriptor childDescriptor = subRegistry
+								.getProperty( findChildProperty( propertyName ) );
 
-	private List<EntityPropertyDescriptor> fetchProperties( EntityPropertyFilter filter,
-	                                                        Comparator<EntityPropertyDescriptor> comparator ) {
-		List<EntityPropertyDescriptor> filtered = new ArrayList<>();
+						if ( childDescriptor != null ) {
+							descriptor = buildNestedDescriptor( propertyName, rootDescriptor, childDescriptor );
+						}
+					}
 
-		EntityPropertyFilter first = defaultFilter != null ? defaultFilter : EntityPropertyFilters.NoOp;
-
-		for ( EntityPropertyDescriptor candidate : descriptorMap.values() ) {
-			if ( first.include( candidate ) && filter.include( candidate ) ) {
-				filtered.add( candidate );
+				}
 			}
+
 		}
 
-		Collections.sort( filtered, comparator );
-
-		return filtered;
+		return descriptor;
 	}
 
-	@Override
-	public boolean contains( String propertyName ) {
-		return descriptorMap.containsKey( propertyName );
+	private EntityPropertyDescriptor buildNestedDescriptor( String name,
+	                                                        EntityPropertyDescriptor parent,
+	                                                        EntityPropertyDescriptor child ) {
+		SimpleEntityPropertyDescriptor descriptor = new SimpleEntityPropertyDescriptor();
+		descriptor.setName( name );
+		descriptor.setDisplayName( name );
+		descriptor.setPropertyType( child.getPropertyType() );
+		descriptor.setReadable( child.isReadable() );
+		descriptor.setWritable( child.isWritable() );
+		descriptor.setHidden( child.isHidden() );
+
+		if ( descriptor.isReadable() ) {
+			descriptor.setValueFetcher( new NestedValueFetcher( parent.getValueFetcher(), child.getValueFetcher() ) );
+		}
+
+		return descriptor;
 	}
 
-	/**
-	 * @return Number of properties in the registry.
-	 */
-	@Override
-	public int size() {
-		return descriptorMap.size();
+	private String findChildProperty( String propertyName ) {
+		return StringUtils.defaultIfEmpty( StringUtils.substringAfter( propertyName, "." ), null );
+	}
+
+	private String findRootProperty( String propertyName ) {
+		return StringUtils.defaultIfEmpty( StringUtils.substringBefore( propertyName, "." ), null );
 	}
 }

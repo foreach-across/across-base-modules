@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.entity.views.model;
 
-import com.foreach.across.modules.entity.business.EntityPropertyFilters;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
 import com.foreach.across.modules.entity.views.EntityView;
 import org.springframework.data.repository.CrudRepository;
@@ -33,8 +32,29 @@ public class AllEntitiesListModelBuilder implements ModelBuilder
 
 	@Override
 	public void build( EntityConfiguration entityConfiguration, EntityView entityView ) {
-		entityView.addObject( "props", entityConfiguration.getPropertyRegistry().getProperties(
-				EntityPropertyFilters.includeOrdered( "username", "email" ) ) );
+
+		/*
+		config
+			.properties()
+			.labels( "Username", "Groups" )
+			.values( "username", "groups.size()" )
+			.labels().property( "groups.size()", "Groups" )
+			.property( "username", "Username")
+			.property( "groups", "Groups", "groups.size()" )
+			.order( "username", "hasGroups" )
+
+
+		config.properties()
+			.property( "calculated", "Calculated", new ValueFetcher<>() {
+				Object getValue( Object entity ) {
+
+				}
+			} );
+		 */
+
+		/*entityView.addObject( "props", entityConfiguration.getPropertyRegistry().getProperties(
+				EntityPropertyFilters.includeOrdered( "username", "email", "groups.size()" ) ) );
+		*/
 		entityView.addObject( "entities", repository.findAll() );
 		entityView.addObject( "entityConfig", entityConfiguration );
 	}

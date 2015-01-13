@@ -1,5 +1,6 @@
 package com.foreach.across.modules.entity.config;
 
+import com.foreach.across.modules.entity.business.EntityPropertyRegistries;
 import com.foreach.across.modules.entity.registrars.CrudRepositoryEntityRegistrar;
 import com.foreach.across.modules.entity.registrars.ModuleEntityRegistration;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
@@ -19,6 +20,11 @@ public class EntityModuleConfiguration
 	@Bean
 	public ModuleEntityRegistration moduleEntityRegistration() {
 		return new ModuleEntityRegistration();
+	}
+
+	@Bean
+	public EntityPropertyRegistries entityPropertyRegistries() {
+		return new EntityPropertyRegistries();
 	}
 
 	@Bean

@@ -23,7 +23,7 @@ public class TestEntityPropertyOrder
 		descriptors = new ArrayList<>();
 
 		for ( PropertyDescriptor descriptor : BeanUtils.getPropertyDescriptors( Customer.class ) ) {
-			descriptors.add( new SimpleEntityPropertyDescriptor( descriptor ) );
+			descriptors.add( SimpleEntityPropertyDescriptor.forPropertyDescriptor( descriptor ) );
 		}
 	}
 
