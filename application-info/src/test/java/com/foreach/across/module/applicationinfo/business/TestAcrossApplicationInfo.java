@@ -23,15 +23,15 @@ public class TestAcrossApplicationInfo
 		long first = applicationInfo.getUptime();
 		assertTrue( first >= 0 );
 
-		Thread.sleep( 15 );
+		Thread.sleep( 50 );
 		assertTrue( applicationInfo.getUptime() > first );
-		assertTrue( applicationInfo.getUptime() >= 5 );
+		assertTrue( applicationInfo.getUptime() >= 10 );
 	}
 
 	@Test
 	public void uptimeIsZeroIfBootstrapNotFinished() throws InterruptedException {
 		assertEquals( 0, applicationInfo.getUptime() );
-		Thread.sleep( 15 );
+		Thread.sleep( 50 );
 		assertEquals( 0, applicationInfo.getUptime() );
 	}
 
