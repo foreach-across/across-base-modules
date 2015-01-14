@@ -1,6 +1,5 @@
 package com.foreach.across.modules.entity.config;
 
-import com.foreach.across.modules.entity.business.DefaultEntityPropertyRegistry;
 import com.foreach.across.modules.entity.business.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.business.EntityWrapper;
 import com.foreach.across.modules.entity.generators.EntityIdGenerator;
@@ -33,8 +32,6 @@ public class EntityConfiguration implements Comparable<EntityConfiguration>
 
 		labelGenerator = new ToStringLabelGenerator();
 		idGenerator = new DefaultIdGenerator();
-
-		propertyRegistry = new DefaultEntityPropertyRegistry( entityClass, null );
 	}
 
 	public EntityConfiguration( BasicRepository repository ) {
@@ -60,6 +57,10 @@ public class EntityConfiguration implements Comparable<EntityConfiguration>
 
 	public EntityPropertyRegistry getPropertyRegistry() {
 		return propertyRegistry;
+	}
+
+	public void setPropertyRegistry( EntityPropertyRegistry propertyRegistry ) {
+		this.propertyRegistry = propertyRegistry;
 	}
 
 	public String getName() {

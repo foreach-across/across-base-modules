@@ -29,12 +29,21 @@ public class EntityPropertyRegistries
 	private final Map<Class<?>, EntityPropertyRegistry> registries = new HashMap<>();
 
 	public EntityPropertyRegistry getRegistry( Class<?> entityType ) {
+		return getRegistry( entityType, true );
+	}
+
+	public EntityPropertyRegistry getRegistry( Class<?> entityType, boolean createIfNotFound ) {
 		EntityPropertyRegistry registry = registries.get( entityType );
 
-		if ( registry == null ) {
+		if ( registry == null && createIfNotFound ) {
 			registry = new DefaultEntityPropertyRegistry( entityType, this );
+			registries.put( entityType, registry );
 		}
 
 		return registry;
+	}
+
+	public void add( Class<?> entityType, EntityPropertyRegistry registry ) {
+		registries.put( entityType, registry );
 	}
 }

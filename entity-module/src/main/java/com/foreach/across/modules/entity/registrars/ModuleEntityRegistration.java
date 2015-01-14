@@ -23,9 +23,12 @@ import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.core.events.AcrossModuleBootstrappedEvent;
 import com.foreach.across.modules.entity.business.MutableEntityRegistry;
+import com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder;
+import com.foreach.across.modules.entity.config.EntityConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Takes care of running all registered {@link com.foreach.across.modules.entity.registrars.EntityRegistrar}
@@ -54,6 +57,20 @@ public class ModuleEntityRegistration
 
 		for ( EntityRegistrar registrar : registrars ) {
 			registrar.registerEntities( entityRegistry, moduleInfo, beanRegistry );
+		}
+
+		applyEntityConfigurers( moduleInfo );
+	}
+
+	private void applyEntityConfigurers( AcrossModuleInfo moduleInfo ) {
+		Map<String, EntityConfigurer> moduleEntityConfigurers = moduleInfo.getApplicationContext()
+		                                                      .getBeansOfType( EntityConfigurer.class );
+
+		for ( EntityConfigurer configurer : moduleEntityConfigurers.values() ) {
+			EntitiesConfigurationBuilder builder = new EntitiesConfigurationBuilder();
+			configurer.configure( builder );
+
+			builder.apply( entityRegistry );
 		}
 	}
 }

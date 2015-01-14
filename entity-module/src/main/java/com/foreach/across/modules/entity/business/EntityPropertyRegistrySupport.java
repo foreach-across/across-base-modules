@@ -108,7 +108,9 @@ public abstract class EntityPropertyRegistrySupport implements EntityPropertyReg
 			}
 		}
 
-		Collections.sort( filtered, comparator );
+		if ( comparator != null ) {
+			Collections.sort( filtered, comparator );
+		}
 
 		return filtered;
 	}

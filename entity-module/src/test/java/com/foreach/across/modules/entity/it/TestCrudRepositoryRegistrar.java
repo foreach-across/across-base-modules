@@ -24,6 +24,7 @@ import com.foreach.across.modules.entity.services.EntityRegistry;
 import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.ClientRepository;
 import com.foreach.across.modules.entity.testmodules.springdata.SpringDataJpaModule;
+import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Test;
@@ -54,6 +55,9 @@ public class TestCrudRepositoryRegistrar
 
 		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
 		assertNotNull( configuration );
+
+		EntityViewFactory viewFactory = configuration.getViewFactory( "crud-list" );
+		assertNotNull( viewFactory );
 	}
 
 	@Configuration

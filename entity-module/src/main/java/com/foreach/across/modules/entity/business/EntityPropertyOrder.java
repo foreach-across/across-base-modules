@@ -3,6 +3,7 @@ package com.foreach.across.modules.entity.business;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,6 +17,15 @@ public class EntityPropertyOrder implements Comparator<EntityPropertyDescriptor>
 
 		for ( int i = 0; i < ordered.length; i++ ) {
 			order.put( ordered[i], i + 1 );
+		}
+	}
+
+	public EntityPropertyOrder( Collection<String> ordered ) {
+		order = new LinkedHashMap<>();
+
+		int i = 0;
+		for ( String item : ordered ) {
+			order.put( item, ++i );
 		}
 	}
 

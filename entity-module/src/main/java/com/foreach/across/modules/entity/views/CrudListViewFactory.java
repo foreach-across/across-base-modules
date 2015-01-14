@@ -15,48 +15,42 @@
  */
 package com.foreach.across.modules.entity.views;
 
+import com.foreach.across.modules.entity.business.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.business.EntityPropertyFilter;
 import com.foreach.across.modules.entity.business.EntityPropertyFilters;
-import com.foreach.across.modules.entity.business.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
-import com.foreach.across.modules.entity.views.model.ModelBuilder;
 import org.springframework.ui.Model;
+
+import java.util.List;
 
 /**
  * @author Arne Vandamme
  */
-public class CrudListViewFactory implements EntityViewFactory
+public class CrudListViewFactory extends CommonEntityViewFactory
 {
-	private EntityPropertyRegistry propertyRegistry;
-	private String viewName;
-	private ModelBuilder modelBuilder;
-
-	public void setTemplate( String viewName ) {
-		this.viewName = viewName;
-	}
-
-	public void setModelBuilder( ModelBuilder modelBuilder ) {
-		this.modelBuilder = modelBuilder;
-	}
-
-	public void setPropertyRegistry( EntityPropertyRegistry propertyRegistry ) {
-		this.propertyRegistry = propertyRegistry;
-	}
-
 	@Override
 	public EntityView create( EntityConfiguration entityConfiguration, Model model ) {
 		// fetch entities
 		// get the properties to apply
 
 		EntityView view = new EntityView();
-		view.setViewName( viewName );
+		view.setViewName( getTemplate() );
 		view.addModel( model );
 
-		modelBuilder.build( entityConfiguration, view );
+		getModelBuilder().build( entityConfiguration, view );
 
-		view.addObject( "props", propertyRegistry.getProperties(
-				                EntityPropertyFilters.includeOrdered( "username", "email", "groups.size()" ) )
-		);
+		view.addObject( "props", getProperties() );
 
 		return view;
+	}
+
+	private List<EntityPropertyDescriptor> getProperties() {
+		EntityPropertyFilter filter = getPropertyFilter() != null ? getPropertyFilter() : EntityPropertyFilters.NoOp;
+
+		if ( getPropertyComparator() != null ) {
+			return getPropertyRegistry().getProperties( filter, getPropertyComparator() );
+		}
+
+		return getPropertyRegistry().getProperties( filter );
 	}
 }

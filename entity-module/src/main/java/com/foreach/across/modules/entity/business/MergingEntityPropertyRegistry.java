@@ -77,6 +77,13 @@ public class MergingEntityPropertyRegistry extends EntityPropertyRegistrySupport
 	}
 
 	@Override
+	public Comparator<EntityPropertyDescriptor> getDefaultOrder() {
+		Comparator<EntityPropertyDescriptor> configured = super.getDefaultOrder();
+
+		return configured != null ? configured : parent.getDefaultOrder();
+	}
+
+	@Override
 	public EntityPropertyFilter getDefaultFilter() {
 		EntityPropertyFilter configured = super.getDefaultFilter();
 

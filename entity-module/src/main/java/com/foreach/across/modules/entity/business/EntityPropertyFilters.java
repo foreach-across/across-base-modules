@@ -16,6 +16,10 @@ public final class EntityPropertyFilters
 	}
 
 	public static EntityPropertyFilter include( String... propertyNames ) {
+		return new InclusivePropertyFilter( Arrays.asList( propertyNames ) );
+	}
+
+	public static EntityPropertyFilter include( Collection<String> propertyNames ) {
 		return new InclusivePropertyFilter( propertyNames );
 	}
 
@@ -23,8 +27,16 @@ public final class EntityPropertyFilters
 		return new OrderedIncludingEntityPropertyFilter( propertyNames );
 	}
 
+	public static EntityPropertyFilter includeOrdered( Collection<String> propertyNames ) {
+		return new OrderedIncludingEntityPropertyFilter( propertyNames );
+	}
+
 	public static EntityPropertyFilter exclude( String... propertyNames ) {
-		final Set<String> excluded = new HashSet<>( Arrays.asList( propertyNames ) );
+		return exclude( Arrays.asList( propertyNames ) );
+	}
+
+	public static EntityPropertyFilter exclude( Collection<String> propertyNames ) {
+		final Set<String> excluded = new HashSet<>( propertyNames );
 
 		return new EntityPropertyFilter()
 		{
@@ -43,8 +55,8 @@ public final class EntityPropertyFilters
 	{
 		private final Set<String> propertyNames = new HashSet<>();
 
-		public InclusivePropertyFilter( String... propertyNames ) {
-			this.propertyNames.addAll( Arrays.asList( propertyNames ) );
+		public InclusivePropertyFilter( Collection<String> propertyNames ) {
+			this.propertyNames.addAll( propertyNames );
 		}
 
 		public Set<String> getPropertyNames() {
@@ -62,6 +74,10 @@ public final class EntityPropertyFilters
 			implements EntityPropertyFilter.Inclusive
 	{
 		public OrderedIncludingEntityPropertyFilter( String... ordered ) {
+			super( ordered );
+		}
+
+		public OrderedIncludingEntityPropertyFilter( Collection<String> ordered ) {
 			super( ordered );
 		}
 

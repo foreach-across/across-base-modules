@@ -23,11 +23,17 @@ import com.foreach.across.modules.entity.views.CrudListViewFactory;
 import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
 import com.foreach.across.modules.entity.views.model.AllEntitiesListModelBuilder;
 import com.foreach.across.modules.entity.views.model.ModelBuilder;
+import com.foreach.across.modules.hibernate.business.Auditable;
+import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,25 +57,15 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 		for ( CrudRepository repository : repositories.values() ) {
 			Class entityType = determineEntityType( repository );
 
-			EntityPropertyRegistry registry = entityPropertyRegistries.getRegistry( entityType );
-			EntityConfiguration entityConfiguration = new EntityConfiguration( entityType );
-
-			CrudListViewFactory viewFactory = new CrudListViewFactory();
-
-			EntityPropertyRegistry reg = new MergingEntityPropertyRegistry( registry );
-
-			if ( registry.contains( "groups" ) ) {
-				SimpleEntityPropertyDescriptor calculated = new SimpleEntityPropertyDescriptor();
-				calculated.setName( "groups.size()" );
-				calculated.setValueFetcher( new SpelValueFetcher( "groups.size()" ) );
-				reg.register( calculated );
+			if ( entityRegistry.getEntityConfiguration( entityType ) != null ) {
+				// already registered, skip it
+				continue;
 			}
 
-			viewFactory.setPropertyRegistry( reg );
-			viewFactory.setTemplate( "th/entity/list" );
-			viewFactory.setModelBuilder( determineListModelBuilder( repository ) );
+			EntityConfiguration entityConfiguration = new EntityConfiguration( entityType );
+			entityConfiguration.setPropertyRegistry( buildEntityPropertyRegistry( entityType ) );
 
-			entityConfiguration.registerView( "crud-list", viewFactory );
+			buildCrudListView( entityConfiguration, repository );
 
 			/*
 			//entityConfiguration.setAttribute( "EntityModule" );
@@ -77,6 +73,88 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 			 */
 			entityRegistry.register( entityConfiguration );
 		}
+	}
+
+	private EntityPropertyRegistry buildEntityPropertyRegistry( Class<?> entityType ) {
+		EntityPropertyRegistry registry = entityPropertyRegistries.getRegistry( entityType );
+
+		if ( registry.getDefaultFilter() == null ) {
+			List<String> excludedProps = new LinkedList<>();
+			excludedProps.add( "class" );
+			if ( Persistable.class.isAssignableFrom( entityType ) ) {
+				excludedProps.add( "new" );
+			}
+			if ( SettableIdBasedEntity.class.isAssignableFrom( entityType ) ) {
+				excludedProps.add( "newEntityId" );
+			}
+			registry.setDefaultFilter( EntityPropertyFilters.exclude( excludedProps ) );
+		}
+
+		if ( Auditable.class.isAssignableFrom( entityType ) ) {
+			modifyDisplayName( registry.getProperty( "createdDate" ), "Created" );
+			modifyDisplayName( registry.getProperty( "lastModifiedDate" ), "Last modified" );
+		}
+
+		return registry;
+	}
+
+	private void modifyDisplayName( EntityPropertyDescriptor descriptor, String displayName ) {
+		if ( descriptor instanceof SimpleEntityPropertyDescriptor ) {
+			( (SimpleEntityPropertyDescriptor) descriptor ).setDisplayName( displayName );
+		}
+	}
+
+	private void buildCrudListView( EntityConfiguration entityConfiguration, CrudRepository repository ) {
+		CrudListViewFactory viewFactory = new CrudListViewFactory();
+		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(
+				entityConfiguration.getPropertyRegistry()
+		);
+		viewFactory.setPropertyRegistry( registry );
+		viewFactory.setTemplate( "th/entity/list" );
+		viewFactory.setModelBuilder( determineListModelBuilder( repository ) );
+
+		LinkedList<String> defaultProperties = new LinkedList<>();
+		if ( registry.contains( "name" ) ) {
+			defaultProperties.add( "name" );
+		}
+		if ( registry.contains( "title" ) ) {
+			defaultProperties.add( "title" );
+		}
+
+		if ( defaultProperties.isEmpty() ) {
+			if ( !registry.contains( "#generatedLabel" ) ) {
+				SimpleEntityPropertyDescriptor label = new SimpleEntityPropertyDescriptor();
+				label.setName( "#generatedLabel" );
+				label.setDisplayName( "Generated label" );
+				label.setValueFetcher( new SpelValueFetcher( "toString()" ) );
+
+				registry.register( label );
+			}
+
+			defaultProperties.add( "#generatedLabel" );
+		}
+
+		if ( SecurityPrincipal.class.isAssignableFrom( entityConfiguration.getEntityType() ) ) {
+			defaultProperties.addFirst( "principalName" );
+		}
+
+		if ( Auditable.class.isAssignableFrom( entityConfiguration.getEntityType() ) ) {
+			defaultProperties.add( "createdDate" );
+			defaultProperties.add( "createdBy" );
+			defaultProperties.add( "lastModifiedDate" );
+			defaultProperties.add( "lastModifiedBy" );
+		}
+
+		viewFactory.setPropertyFilter( EntityPropertyFilters.includeOrdered( defaultProperties ) );
+
+					/*if ( registry.contains( "groups" ) ) {
+						SimpleEntityPropertyDescriptor calculated = new SimpleEntityPropertyDescriptor();
+						calculated.setName( "groups.size()" );
+						calculated.setValueFetcher( new SpelValueFetcher( "groups.size()" ) );
+						reg.register( calculated );
+					}*/
+
+		entityConfiguration.registerView( "crud-list", viewFactory );
 	}
 
 	private ModelBuilder determineListModelBuilder( CrudRepository repository ) {

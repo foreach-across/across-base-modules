@@ -1,8 +1,10 @@
 package com.foreach.across.modules.entity.business;
 
+import com.foreach.across.modules.entity.util.EntityUtils;
 import com.foreach.across.modules.entity.views.helpers.PropertyDescriptorValueFetcher;
 import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
 import org.springframework.beans.BeanUtils;
+import org.thymeleaf.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 
@@ -113,7 +115,14 @@ public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
 		SimpleEntityPropertyDescriptor descriptor = new SimpleEntityPropertyDescriptor();
 
 		descriptor.setName( prop.getName() );
-		descriptor.setDisplayName( prop.getDisplayName() );
+
+		if ( StringUtils.equals( prop.getName(), prop.getDisplayName() ) ) {
+			descriptor.setDisplayName( EntityUtils.propertyToDisplayName( prop.getName() ) );
+		}
+		else {
+			descriptor.setDisplayName( prop.getDisplayName() );
+		}
+
 		descriptor.setWritable( prop.getWriteMethod() != null );
 		descriptor.setReadable( prop.getReadMethod() != null );
 		descriptor.setHidden( prop.isHidden() );

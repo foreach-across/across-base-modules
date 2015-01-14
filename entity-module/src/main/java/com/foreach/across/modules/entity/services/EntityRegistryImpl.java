@@ -113,11 +113,13 @@ public class EntityRegistryImpl implements MutableEntityRegistry
 
 				entityConfiguration.setIdGenerator( new DefaultIdGenerator() );
 
+				/*
 				for( EntityConfigurer configurer : configurers ) {
 					if ( configurer.accepts( repository.getEntityClass() ) ) {
 						configurer.configure( entityConfiguration );
 					}
 				}
+				*/
 
 				entities.add( entityConfiguration );
 			}
