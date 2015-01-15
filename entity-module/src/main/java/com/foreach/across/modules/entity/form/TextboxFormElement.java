@@ -1,9 +1,7 @@
 package com.foreach.across.modules.entity.form;
 
+import com.foreach.across.modules.entity.business.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.business.FormElement;
-import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
-
-import java.beans.PropertyDescriptor;
 
 public class TextboxFormElement implements FormElement
 {
@@ -12,12 +10,7 @@ public class TextboxFormElement implements FormElement
 	private String name, label;
 	private Object value;
 
-	public TextboxFormElement( PropertyDescriptor propertyDescriptor ) {
-		setName( propertyDescriptor.getName() );
-		setLabel( propertyDescriptor.getDisplayName() );
-	}
-
-	public TextboxFormElement( FormPropertyDescriptor propertyDescriptor ) {
+	public TextboxFormElement( EntityPropertyDescriptor propertyDescriptor ) {
 		setName( propertyDescriptor.getName() );
 		setLabel( propertyDescriptor.getDisplayName() );
 	}

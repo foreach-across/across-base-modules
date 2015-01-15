@@ -1,19 +1,16 @@
 package com.foreach.across.modules.entity.form;
 
+import com.foreach.across.modules.entity.business.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.business.FormElement;
-
-import java.beans.PropertyDescriptor;
 
 public class HiddenFormElement implements FormElement
 {
-	private final PropertyDescriptor propertyDescriptor;
 	private Object entity;
 
 	private String name, label;
 	private Object value;
 
-	public HiddenFormElement( PropertyDescriptor propertyDescriptor ) {
-		this.propertyDescriptor = propertyDescriptor;
+	public HiddenFormElement( EntityPropertyDescriptor propertyDescriptor ) {
 
 		setName( propertyDescriptor.getName() );
 		setLabel( propertyDescriptor.getDisplayName() );

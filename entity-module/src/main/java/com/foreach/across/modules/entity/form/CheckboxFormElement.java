@@ -1,9 +1,7 @@
 package com.foreach.across.modules.entity.form;
 
+import com.foreach.across.modules.entity.business.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.business.FormElement;
-import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
-
-import java.beans.PropertyDescriptor;
 
 public class CheckboxFormElement implements FormElement
 {
@@ -11,12 +9,7 @@ public class CheckboxFormElement implements FormElement
 
 	private String name, label;
 
-	public CheckboxFormElement( FormPropertyDescriptor propertyDescriptor ) {
-		setName( propertyDescriptor.getName() );
-		setLabel( propertyDescriptor.getDisplayName() );
-	}
-
-	public CheckboxFormElement( PropertyDescriptor propertyDescriptor ) {
+	public CheckboxFormElement( EntityPropertyDescriptor propertyDescriptor ) {
 		setName( propertyDescriptor.getName() );
 		setLabel( propertyDescriptor.getDisplayName() );
 	}

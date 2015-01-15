@@ -73,6 +73,7 @@ public class EntityController
 	public String createEntity( @PathVariable("entityConfig") String entityType,
 	                            Model model ) throws Exception {
 		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
+		//EntityViewFactory view = entityConfiguration.getViewFactory( "crud-create" );
 
 		model.addAttribute( "entityMenu",
 		                    menuFactory.buildMenu( new EntityAdminMenu<>( entityConfiguration.getEntityType() ) ) );
