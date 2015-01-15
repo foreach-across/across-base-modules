@@ -20,9 +20,8 @@ import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.entity.business.*;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
 import com.foreach.across.modules.entity.views.CrudListViewFactory;
+import com.foreach.across.modules.entity.views.RepositoryListViewPageFetcher;
 import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
-import com.foreach.across.modules.entity.views.model.AllEntitiesListModelBuilder;
-import com.foreach.across.modules.entity.views.model.ModelBuilder;
 import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
@@ -30,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -111,7 +109,7 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 		);
 		viewFactory.setPropertyRegistry( registry );
 		viewFactory.setTemplate( "th/entity/list" );
-		viewFactory.setModelBuilder( determineListModelBuilder( repository ) );
+		viewFactory.setPageFetcher( new RepositoryListViewPageFetcher( repository ) );
 
 		LinkedList<String> defaultProperties = new LinkedList<>();
 		if ( registry.contains( "name" ) ) {
@@ -155,14 +153,6 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 					}*/
 
 		entityConfiguration.registerView( "crud-list", viewFactory );
-	}
-
-	private ModelBuilder determineListModelBuilder( CrudRepository repository ) {
-		if ( repository instanceof PagingAndSortingRepository ) {
-			// PagingAndSortingRepository model builder
-		}
-
-		return new AllEntitiesListModelBuilder( repository );
 	}
 
 	private Class determineEntityType( CrudRepository repository ) {

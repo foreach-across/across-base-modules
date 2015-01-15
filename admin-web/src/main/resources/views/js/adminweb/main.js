@@ -32,6 +32,7 @@ $(function(){
               $("[data-toggle='tooltip']").tooltip();
           } ;
 // Javascript to enable link to tab
+    /*
     var hash = document.location.hash;
     var prefix = "tab_";
 
@@ -40,7 +41,7 @@ $(function(){
         var hashPieces = hash.split('?');
         activeTab = $('.nav-tabs a[href=' + hashPieces[0] + ']');
         activeTab && activeTab.tab('show');
-    }
+    }*/
 
 // Change hash for page-reload
     $('.nav-tabs a').on('shown.bs.tab', function (e) {

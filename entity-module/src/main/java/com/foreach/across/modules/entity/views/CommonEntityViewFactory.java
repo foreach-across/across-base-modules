@@ -33,6 +33,8 @@ public abstract class CommonEntityViewFactory implements EntityViewFactory
 {
 	private EntityPropertyRegistry propertyRegistry;
 	private String template;
+
+	@Deprecated
 	private ModelBuilder modelBuilder;
 	private EntityPropertyFilter propertyFilter;
 	private Comparator<EntityPropertyDescriptor> propertyComparator;

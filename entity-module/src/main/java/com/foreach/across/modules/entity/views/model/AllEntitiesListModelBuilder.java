@@ -22,6 +22,7 @@ import org.springframework.data.repository.CrudRepository;
 /**
  * @author Arne Vandamme
  */
+@Deprecated
 public class AllEntitiesListModelBuilder implements ModelBuilder
 {
 	private final CrudRepository repository;

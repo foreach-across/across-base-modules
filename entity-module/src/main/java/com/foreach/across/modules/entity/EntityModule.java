@@ -9,6 +9,7 @@ import com.foreach.across.core.annotations.AcrossDepends;
 public class EntityModule extends AcrossModule
 {
 	public static final String NAME = "EntityModule";
+	public static final String RESOURCES = "entity";
 
 	@Override
 	public String getName() {
@@ -18,5 +19,10 @@ public class EntityModule extends AcrossModule
 	@Override
 	public String getDescription() {
 		return "Provide entity management functionality.";
+	}
+
+	@Override
+	public String getResourcesKey() {
+		return RESOURCES;
 	}
 }

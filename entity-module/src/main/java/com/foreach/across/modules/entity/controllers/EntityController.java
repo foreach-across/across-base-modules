@@ -3,6 +3,7 @@ package com.foreach.across.modules.entity.controllers;
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.adminweb.menu.AdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
+import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.business.EntityForm;
 import com.foreach.across.modules.entity.business.EntityWrapper;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
@@ -10,8 +11,12 @@ import com.foreach.across.modules.entity.services.EntityFormFactory;
 import com.foreach.across.modules.entity.services.EntityRegistryImpl;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.web.menu.MenuFactory;
+import com.foreach.across.modules.web.resource.WebResource;
+import com.foreach.across.modules.web.resource.WebResourceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,6 +35,13 @@ public class EntityController
 	@Autowired
 	private MenuFactory menuFactory;
 
+	@ModelAttribute
+	public void init( WebResourceRegistry registry ) {
+		registry.addWithKey( WebResource.CSS, EntityModule.NAME, "/css/entity/entity-module.css", WebResource.VIEWS );
+		registry.addWithKey( WebResource.JAVASCRIPT_PAGE_END, EntityModule.NAME,
+		                     "/js/entity/entity-module.js", WebResource.VIEWS );
+	}
+
 	@RequestMapping
 	public String listAllEntityTypes( Model model ) {
 		model.addAttribute( "entities", entityRegistry.getEntities() );
@@ -38,9 +50,14 @@ public class EntityController
 	}
 
 	@RequestMapping(value = "/{entityConfig}", method = RequestMethod.GET)
-	public ModelAndView listAllEntities( @PathVariable("entityConfig") String entityType, Model model ) {
+	public ModelAndView listAllEntities( @PathVariable("entityConfig") String entityType,
+	                                     Model model,
+	                                     Pageable pageable
+	) {
 		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
 		EntityViewFactory view = entityConfiguration.getViewFactory( "crud-list" );
+
+		model.addAttribute( "pageable", pageable );
 
 		return view.create( entityConfiguration, model );
 

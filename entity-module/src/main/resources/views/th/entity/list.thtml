@@ -18,30 +18,46 @@
 	<title th:fragment="title">List entities overview</title>
 </head>
 <body th:fragment="content">
+
 <div class="text-right">
 	<a class="btn btn-primary"
 	   th:href="@{${@adminWeb.path('/entities/' + entityConfig.path + '/create')}}"
 	   th:text="|Create a new ${entityConfig.name}|">create a new entity</a>
 </div>
 
-<table class="table table-striped table-hover" th:unless="${props.empty}">
+<div>
+	<span th:text="${page.totalElements}">0</span> item(s) found.<br />
+	<a th:unless="${page.first}" href="#" data-tbl="entity-list" th:attr="data-tbl-page=${page.number - 1}">prev</a>
+	<span th:if="${page.totalPages gt 1}" th:text="|Showing page ${page.number + 1} of ${page.totalPages}|">Showing page 1 of 13</span>
+	<a th:unless="${page.last}" href="#" data-tbl="entity-list" th:attr="data-tbl-page=${page.number + 1}">next</a>
+</div>
+
+<table class="table table-striped table-hover" th:unless="${props.empty}" data-tbl="entity-list" data-tbl-type="paged"
+       th:attr="data-tbl-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
 	<thead>
 	<tr>
 		<th>#</th>
-		<th th:each="prop : ${props}" th:text="${prop.displayName}">Name</th>
+		<th th:each="prop : ${props}"
+		    data-tbl="entity-list"
+		    class="sortable"
+		    th:attr="data-tbl-sort-property=${prop.name}">
+				<span th:text="${prop.displayName}">Name</span>
+				<span class="caret"></span>
+		</th>
 		<th></th>
 	</tr>
 	</thead>
 	<tbody>
 	<tr th:each="entity,entityStats:${entities}" th:with="wrapped=${entityConfig.wrap(entity)}">
-		<td th:text="${entityStats.count}"></td>
+		<td th:text="${entityStats.count + page.number * page.size}"></td>
 		<td th:each="prop : ${props}" th:text="${prop.getValueFetcher().getValue(entity)}">value</td>
 		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfig.path + '/' + wrapped.id)}}">edit</a></td>
 	</tr>
 	</tbody>
 </table>
 
-<table class="table table-striped table-hover" th:if="${props.empty}">
+<table class="table table-striped table-hover" th:if="${props.empty}" data-tbl="entity-list" data-tbl-type="paged"
+       th:attr="data-tbl-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
 	<thead>
 	<tr>
 		<th>#</th>
