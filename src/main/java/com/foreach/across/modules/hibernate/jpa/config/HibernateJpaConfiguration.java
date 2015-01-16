@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -46,6 +47,9 @@ public class HibernateJpaConfiguration
 
 	@Autowired
 	private HibernatePackage hibernatePackage;
+
+	@Autowired
+	private ApplicationContext ctx;
 
 	@Bean
 	@Exposed
