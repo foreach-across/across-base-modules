@@ -6,6 +6,7 @@ import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
 import com.foreach.across.modules.entity.form.CheckboxFormElement;
 import com.foreach.across.modules.entity.form.HiddenFormElement;
+import com.foreach.across.modules.entity.form.TextFormElement;
 import com.foreach.across.modules.entity.form.TextboxFormElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,11 +79,14 @@ public class EntityFormFactory
 		EntityForm form = new EntityForm();
 
 		for ( EntityPropertyDescriptor descriptor : descriptors ) {
-			if ( descriptor.isWritable() && descriptor.isReadable() ) {
-				if ( descriptor.getName().equals( "id" ) ) {
-					form.addElement( new HiddenFormElement( descriptor ) );
-				}
-				else if ( descriptor.getPropertyType().equals( boolean.class ) || descriptor.getPropertyType().equals(
+			if ( descriptor.isHidden() ) {
+				form.addElement( new HiddenFormElement( descriptor ) );
+			}
+			else if ( descriptor.isReadable() && !descriptor.isWritable() ) {
+				form.addElement( new TextFormElement( descriptor ) );
+			}
+			else if ( descriptor.isWritable() && descriptor.isReadable() ) {
+				if ( descriptor.getPropertyType().equals( boolean.class ) || descriptor.getPropertyType().equals(
 						Boolean.class ) ) {
 					form.addElement( new CheckboxFormElement( descriptor ) );
 				}

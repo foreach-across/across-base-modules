@@ -1,0 +1,6 @@
+<div th:fragment="createdDate">
+	<span th:text="${prop.print(entity)}"></span>
+	<span th:if="${entity.createdBy}">by
+		<a th:href="@{${@adminWeb.path('/entities/basicsecurityprincipal/' + en)}}" th:utext="${entity.createdBy}">>principal</a>
+	</span>
+</div>

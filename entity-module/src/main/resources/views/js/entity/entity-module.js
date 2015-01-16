@@ -17,7 +17,7 @@ var TablePager = function ( element )
 {
     var table = $( element );
     var id = $( element ).attr( 'data-tbl' );
-    var page = table.attr( 'data-tbl-page' );
+    var page = table.attr( 'data-tbl-current-page' );
     var size = table.attr( 'data-tbl-size' );
     var sort = [];
 

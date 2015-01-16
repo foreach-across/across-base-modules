@@ -18,15 +18,15 @@ public class EntityWrapper
 		this.entity = entity;
 	}
 
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public Serializable getId() {
-		return entityConfiguration.getIdGenerator().getId( entity );
+		return entityConfiguration.getEntityModel().getId( entity );
 	}
-
 
 	public String getEntityLabel() {
-		return entityConfiguration.getLabelGenerator().getLabel( entity );
+		return entity != null ? entity.toString() : "unknown";
 	}
+
 	/**
 	 * @return The entity instance that is being wrapped.
 	 */

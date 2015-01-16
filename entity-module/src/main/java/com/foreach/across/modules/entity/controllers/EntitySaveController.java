@@ -11,7 +11,6 @@ import com.foreach.across.modules.entity.services.EntityFormFactory;
 import com.foreach.across.modules.entity.services.EntityRegistryImpl;
 import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.web.menu.MenuFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -53,12 +52,12 @@ public class EntitySaveController
 	) throws Exception {
 		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
 
-		Object entity = entityConfiguration.getEntityType().newInstance();
+		Object entity = entityConfiguration.getEntityModel().createNew();
 
 		if ( entityId != null && entityId != 0 ) {
-			Object original = entityConfiguration.getRepository().getById( entityId );
+			Object original = entityConfiguration.getEntityModel().findOne( entityId );
 			model.addAttribute( "original", entityConfiguration.wrap( original ) );
-			BeanUtils.copyProperties( original, entity );
+			entity = entityConfiguration.getEntityModel().createDto( original );
 		}
 
 		return entity;
@@ -75,12 +74,7 @@ public class EntitySaveController
 		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
 
 		if ( !bindingResult.hasErrors() ) {
-			if ( isNewEntity( entity ) ) {
-				entityConfiguration.getRepository().create( entity );
-			}
-			else {
-				entityConfiguration.getRepository().update( entity );
-			}
+			entityConfiguration.getEntityModel().save( entity );
 
 			re.addAttribute( "entityId", ( (IdBasedEntity) entity ).getId() );
 

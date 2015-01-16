@@ -15,17 +15,18 @@
  */
 package com.foreach.across.modules.entity.views;
 
-import com.foreach.across.modules.entity.business.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.business.EntityPropertyFilter;
-import com.foreach.across.modules.entity.business.EntityPropertyFilters;
+import com.foreach.across.modules.entity.business.*;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
 import liquibase.util.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.datetime.DateFormatter;
+import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.ui.Model;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -88,13 +89,26 @@ public class CrudListViewFactory extends CommonEntityViewFactory
 		return existing;
 	}
 
-	private List<EntityPropertyDescriptor> getProperties() {
+	private List<PrintablePropertyView> getProperties() {
 		EntityPropertyFilter filter = getPropertyFilter() != null ? getPropertyFilter() : EntityPropertyFilters.NoOp;
 
+		List<EntityPropertyDescriptor> descriptors;
+
 		if ( getPropertyComparator() != null ) {
-			return getPropertyRegistry().getProperties( filter, getPropertyComparator() );
+			descriptors = getPropertyRegistry().getProperties( filter, getPropertyComparator() );
+		}
+		else {
+			descriptors = getPropertyRegistry().getProperties( filter );
 		}
 
-		return getPropertyRegistry().getProperties( filter );
+		List<PrintablePropertyView> propertyViews = new ArrayList<>( descriptors.size() );
+		DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService( true );
+		conversionService.addFormatter( new DateFormatter( "dd MMM yyyy - HH:mm" ) );
+
+		for ( EntityPropertyDescriptor descriptor : descriptors ) {
+			propertyViews.add( new ConversionServicePrintablePropertyView( conversionService, descriptor ) );
+		}
+
+		return propertyViews;
 	}
 }

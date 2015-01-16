@@ -19,6 +19,7 @@ import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.modules.entity.EntityModule;
+import com.foreach.across.modules.entity.business.EntityModel;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
 import com.foreach.across.modules.entity.services.EntityRegistry;
 import com.foreach.across.modules.entity.testmodules.springdata.Client;
@@ -56,8 +57,48 @@ public class TestCrudRepositoryRegistrar
 		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
 		assertNotNull( configuration );
 
+		EntityModel model = configuration.getEntityModel();
+		assertNotNull( model );
+
 		EntityViewFactory viewFactory = configuration.getViewFactory( "crud-list" );
 		assertNotNull( viewFactory );
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void verifyEntityModel() {
+		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
+		EntityModel<Client, Long> model = (EntityModel<Client, Long>) configuration.getEntityModel();
+
+		Client existing = model.findOne( 10L );
+		assertNull( existing );
+
+		Client created = model.createNew();
+		assertNotNull( created );
+		assertTrue( model.isNew( created ) );
+
+		created.setNewEntityId( 10L );
+		created.setName( "Some name" );
+
+		created = model.save( created );
+		assertEquals( Long.valueOf( 10 ), created.getId() );
+		assertFalse( model.isNew( created ) );
+
+		existing = model.findOne( 10L );
+		assertNotNull( existing );
+		assertEquals( "Some name", existing.getName() );
+
+		Client dto = model.createDto( created );
+		assertNotSame( created, dto );
+		assertEquals( created.getId(), dto.getId() );
+		assertEquals( created.getName(), dto.getName() );
+
+		dto.setName( "Modified name" );
+		model.save( dto );
+
+		existing = model.findOne( 10L );
+		assertNotNull( existing );
+		assertEquals( "Modified name", existing.getName() );
 	}
 
 	@Configuration

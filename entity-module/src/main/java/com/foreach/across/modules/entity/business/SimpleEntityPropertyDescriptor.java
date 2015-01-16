@@ -8,7 +8,7 @@ import org.thymeleaf.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 
-public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
+public class SimpleEntityPropertyDescriptor implements MutableEntityPropertyDescriptor
 {
 	private String name, displayName;
 	private boolean readable, writable, hidden;
@@ -33,6 +33,7 @@ public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
 		return displayName;
 	}
 
+	@Override
 	public void setDisplayName( String displayName ) {
 		this.displayName = displayName;
 	}
@@ -42,6 +43,7 @@ public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
 		return readable;
 	}
 
+	@Override
 	public void setReadable( boolean readable ) {
 		this.readable = readable;
 	}
@@ -51,6 +53,7 @@ public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
 		return writable;
 	}
 
+	@Override
 	public void setWritable( boolean writable ) {
 		this.writable = writable;
 	}
@@ -60,11 +63,13 @@ public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
 		return hidden;
 	}
 
+	@Override
 	public void setHidden( boolean hidden ) {
 		this.hidden = hidden;
 	}
 
-	public void setValueFetcher( ValueFetcher valueFetcher ) {
+	@Override
+	public void setValueFetcher( ValueFetcher<?> valueFetcher ) {
 		this.valueFetcher = valueFetcher;
 
 		if ( valueFetcher != null ) {
@@ -77,6 +82,7 @@ public class SimpleEntityPropertyDescriptor implements EntityPropertyDescriptor
 		return propertyType;
 	}
 
+	@Override
 	public void setPropertyType( Class<?> propertyType ) {
 		this.propertyType = propertyType;
 	}

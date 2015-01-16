@@ -14,6 +14,12 @@ public class UserEntitiesConfiguration implements EntityConfigurer
 	@Override
 	public void configure( EntitiesConfigurationBuilder configuration ) {
 		configuration.entity( User.class )
+					 /*.properties()
+						.order( "id", "email", "displayName" )
+						.property( "created", "Created", new AuditableCreatedPrinter() ).and()
+						.property( "lastModified", "Last modified", new AuditableLastModifiedPrinter() ).and()
+						.hide( "createdDate", "createdBy", "lastModifiedDate", "lastModifiedBy" )
+						.and()*/
 		             .view( "crud-list" )
 		             .properties(
 				             "id",

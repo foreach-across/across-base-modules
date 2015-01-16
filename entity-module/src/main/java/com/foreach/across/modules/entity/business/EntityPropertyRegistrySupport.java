@@ -22,7 +22,7 @@ import java.util.*;
 /**
  * @author Arne Vandamme
  */
-public abstract class EntityPropertyRegistrySupport implements EntityPropertyRegistry
+public abstract class EntityPropertyRegistrySupport implements MutableEntityPropertyRegistry
 {
 	private final Map<String, EntityPropertyDescriptor> descriptorMap = new HashMap<>();
 
@@ -123,6 +123,13 @@ public abstract class EntityPropertyRegistrySupport implements EntityPropertyReg
 	@Override
 	public EntityPropertyDescriptor getProperty( String propertyName ) {
 		return descriptorMap.get( propertyName );
+	}
+
+	@Override
+	public MutableEntityPropertyDescriptor getMutableProperty( String propertyName ) {
+		EntityPropertyDescriptor descriptor = getProperty( propertyName );
+
+		return descriptor instanceof MutableEntityPropertyDescriptor ? (MutableEntityPropertyDescriptor) descriptor : null;
 	}
 
 	@Override

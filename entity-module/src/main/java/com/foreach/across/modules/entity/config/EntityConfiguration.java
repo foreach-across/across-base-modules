@@ -1,5 +1,6 @@
 package com.foreach.across.modules.entity.config;
 
+import com.foreach.across.modules.entity.business.EntityModel;
 import com.foreach.across.modules.entity.business.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.business.EntityWrapper;
 import com.foreach.across.modules.entity.generators.EntityIdGenerator;
@@ -9,6 +10,7 @@ import com.foreach.across.modules.entity.generators.label.ToStringLabelGenerator
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.hibernate.repositories.BasicRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.repository.core.CrudInvoker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,9 +23,12 @@ public class EntityConfiguration implements Comparable<EntityConfiguration>
 	private final Class<?> entityClass;
 	private BasicRepository repository;
 
+	private CrudInvoker<Object> crudInvoker;
+
 	private EntityLabelGenerator labelGenerator;
 	private EntityIdGenerator idGenerator;
 
+	private EntityModel entityModel;
 	private EntityPropertyRegistry propertyRegistry;
 	private Map<String, EntityViewFactory> registeredViews = new HashMap<>();
 
@@ -37,6 +42,14 @@ public class EntityConfiguration implements Comparable<EntityConfiguration>
 	public EntityConfiguration( BasicRepository repository ) {
 		this.repository = repository;
 		this.entityClass = repository.getEntityClass();
+	}
+
+	public EntityModel getEntityModel() {
+		return entityModel;
+	}
+
+	public void setEntityModel( EntityModel entityModel ) {
+		this.entityModel = entityModel;
 	}
 
 	public Class<?> getEntityType() {
@@ -92,10 +105,21 @@ public class EntityConfiguration implements Comparable<EntityConfiguration>
 		return getName().compareTo( o.getName() );
 	}
 
+	@Deprecated
+	public CrudInvoker<Object> getCrudInvoker() {
+		return crudInvoker;
+	}
+
+	public void setCrudInvoker( CrudInvoker<Object> crudInvoker ) {
+		this.crudInvoker = crudInvoker;
+	}
+
+	@Deprecated
 	public BasicRepository getRepository() {
 		return repository;
 	}
 
+	@Deprecated
 	/**
 	 * Wraps an entity with an access wrapper configured according to the configuration.
 	 *

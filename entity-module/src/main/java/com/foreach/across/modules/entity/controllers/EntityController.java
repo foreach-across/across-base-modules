@@ -5,7 +5,6 @@ import com.foreach.across.modules.adminweb.menu.AdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.business.EntityForm;
-import com.foreach.across.modules.entity.business.EntityWrapper;
 import com.foreach.across.modules.entity.config.EntityConfiguration;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
 import com.foreach.across.modules.entity.services.EntityRegistryImpl;
@@ -96,22 +95,24 @@ public class EntityController
 	                            AdminMenu adminMenu,
 	                            Model model ) throws Exception {
 		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
-		EntityWrapper entity = entityConfiguration.wrap( entityConfiguration.getRepository().getById( entityId ) );
+		Object entity = entityConfiguration.getEntityModel().findOne( entityId );
 
-		adminMenu.getLowestSelectedItem().addItem( "/selectedEntity", entity.getEntityLabel() ).setSelected( true );
+		//EntityWrapper entity = entityConfiguration.wrap( entityConfiguration.getRepository().getById( entityId ) );
+
+		//adminMenu.getLowestSelectedItem().addItem( "/selectedEntity", entity.getEntityLabel() ).setSelected( true );
 
 		model.addAttribute( "entityMenu",
 		                    menuFactory.buildMenu( new EntityAdminMenu( entityConfiguration.getEntityType(),
-		                                                                entity.getEntity() ) ) );
+		                                                                entity ) ) );
 
 		EntityForm entityForm = formFactory.create( entityConfiguration );
-		entityForm.setEntity( entity.getEntity() );
+		entityForm.setEntity( entity );
 
 		model.addAttribute( "entityForm", entityForm );
 		model.addAttribute( "existing", true );
 		model.addAttribute( "entityConfig", entityConfiguration );
 		model.addAttribute( "original", entity );
-		model.addAttribute( "entity", entity.getEntity() );
+		model.addAttribute( "entity", entity );
 
 		return "th/entity/edit";
 	}

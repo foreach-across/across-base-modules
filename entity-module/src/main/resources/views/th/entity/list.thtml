@@ -33,7 +33,7 @@
 </div>
 
 <table class="table table-striped table-hover" th:unless="${props.empty}" data-tbl="entity-list" data-tbl-type="paged"
-       th:attr="data-tbl-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
+       th:attr="data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
 	<thead>
 	<tr>
 		<th>#</th>
@@ -50,14 +50,19 @@
 	<tbody>
 	<tr th:each="entity,entityStats:${entities}" th:with="wrapped=${entityConfig.wrap(entity)}">
 		<td th:text="${entityStats.count + page.number * page.size}"></td>
-		<td th:each="prop : ${props}" th:text="${prop.getValueFetcher().getValue(entity)}">value</td>
-		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfig.path + '/' + wrapped.id)}}">edit</a></td>
+		<td th:each="prop : ${props}">
+			<span th:if="${prop.name eq 'createdDate'}" th:remove="tag">
+				<div th:replace="|th/entity/${prop.name}|">DATUM</div>
+			</span>
+			<span th:unless="${prop.name eq 'createdDate'}" th:utext="${prop.print(entity)}">value</span>
+		</td>
+		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfig.path + '/' + entity.id)}}">edit</a></td>
 	</tr>
 	</tbody>
 </table>
 
 <table class="table table-striped table-hover" th:if="${props.empty}" data-tbl="entity-list" data-tbl-type="paged"
-       th:attr="data-tbl-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
+       th:attr="data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
 	<thead>
 	<tr>
 		<th>#</th>

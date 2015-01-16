@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.registrars;
 
+import com.foreach.across.core.annotations.RefreshableCollection;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.entity.business.*;
@@ -26,13 +27,17 @@ import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
+import org.springframework.data.mapping.PersistentEntity;
+import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.core.EntityInformation;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import javax.persistence.EntityManager;
+import java.util.*;
 
 /**
  * Scans for {@link org.springframework.data.repository.CrudRepository} implementations
@@ -45,14 +50,28 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 	@Autowired
 	private EntityPropertyRegistries entityPropertyRegistries;
 
+	@RefreshableCollection(incremental = true, includeModuleInternals = true)
+	private Collection<EntityManager> entityManagers;
+
+	private Map<Class, PersistentEntity> persistentEntities = new HashMap<>();
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public void registerEntities( MutableEntityRegistry entityRegistry,
 	                              AcrossModuleInfo moduleInfo,
 	                              AcrossContextBeanRegistry beanRegistry ) {
-		Map<String, CrudRepository> repositories = moduleInfo.getApplicationContext()
-		                                                     .getBeansOfType( CrudRepository.class );
+		ApplicationContext applicationContext = moduleInfo.getApplicationContext();
+		Map<String, CrudRepository> repositories = applicationContext.getBeansOfType( CrudRepository.class );
+		Map<String, MappingContext> mappingContexts = applicationContext.getBeansOfType( MappingContext.class );
 
-		for ( CrudRepository repository : repositories.values() ) {
+		for ( MappingContext mappingContext : mappingContexts.values() ) {
+			for ( PersistentEntity persistentEntity : (Collection<PersistentEntity>) mappingContext
+					.getPersistentEntities() ) {
+				persistentEntities.put( persistentEntity.getType(), persistentEntity );
+			}
+		}
+
+		for ( final CrudRepository repository : repositories.values() ) {
 			Class entityType = determineEntityType( repository );
 
 			if ( entityRegistry.getEntityConfiguration( entityType ) != null ) {
@@ -62,6 +81,7 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 
 			EntityConfiguration entityConfiguration = new EntityConfiguration( entityType );
 			entityConfiguration.setPropertyRegistry( buildEntityPropertyRegistry( entityType ) );
+			entityConfiguration.setEntityModel( buildEntityModel( entityType, repository ) );
 
 			buildCrudListView( entityConfiguration, repository );
 
@@ -73,17 +93,44 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private EntityModel buildEntityModel( Class<?> entityType, CrudRepository<?, ?> repository ) {
+		return new EntityModelImpl(
+				persistentEntities.get( entityType ),
+				findEntityInformation( entityType ),
+				repository
+		);
+	}
+
+	private EntityInformation findEntityInformation( Class<?> entityType ) {
+		for ( EntityManager entityManager : entityManagers ) {
+			if ( entityManager.getMetamodel().managedType( entityType ) != null ) {
+				return JpaEntityInformationSupport.getMetadata( entityType, entityManager );
+			}
+		}
+
+		return null;
+	}
+
 	private EntityPropertyRegistry buildEntityPropertyRegistry( Class<?> entityType ) {
-		EntityPropertyRegistry registry = entityPropertyRegistries.getRegistry( entityType );
+		MutableEntityPropertyRegistry registry =
+				(MutableEntityPropertyRegistry) entityPropertyRegistries.getRegistry( entityType );
+
+		Map<String, Integer> propertiesOrder = new HashMap<>();
 
 		if ( registry.getDefaultFilter() == null ) {
 			List<String> excludedProps = new LinkedList<>();
 			excludedProps.add( "class" );
 			if ( Persistable.class.isAssignableFrom( entityType ) ) {
 				excludedProps.add( "new" );
+				registry.getMutableProperty( "id" ).setHidden( true );
 			}
 			if ( SettableIdBasedEntity.class.isAssignableFrom( entityType ) ) {
 				excludedProps.add( "newEntityId" );
+
+				MutableEntityPropertyDescriptor mutable = registry.getMutableProperty( "newEntityId" );
+				mutable.setReadable( false );
+				mutable.setHidden( true );
 			}
 			registry.setDefaultFilter( EntityPropertyFilters.exclude( excludedProps ) );
 		}
@@ -91,7 +138,20 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 		if ( Auditable.class.isAssignableFrom( entityType ) ) {
 			modifyDisplayName( registry.getProperty( "createdDate" ), "Created" );
 			modifyDisplayName( registry.getProperty( "lastModifiedDate" ), "Last modified" );
+
+			// Auditable properties are set automatically, should not be set through entity
+			registry.getMutableProperty( "createdBy" ).setWritable( false );
+			registry.getMutableProperty( "createdDate" ).setWritable( false );
+			registry.getMutableProperty( "lastModifiedBy" ).setWritable( false );
+			registry.getMutableProperty( "lastModifiedDate" ).setWritable( false );
+
+			propertiesOrder.put( "createdDate", 1 );
+			propertiesOrder.put( "createdBy", 2 );
+			propertiesOrder.put( "lastModifiedDate", 3 );
+			propertiesOrder.put( "lastModifiedBy", 4 );
 		}
+
+		registry.setDefaultOrder( new EntityPropertyOrder( propertiesOrder ) );
 
 		return registry;
 	}

@@ -1,6 +1,5 @@
 package com.foreach.across.modules.entity.business;
 
-import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
@@ -8,6 +7,9 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Undefined entities are assumed to have an order index of 0.
+ */
 public class EntityPropertyOrder implements Comparator<EntityPropertyDescriptor>
 {
 	private final Map<String, Integer> order;
@@ -16,7 +18,7 @@ public class EntityPropertyOrder implements Comparator<EntityPropertyDescriptor>
 		order = new LinkedHashMap<>();
 
 		for ( int i = 0; i < ordered.length; i++ ) {
-			order.put( ordered[i], i + 1 );
+			order.put( ordered[i], -ordered.length + i );
 		}
 	}
 
@@ -47,7 +49,7 @@ public class EntityPropertyOrder implements Comparator<EntityPropertyDescriptor>
 	}
 
 	private Integer applyDefault( Integer fixed ) {
-		return fixed != null ? fixed : Ordered.LOWEST_PRECEDENCE;
+		return fixed != null ? fixed : 0;
 	}
 
 	public static Comparator<EntityPropertyDescriptor> composite( final Comparator<EntityPropertyDescriptor> first,
