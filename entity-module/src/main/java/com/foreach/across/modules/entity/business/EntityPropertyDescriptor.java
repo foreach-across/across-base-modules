@@ -2,6 +2,8 @@ package com.foreach.across.modules.entity.business;
 
 import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
 
+import java.util.Map;
+
 public interface EntityPropertyDescriptor
 {
 	/**
@@ -18,6 +20,12 @@ public interface EntityPropertyDescriptor
 	boolean isHidden();
 
 	Class<?> getPropertyType();
+
+	boolean hasAttribute( String name );
+
+	<T> T getAttribute( String name );
+
+	Map<String, Object> getAttributes();
 
 	/**
 	 * @return Associated instance that can fetch the property value from an instance.

@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.entity.registrars;
 
-import com.foreach.across.core.annotations.RefreshableCollection;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.entity.business.*;
@@ -50,8 +49,7 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 	@Autowired
 	private EntityPropertyRegistries entityPropertyRegistries;
 
-	@RefreshableCollection(incremental = true, includeModuleInternals = true)
-	private Collection<EntityManager> entityManagers;
+	private Collection<EntityManager> entityManagers = Collections.emptyList();
 
 	private Map<Class, PersistentEntity> persistentEntities = new HashMap<>();
 
@@ -70,6 +68,9 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 				persistentEntities.put( persistentEntity.getType(), persistentEntity );
 			}
 		}
+
+		// Update the entity managers as some might have been added
+		entityManagers = beanRegistry.getBeansOfType( EntityManager.class, true );
 
 		for ( final CrudRepository repository : repositories.values() ) {
 			Class entityType = determineEntityType( repository );

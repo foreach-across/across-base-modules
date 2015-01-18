@@ -19,7 +19,6 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.info.AcrossContextInfo;
-import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.core.development.AcrossDevelopmentMode;
 import com.foreach.across.modules.adminweb.AdminWeb;
 import com.foreach.across.modules.adminweb.AdminWebModule;
@@ -61,9 +60,6 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 	private AcrossContextInfo contextInfo;
 
 	@Autowired
-	private AcrossContextBeanRegistry beanRegistry;
-
-	@Autowired
 	@Module(AcrossModule.CURRENT_MODULE)
 	private AdminWebModule adminWebModule;
 
@@ -93,7 +89,7 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 	@Bean
 	@Exposed
 	public AdminWeb adminWeb() {
-		return new AdminWeb( adminWebModule.getRootPath(), "Administrative web interface" );
+		return new AdminWeb( adminWebModule.getRootPath() );
 	}
 
 	@Bean

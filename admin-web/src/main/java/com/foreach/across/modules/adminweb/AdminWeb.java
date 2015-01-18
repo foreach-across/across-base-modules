@@ -28,16 +28,12 @@ public final class AdminWeb extends PrefixingPathContext
 	@Autowired
 	private AdminWebModuleSettings settings;
 
-	private final String title;
-
-	public AdminWeb( String prefix, String title ) {
+	public AdminWeb( String prefix ) {
 		super( prefix );
-
-		this.title = title;
 	}
 
 	public String getTitle() {
-		return title;
+		return settings.getTitle();
 	}
 
 	public AdminWebModuleSettings getSettings() {

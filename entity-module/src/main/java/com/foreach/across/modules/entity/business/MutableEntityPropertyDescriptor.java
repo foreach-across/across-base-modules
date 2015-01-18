@@ -30,6 +30,10 @@ public interface MutableEntityPropertyDescriptor extends EntityPropertyDescripto
 
 	void setHidden( boolean hidden );
 
+	void addAttribute( String name, Object value );
+
+	boolean removeAttribute( String name );
+
 	void setPropertyType( Class<?> propertyType );
 
 	void setValueFetcher( ValueFetcher<?> valueFetcher );

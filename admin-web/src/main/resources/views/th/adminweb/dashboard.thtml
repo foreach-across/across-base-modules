@@ -20,7 +20,7 @@
 </head>
 <body>
 <div th:fragment="content">
-	Welcome to: <strong th:text="${@adminWeb.title}">the administrative web interface</strong>.
+	Welcome to the <strong th:if="${@adminWeb.title}" th:text="${@adminWeb.title}">application name</strong> administration section.
 </div>
 </body>
 </html>
