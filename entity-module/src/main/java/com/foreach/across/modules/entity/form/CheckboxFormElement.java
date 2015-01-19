@@ -1,7 +1,7 @@
 package com.foreach.across.modules.entity.form;
 
-import com.foreach.across.modules.entity.business.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.business.FormElement;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 
 public class CheckboxFormElement implements FormElement
 {

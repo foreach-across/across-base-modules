@@ -22,9 +22,9 @@ import com.foreach.across.core.context.AcrossContextUtils;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.core.events.AcrossModuleBootstrappedEvent;
-import com.foreach.across.modules.entity.business.MutableEntityRegistry;
 import com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
+import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;

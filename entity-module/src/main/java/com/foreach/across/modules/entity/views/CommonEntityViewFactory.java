@@ -15,10 +15,9 @@
  */
 package com.foreach.across.modules.entity.views;
 
-import com.foreach.across.modules.entity.business.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.business.EntityPropertyFilter;
-import com.foreach.across.modules.entity.business.EntityPropertyRegistry;
-import com.foreach.across.modules.entity.views.model.ModelBuilder;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilter;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 
 import java.util.Comparator;
 
@@ -34,8 +33,6 @@ public abstract class CommonEntityViewFactory implements EntityViewFactory
 	private EntityPropertyRegistry propertyRegistry;
 	private String template;
 
-	@Deprecated
-	private ModelBuilder modelBuilder;
 	private EntityPropertyFilter propertyFilter;
 	private Comparator<EntityPropertyDescriptor> propertyComparator;
 
@@ -53,14 +50,6 @@ public abstract class CommonEntityViewFactory implements EntityViewFactory
 
 	public void setTemplate( String template ) {
 		this.template = template;
-	}
-
-	public ModelBuilder getModelBuilder() {
-		return modelBuilder;
-	}
-
-	public void setModelBuilder( ModelBuilder modelBuilder ) {
-		this.modelBuilder = modelBuilder;
 	}
 
 	public EntityPropertyFilter getPropertyFilter() {

@@ -15,7 +15,7 @@
  */
 package com.foreach.across.modules.entity.views;
 
-import com.foreach.across.modules.entity.config.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;

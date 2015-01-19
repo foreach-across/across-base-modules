@@ -8,7 +8,7 @@ import java.util.List;
 
 public class EntityUtils
 {
-	public static String propertyToDisplayName( String propertyName ) {
+	public static String generateDisplayName( String propertyName ) {
 		String cleaned = propertyName.replace( '.', ' ' ).replaceAll("[^\\p{L}\\p{Nd} ]+", "");
 
 		List<String> finished = new LinkedList<>();

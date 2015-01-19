@@ -19,9 +19,9 @@ import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.modules.entity.EntityModule;
-import com.foreach.across.modules.entity.business.EntityModel;
-import com.foreach.across.modules.entity.config.EntityConfiguration;
-import com.foreach.across.modules.entity.services.EntityRegistry;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityModel;
+import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.ClientRepository;
 import com.foreach.across.modules.entity.testmodules.springdata.SpringDataJpaModule;
@@ -31,7 +31,10 @@ import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -49,6 +52,12 @@ public class TestCrudRepositoryRegistrar
 	@Autowired
 	private EntityRegistry entityRegistry;
 
+	@Autowired
+	private ConversionService conversionService;
+
+	@Autowired
+	private ClientRepository clientRepository;
+
 	@Test
 	public void clientShouldBeRegistered() {
 		assertEquals( 1, entityRegistry.getEntities().size() );
@@ -62,6 +71,36 @@ public class TestCrudRepositoryRegistrar
 
 		EntityViewFactory viewFactory = configuration.getViewFactory( "crud-list" );
 		assertNotNull( viewFactory );
+	}
+
+	@Test
+	public void entityConfigurationFromConversionService() {
+		EntityConfiguration clientConfiguration = conversionService.convert( "client", EntityConfiguration.class );
+
+		assertNotNull( clientConfiguration );
+		assertEquals( Client.class, clientConfiguration.getEntityType() );
+
+		EntityConfiguration notExisting = conversionService.convert( "someUnexistingEntity",
+		                                                             EntityConfiguration.class );
+		assertNull( notExisting );
+	}
+
+	@Test
+	public void entityConverter() {
+		Client client = new Client();
+		client.setNewEntityId( 123L );
+		client.setName( "Known client name" );
+
+		clientRepository.save( client );
+
+		Client converted = conversionService.convert( "", Client.class );
+		assertNull( converted );
+
+		converted = conversionService.convert( 123, Client.class );
+		assertEquals( client, converted );
+
+		converted = conversionService.convert( "123", Client.class );
+		assertEquals( client, converted );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -105,6 +144,11 @@ public class TestCrudRepositoryRegistrar
 	@AcrossTestConfiguration
 	protected static class Config implements AcrossContextConfigurer
 	{
+		@Bean
+		public ConversionService conversionService() {
+			return new DefaultFormattingConversionService( true );
+		}
+
 		@Override
 		public void configure( AcrossContext context ) {
 			context.addModule( new EntityModule() );

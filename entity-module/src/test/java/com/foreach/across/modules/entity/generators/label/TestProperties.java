@@ -1,6 +1,6 @@
 package com.foreach.across.modules.entity.generators.label;
 
-import com.foreach.across.modules.entity.business.*;
+import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
 import org.junit.Test;
 

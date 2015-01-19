@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.testmodules.springdata;
+package com.foreach.across.modules.entity.testmodules.springdata2;
 
 import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
@@ -26,12 +26,12 @@ import javax.persistence.*;
 public class Client extends SettableIdBasedEntity<Client>
 {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "seq_test_client_id")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "seq_test_client2_id")
 	@GenericGenerator(
-			name = "seq_test_client_id",
+			name = "seq_test_client2_id",
 			strategy = AcrossSequenceGenerator.STRATEGY,
 			parameters = {
-					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "seq_test_client_id"),
+					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "seq_test_client2_id"),
 					@org.hibernate.annotations.Parameter(name = "allocationSize", value = "1")
 			}
 	)
@@ -82,9 +82,6 @@ public class Client extends SettableIdBasedEntity<Client>
 
 		Client client = (Client) o;
 
-		if ( id != null ? !id.equals( client.id ) : client.id != null ) {
-			return false;
-		}
 		if ( name != null ? !name.equals( client.name ) : client.name != null ) {
 			return false;
 		}
@@ -94,8 +91,6 @@ public class Client extends SettableIdBasedEntity<Client>
 
 	@Override
 	public int hashCode() {
-		int result = id != null ? id.hashCode() : 0;
-		result = 31 * result + ( name != null ? name.hashCode() : 0 );
-		return result;
+		return name != null ? name.hashCode() : 0;
 	}
 }

@@ -19,8 +19,8 @@
 </head>
 <body th:fragment="content">
 
-<h4 class="page-header" th:if="${existing}" th:text="|Modify ${entityConfig.name}: ${entity}|">Modify entity: name</h4>
-<h4 class="page-header" th:unless="${existing}" th:text="|Create a new ${entityConfig.name}|">Create a new entity</h4>
+<h4 class="page-header" th:if="${existing}" th:text="|Modify ${T(org.apache.commons.lang3.StringUtils).uncapitalize(entityConfig.displayName)}: ${entity}|">Modify entity: name</h4>
+<h4 class="page-header" th:unless="${existing}" th:text="|Create a new ${T(org.apache.commons.lang3.StringUtils).uncapitalize(entityConfig.displayName)}|">Create a new entity</h4>
 
 <div class="tabbable filled">
 	<ul class="nav nav-tabs">
@@ -31,8 +31,7 @@
 
 	<div class="tab-content">
 		<div class="tab-pane active">
-			<form method="post" th:action="@{${@adminWeb.path('/entities/' + entityConfig.path + (existing ? '/' + entity.id : '/create'))}}" th:object="${entity}" role="form">
-				<input type="hidden" th:field="*{id}"/>
+			<form method="post" th:action="@{${@adminWeb.path('/entities/' + entityConfig.name + (existing ? '/' + entity.id : '/create'))}}" th:object="${entity}" role="form">
 
 				<div class="row">
 					<div class="col-md-4">
@@ -88,7 +87,7 @@
 						</div>
 
 						<input class="btn btn-primary" type="submit" value="Save"/>
-						<a class="btn btn-link" th:href="@{${@adminWeb.path('/entities/' + entityConfig.path)}}">Cancel</a>
+						<a class="btn btn-link" th:href="@{${@adminWeb.path('/entities/' + entityConfig.name)}}">Cancel</a>
 
 					</div>
 				</div>

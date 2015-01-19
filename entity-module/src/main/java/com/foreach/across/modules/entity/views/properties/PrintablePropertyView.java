@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.business;
-
-import com.foreach.across.modules.entity.config.EntityConfiguration;
-import com.foreach.across.modules.entity.services.EntityRegistry;
+package com.foreach.across.modules.entity.views.properties;
 
 /**
  * @author Arne Vandamme
  */
-public interface MutableEntityRegistry extends EntityRegistry
+public interface PrintablePropertyView
 {
-	void register( EntityConfiguration entityConfiguration );
+	String getName();
+
+	String getDisplayName();
+
+	String getCustomTemplate();
+
+	Object value( Object entity );
+
+	String print( Object entity );
 }

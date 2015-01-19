@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.business;
+package com.foreach.across.modules.entity.testmodules.springdata2;
 
-/**
- * @author Arne Vandamme
- */
-public interface PrintablePropertyView
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ClientRepository extends JpaRepository<Client, Long>
 {
-	String getName();
-
-	String getDisplayName();
-
-	String getCustomTemplate();
-
-	Object value( Object entity );
-
-	String print( Object entity );
 }

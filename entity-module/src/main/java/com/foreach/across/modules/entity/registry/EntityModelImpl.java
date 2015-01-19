@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.business;
+package com.foreach.across.modules.entity.registry;
 
 import com.foreach.across.modules.hibernate.business.EntityWithDto;
 import org.springframework.beans.BeanUtils;
@@ -42,6 +42,11 @@ public class EntityModelImpl<T, ID extends Serializable> implements EntityModel<
 		this.repository = repository;
 
 		constructor = persistentEntity.getPersistenceConstructor().getConstructor();
+	}
+
+	@Override
+	public String getGeneratedLabel( T entity ) {
+		return getId( entity ).toString();
 	}
 
 	@Override

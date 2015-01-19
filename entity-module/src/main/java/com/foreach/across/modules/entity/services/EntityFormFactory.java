@@ -1,13 +1,14 @@
 package com.foreach.across.modules.entity.services;
 
 import com.foreach.across.modules.entity.business.EntityForm;
-import com.foreach.across.modules.entity.business.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
-import com.foreach.across.modules.entity.config.EntityConfiguration;
 import com.foreach.across.modules.entity.form.CheckboxFormElement;
 import com.foreach.across.modules.entity.form.HiddenFormElement;
 import com.foreach.across.modules.entity.form.TextFormElement;
 import com.foreach.across.modules.entity.form.TextboxFormElement;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -113,7 +114,7 @@ public class EntityFormFactory
 
 					}*/
 				}
-				else if ( entityRegistry.getEntityByClass( descriptor.getPropertyType() ) != null ) {
+				else if ( entityRegistry.contains( descriptor.getPropertyType() ) ) {
 					/*EntityConfiguration itemEntityType = entityRegistry.getEntityByClass(
 							descriptor.getPropertyType() );
 

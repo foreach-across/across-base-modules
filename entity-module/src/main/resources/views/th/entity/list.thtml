@@ -21,8 +21,8 @@
 
 <div class="text-right">
 	<a class="btn btn-primary"
-	   th:href="@{${@adminWeb.path('/entities/' + entityConfig.path + '/create')}}"
-	   th:text="|Create a new ${entityConfig.name}|">create a new entity</a>
+	   th:href="@{${@adminWeb.path('/entities/' + entityConfig.name + '/create')}}"
+	   th:text="|Create a new ${T(org.apache.commons.lang3.StringUtils).uncapitalize(entityConfig.displayName)}|">create a new entity</a>
 </div>
 
 <div>
@@ -56,7 +56,7 @@
 			</span>
 			<span th:unless="${prop.name eq 'createdDate'}" th:utext="${prop.print(entity)}">value</span>
 		</td>
-		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfig.path + '/' + entity.id)}}">edit</a></td>
+		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfig.name + '/' + entity.id)}}">edit</a></td>
 	</tr>
 	</tbody>
 </table>
@@ -74,7 +74,7 @@
 	<tr th:each="entity,entityStats:${entities}" th:with="wrapped=${entityConfig.wrap(entity)}">
 		<td th:text="${entityStats.count}"></td>
 		<td th:text="${wrapped.entityLabel}"></td>
-		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfig.path + '/' + wrapped.id)}}">edit</a></td>
+		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfig.name + '/' + wrapped.id)}}">edit</a></td>
 	</tr>
 	</tbody>
 </table>

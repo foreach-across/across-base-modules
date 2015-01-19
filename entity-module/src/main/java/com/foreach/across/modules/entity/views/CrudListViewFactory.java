@@ -15,8 +15,12 @@
  */
 package com.foreach.across.modules.entity.views;
 
-import com.foreach.across.modules.entity.business.*;
-import com.foreach.across.modules.entity.config.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilter;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilters;
+import com.foreach.across.modules.entity.views.properties.ConversionServicePrintablePropertyView;
+import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
 import liquibase.util.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

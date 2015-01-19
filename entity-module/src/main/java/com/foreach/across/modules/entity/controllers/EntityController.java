@@ -5,14 +5,16 @@ import com.foreach.across.modules.adminweb.menu.AdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.business.EntityForm;
-import com.foreach.across.modules.entity.config.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityModel;
+import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
-import com.foreach.across.modules.entity.services.EntityRegistryImpl;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import com.foreach.across.modules.web.resource.WebResource;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.io.Serializable;
 
 @AdminWebController
 @RequestMapping("/entities")
@@ -33,6 +37,9 @@ public class EntityController
 
 	@Autowired
 	private MenuFactory menuFactory;
+
+	@Autowired
+	private ConversionService conversionService;
 
 	@ModelAttribute
 	public void init( WebResourceRegistry registry ) {
@@ -49,11 +56,10 @@ public class EntityController
 	}
 
 	@RequestMapping(value = "/{entityConfig}", method = RequestMethod.GET)
-	public ModelAndView listAllEntities( @PathVariable("entityConfig") String entityType,
+	public ModelAndView listAllEntities( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
 	                                     Model model,
 	                                     Pageable pageable
 	) {
-		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
 		EntityViewFactory view = entityConfiguration.getViewFactory( "crud-list" );
 
 		model.addAttribute( "pageable", pageable );
@@ -69,9 +75,8 @@ public class EntityController
 	}
 
 	@RequestMapping(value = "/{entityConfig}/create", method = RequestMethod.GET)
-	public String createEntity( @PathVariable("entityConfig") String entityType,
+	public String createEntity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
 	                            Model model ) throws Exception {
-		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
 		//EntityViewFactory view = entityConfiguration.getViewFactory( "crud-create" );
 
 		model.addAttribute( "entityMenu",
@@ -90,12 +95,14 @@ public class EntityController
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/{entityConfig}/{entityId}", method = RequestMethod.GET)
-	public String modifyEntity( @PathVariable("entityConfig") String entityType,
-	                            @PathVariable("entityId") long entityId,
+	public String modifyEntity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
+	                            @PathVariable("entityId") Serializable entityId,
 	                            AdminMenu adminMenu,
 	                            Model model ) throws Exception {
-		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
-		Object entity = entityConfiguration.getEntityModel().findOne( entityId );
+		EntityModel entityModel = entityConfiguration.getEntityModel();
+
+		Serializable coercedEntityId = (Serializable) conversionService.convert( entityId, entityModel.getIdType() );
+		Object entity = entityModel.findOne( coercedEntityId );
 
 		//EntityWrapper entity = entityConfiguration.wrap( entityConfiguration.getRepository().getById( entityId ) );
 

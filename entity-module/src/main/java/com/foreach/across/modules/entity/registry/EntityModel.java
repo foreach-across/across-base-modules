@@ -13,15 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.model;
+package com.foreach.across.modules.entity.registry;
 
-import com.foreach.across.modules.entity.config.EntityConfiguration;
-import com.foreach.across.modules.entity.views.EntityView;
+import org.springframework.data.repository.core.EntityInformation;
+
+import java.io.Serializable;
 
 /**
  * @author Arne Vandamme
  */
-public interface ModelBuilder
+public interface EntityModel<T, ID extends Serializable> extends EntityInformation<T, ID>
 {
-	void build( EntityConfiguration entityConfiguration, EntityView entityView );
+	String getGeneratedLabel( T entity );
+
+	T createNew( Object... args );
+
+	T createDto( T entity );
+
+	T findOne( ID id );
+
+	T save( T entity );
 }

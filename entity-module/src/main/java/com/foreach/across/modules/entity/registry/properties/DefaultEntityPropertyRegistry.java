@@ -1,4 +1,4 @@
-package com.foreach.across.modules.entity.business;
+package com.foreach.across.modules.entity.registry.properties;
 
 import com.foreach.across.modules.entity.views.helpers.NestedValueFetcher;
 import org.apache.commons.lang3.StringUtils;

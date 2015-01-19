@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.business;
+package com.foreach.across.modules.entity.registry.properties;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages the {@link com.foreach.across.modules.entity.business.EntityPropertyRegistry} instances for
+ * Manages the {@link EntityPropertyRegistry} instances for
  * a set of entity types.
  *
  * @author Arne Vandamme

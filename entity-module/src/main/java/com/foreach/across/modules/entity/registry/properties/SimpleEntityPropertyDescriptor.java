@@ -1,4 +1,4 @@
-package com.foreach.across.modules.entity.business;
+package com.foreach.across.modules.entity.registry.properties;
 
 import com.foreach.across.modules.entity.util.EntityUtils;
 import com.foreach.across.modules.entity.views.helpers.PropertyDescriptorValueFetcher;
@@ -155,7 +155,7 @@ public class SimpleEntityPropertyDescriptor implements MutableEntityPropertyDesc
 		descriptor.setName( prop.getName() );
 
 		if ( StringUtils.equals( prop.getName(), prop.getDisplayName() ) ) {
-			descriptor.setDisplayName( EntityUtils.propertyToDisplayName( prop.getName() ) );
+			descriptor.setDisplayName( EntityUtils.generateDisplayName( prop.getName() ) );
 		}
 		else {
 			descriptor.setDisplayName( prop.getDisplayName() );

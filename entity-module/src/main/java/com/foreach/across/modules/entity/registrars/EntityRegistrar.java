@@ -17,7 +17,7 @@ package com.foreach.across.modules.entity.registrars;
 
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
-import com.foreach.across.modules.entity.business.MutableEntityRegistry;
+import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 
 /**
  * Interface for automatic creating of EntityConfiguration.

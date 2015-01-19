@@ -15,7 +15,11 @@
  */
 package com.foreach.across.modules.entity.config;
 
-import com.foreach.across.modules.entity.business.*;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityConfigurationImpl;
+import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
+import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
+import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.views.CommonEntityViewFactory;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
@@ -117,10 +121,10 @@ public class EntitiesConfigurationBuilder
 		}
 
 		private void apply( MutableEntityRegistry entityRegistry ) {
-			EntityConfiguration configuration = entityRegistry.getEntityConfiguration( entityType );
+			MutableEntityConfiguration configuration = entityRegistry.getMutableEntityConfiguration( entityType );
 
 			if ( configuration == null ) {
-				configuration = new EntityConfiguration( entityType );
+				configuration = new EntityConfigurationImpl<>( entityType );
 				configuration.setPropertyRegistry( new DefaultEntityPropertyRegistry( entityType ) );
 				entityRegistry.register( configuration );
 			}
@@ -252,7 +256,7 @@ public class EntitiesConfigurationBuilder
 		}
 
 		@SuppressWarnings("unchecked")
-		protected void apply( EntityConfiguration configuration ) {
+		protected void apply( MutableEntityConfiguration configuration ) {
 			T configuredFactory = (T) configuration.getViewFactory( name );
 
 			if ( configuredFactory == null ) {

@@ -25,14 +25,16 @@ import static org.junit.Assert.assertEquals;
 public class TestEntityUtils
 {
 	@Test
-	public void propertyDisplayName() {
-		assertEquals( "Name", EntityUtils.propertyToDisplayName( "name" ) );
-		assertEquals( "Principal name", EntityUtils.propertyToDisplayName( "principalName" ));
-		assertEquals( "Address street", EntityUtils.propertyToDisplayName( "address.street" ) );
-		assertEquals( "Customer address zip code", EntityUtils.propertyToDisplayName( "customer.address.zipCode" ) );
-		assertEquals( "Groups size", EntityUtils.propertyToDisplayName( "groups.size()" ) );
-		assertEquals( "Text with html", EntityUtils.propertyToDisplayName( "textWithHTML" ) );
-		assertEquals( "Members 0 length", EntityUtils.propertyToDisplayName( "members[0].length" ) );
-		assertEquals( "Generated label", EntityUtils.propertyToDisplayName( "Generated label" ) );
+	public void createDisplayName() {
+		assertEquals( "Name", EntityUtils.generateDisplayName( "name" ) );
+		assertEquals( "Principal name", EntityUtils.generateDisplayName( "principalName" ) );
+		assertEquals( "Address street", EntityUtils.generateDisplayName( "address.street" ) );
+		assertEquals( "Customer address zip code", EntityUtils.generateDisplayName( "customer.address.zipCode" ) );
+		assertEquals( "Groups size", EntityUtils.generateDisplayName( "groups.size()" ) );
+		assertEquals( "Text with html", EntityUtils.generateDisplayName( "textWithHTML" ) );
+		assertEquals( "Members 0 length", EntityUtils.generateDisplayName( "members[0].length" ) );
+		assertEquals( "Generated label", EntityUtils.generateDisplayName( "Generated label" ) );
+		assertEquals( "Basic security principal", EntityUtils.generateDisplayName( "BasicSecurityPrincipal" ) );
+		assertEquals( "Permission group", EntityUtils.generateDisplayName( "PermissionGroup" ) );
 	}
 }

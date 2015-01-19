@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.business;
+package com.foreach.across.modules.entity.views.properties;
 
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import org.springframework.core.convert.ConversionService;
 
 /**

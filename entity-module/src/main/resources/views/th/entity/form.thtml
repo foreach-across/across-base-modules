@@ -28,7 +28,7 @@
 	</li>
 </ul>
 
-<form method="post" th:action="@{${@adminWeb.path('/entities/' + entityConfig.path + '/' + entity.id + '/' + tab)}}" th:object="${entity}" role="form">
+<form method="post" th:action="@{${@adminWeb.path('/entities/' + entityConfig.name + '/' + entity.id + '/' + tab)}}" th:object="${entity}" role="form">
 
 	<div class="row">
 		<div class="col-md-4">
@@ -79,7 +79,7 @@
 			</div>
 
 			<input class="btn btn-primary" type="submit" value="Save"/>
-			<a class="btn btn-link" th:href="@{${@adminWeb.path('/entities/' + entityConfig.path + '/' + entity.id)}}">Cancel</a>
+			<a class="btn btn-link" th:href="@{${@adminWeb.path('/entities/' + entityConfig.name + '/' + entity.id)}}">Cancel</a>
 
 		</div>
 	</div>

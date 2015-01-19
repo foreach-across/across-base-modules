@@ -30,7 +30,7 @@
 	<tbody>
 	<tr th:each="entity,entityStats:${entities}">
 		<td th:text="${entityStats.count}"></td>
-		<td><a th:href="@{${@adminWeb.path('/entities/' + entity.path)}}" th:text="${entity.name}">entity type</a></td>
+		<td><a th:href="@{${@adminWeb.path('/entities/' + entity.name)}}" th:text="${entity.displayName}">entity type</a></td>
 	</tr>
 	</tbody>
 </table>

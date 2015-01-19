@@ -1,8 +1,8 @@
 package com.foreach.across.modules.entity.generators.label;
 
-import com.foreach.across.modules.entity.business.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.business.EntityPropertyOrder;
-import com.foreach.across.modules.entity.business.SimpleEntityPropertyDescriptor;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyOrder;
+import com.foreach.across.modules.entity.registry.properties.SimpleEntityPropertyDescriptor;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;

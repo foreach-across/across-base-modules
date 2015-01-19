@@ -13,22 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.business;
+package com.foreach.across.modules.entity.testmodules.springdata2;
 
-import org.springframework.data.repository.core.EntityInformation;
+import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import java.io.Serializable;
-
-/**
- * @author Arne Vandamme
- */
-public interface EntityModel<T, ID extends Serializable> extends EntityInformation<T, ID>
+@Configuration
+@EnableJpaRepositories(transactionManagerRef = HibernateJpaConfiguration.TRANSACTION_MANAGER)
+public class ClientConfig
 {
-	T createNew( Object... args );
-
-	T createDto( T entity );
-
-	T findOne( ID id );
-
-	T save( T entity );
 }

@@ -11,9 +11,9 @@ import com.foreach.across.modules.entity.business.EntityForm;
 import com.foreach.across.modules.entity.business.EntityWrapper;
 import com.foreach.across.modules.entity.business.FormElement;
 import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
-import com.foreach.across.modules.entity.config.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
-import com.foreach.across.modules.entity.services.EntityRegistryImpl;
 import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.properties.business.EntityProperties;
 import com.foreach.across.modules.properties.config.EntityPropertiesDescriptor;
@@ -94,13 +94,13 @@ public class EntityPropertiesController
 	                             @PathVariable("entityId") long entityId,
 	                             ModelMap model
 	) throws Exception {
-		EntityConfiguration entityConfiguration = entityRegistry.getEntityByPath( entityType );
-		Object original = entityConfiguration.getRepository().getById( entityId );
+		EntityConfiguration entityConfiguration = entityRegistry.getEntityConfiguration( entityType );
+		Object original = entityConfiguration.getEntityModel().findOne( entityId );
 
 		model.addAttribute( "entityConfig", entityConfiguration );
 		model.addAttribute( "properties", loadProperties( entityConfiguration.getEntityType(), entityId ) );
 
-		return entityConfiguration.wrap( original );
+		return null;//entityConfiguration.wrap( original );
 	}
 
 	@SuppressWarnings("unchecked")

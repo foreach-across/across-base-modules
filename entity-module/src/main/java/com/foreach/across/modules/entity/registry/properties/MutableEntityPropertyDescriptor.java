@@ -13,20 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.services;
+package com.foreach.across.modules.entity.registry.properties;
 
-import com.foreach.across.modules.entity.config.EntityConfiguration;
-
-import java.util.Collection;
+import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
 
 /**
  * @author Arne Vandamme
  */
-public interface EntityRegistry
+public interface MutableEntityPropertyDescriptor extends EntityPropertyDescriptor
 {
-	Collection<EntityConfiguration> getEntities();
+	void setDisplayName( String displayName );
 
-	boolean contains( Class entityType );
+	void setReadable( boolean readable );
 
-	EntityConfiguration getEntityConfiguration( Class entityType );
+	void setWritable( boolean writable );
+
+	void setHidden( boolean hidden );
+
+	void addAttribute( String name, Object value );
+
+	boolean removeAttribute( String name );
+
+	void setPropertyType( Class<?> propertyType );
+
+	void setValueFetcher( ValueFetcher<?> valueFetcher );
 }

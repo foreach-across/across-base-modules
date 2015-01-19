@@ -2,7 +2,7 @@ package com.foreach.across.modules.entity.form;
 
 import com.foreach.across.modules.entity.business.FormElement;
 import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
-import com.foreach.across.modules.entity.services.EntityRegistryImpl;
+import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;

@@ -17,8 +17,11 @@ package com.foreach.across.modules.entity.registrars;
 
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
-import com.foreach.across.modules.entity.business.*;
-import com.foreach.across.modules.entity.config.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityConfigurationImpl;
+import com.foreach.across.modules.entity.registry.EntityModel;
+import com.foreach.across.modules.entity.registry.EntityModelImpl;
+import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
+import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.views.CrudListViewFactory;
 import com.foreach.across.modules.entity.views.RepositoryListViewPageFetcher;
 import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
@@ -80,7 +83,7 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 				continue;
 			}
 
-			EntityConfiguration entityConfiguration = new EntityConfiguration( entityType );
+			EntityConfigurationImpl entityConfiguration = new EntityConfigurationImpl( entityType );
 			entityConfiguration.setPropertyRegistry( buildEntityPropertyRegistry( entityType ) );
 			entityConfiguration.setEntityModel( buildEntityModel( entityType, repository ) );
 
@@ -163,7 +166,7 @@ public class CrudRepositoryEntityRegistrar implements EntityRegistrar
 		}
 	}
 
-	private void buildCrudListView( EntityConfiguration entityConfiguration, CrudRepository repository ) {
+	private void buildCrudListView( EntityConfigurationImpl entityConfiguration, CrudRepository repository ) {
 		CrudListViewFactory viewFactory = new CrudListViewFactory();
 		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(
 				entityConfiguration.getPropertyRegistry()

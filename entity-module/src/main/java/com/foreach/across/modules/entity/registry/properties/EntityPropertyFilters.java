@@ -1,4 +1,4 @@
-package com.foreach.across.modules.entity.business;
+package com.foreach.across.modules.entity.registry.properties;
 
 import java.util.*;
 
