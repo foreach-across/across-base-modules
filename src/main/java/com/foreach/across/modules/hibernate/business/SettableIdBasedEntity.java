@@ -2,6 +2,8 @@ package com.foreach.across.modules.hibernate.business;
 
 import org.springframework.data.domain.Persistable;
 
+import javax.persistence.Transient;
+
 /**
  * Base class for an entity with a unique long id, that allows the id to be manually set.
  * This requires the use of a generator strategy that supports manual ids.
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Persistable;
 public abstract class SettableIdBasedEntity<T extends Persistable<Long>>
 		implements IdBasedEntity, Persistable<Long>, EntityWithDto<T>
 {
+	@Transient
 	private Long newEntityId;
 
 	public abstract void setId( Long id );
