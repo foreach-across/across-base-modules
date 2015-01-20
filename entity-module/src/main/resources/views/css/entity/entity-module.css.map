@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": ";;;;;;;;;;;;;;;AAeA,SAAU;EACR,MAAM,EAAE,OAAO;EAEf,gBAAO;IACL,KAAK,EAAE,MAAM;EAGf,oBAAW;IACT,OAAO,EAAE,IAAI;EAGb,0DAAW;IACT,OAAO,EAAE,YAAY",
+"sources": ["entity-module.scss"],
+"names": [],
+"file": "entity-module.css"
+}
