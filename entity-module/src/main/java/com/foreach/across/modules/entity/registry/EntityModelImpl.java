@@ -15,33 +15,30 @@
  */
 package com.foreach.across.modules.entity.registry;
 
-import com.foreach.across.modules.hibernate.business.EntityWithDto;
-import org.springframework.beans.BeanUtils;
-import org.springframework.data.mapping.PersistentEntity;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.core.CrudInvoker;
 import org.springframework.data.repository.core.EntityInformation;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Arne Vandamme
  */
 public class EntityModelImpl<T, ID extends Serializable> implements EntityModel<T, ID>
 {
-	private CrudRepository<T, ID> repository;
+	private EntityFactory<T> entityFactory;
 	private EntityInformation<T, ID> entityInformation;
+	private CrudInvoker<T> crudInvoker;
 
-	private Constructor<T> constructor;
+	public void setEntityFactory( EntityFactory<T> entityFactory ) {
+		this.entityFactory = entityFactory;
+	}
 
-	public EntityModelImpl( PersistentEntity<T, ?> persistentEntity,
-	                        EntityInformation<T, ID> entityInformation,
-	                        CrudRepository<T, ID> repository ) {
+	public void setEntityInformation( EntityInformation<T, ID> entityInformation ) {
 		this.entityInformation = entityInformation;
-		this.repository = repository;
+	}
 
-		constructor = persistentEntity.getPersistenceConstructor().getConstructor();
+	public void setCrudInvoker( CrudInvoker<T> crudInvoker ) {
+		this.crudInvoker = crudInvoker;
 	}
 
 	@Override
@@ -51,35 +48,23 @@ public class EntityModelImpl<T, ID extends Serializable> implements EntityModel<
 
 	@Override
 	public T createNew( Object... args ) {
-		try {
-			return constructor.newInstance( args );
-		}
-		catch ( IllegalAccessException | InstantiationException | InvocationTargetException ie ) {
-			throw new RuntimeException( ie );
-		}
+		return entityFactory.createNew( args );
 	}
 
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	@Override
 	public T createDto( T entity ) {
-		if ( entity instanceof EntityWithDto ) {
-			return ( (EntityWithDto<T>) entity ).toDto();
-		}
-
-		T dto = createNew();
-		BeanUtils.copyProperties( entity, dto );
-
-		return dto;
+		return entityFactory.createDto( entity );
 	}
 
 	@Override
 	public T findOne( ID id ) {
-		return repository.findOne( id );
+		return crudInvoker.invokeFindOne( id );
 	}
 
 	@Override
 	public T save( T entity ) {
-		return repository.save( entity );
+		return crudInvoker.invokeSave( entity );
 	}
 
 	@Override

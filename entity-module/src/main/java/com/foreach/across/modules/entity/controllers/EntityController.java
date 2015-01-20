@@ -9,11 +9,13 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
+import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import com.foreach.across.modules.web.resource.WebResource;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;
@@ -26,9 +28,11 @@ import org.springframework.web.servlet.ModelAndView;
 import java.io.Serializable;
 
 @AdminWebController
-@RequestMapping("/entities")
+@RequestMapping(EntityController.PATH)
 public class EntityController
 {
+	public static final String PATH = "/entities";
+
 	@Autowired
 	private EntityRegistryImpl entityRegistry;
 
@@ -40,6 +44,9 @@ public class EntityController
 
 	@Autowired
 	private ConversionService conversionService;
+
+	@Autowired
+	private MessageSource messageSource;
 
 	@ModelAttribute
 	public void init( WebResourceRegistry registry ) {
@@ -60,9 +67,10 @@ public class EntityController
 	                                     Model model,
 	                                     Pageable pageable
 	) {
-		EntityViewFactory view = entityConfiguration.getViewFactory( "crud-list" );
+		EntityViewFactory view = entityConfiguration.getViewFactory( EntityListView.VIEW_NAME );
 
-		model.addAttribute( "pageable", pageable );
+		model.addAttribute( EntityListView.ATTRIBUTE_PAGEABLE, pageable );
+		model.addAttribute( "messageSource", messageSource );
 
 		return view.create( entityConfiguration, model );
 
@@ -87,14 +95,14 @@ public class EntityController
 
 		model.addAttribute( "entityForm", entityForm );
 		model.addAttribute( "existing", false );
-		model.addAttribute( "entityConfig", entityConfiguration );
+		model.addAttribute( "entityConfiguration", entityConfiguration );
 		model.addAttribute( "entity", entityConfiguration.getEntityType().newInstance() );
 
 		return "th/entity/edit";
 	}
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/{entityConfig}/{entityId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{entityConfig}/{entityId}/update", method = RequestMethod.GET)
 	public String modifyEntity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
 	                            @PathVariable("entityId") Serializable entityId,
 	                            AdminMenu adminMenu,
@@ -117,7 +125,7 @@ public class EntityController
 
 		model.addAttribute( "entityForm", entityForm );
 		model.addAttribute( "existing", true );
-		model.addAttribute( "entityConfig", entityConfiguration );
+		model.addAttribute( "entityConfiguration", entityConfiguration );
 		model.addAttribute( "original", entity );
 		model.addAttribute( "entity", entity );
 

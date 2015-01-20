@@ -1,11 +1,12 @@
 package com.foreach.across.modules.entity.registry;
 
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
+import com.foreach.across.modules.entity.registry.support.ReadableAttributes;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 
 import java.io.Serializable;
 
-public interface EntityConfiguration<T>
+public interface EntityConfiguration<T> extends ReadableAttributes
 {
 	String getName();
 
@@ -17,7 +18,7 @@ public interface EntityConfiguration<T>
 
 	boolean hasView( String viewName );
 
-	EntityViewFactory getViewFactory( String viewName );
+	<Y extends EntityViewFactory> Y getViewFactory( String viewName );
 
 	EntityPropertyRegistry getPropertyRegistry();
 }

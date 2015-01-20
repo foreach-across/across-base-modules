@@ -21,7 +21,7 @@ package com.foreach.across.modules.entity.registry;
  * {@link com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder.EntityConfigurationBuilder} classes.
  *
  * @author Arne Vandamme
- * @see com.foreach.across.modules.entity.registrars.CrudRepositoryEntityRegistrar
+ * @see com.foreach.across.modules.entity.registrars.repository.RepositoryEntityRegistrar
  * @see com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder.EntityConfigurationBuilder
  */
 public interface MutableEntityRegistry extends EntityRegistry

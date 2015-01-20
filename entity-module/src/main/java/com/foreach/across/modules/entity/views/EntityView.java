@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.views;
 
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -23,7 +24,17 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class EntityView extends ModelAndView
 {
+	public static final String ATTRIBUTE_ENTITY_CONFIGURATION = "entityConfiguration";
+
 	public void addModel( Model model ) {
 		addAllObjects( model.asMap() );
+	}
+
+	public EntityConfiguration getEntityConfiguration() {
+		return (EntityConfiguration) getModelMap().get( ATTRIBUTE_ENTITY_CONFIGURATION );
+	}
+
+	public void setEntityConfiguration( EntityConfiguration entityConfiguration ) {
+		getModelMap().addAttribute( ATTRIBUTE_ENTITY_CONFIGURATION, entityConfiguration );
 	}
 }

@@ -115,6 +115,9 @@ public abstract class EntityPropertyRegistrySupport implements MutableEntityProp
 		return filtered;
 	}
 
+	/**
+	 * @return The unfiltered list of all registered EntityPropertyDescriptors.
+	 */
 	@Override
 	public Collection<EntityPropertyDescriptor> getRegisteredDescriptors() {
 		return descriptorMap.values();

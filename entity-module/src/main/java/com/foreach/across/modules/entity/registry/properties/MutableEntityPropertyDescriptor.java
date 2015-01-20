@@ -15,12 +15,13 @@
  */
 package com.foreach.across.modules.entity.registry.properties;
 
+import com.foreach.across.modules.entity.registry.support.WritableAttributes;
 import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
 
 /**
  * @author Arne Vandamme
  */
-public interface MutableEntityPropertyDescriptor extends EntityPropertyDescriptor
+public interface MutableEntityPropertyDescriptor extends EntityPropertyDescriptor, WritableAttributes
 {
 	void setDisplayName( String displayName );
 
@@ -29,10 +30,6 @@ public interface MutableEntityPropertyDescriptor extends EntityPropertyDescripto
 	void setWritable( boolean writable );
 
 	void setHidden( boolean hidden );
-
-	void addAttribute( String name, Object value );
-
-	boolean removeAttribute( String name );
 
 	void setPropertyType( Class<?> propertyType );
 

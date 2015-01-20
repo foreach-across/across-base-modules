@@ -16,8 +16,12 @@
 package com.foreach.across.modules.entity.config.modules;
 
 import com.foreach.across.core.annotations.AcrossDepends;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+
+import javax.annotation.PostConstruct;
 
 /**
  * @author Arne Vandamme
@@ -27,4 +31,11 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @EnableSpringDataWebSupport
 public class AcrossWebConfiguration
 {
+	@Autowired
+	private PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver;
+
+	@PostConstruct
+	public void removeFallbackPageable() {
+		pageableHandlerMethodArgumentResolver.setFallbackPageable( null );
+	}
 }

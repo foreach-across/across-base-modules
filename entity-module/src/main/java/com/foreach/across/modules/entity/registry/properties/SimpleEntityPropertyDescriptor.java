@@ -1,5 +1,6 @@
 package com.foreach.across.modules.entity.registry.properties;
 
+import com.foreach.across.modules.entity.registry.support.AttributeSupport;
 import com.foreach.across.modules.entity.util.EntityUtils;
 import com.foreach.across.modules.entity.views.helpers.PropertyDescriptorValueFetcher;
 import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
@@ -7,19 +8,14 @@ import org.springframework.beans.BeanUtils;
 import org.thymeleaf.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
-public class SimpleEntityPropertyDescriptor implements MutableEntityPropertyDescriptor
+public class SimpleEntityPropertyDescriptor extends AttributeSupport implements MutableEntityPropertyDescriptor
 {
 	private String name, displayName;
 	private boolean readable, writable, hidden;
 
 	private ValueFetcher valueFetcher;
 	private Class<?> propertyType;
-
-	private Map<String, Object> attributes = new HashMap<>();
 
 	/**
 	 * @return Property name.
@@ -98,32 +94,6 @@ public class SimpleEntityPropertyDescriptor implements MutableEntityPropertyDesc
 	}
 
 	@Override
-	public void addAttribute( String name, Object value ) {
-		attributes.put( name, value );
-	}
-
-	@Override
-	public boolean removeAttribute( String name ) {
-		return attributes.remove( name ) != null;
-	}
-
-	@Override
-	public boolean hasAttribute( String name ) {
-		return attributes.containsKey( name );
-	}
-
-	@SuppressWarnings( "unchecked" )
-	@Override
-	public <T> T getAttribute( String name ) {
-		return (T) attributes.get( name );
-	}
-
-	@Override
-	public Map<String, Object> getAttributes() {
-		return Collections.unmodifiableMap( attributes );
-	}
-
-	@Override
 	public EntityPropertyDescriptor merge( EntityPropertyDescriptor other ) {
 		SimpleEntityPropertyDescriptor descriptor = new SimpleEntityPropertyDescriptor();
 		BeanUtils.copyProperties( this, descriptor );
@@ -144,7 +114,8 @@ public class SimpleEntityPropertyDescriptor implements MutableEntityPropertyDesc
 		if ( other.getDisplayName() != null ) {
 			descriptor.setDisplayName( other.getDisplayName() );
 		}
-		descriptor.attributes.putAll( other.getAttributes() );
+
+		descriptor.addAllAttributes( other.getAttributes() );
 
 		return descriptor;
 	}

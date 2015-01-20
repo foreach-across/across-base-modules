@@ -18,13 +18,18 @@ package com.foreach.across.modules.entity.it;
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.filters.ClassBeanFilter;
+import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.ClientRepository;
 import com.foreach.across.modules.entity.testmodules.springdata.SpringDataJpaModule;
+import com.foreach.across.modules.entity.views.EntityListView;
+import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;
@@ -34,6 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -46,8 +55,8 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration(classes = TestCrudRepositoryRegistrar.Config.class)
-public class TestCrudRepositoryRegistrar
+@ContextConfiguration(classes = TestRepositoryEntityRegistrar.Config.class)
+public class TestRepositoryEntityRegistrar
 {
 	@Autowired
 	private EntityRegistry entityRegistry;
@@ -59,18 +68,54 @@ public class TestCrudRepositoryRegistrar
 	private ClientRepository clientRepository;
 
 	@Test
-	public void clientShouldBeRegistered() {
+	public void clientShouldBeRegisteredWithRepositoryInformation() {
 		assertEquals( 1, entityRegistry.getEntities().size() );
 		assertTrue( entityRegistry.contains( Client.class ) );
 
-		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
+		EntityConfiguration<?> configuration = entityRegistry.getEntityConfiguration( Client.class );
 		assertNotNull( configuration );
+
+		CrudRepository<Client, Long> repository = configuration.getAttribute( Repository.class );
+		assertNotNull( repository );
+
+		RepositoryFactoryInformation<Client, Long> repositoryFactoryInformation
+				= configuration.getAttribute( RepositoryFactoryInformation.class );
+		assertNotNull( repositoryFactoryInformation );
 
 		EntityModel model = configuration.getEntityModel();
 		assertNotNull( model );
 
-		EntityViewFactory viewFactory = configuration.getViewFactory( "crud-list" );
+		EntityViewFactory viewFactory = configuration.getViewFactory( EntityListView.VIEW_NAME );
 		assertNotNull( viewFactory );
+	}
+
+	@Test
+	public void verifyPropertyRegistry() {
+		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
+		EntityPropertyRegistry registry = configuration.getPropertyRegistry();
+
+		assertProperty( registry, "name", "Name", true );
+		assertProperty( registry, "id", "Id", true );
+		assertProperty( registry, "newEntityId", "New entity id", false );
+		assertProperty( registry, "nameWithId", "Name with id", false );
+		assertProperty( registry, "class", "Class", false );
+	}
+
+	private void assertProperty( EntityPropertyRegistry registry,
+	                             String propertyName,
+	                             String displayName,
+	                             boolean sortable ) {
+		EntityPropertyDescriptor descriptor = registry.getProperty( propertyName );
+		assertNotNull( propertyName );
+		assertEquals( propertyName, descriptor.getName() );
+		assertEquals( displayName, descriptor.getDisplayName() );
+
+		if ( sortable ) {
+			assertEquals( propertyName, descriptor.getAttribute( EntityAttributes.SORTABLE_PROPERTY ) );
+		}
+		else {
+			assertFalse( descriptor.hasAttribute( EntityAttributes.SORTABLE_PROPERTY ) );
+		}
 	}
 
 	@Test
@@ -106,7 +151,7 @@ public class TestCrudRepositoryRegistrar
 	@SuppressWarnings("unchecked")
 	@Test
 	public void verifyEntityModel() {
-		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
+		EntityConfiguration<Client> configuration = entityRegistry.getEntityConfiguration( Client.class );
 		EntityModel<Client, Long> model = (EntityModel<Client, Long>) configuration.getEntityModel();
 
 		Client existing = model.findOne( 10L );
@@ -138,6 +183,20 @@ public class TestCrudRepositoryRegistrar
 		existing = model.findOne( 10L );
 		assertNotNull( existing );
 		assertEquals( "Modified name", existing.getName() );
+	}
+
+	@Test
+	public void verifyListView() {
+		EntityConfiguration<Client> configuration = entityRegistry.getEntityConfiguration( Client.class );
+		assertTrue( configuration.hasView( EntityListView.VIEW_NAME ) );
+
+		EntityListViewFactory viewFactory = configuration.getViewFactory( EntityListView.VIEW_NAME );
+		assertNotNull( viewFactory );
+
+		assertNotNull( viewFactory.getPageFetcher() );
+		assertEquals( 50, viewFactory.getPageSize() );
+		assertNull( viewFactory.getSortableProperties() );
+		assertEquals( new Sort( "name" ), viewFactory.getDefaultSort() );
 	}
 
 	@Configuration

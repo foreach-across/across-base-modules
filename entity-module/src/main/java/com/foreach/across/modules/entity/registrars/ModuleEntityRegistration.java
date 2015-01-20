@@ -19,16 +19,18 @@ import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.RefreshableCollection;
 import com.foreach.across.core.context.AcrossContextUtils;
+import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
+import com.foreach.across.core.events.AcrossContextBootstrappedEvent;
 import com.foreach.across.core.events.AcrossModuleBootstrappedEvent;
 import com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Takes care of running all registered {@link com.foreach.across.modules.entity.registrars.EntityRegistrar}
@@ -36,13 +38,20 @@ import java.util.Map;
  * instances from the module.
  * <p/>
  * A registrar automatically creates an EntityConfiguration, whereas an
- * {@link com.foreach.across.modules.entity.config.EntityConfigurer} can manually alter it afterwards.
+ * {@link com.foreach.across.modules.entity.config.EntityConfigurer} provides a builders that can be used to modify
+ * existing configurations.
  *
  * @author Arne Vandamme
+ * @see com.foreach.across.modules.entity.config.EntityConfigurer
+ * @see com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder.EntityConfigurationBuilder
+ * @see com.foreach.across.modules.entity.registrars.EntityRegistrar
  */
 @AcrossEventHandler
 public class ModuleEntityRegistration
 {
+	@Autowired
+	private AcrossContextInfo contextInfo;
+
 	@Autowired
 	private MutableEntityRegistry entityRegistry;
 
@@ -50,27 +59,43 @@ public class ModuleEntityRegistration
 	@RefreshableCollection(includeModuleInternals = true, incremental = true)
 	private Collection<EntityRegistrar> registrars;
 
-	@Event
-	protected void applyModule( AcrossModuleBootstrappedEvent moduleBootstrappedEvent ) {
-		AcrossModuleInfo moduleInfo = moduleBootstrappedEvent.getModule();
-		AcrossContextBeanRegistry beanRegistry = AcrossContextUtils.getBeanRegistry( moduleInfo );
-
-		for ( EntityRegistrar registrar : registrars ) {
-			registrar.registerEntities( entityRegistry, moduleInfo, beanRegistry );
+	@PostConstruct
+	protected void registerAlreadyBootstrappedModules() {
+		for ( AcrossModuleInfo moduleInfo : contextInfo.getModules() ) {
+			switch ( moduleInfo.getBootstrapStatus() ) {
+				case BootstrapBusy:
+				case Bootstrapped:
+					applyModule( moduleInfo );
+					break;
+				default:
+					break;
+			}
 		}
-
-		applyEntityConfigurers( moduleInfo );
 	}
 
-	private void applyEntityConfigurers( AcrossModuleInfo moduleInfo ) {
-		Map<String, EntityConfigurer> moduleEntityConfigurers = moduleInfo.getApplicationContext()
-		                                                      .getBeansOfType( EntityConfigurer.class );
+	@Event
+	protected void moduleBootstrapped( AcrossModuleBootstrappedEvent moduleBootstrappedEvent ) {
+		applyModule( moduleBootstrappedEvent.getModule() );
+	}
 
-		for ( EntityConfigurer configurer : moduleEntityConfigurers.values() ) {
+	@Event
+	protected void contextBootstrapped( AcrossContextBootstrappedEvent contextBootstrappedEvent ) {
+		AcrossContextBeanRegistry beanRegistry
+				= AcrossContextUtils.getBeanRegistry( contextBootstrappedEvent.getContext() );
+
+		for ( EntityConfigurer configurer : beanRegistry.getBeansOfType( EntityConfigurer.class, true ) ) {
 			EntitiesConfigurationBuilder builder = new EntitiesConfigurationBuilder();
 			configurer.configure( builder );
 
 			builder.apply( entityRegistry );
+		}
+	}
+
+	private void applyModule( AcrossModuleInfo moduleInfo ) {
+		AcrossContextBeanRegistry beanRegistry = AcrossContextUtils.getBeanRegistry( moduleInfo );
+
+		for ( EntityRegistrar registrar : registrars ) {
+			registrar.registerEntities( entityRegistry, moduleInfo, beanRegistry );
 		}
 	}
 }

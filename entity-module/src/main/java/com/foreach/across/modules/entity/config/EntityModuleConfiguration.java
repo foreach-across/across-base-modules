@@ -2,7 +2,6 @@ package com.foreach.across.modules.entity.config;
 
 import com.foreach.across.modules.entity.converters.EntityConverter;
 import com.foreach.across.modules.entity.converters.StringToEntityConfigurationConverter;
-import com.foreach.across.modules.entity.registrars.CrudRepositoryEntityRegistrar;
 import com.foreach.across.modules.entity.registrars.ModuleEntityRegistration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
@@ -37,19 +36,18 @@ public class EntityModuleConfiguration
 		return new EntityRegistryImpl();
 	}
 
+	/**
+	 * Ensures modules can configure entities through either EntityRegistrar or EntityConfigurer beans.
+	 */
 	@Bean
 	public ModuleEntityRegistration moduleEntityRegistration() {
 		return new ModuleEntityRegistration();
 	}
 
+
 	@Bean
 	public EntityPropertyRegistries entityPropertyRegistries() {
 		return new EntityPropertyRegistries();
-	}
-
-	@Bean
-	public CrudRepositoryEntityRegistrar crudRepositoryEntityRegistrar() {
-		return new CrudRepositoryEntityRegistrar();
 	}
 
 	@Bean

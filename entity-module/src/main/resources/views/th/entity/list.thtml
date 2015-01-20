@@ -21,9 +21,11 @@
 
 <div class="text-right">
 	<a class="btn btn-primary"
-	   th:href="@{${@adminWeb.path('/entities/' + entityConfig.name + '/create')}}"
-	   th:text="|Create a new ${T(org.apache.commons.lang3.StringUtils).uncapitalize(entityConfig.displayName)}|">create a new entity</a>
+	   th:href="@{${entityLinks.create()}}"
+	   th:text="|Create a new ${T(org.apache.commons.lang3.StringUtils).uncapitalize(entityConfiguration.displayName)}|">create a new entity</a>
 </div>
+
+<span th:text="${messages.buttonCreateNewText}"></span>
 
 <div>
 	<span th:text="${page.totalElements}">0</span> item(s) found.<br />
@@ -36,27 +38,30 @@
        th:attr="data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
 	<thead>
 	<tr>
-		<th>#</th>
-		<th th:each="prop : ${props}"
-		    data-tbl="entity-list"
-		    class="sortable"
-		    th:attr="data-tbl-sort-property=${prop.name}">
-				<span th:text="${prop.displayName}">Name</span>
+		<th th:if="${showResultNumber}">#</th>
+		<th th:each="prop : ${props}">
+			<span th:if="${prop.sortable}"
+			      data-tbl="entity-list"
+			      class="sortable"
+			      th:attr="data-tbl-sort-property=${prop.sortableProperty}">
+				<span th:text="${prop.displayName}">Property name</span>
 				<span class="caret"></span>
+			</span>
+			<span th:unless="${prop.sortable}" th:text="${prop.displayName}">Name</span>
 		</th>
 		<th></th>
 	</tr>
 	</thead>
 	<tbody>
-	<tr th:each="entity,entityStats:${entities}" th:with="wrapped=${entityConfig.wrap(entity)}">
-		<td th:text="${entityStats.count + page.number * page.size}"></td>
+	<tr th:each="entity,entityStats:${entities}" th:with="wrapped=${entityConfiguration.wrap(entity)}">
+		<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
 		<td th:each="prop : ${props}">
 			<span th:if="${prop.name eq 'createdDate'}" th:remove="tag">
 				<div th:replace="|th/entity/${prop.name}|">DATUM</div>
 			</span>
 			<span th:unless="${prop.name eq 'createdDate'}" th:utext="${prop.print(entity)}">value</span>
 		</td>
-		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfig.name + '/' + entity.id)}}">edit</a></td>
+		<td><a th:href="@{${entityLinks.update(entity)}}">edit</a></td>
 	</tr>
 	</tbody>
 </table>
@@ -71,10 +76,10 @@
 	</tr>
 	</thead>
 	<tbody>
-	<tr th:each="entity,entityStats:${entities}" th:with="wrapped=${entityConfig.wrap(entity)}">
+	<tr th:each="entity,entityStats:${entities}" th:with="wrapped=${entityConfiguration.wrap(entity)}">
 		<td th:text="${entityStats.count}"></td>
 		<td th:text="${wrapped.entityLabel}"></td>
-		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfig.name + '/' + wrapped.id)}}">edit</a></td>
+		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfiguration.name + '/' + wrapped.id)}}">edit</a></td>
 	</tr>
 	</tbody>
 </table>

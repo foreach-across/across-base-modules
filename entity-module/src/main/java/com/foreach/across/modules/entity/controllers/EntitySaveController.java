@@ -25,7 +25,7 @@ import javax.validation.Valid;
 import java.io.Serializable;
 
 @AdminWebController
-@RequestMapping("/entities/{entityConfig}")
+@RequestMapping(EntityController.PATH + "/{entityConfig}")
 public class EntitySaveController
 {
 	@Autowired

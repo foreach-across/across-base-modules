@@ -28,7 +28,9 @@ import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -37,6 +39,10 @@ import java.util.Map;
 public class EntitiesConfigurationBuilder
 {
 	private final Map<Class<?>, EntityConfigurationBuilder> builders = new HashMap<>();
+
+	private final Map<Object, Object> attributes = new HashMap<>();
+
+	private final Collection<PostProcessor<MutableEntityConfiguration>> postProcessors = new LinkedList<>();
 
 	public synchronized EntityConfigurationBuilder entity( Class<?> entityType ) {
 		Assert.notNull( entityType );
@@ -51,14 +57,56 @@ public class EntitiesConfigurationBuilder
 		return builder;
 	}
 
+	public EntitiesConfigurationBuilder attribute( String name, Object value ) {
+		Assert.notNull( name );
+		attributes.put( name, value );
+		return this;
+	}
+
+	public <T> EntitiesConfigurationBuilder attribute( Class<T> type, T value ) {
+		Assert.notNull( type );
+		attributes.put( type, value );
+		return this;
+	}
+
+	public void addPostProcessor( PostProcessor<MutableEntityConfiguration> postProcessor ) {
+		postProcessors.add( postProcessor );
+	}
+
 	/**
 	 * Apply the configuration to the EntityRegistry.
 	 *
 	 * @param entityRegistry EntityRegistry to which the configuration should be applied.
 	 */
 	public synchronized void apply( MutableEntityRegistry entityRegistry ) {
+		for ( EntityConfiguration entityConfiguration : entityRegistry.getEntities() ) {
+			MutableEntityConfiguration mutableEntityConfiguration
+					= entityRegistry.getMutableEntityConfiguration( entityConfiguration.getEntityType() );
+
+			for ( Map.Entry<Object, Object> attribute : attributes.entrySet() ) {
+				if ( attribute.getKey() instanceof String ) {
+					mutableEntityConfiguration.addAttribute( (String) attribute.getKey(), attribute.getValue() );
+				}
+				else {
+					mutableEntityConfiguration.addAttribute( (Class) attribute.getKey(), attribute.getValue() );
+				}
+			}
+		}
+
+		// Apply the individual builder
 		for ( EntityConfigurationBuilder builder : builders.values() ) {
 			builder.apply( entityRegistry );
+		}
+
+		// Apply post processors
+		// todo: if different instance is returned, update registry
+		for ( EntityConfiguration entityConfiguration : entityRegistry.getEntities() ) {
+			MutableEntityConfiguration mutableEntityConfiguration
+					= entityRegistry.getMutableEntityConfiguration( entityConfiguration.getEntityType() );
+
+			for ( PostProcessor<MutableEntityConfiguration> postProcessor : postProcessors ) {
+				postProcessor.process( mutableEntityConfiguration );
+			}
 		}
 	}
 
@@ -159,8 +207,8 @@ public class EntitiesConfigurationBuilder
 		}
 
 		public EntityPropertyRegistryBuilderSupport<T> property( String name,
-		                                                      String displayName,
-		                                                      ValueFetcher valueFetcher ) {
+		                                                         String displayName,
+		                                                         ValueFetcher valueFetcher ) {
 			Assert.notNull( name );
 
 			Descriptor descriptor = new Descriptor();

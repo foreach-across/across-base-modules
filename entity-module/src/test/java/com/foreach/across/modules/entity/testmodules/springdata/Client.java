@@ -63,6 +63,10 @@ public class Client extends SettableIdBasedEntity<Client>
 		this.name = name;
 	}
 
+	public String getNameWithId() {
+		return String.format( "%s (%s)", getName(), getId() );
+	}
+
 	@Override
 	public Client toDto() {
 		Client client = new Client();

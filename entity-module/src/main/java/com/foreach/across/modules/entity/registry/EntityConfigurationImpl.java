@@ -2,6 +2,7 @@ package com.foreach.across.modules.entity.registry;
 
 import com.foreach.across.modules.entity.business.EntityWrapper;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
+import com.foreach.across.modules.entity.registry.support.AttributeSupport;
 import com.foreach.across.modules.entity.util.EntityUtils;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +17,7 @@ import java.util.Map;
  * {@link com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry}
  * along with the registered views and attributes.
  */
-public class EntityConfigurationImpl<T> implements MutableEntityConfiguration<T>
+public class EntityConfigurationImpl<T> extends AttributeSupport implements MutableEntityConfiguration<T>
 {
 	private final String name;
 	private final Class<T> entityType;
@@ -77,8 +78,9 @@ public class EntityConfigurationImpl<T> implements MutableEntityConfiguration<T>
 	}
 
 	@Override
-	public EntityViewFactory getViewFactory( String viewName ) {
-		return registeredViews.get( viewName );
+	@SuppressWarnings( "unchecked" )
+	public <Y extends EntityViewFactory> Y getViewFactory( String viewName ) {
+		return (Y) registeredViews.get( viewName );
 	}
 
 	@Override

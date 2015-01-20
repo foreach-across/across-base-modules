@@ -30,8 +30,10 @@ import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.ClientRepository;
 import com.foreach.across.modules.entity.testmodules.springdata.SpringDataJpaModule;
 import com.foreach.across.modules.entity.views.CommonEntityViewFactory;
+import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
+import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Before;
@@ -74,6 +76,13 @@ public class TestCustomizingEntityConfiguration
 	}
 
 	@Test
+	public void attributesShouldBeSet() {
+		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
+
+		assertNotNull( configuration.getAttribute( EntityLinkBuilder.class ) );
+	}
+
+	@Test
 	public void customPropertiesOnEntity() {
 		EntityPropertyRegistry registry = configuration.getPropertyRegistry();
 		assertNotNull( registry );
@@ -87,7 +96,7 @@ public class TestCustomizingEntityConfiguration
 
 	@Test
 	public void crudListViewShouldBeModified() {
-		EntityViewFactory viewFactory = configuration.getViewFactory( "crud-list" );
+		EntityViewFactory viewFactory = configuration.getViewFactory( EntityListView.VIEW_NAME );
 		assertNotNull( viewFactory );
 	}
 
@@ -143,6 +152,8 @@ public class TestCustomizingEntityConfiguration
 	{
 		@Override
 		public void configure( EntitiesConfigurationBuilder configuration ) {
+			configuration.attribute( EntityLinkBuilder.class, mock( EntityLinkBuilder.class ) );
+
 			configuration.entity( Client.class )
 			             .properties()
 			             .property( "someprop", "Some property", "'fixed'" )
