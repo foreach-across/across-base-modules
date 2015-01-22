@@ -1,12 +1,8 @@
 package com.foreach.across.modules.entity.business;
 
-public interface FormElement
+import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
+
+public interface FormElement extends PrintablePropertyView
 {
-	void setEntity( Object entity );
-
-	String getName();
-
-	void setValue( Object value );
-
 	String getElementType();
 }

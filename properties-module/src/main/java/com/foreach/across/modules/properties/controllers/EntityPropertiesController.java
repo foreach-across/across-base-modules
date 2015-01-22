@@ -143,7 +143,7 @@ public class EntityPropertiesController
 		EntityForm entityForm = formFactory.create( descriptors );
 
 		for ( FormElement element : entityForm.getElements() ) {
-			element.setValue( properties.getValue( element.getName() ) );
+			//element.setValue( properties.getValue( element.getName() ) );
 		}
 
 		model.addAttribute( "entityForm", entityForm );

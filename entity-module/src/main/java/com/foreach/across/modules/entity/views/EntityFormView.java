@@ -18,8 +18,9 @@ package com.foreach.across.modules.entity.views;
 /**
  * @author Arne Vandamme
  */
-public class EntityCreateView extends EntityView
+public class EntityFormView extends EntityView
 {
-	public static final String VIEW_NAME = "createView";
+	public static final String CREATE_VIEW_NAME = "createView";
+	public static final String UPDATE_VIEW_NAME = "updateView";
 	public static final String VIEW_TEMPLATE = "th/entity/edit";
 }

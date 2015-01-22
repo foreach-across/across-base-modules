@@ -89,7 +89,7 @@ public abstract class EntityPropertyRegistrySupport implements MutableEntityProp
 			for ( String propertyName : inclusiveFilter.getPropertyNames() ) {
 				EntityPropertyDescriptor candidate = getProperty( propertyName );
 
-				if ( candidate != null && inclusiveFilter.include( candidate ) ) {
+				if ( candidate != null && inclusiveFilter.shouldInclude( candidate ) ) {
 					filtered.add( candidate );
 				}
 			}
@@ -102,7 +102,7 @@ public abstract class EntityPropertyRegistrySupport implements MutableEntityProp
 			}
 
 			for ( EntityPropertyDescriptor candidate : getRegisteredDescriptors() ) {
-				if ( first.include( candidate ) && filter.include( candidate ) ) {
+				if ( first.shouldInclude( candidate ) && filter.shouldInclude( candidate ) ) {
 					filtered.add( candidate );
 				}
 			}

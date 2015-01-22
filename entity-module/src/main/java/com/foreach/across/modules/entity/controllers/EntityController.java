@@ -7,7 +7,7 @@ import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
-import com.foreach.across.modules.entity.views.EntityCreateView;
+import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
@@ -77,25 +77,19 @@ public class EntityController
 		model.addAttribute( "entityMenu",
 		                    menuFactory.buildMenu( new EntityAdminMenu<>( entityConfiguration.getEntityType() ) ) );
 
-		EntityViewFactory view = entityConfiguration.getViewFactory( EntityCreateView.VIEW_NAME );
+		EntityViewFactory view = entityConfiguration.getViewFactory( EntityFormView.CREATE_VIEW_NAME );
 		return view.create( entityConfiguration, model );
 	}
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/{entityConfig}/{entityId}/update", method = RequestMethod.GET)
 	public ModelAndView modifyEntity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
-	                            @PathVariable("entityId") Serializable entityId,
-	                            AdminMenu adminMenu,
-	                            Model model ) throws Exception {
+	                                  @PathVariable("entityId") Serializable entityId,
+	                                  AdminMenu adminMenu,
+	                                  Model model ) throws Exception {
 		Object entity = conversionService.convert( entityId, entityConfiguration.getEntityType() );
 		model.addAttribute( EntityView.ATTRIBUTE_ENTITY, entity );
 
-		/*
-		EntityModel entityModel = entityConfiguration.getEntityModel();
-
-		Serializable coercedEntityId = (Serializable) conversionService.convert( entityId, entityModel.getIdType() );
-		Object entity = entityModel.findOne( coercedEntityId );
-*/
 		//EntityWrapper entity = entityConfiguration.wrap( entityConfiguration.getRepository().getById( entityId ) );
 		//adminMenu.getLowestSelectedItem().addItem( "/selectedEntity", entity.getEntityLabel() ).setSelected( true );
 
@@ -103,19 +97,7 @@ public class EntityController
 		                    menuFactory.buildMenu( new EntityAdminMenu( entityConfiguration.getEntityType(),
 		                                                                entity ) ) );
 
-		EntityViewFactory view = entityConfiguration.getViewFactory( EntityCreateView.VIEW_NAME );
+		EntityViewFactory view = entityConfiguration.getViewFactory( EntityFormView.UPDATE_VIEW_NAME );
 		return view.create( entityConfiguration, model );
-
-		/*
-		EntityForm entityForm = formFactory.create( entityConfiguration );
-		entityForm.setEntity( entity );
-
-		model.addAttribute( "entityForm", entityForm );
-		model.addAttribute( "existing", true );
-		model.addAttribute( "entityConfiguration", entityConfiguration );
-		model.addAttribute( "original", entity );
-		model.addAttribute( "entity", entity );
-
-		return "th/entity/edit";*/
 	}
 }

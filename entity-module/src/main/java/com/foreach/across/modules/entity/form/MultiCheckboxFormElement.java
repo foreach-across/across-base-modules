@@ -8,7 +8,7 @@ import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.util.Collection;
 
-public class MultiCheckboxFormElement implements FormElement
+public abstract class MultiCheckboxFormElement implements FormElement
 {
 	private final EntityRegistryImpl registry;
 	private Object entity;
@@ -56,16 +56,6 @@ public class MultiCheckboxFormElement implements FormElement
 
 	public Object getValue() {
 		return value;
-	}
-
-	@Override
-	public void setValue( Object value ) {
-		this.value = value;
-	}
-
-	@Override
-	public void setEntity( Object entity ) {
-		this.entity = entity;
 	}
 
 	@Override

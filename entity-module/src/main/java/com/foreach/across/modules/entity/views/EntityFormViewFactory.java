@@ -15,16 +15,18 @@
  */
 package com.foreach.across.modules.entity.views;
 
-import com.foreach.across.modules.entity.business.EntityForm;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
+import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
+import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Arne Vandamme
  */
-public class EntityCreateViewFactory extends ConfigurablePropertiesEntityViewFactorySupport
+public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFactorySupport
 {
 	@Autowired
 	private EntityFormFactory formFactory;
@@ -36,11 +38,6 @@ public class EntityCreateViewFactory extends ConfigurablePropertiesEntityViewFac
 
 		Object entity = retrieveOrCreateEntity( entityModel, view );
 		view.setEntity( entity );
-
-		EntityForm entityForm = formFactory.create( entityConfiguration );
-		entityForm.setEntity( entity );
-
-		view.addObject( "entityForm", entityForm );
 		view.addObject( "existing", !entityModel.isNew( entity ) );
 	}
 
@@ -55,7 +52,13 @@ public class EntityCreateViewFactory extends ConfigurablePropertiesEntityViewFac
 	}
 
 	@Override
+	protected PrintablePropertyView createPropertyView( EntityPropertyDescriptor descriptor,
+	                                                    EntityMessageCodeResolver messageCodeResolver ) {
+		return formFactory.createFormElement( descriptor, messageCodeResolver );
+	}
+
+	@Override
 	protected EntityView createEntityView() {
-		return new EntityCreateView();
+		return new EntityFormView();
 	}
 }

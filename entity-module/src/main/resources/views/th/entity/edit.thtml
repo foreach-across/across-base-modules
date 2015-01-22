@@ -31,24 +31,24 @@
 
 	<div class="tab-content">
 		<div class="tab-pane active">
-			<form method="post" th:action="@{${@adminWeb.path('/entities/' + entityConfiguration.name + (existing ? '/' + entity.id : '/create'))}}" th:object="${entity}" role="form">
+			<form method="post" th:action="@{${existing ? entityLinks.update(entity) : entityLinks.create()}}" th:object="${entity}" role="form">
 
 				<div class="row">
 					<div class="col-md-4">
-						<div class="form-group" th:each="element : ${entityForm.elements}" th:classappend="${#fields.hasErrors(element.name)}? has-error">
+						<div class="form-group" th:each="element : ${properties}" th:classappend="${#fields.hasErrors(element.name)}? has-error">
 							<!--/* label */-->
 							<div th:if="${element.elementType eq 'text'}">
 								<label th:for="${element.name}" th:text="${element.label}">label</label>
-								<div th:text="${element.value}">text value</div>
+								<div th:text="${element.value(entity)}">text value</div>
 							</div>
 							<!--/* hidden */-->
 							<div th:if="${element.elementType eq 'hidden'}">
-								<input type="hidden" th:name="${element.name}" th:value="${element.value}" />
+								<input type="hidden" th:name="${element.name}" th:value="${element.value(entity)}" />
 							</div>
 							<!--/* textbox */-->
 							<div th:if="${element.elementType eq 'textbox'}">
-								<label th:for="${element.name}" th:text="${element.label}">label</label>
-								<input type="text" th:name="${element.name}" class="form-control" th:value="${element.value}" />
+								<label th:for="${#ids.next(element.name)}" th:text="${element.label}">label</label>
+								<input th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}" class="form-control" th:value="${element.value(entity)}" />
 							</div>
 							<!--/* checkbox */-->
 							<div th:if="${element.elementType eq 'checkbox'}" class="checkbox">

@@ -200,9 +200,9 @@ public class TestRepositoryEntityRegistrar
 	@Test
 	public void verifyCreateView() {
 		EntityConfiguration<Client> configuration = entityRegistry.getEntityConfiguration( Client.class );
-		assertTrue( configuration.hasView( EntityCreateView.VIEW_NAME ) );
+		assertTrue( configuration.hasView( EntityFormView.CREATE_VIEW_NAME ) );
 
-		EntityCreateViewFactory viewFactory = configuration.getViewFactory( EntityCreateView.VIEW_NAME );
+		EntityFormViewFactory viewFactory = configuration.getViewFactory( EntityFormView.CREATE_VIEW_NAME );
 		assertNotNull( viewFactory );
 	}
 

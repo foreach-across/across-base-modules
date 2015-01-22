@@ -1,10 +1,7 @@
 package com.foreach.across.modules.entity.registrars.repository;
 
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilters;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
-import com.foreach.across.modules.entity.registry.properties.MergingEntityPropertyRegistry;
-import com.foreach.across.modules.entity.registry.properties.SimpleEntityPropertyDescriptor;
+import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
 import com.foreach.across.modules.hibernate.business.Auditable;
@@ -48,23 +45,54 @@ public class RepositoryEntityViewsBuilder
 
 	public void createViews( MutableEntityConfiguration entityConfiguration ) {
 		buildCreateView( entityConfiguration );
+		buildUpdateView( entityConfiguration );
 
 		// todo: support regular repository to be used instead of specific CrudRepository interface (use repo information)
 		buildListView( entityConfiguration, (CrudRepository) entityConfiguration.getAttribute( Repository.class ) );
 	}
 
 	private void buildCreateView( MutableEntityConfiguration entityConfiguration ) {
-		EntityCreateViewFactory viewFactory = beanFactory.getBean( EntityCreateViewFactory.class );
-		viewFactory.setMessagePrefixes( "entityViews.createView", "entityViews" );
+		EntityFormViewFactory viewFactory = beanFactory.getBean( EntityFormViewFactory.class );
+		viewFactory.setMessagePrefixes( "entityViews." + EntityFormView.CREATE_VIEW_NAME, "entityViews" );
 
 		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(
 				entityConfiguration.getPropertyRegistry()
 		);
 
 		viewFactory.setPropertyRegistry( registry );
-		viewFactory.setTemplate( EntityCreateView.VIEW_TEMPLATE );
+		viewFactory.setTemplate( EntityFormView.VIEW_TEMPLATE );
 
-		entityConfiguration.registerView( EntityCreateView.VIEW_NAME, viewFactory );
+		if ( Auditable.class.isAssignableFrom( entityConfiguration.getEntityType() ) ) {
+			LinkedList<String> excludedProperties = new LinkedList<>();
+			excludedProperties.add( "createdDate" );
+			excludedProperties.add( "createdBy" );
+			excludedProperties.add( "lastModifiedDate" );
+			excludedProperties.add( "lastModifiedBy" );
+
+			EntityPropertyFilter existingFilter = registry.getDefaultFilter();
+
+			if ( existingFilter instanceof EntityPropertyFilter.Exclusive ) {
+				excludedProperties.addAll( existingFilter.getPropertyNames() );
+			}
+
+			registry.setDefaultFilter( EntityPropertyFilters.exclude( excludedProperties ) );
+		}
+
+		entityConfiguration.registerView( EntityFormView.CREATE_VIEW_NAME, viewFactory );
+	}
+
+	private void buildUpdateView( MutableEntityConfiguration entityConfiguration ) {
+		EntityFormViewFactory viewFactory = beanFactory.getBean( EntityFormViewFactory.class );
+		viewFactory.setMessagePrefixes( "entityViews." + EntityFormView.UPDATE_VIEW_NAME, "entityViews" );
+
+		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(
+				entityConfiguration.getPropertyRegistry()
+		);
+
+		viewFactory.setPropertyRegistry( registry );
+		viewFactory.setTemplate( EntityFormView.VIEW_TEMPLATE );
+
+		entityConfiguration.registerView( EntityFormView.UPDATE_VIEW_NAME, viewFactory );
 	}
 
 	private void buildListView( MutableEntityConfiguration entityConfiguration, CrudRepository repository ) {

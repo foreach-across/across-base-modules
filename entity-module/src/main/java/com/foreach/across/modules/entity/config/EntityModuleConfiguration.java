@@ -10,7 +10,7 @@ import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistries;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
 import com.foreach.across.modules.entity.services.EntityFormRenderer;
-import com.foreach.across.modules.entity.views.EntityCreateViewFactory;
+import com.foreach.across.modules.entity.views.EntityFormViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -84,8 +84,8 @@ public class EntityModuleConfiguration
 	@Bean
 	@Exposed
 	@Scope("prototype")
-	public EntityCreateViewFactory entityCreateViewFactory() {
-		return new EntityCreateViewFactory();
+	public EntityFormViewFactory entityCreateViewFactory() {
+		return new EntityFormViewFactory();
 	}
 
 /*

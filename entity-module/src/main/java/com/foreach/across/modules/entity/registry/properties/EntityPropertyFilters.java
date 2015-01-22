@@ -4,11 +4,16 @@ import java.util.*;
 
 public final class EntityPropertyFilters
 {
-	public static EntityPropertyFilter NoOp = new EntityPropertyFilter()
+	public static EntityPropertyFilter NoOp = new EntityPropertyFilter.Exclusive()
 	{
 		@Override
-		public boolean include( EntityPropertyDescriptor descriptor ) {
+		public boolean shouldInclude( EntityPropertyDescriptor descriptor ) {
 			return true;
+		}
+
+		@Override
+		public Collection<String> getPropertyNames() {
+			return Collections.emptyList();
 		}
 	};
 
@@ -38,11 +43,16 @@ public final class EntityPropertyFilters
 	public static EntityPropertyFilter exclude( Collection<String> propertyNames ) {
 		final Set<String> excluded = new HashSet<>( propertyNames );
 
-		return new EntityPropertyFilter()
+		return new EntityPropertyFilter.Exclusive()
 		{
 			@Override
-			public boolean include( EntityPropertyDescriptor descriptor ) {
+			public boolean shouldInclude( EntityPropertyDescriptor descriptor ) {
 				return !excluded.contains( descriptor.getName() );
+			}
+
+			@Override
+			public Collection<String> getPropertyNames() {
+				return excluded;
 			}
 		};
 	}
@@ -64,7 +74,7 @@ public final class EntityPropertyFilters
 		}
 
 		@Override
-		public boolean include( EntityPropertyDescriptor descriptor ) {
+		public boolean shouldInclude( EntityPropertyDescriptor descriptor ) {
 			return propertyNames.contains( descriptor.getName() );
 		}
 	}
@@ -87,7 +97,7 @@ public final class EntityPropertyFilters
 		}
 
 		@Override
-		public boolean include( EntityPropertyDescriptor descriptor ) {
+		public boolean shouldInclude( EntityPropertyDescriptor descriptor ) {
 			return getOrder().containsKey( descriptor.getName() );
 		}
 	}

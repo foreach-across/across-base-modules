@@ -4,22 +4,23 @@ import com.foreach.across.modules.adminweb.AdminWeb;
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.adminweb.menu.AdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
-import com.foreach.across.modules.entity.business.EntityForm;
 import com.foreach.across.modules.entity.business.EntityWrapper;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
-import com.foreach.across.modules.entity.services.EntityFormFactory;
-import com.foreach.across.modules.hibernate.business.IdBasedEntity;
+import com.foreach.across.modules.entity.views.EntityFormView;
+import com.foreach.across.modules.entity.views.EntityView;
+import com.foreach.across.modules.entity.views.EntityViewFactory;
+import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.web.menu.MenuFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.io.Serializable;
@@ -30,9 +31,6 @@ public class EntitySaveController
 {
 	@Autowired
 	private AdminWeb adminWeb;
-
-	@Autowired
-	private EntityFormFactory formFactory;
 
 	@Autowired
 	private MenuFactory menuFactory;
@@ -49,48 +47,55 @@ public class EntitySaveController
 	}
 
 	@SuppressWarnings("unchecked")
-	@ModelAttribute("entity")
+	@ModelAttribute(EntityView.ATTRIBUTE_ENTITY)
+	@RequestMapping(value = "/{entityId}/update", method = RequestMethod.POST)
 	public Object entity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
-	                      @RequestParam(value = "id", required = false) String entityId,
+	                      @PathVariable("entityId") Serializable entityId,
 	                      ModelMap model
 	) throws Exception {
 		EntityModel entityModel = entityConfiguration.getEntityModel();
 
 		Object entity = entityModel.createNew();
+		Object original = conversionService.convert( entityId, entityConfiguration.getEntityType() );
+		model.addAttribute( "original", original );
 
-		if ( !StringUtils.isBlank( entityId ) ) {
-			Serializable coercedEntityId = (Serializable) conversionService.convert( entityId,
-			                                                                         entityModel.getIdType() );
-			if ( coercedEntityId != null ) {
-				Object original = entityModel.findOne( coercedEntityId );
-
-				if ( original != null ) {
-					//model.addAttribute( "original", entityConfiguration.wrap( original ) );
-					entity = entityModel.createDto( original );
-				}
-			}
+		if ( original != null ) {
+			//model.addAttribute( "original", entityConfiguration.wrap( original ) );
+			entity = entityModel.createDto( original );
 		}
 
 		return entity;
 	}
 
+	@ModelAttribute(EntityView.ATTRIBUTE_ENTITY)
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	public Object entity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration ) throws Exception {
+		EntityModel entityModel = entityConfiguration.getEntityModel();
+
+		return entityModel.createNew();
+	}
+
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/*", method = RequestMethod.POST)
-	public String saveEntity( @PathVariable("entityConfig") EntityConfiguration entityConfiguration,
-	                          @ModelAttribute("entity") @Valid Object entity,
-	                          BindingResult bindingResult,
-	                          ModelMap model,
-	                          AdminMenu adminMenu,
-	                          RedirectAttributes re ) {
+	@RequestMapping(value = { "/create", "/{entityId}/update" }, method = RequestMethod.POST)
+	public ModelAndView saveEntity( @PathVariable("entityConfig") EntityConfiguration entityConfiguration,
+	                                @ModelAttribute(EntityView.ATTRIBUTE_ENTITY) @Valid Object entity,
+	                                BindingResult bindingResult,
+	                                Model model,
+	                                AdminMenu adminMenu ) {
+		EntityModel entityModel = entityConfiguration.getEntityModel();
+
 		if ( !bindingResult.hasErrors() ) {
-			entityConfiguration.getEntityModel().save( entity );
+			entityModel.save( entity );
 
-			re.addAttribute( "entityId", ( (IdBasedEntity) entity ).getId() );
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName(
+					"redirect:" + entityConfiguration.getAttribute( EntityLinkBuilder.class ).update( entity )
+			);
 
-			return adminWeb.redirect( "/entities/" + entityConfiguration.getName() + "/{entityId}" );
+			return mav;
 		}
 		else {
-			EntityWrapper originalEntity = (EntityWrapper) model.get( "original" );
+			EntityWrapper originalEntity = (EntityWrapper) model.asMap().get( "original" );
 
 			if ( originalEntity != null ) {
 				adminMenu.getLowestSelectedItem()
@@ -113,19 +118,11 @@ public class EntitySaveController
 				);
 			}
 
-			EntityForm entityForm = formFactory.create( entityConfiguration );
-			entityForm.setEntity( entity );
+			EntityViewFactory viewFactory = entityConfiguration.getViewFactory(
+					entityModel.isNew( entity ) ? EntityFormView.CREATE_VIEW_NAME : EntityFormView.UPDATE_VIEW_NAME
+			);
 
-			model.addAttribute( "entityForm", entityForm );
-			model.addAttribute( "existing", originalEntity != null );
-			model.addAttribute( "entityConfig", entityConfiguration );
-			//model.addAttribute( "entity", entityConfiguration.wrap( entity ) );
+			return viewFactory.create( entityConfiguration, model );
 		}
-
-		return "th/entity/edit";
-	}
-
-	private boolean isNewEntity( Object entity ) {
-		return ( (IdBasedEntity) entity ).getId() == 0;
 	}
 }
