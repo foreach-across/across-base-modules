@@ -29,9 +29,10 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegis
 import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.ClientRepository;
 import com.foreach.across.modules.entity.testmodules.springdata.SpringDataJpaModule;
-import com.foreach.across.modules.entity.views.CommonEntityViewFactory;
+import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
 import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
+import com.foreach.across.modules.entity.views.SimpleEntityViewFactorySupport;
 import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
@@ -106,9 +107,9 @@ public class TestCustomizingEntityConfiguration
 
 		EntityViewFactory viewFactory = configuration.getViewFactory( "some-extra-view" );
 		assertNotNull( viewFactory );
-		assertTrue( viewFactory instanceof CommonEntityViewFactory );
+		assertTrue( viewFactory instanceof SimpleEntityViewFactorySupport );
 
-		CommonEntityViewFactory common = (CommonEntityViewFactory) viewFactory;
+		ConfigurablePropertiesEntityViewFactorySupport common = (ConfigurablePropertiesEntityViewFactorySupport) viewFactory;
 		assertEquals( "th/someTemplate", common.getTemplate() );
 
 		EntityPropertyDescriptor calculated = common.getPropertyRegistry().getProperty( "calculated" );
@@ -165,7 +166,7 @@ public class TestCustomizingEntityConfiguration
 			             .property( "group-membership", "Group membership", "groups.size()" )
 			             .and()
 			             .and()
-			             .view( "some-other-view" ).factory( mock( CommonEntityViewFactory.class ) );
+			             .view( "some-other-view" ).factory( mock( ConfigurablePropertiesEntityViewFactorySupport.class ) );
 		}
 	}
 }

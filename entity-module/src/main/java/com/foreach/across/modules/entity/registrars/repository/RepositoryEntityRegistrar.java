@@ -17,16 +17,20 @@ package com.foreach.across.modules.entity.registrars.repository;
 
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
+import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.registrars.EntityRegistrar;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityConfigurationImpl;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
+import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.MessageSource;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 import org.springframework.util.ClassUtils;
@@ -54,6 +58,9 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 	@Autowired
 	private RepositoryEntityViewsBuilder viewsBuilder;
 
+	@Autowired
+	private MessageSource messageSource;
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void registerEntities( MutableEntityRegistry entityRegistry,
@@ -78,7 +85,7 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 			if ( !entityRegistry.contains( entityType ) ) {
 				LOG.debug( "Auto registering entity type {} as repository", entityType.getName() );
 
-				registerEntity( entityRegistry, entityType, repositoryFactoryInformation, repository );
+				registerEntity( moduleInfo, entityRegistry, entityType, repositoryFactoryInformation, repository );
 			}
 			else {
 				LOG.info( "Skipping auto registration of entity type {} as it is already registered",
@@ -88,16 +95,22 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 	}
 
 	@SuppressWarnings("unchecked")
-	private void registerEntity( MutableEntityRegistry entityRegistry,
-	                             Class<?> entityType,
-	                             RepositoryFactoryInformation repositoryFactoryInformation,
-	                             Repository repository ) {
+	private void registerEntity(
+			AcrossModuleInfo moduleInfo,
+			MutableEntityRegistry entityRegistry,
+			Class<?> entityType,
+			RepositoryFactoryInformation repositoryFactoryInformation,
+			Repository repository ) {
 		String entityTypeName = determineUniqueEntityTypeName( entityRegistry, entityType );
 
 		if ( entityTypeName != null ) {
 			EntityConfigurationImpl entityConfiguration = new EntityConfigurationImpl<>( entityTypeName, entityType );
 			entityConfiguration.addAttribute( RepositoryFactoryInformation.class, repositoryFactoryInformation );
 			entityConfiguration.addAttribute( Repository.class, repository );
+
+			entityConfiguration.setEntityMessageCodeResolver(
+					buildMessageCodeResolver( entityConfiguration, moduleInfo )
+			);
 
 			entityConfiguration.setEntityModel(
 					entityModelBuilder.buildEntityModel( repositoryFactoryInformation, repository )
@@ -115,6 +128,19 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 			LOG.warn( "Skipping registration of entity type {} as no unique name could be determined",
 			          entityType.getName() );
 		}
+	}
+
+	private EntityMessageCodeResolver buildMessageCodeResolver( EntityConfiguration entityConfiguration,
+	                                                            AcrossModuleInfo moduleInfo ) {
+		String name = StringUtils.uncapitalize( entityConfiguration.getEntityType().getSimpleName() );
+
+		EntityMessageCodeResolver resolver = new EntityMessageCodeResolver();
+		resolver.setMessageSource( messageSource );
+		resolver.setEntityConfiguration( entityConfiguration );
+		resolver.setPrefixes( moduleInfo.getName() + ".entities." + name );
+		resolver.setFallbackCollections( EntityModule.NAME + ".entities", "" );
+
+		return resolver;
 	}
 
 	private String determineUniqueEntityTypeName( EntityRegistry registry, Class<?> entityType ) {

@@ -18,24 +18,16 @@ package com.foreach.across.modules.entity.views;
 import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilter;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilters;
-import com.foreach.across.modules.entity.views.properties.ConversionServicePrintablePropertyView;
+import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
-import com.foreach.across.modules.entity.web.EntityLinkBuilder;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
+import com.foreach.across.modules.entity.views.support.EntityMessages;
+import com.foreach.across.modules.entity.views.support.ListViewEntityMessages;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.format.datetime.DateFormatter;
-import org.springframework.format.support.DefaultFormattingConversionService;
-import org.springframework.ui.Model;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * Handles a list of items (entities) with support for the properties to show,
@@ -43,23 +35,23 @@ import java.util.*;
  *
  * @author Arne Vandamme
  */
-public class EntityListViewFactory extends CommonEntityViewFactory
+public class EntityListViewFactory extends ConfigurablePropertiesEntityViewFactorySupport<EntityListView>
 {
 	private int pageSize = 50;
 	private boolean showResultNumber = true;
 
 	private Sort defaultSort;
 	private Collection<String> sortableProperties;
-	private ListViewPageFetcher pageFetcher;
+	private EntityListViewPageFetcher pageFetcher;
 
-	public ListViewPageFetcher getPageFetcher() {
+	public EntityListViewPageFetcher getPageFetcher() {
 		return pageFetcher;
 	}
 
 	/**
 	 * @param pageFetcher The ListViewPageFetcher to use for retrieving the actual items.
 	 */
-	public void setPageFetcher( ListViewPageFetcher pageFetcher ) {
+	public void setPageFetcher( EntityListViewPageFetcher pageFetcher ) {
 		this.pageFetcher = pageFetcher;
 	}
 
@@ -108,37 +100,18 @@ public class EntityListViewFactory extends CommonEntityViewFactory
 	}
 
 	@Override
-	public EntityView create( EntityConfiguration entityConfiguration, Model model ) {
-		EntityListView view = new EntityListView();
-		view.setEntityConfiguration( entityConfiguration );
-		view.setViewName( getTemplate() );
-		view.addModel( model );
+	protected EntityListView createEntityView() {
+		return new EntityListView();
+	}
 
-		view.addObject( "entityLinks", entityConfiguration.getAttribute( EntityLinkBuilder.class ) );
-
+	@Override
+	protected void extendViewModel( EntityConfiguration entityConfiguration, EntityListView view ) {
 		Pageable pageable = buildPageable( view );
-		Page page = getPageFetcher().fetchPage( entityConfiguration, pageable, model );
+		Page page = getPageFetcher().fetchPage( entityConfiguration, pageable, view );
 
 		view.setPageable( pageable );
 		view.setPage( page );
 		view.setShowResultNumber( isShowResultNumber() );
-
-		//view.addObject( "page", page );
-		view.addObject( "entities", page.getContent() );
-		//view.addObject( "entityConfig", entityConfiguration );
-		view.addObject( "props", getProperties() );
-
-		Map<String, String> messages = new HashMap<>();
-		MessageSource messageSource = (MessageSource) model.asMap().get( "messageSource" );
-		messages.put( "buttonCreateNewText", messageSource.getMessage(
-				new DefaultMessageSourceResolvable( new String[] { "create.new.button" }, new Object[] {
-						StringUtils.uncapitalize( entityConfiguration.getDisplayName() ) }, "Create a new {0}" ),
-				LocaleContextHolder.getLocale() ) );
-
-		model.addAttribute( "messages", messages );
-/*Create a new ${T(org.apache.commons.lang3.StringUtils).uncapitalize(entityConfiguration.displayName)}*/
-
-		return view;
 	}
 
 	private Pageable buildPageable( EntityListView view ) {
@@ -151,32 +124,20 @@ public class EntityListViewFactory extends CommonEntityViewFactory
 		return existing;
 	}
 
-	private List<PrintablePropertyView> getProperties() {
-		EntityPropertyFilter filter = getPropertyFilter() != null ? getPropertyFilter() : EntityPropertyFilters.NoOp;
+	@Override
+	protected EntityMessages createEntityMessages( EntityMessageCodeResolver codeResolver ) {
+		return new ListViewEntityMessages( codeResolver );
+	}
 
-		List<EntityPropertyDescriptor> descriptors;
+	@Override
+	protected PrintablePropertyView createPropertyView( EntityPropertyDescriptor descriptor,
+	                                                    EntityMessageCodeResolver messageCodeResolver ) {
+		SortablePropertyView sortablePropertyView = new SortablePropertyView(
+				super.createPropertyView( descriptor, messageCodeResolver )
+		);
+		sortablePropertyView.setSortableProperty( determineSortableProperty( descriptor ) );
 
-		if ( getPropertyComparator() != null ) {
-			descriptors = getPropertyRegistry().getProperties( filter, getPropertyComparator() );
-		}
-		else {
-			descriptors = getPropertyRegistry().getProperties( filter );
-		}
-
-		List<PrintablePropertyView> propertyViews = new ArrayList<>( descriptors.size() );
-		DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService( true );
-		conversionService.addFormatter( new DateFormatter( "dd MMM yyyy - HH:mm" ) );
-
-		for ( EntityPropertyDescriptor descriptor : descriptors ) {
-			SortablePropertyView propertyView = new SortablePropertyView(
-					new ConversionServicePrintablePropertyView( conversionService, descriptor )
-			);
-			propertyView.setSortableProperty( determineSortableProperty( descriptor ) );
-
-			propertyViews.add( propertyView );
-		}
-
-		return propertyViews;
+		return sortablePropertyView;
 	}
 
 	private String determineSortableProperty( EntityPropertyDescriptor descriptor ) {

@@ -20,10 +20,15 @@ import com.foreach.across.modules.adminweb.AdminWeb;
 import com.foreach.across.modules.adminweb.AdminWebModuleSettings;
 import com.foreach.across.modules.adminweb.events.AdminWebUrlRegistry;
 import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
+import com.foreach.across.modules.spring.security.filters.LocaleChangeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.LocaleResolver;
 
 @Configuration
 public class AdminWebSecurityConfiguration extends SpringSecurityWebConfigurerAdapter
@@ -37,10 +42,19 @@ public class AdminWebSecurityConfiguration extends SpringSecurityWebConfigurerAd
 	@Autowired
 	private AdminWebModuleSettings settings;
 
+	@Autowired(required = false)
+	@Qualifier(DispatcherServlet.LOCALE_RESOLVER_BEAN_NAME)
+	private LocaleResolver localeResolver;
+
 	@Override
 	@SuppressWarnings("SignatureDeclareThrowsException")
 	public void configure( HttpSecurity root ) throws Exception {
 		HttpSecurity http = root.antMatcher( adminWeb.path( "/**" ) );
+
+		// Allow locale to be changed before security applied
+		if ( localeResolver != null ) {
+			http.addFilterBefore( new LocaleChangeFilter( localeResolver ), SecurityContextPersistenceFilter.class );
+		}
 
 		ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry urlRegistry =
 				http.authorizeRequests();

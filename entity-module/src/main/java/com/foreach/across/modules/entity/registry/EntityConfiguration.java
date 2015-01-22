@@ -2,6 +2,7 @@ package com.foreach.across.modules.entity.registry;
 
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.registry.support.ReadableAttributes;
+import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 
 import java.io.Serializable;
@@ -21,4 +22,6 @@ public interface EntityConfiguration<T> extends ReadableAttributes
 	<Y extends EntityViewFactory> Y getViewFactory( String viewName );
 
 	EntityPropertyRegistry getPropertyRegistry();
+
+	EntityMessageCodeResolver getEntityMessageCodeResolver();
 }

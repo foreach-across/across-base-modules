@@ -28,9 +28,9 @@
 	      th:href="@{${css.data}}"/>
 </head>
 <body>
-<div class="container">
+<div sec:authorize="isAuthenticated()" class="container">
 	<!-- Main menu navigation -->
-	<div class="row" sec:authorize="isAuthenticated()">
+	<div class="row">
 		<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<div class="container-fluid">
 				<div class="navbar-header admin-navbar-title">
@@ -61,6 +61,10 @@
 
 		<div th:replace="${childPage} :: content"></div>
 	</div>
+</div>
+
+<div sec:authorize="not isAuthenticated()">
+	<div th:replace="${childPage} :: content"></div>
 </div>
 
 <script th:each="javascript : ${webResourceRegistry.getResources('javascript-page-end')}" th:src="@{${javascript.data}}"

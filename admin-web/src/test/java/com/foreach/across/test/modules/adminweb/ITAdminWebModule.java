@@ -34,6 +34,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -61,6 +62,9 @@ public class ITAdminWebModule
 	private PrefixingRequestMappingHandlerMapping adminRequestMappingHandlerMapping;
 
 	@Autowired
+	private CookieLocaleResolver localeResolver;
+
+	@Autowired
 	private AdminWeb adminWeb;
 
 	@Test
@@ -72,6 +76,7 @@ public class ITAdminWebModule
 		assertNotNull( adminWebResourcePackageManager );
 		assertNotNull( adminWebResourceRegistryInterceptor );
 		assertNotNull( adminRequestMappingHandlerMapping );
+		assertNotNull( localeResolver );
 	}
 
 	@Configuration

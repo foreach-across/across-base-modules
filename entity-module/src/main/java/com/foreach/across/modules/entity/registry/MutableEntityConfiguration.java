@@ -2,6 +2,7 @@ package com.foreach.across.modules.entity.registry;
 
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.registry.support.WritableAttributes;
+import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 
 import java.io.Serializable;
@@ -20,4 +21,6 @@ public interface MutableEntityConfiguration<T> extends EntityConfiguration<T>, W
 	void setPropertyRegistry( EntityPropertyRegistry propertyRegistry );
 
 	void registerView( String viewName, EntityViewFactory viewFactory );
+
+	void setEntityMessageCodeResolver( EntityMessageCodeResolver entityMessageCodeResolver );
 }

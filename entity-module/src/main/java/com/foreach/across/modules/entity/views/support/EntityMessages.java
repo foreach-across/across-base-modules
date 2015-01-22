@@ -1,0 +1,76 @@
+/*
+ * Copyright 2014 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.foreach.across.modules.entity.views.support;
+
+import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
+import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.util.ObjectUtils;
+
+/**
+ * Base class for resolving common entity messages.
+ *
+ * @author Arne Vandamme
+ */
+public class EntityMessages
+{
+	public static final String ACTION_CREATE = "actions.create";
+	public static final String ACTION_UPDATE = "actions.update";
+	public static final String ACTION_DELETE = "actions.delete";
+	public static final String ACTION_VIEW = "actions.view";
+
+	protected final EntityMessageCodeResolver messageCodeResolver;
+
+	public EntityMessages( EntityMessageCodeResolver messageCodeResolver ) {
+		this.messageCodeResolver = messageCodeResolver;
+	}
+
+	public String createAction( Object... arguments ) {
+		return messageWithFallback( ACTION_CREATE, messageCodeResolver.getNameSingularInline(), arguments );
+	}
+
+	public String updateAction( Object... arguments ) {
+		return messageWithFallback( ACTION_UPDATE, messageCodeResolver.getNameSingularInline(), arguments );
+	}
+
+	public String deleteAction( Object... arguments ) {
+		return messageWithFallback( ACTION_DELETE, messageCodeResolver.getNameSingularInline(), arguments );
+	}
+
+	public String viewAction( Object... arguments ) {
+		return messageWithFallback( ACTION_VIEW, messageCodeResolver.getNameSingularInline(), arguments );
+	}
+
+	public String message( String code, Object... arguments ) {
+		return messageCodeResolver.getMessage( code, arguments( arguments ), null );
+	}
+
+	public String messageWithFallback( String code, Object... arguments ) {
+		return messageCodeResolver.getMessageWithFallback( code, arguments( arguments ), null );
+	}
+
+	protected Object[] arguments( Object... candidates ) {
+		if ( candidates.length > 0 ) {
+			int last = candidates.length - 1;
+			if ( ObjectUtils.isArray( candidates[last] ) ) {
+				ArrayUtils.addAll(
+						ArrayUtils.subarray( candidates, 0, last ),
+						(Object[]) candidates[last]
+				);
+			}
+		}
+		return candidates;
+	}
+}

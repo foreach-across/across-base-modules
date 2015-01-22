@@ -20,12 +20,11 @@ import com.foreach.across.modules.entity.registry.EntityConfigurationImpl;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.*;
-import com.foreach.across.modules.entity.views.CommonEntityViewFactory;
+import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
 import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
-import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
@@ -320,7 +319,7 @@ public class EntitiesConfigurationBuilder
 		protected abstract void applyToFactory( EntityConfiguration configuration, T factory );
 	}
 
-	public static class CommonEntityViewBuilder extends EntityViewBuilder<CommonEntityViewFactory>
+	public static class CommonEntityViewBuilder extends EntityViewBuilder<ConfigurablePropertiesEntityViewFactorySupport>
 	{
 		public static class EntityViewPropertyRegistryBuilder
 				extends EntityPropertyRegistryBuilderSupport<CommonEntityViewBuilder>
@@ -357,18 +356,23 @@ public class EntitiesConfigurationBuilder
 		}
 
 		@Override
-		protected CommonEntityViewFactory createFactoryInstance() {
-			return new CommonEntityViewFactory()
+		protected ConfigurablePropertiesEntityViewFactorySupport createFactoryInstance() {
+			return new ConfigurablePropertiesEntityViewFactorySupport()
 			{
 				@Override
-				public EntityView create( EntityConfiguration entityConfiguration, Model model ) {
-					return null;
+				protected void extendViewModel( EntityConfiguration entityConfiguration, EntityView view ) {
+				}
+
+				@Override
+				protected EntityView createEntityView() {
+					return new EntityView();
 				}
 			};
 		}
 
 		@Override
-		protected void applyToFactory( EntityConfiguration configuration, CommonEntityViewFactory factory ) {
+		protected void applyToFactory( EntityConfiguration configuration,
+		                               ConfigurablePropertiesEntityViewFactorySupport factory ) {
 			if ( template != null ) {
 				factory.setTemplate( template );
 			}

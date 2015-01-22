@@ -7,14 +7,20 @@ import com.foreach.across.modules.entity.registry.properties.MergingEntityProper
 import com.foreach.across.modules.entity.registry.properties.SimpleEntityPropertyDescriptor;
 import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
-import com.foreach.across.modules.entity.views.RepositoryListViewPageFetcher;
+import com.foreach.across.modules.entity.views.RepositoryEntityListViewPageFetcher;
 import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
 import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.Repository;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -24,6 +30,20 @@ import java.util.LinkedList;
  */
 public class RepositoryEntityViewsBuilder
 {
+	private static final Logger LOG = LoggerFactory.getLogger( RepositoryEntityViewsBuilder.class );
+
+	@Autowired(required = false)
+	private ConversionService conversionService;
+
+	@PostConstruct
+	protected void createDefaultConversionService() {
+		if ( conversionService == null ) {
+			LOG.info(
+					"No ConversionService found for the EntityModule - creating default conversion service for views." );
+			conversionService = new DefaultConversionService();
+		}
+	}
+
 	public void createViews( MutableEntityConfiguration entityConfiguration ) {
 		// Get the repository
 		buildListView( entityConfiguration, (CrudRepository) entityConfiguration.getAttribute( Repository.class ) );
@@ -31,6 +51,7 @@ public class RepositoryEntityViewsBuilder
 
 	private void buildListView( MutableEntityConfiguration entityConfiguration, CrudRepository repository ) {
 		EntityListViewFactory viewFactory = new EntityListViewFactory();
+		viewFactory.setConversionService( conversionService );
 
 		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(
 				entityConfiguration.getPropertyRegistry()
@@ -38,7 +59,7 @@ public class RepositoryEntityViewsBuilder
 
 		viewFactory.setPropertyRegistry( registry );
 		viewFactory.setTemplate( EntityListView.VIEW_TEMPLATE );
-		viewFactory.setPageFetcher( new RepositoryListViewPageFetcher( repository ) );
+		viewFactory.setPageFetcher( new RepositoryEntityListViewPageFetcher( repository ) );
 
 		LinkedList<String> defaultProperties = new LinkedList<>();
 		if ( registry.contains( "name" ) ) {

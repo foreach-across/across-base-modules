@@ -15,7 +15,6 @@ import com.foreach.across.modules.web.menu.MenuFactory;
 import com.foreach.across.modules.web.resource.WebResource;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;
@@ -45,9 +44,6 @@ public class EntityController
 	@Autowired
 	private ConversionService conversionService;
 
-	@Autowired
-	private MessageSource messageSource;
-
 	@ModelAttribute
 	public void init( WebResourceRegistry registry ) {
 		registry.addWithKey( WebResource.CSS, EntityModule.NAME, "/css/entity/entity-module.css", WebResource.VIEWS );
@@ -67,19 +63,11 @@ public class EntityController
 	                                     Model model,
 	                                     Pageable pageable
 	) {
+		model.addAttribute( EntityListView.ATTRIBUTE_PAGEABLE, pageable );
+
 		EntityViewFactory view = entityConfiguration.getViewFactory( EntityListView.VIEW_NAME );
 
-		model.addAttribute( EntityListView.ATTRIBUTE_PAGEABLE, pageable );
-		model.addAttribute( "messageSource", messageSource );
-
 		return view.create( entityConfiguration, model );
-
-		/*
-		model.addAttribute( "entityConfig", entityConfiguration );
-		model.addAttribute( "entities", entityConfiguration.getRepository().findAll() );
-
-		return "th/entity/list";
-		*/
 	}
 
 	@RequestMapping(value = "/{entityConfig}/create", method = RequestMethod.GET)

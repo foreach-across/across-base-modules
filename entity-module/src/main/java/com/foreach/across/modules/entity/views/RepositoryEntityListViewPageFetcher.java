@@ -21,7 +21,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.ui.Model;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,17 +29,17 @@ import java.util.List;
 /**
  * @author Arne Vandamme
  */
-public class RepositoryListViewPageFetcher implements ListViewPageFetcher
+public class RepositoryEntityListViewPageFetcher implements EntityListViewPageFetcher
 {
 	private CrudRepository repository;
 
-	public RepositoryListViewPageFetcher( CrudRepository repository ) {
+	public RepositoryEntityListViewPageFetcher( CrudRepository repository ) {
 		this.repository = repository;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Page fetchPage( EntityConfiguration entityConfiguration, Pageable pageable, Model model ) {
+	public Page fetchPage( EntityConfiguration entityConfiguration, Pageable pageable, EntityView model ) {
 		if ( repository instanceof PagingAndSortingRepository ) {
 			return ( (PagingAndSortingRepository) repository ).findAll( pageable );
 		}

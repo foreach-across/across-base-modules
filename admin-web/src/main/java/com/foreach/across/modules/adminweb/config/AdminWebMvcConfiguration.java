@@ -16,12 +16,14 @@
 package com.foreach.across.modules.adminweb.config;
 
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.development.AcrossDevelopmentMode;
 import com.foreach.across.modules.adminweb.AdminWeb;
 import com.foreach.across.modules.adminweb.AdminWebModule;
+import com.foreach.across.modules.adminweb.AdminWebModuleSettings;
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.adminweb.controllers.AuthenticationController;
 import com.foreach.across.modules.adminweb.menu.AdminMenu;
@@ -44,9 +46,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
 import javax.annotation.PostConstruct;
+import java.util.Locale;
 
 @Configuration
 public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
@@ -64,6 +69,10 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 	private AdminWebModule adminWebModule;
 
 	@Autowired
+	@Module(AcrossModule.CURRENT_MODULE)
+	private AdminWebModuleSettings settings;
+
+	@Autowired
 	private AcrossDevelopmentMode developmentMode;
 
 	@Autowired
@@ -74,6 +83,20 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 	public void initialize() {
 		menuFactory.addMenuBuilder( adminMenuBuilder(), AdminMenu.class );
 		menuFactory.addMenuBuilder( entityAdminMenuBuilder(), EntityAdminMenu.class );
+	}
+
+	@AcrossCondition("#{not getBeanFactory().containsBean('" + DispatcherServlet.LOCALE_RESOLVER_BEAN_NAME + "')}")
+	@Bean(name = DispatcherServlet.LOCALE_RESOLVER_BEAN_NAME)
+	@Exposed
+	public CookieLocaleResolver localeResolver() {
+		CookieLocaleResolver cookieLocaleResolver = new CookieLocaleResolver();
+		Locale defaultLocale = settings.getDefaultLocale();
+
+		if ( defaultLocale != null ) {
+			cookieLocaleResolver.setDefaultLocale( defaultLocale );
+		}
+
+		return new CookieLocaleResolver();
 	}
 
 	@Bean
@@ -164,6 +187,9 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 				new PrefixingRequestMappingHandlerMapping( adminWebModule.getRootPath(),
 				                                           new AnnotationClassFilter( AdminWebController.class,
 				                                                                      true ) );
+
+		//mappingHandlerMapping.addInterceptor( new LocaleChangeInterceptor() );
+
 		// todo: unify web registration approach and move this to a different configuration
 		if ( contextInfo.hasModule( "AcrossHibernateModule" ) ) {
 			ApplicationContext moduleCtx = contextInfo.getModuleInfo( "AcrossHibernateModule" ).getApplicationContext();

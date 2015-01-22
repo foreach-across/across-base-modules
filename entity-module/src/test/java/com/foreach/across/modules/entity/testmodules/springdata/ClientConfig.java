@@ -16,11 +16,21 @@
 package com.foreach.across.modules.entity.testmodules.springdata;
 
 import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @EnableJpaRepositories(transactionManagerRef = HibernateJpaConfiguration.TRANSACTION_MANAGER)
 public class ClientConfig
 {
+	@Bean
+	public MessageSource messageSource() {
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		messageSource.setBasename( "client" );
+
+		return messageSource;
+	}
 }

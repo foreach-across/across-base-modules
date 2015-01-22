@@ -201,7 +201,7 @@ public class TestRepositoryEntityRegistrar
 
 	@Configuration
 	@AcrossTestConfiguration
-	protected static class Config implements AcrossContextConfigurer
+	public static class Config implements AcrossContextConfigurer
 	{
 		@Bean
 		public ConversionService conversionService() {

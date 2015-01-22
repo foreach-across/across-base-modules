@@ -16,6 +16,7 @@
 package com.foreach.across.modules.entity.views.properties;
 
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import org.springframework.core.convert.ConversionService;
 
 /**
@@ -23,13 +24,17 @@ import org.springframework.core.convert.ConversionService;
  */
 public class ConversionServicePrintablePropertyView implements PrintablePropertyView
 {
-	private EntityPropertyDescriptor descriptor;
-	private ConversionService conversionService;
+	private final EntityMessageCodeResolver messageCodeResolver;
+	private final EntityPropertyDescriptor descriptor;
+	private final ConversionService conversionService;
 
 	private String customTemplate;
 
-	public ConversionServicePrintablePropertyView( ConversionService conversionService,
-	                                               EntityPropertyDescriptor descriptor ) {
+	public ConversionServicePrintablePropertyView(
+			EntityMessageCodeResolver messageCodeResolver,
+			ConversionService conversionService,
+			EntityPropertyDescriptor descriptor ) {
+		this.messageCodeResolver = messageCodeResolver;
 		this.descriptor = descriptor;
 		this.conversionService = conversionService;
 	}
@@ -41,7 +46,7 @@ public class ConversionServicePrintablePropertyView implements PrintableProperty
 
 	@Override
 	public String getDisplayName() {
-		return descriptor.getDisplayName();
+		return messageCodeResolver.getPropertyDisplayName( descriptor );
 	}
 
 	public String getCustomTemplate() {

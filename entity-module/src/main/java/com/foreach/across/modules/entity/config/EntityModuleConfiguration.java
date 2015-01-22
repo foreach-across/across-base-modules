@@ -1,5 +1,6 @@
 package com.foreach.across.modules.entity.config;
 
+import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.converters.EntityConverter;
 import com.foreach.across.modules.entity.converters.StringToEntityConfigurationConverter;
 import com.foreach.across.modules.entity.registrars.ModuleEntityRegistration;
@@ -9,8 +10,10 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegis
 import com.foreach.across.modules.entity.services.EntityFormFactory;
 import com.foreach.across.modules.entity.services.EntityFormRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 
 import javax.annotation.PostConstruct;
@@ -44,7 +47,6 @@ public class EntityModuleConfiguration
 		return new ModuleEntityRegistration();
 	}
 
-
 	@Bean
 	public EntityPropertyRegistries entityPropertyRegistries() {
 		return new EntityPropertyRegistries();
@@ -58,6 +60,14 @@ public class EntityModuleConfiguration
 	@Bean
 	public EntityFormRenderer entityFormRenderer() {
 		return new EntityFormRenderer();
+	}
+
+	@Bean
+	public MessageSource messageSource() {
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		messageSource.setBasename( EntityModule.class.getPackage().getName() + ".messages.EntityModule" );
+
+		return messageSource;
 	}
 
 /*

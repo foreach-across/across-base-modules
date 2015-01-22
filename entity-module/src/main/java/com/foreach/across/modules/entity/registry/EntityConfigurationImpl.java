@@ -3,9 +3,11 @@ package com.foreach.across.modules.entity.registry;
 import com.foreach.across.modules.entity.business.EntityWrapper;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.registry.support.AttributeSupport;
+import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.util.EntityUtils;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -22,6 +24,8 @@ public class EntityConfigurationImpl<T> extends AttributeSupport implements Muta
 	private final String name;
 	private final Class<T> entityType;
 	private final Map<String, EntityViewFactory> registeredViews = new HashMap<>();
+
+	private EntityMessageCodeResolver entityMessageCodeResolver;
 
 	private String displayName;
 
@@ -73,12 +77,15 @@ public class EntityConfigurationImpl<T> extends AttributeSupport implements Muta
 		return registeredViews.containsKey( viewName );
 	}
 
+	@Override
 	public void registerView( String viewName, EntityViewFactory viewFactory ) {
+		Assert.notNull( viewName );
+		Assert.notNull( viewFactory );
 		registeredViews.put( viewName, viewFactory );
 	}
 
 	@Override
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public <Y extends EntityViewFactory> Y getViewFactory( String viewName ) {
 		return (Y) registeredViews.get( viewName );
 	}
@@ -88,8 +95,21 @@ public class EntityConfigurationImpl<T> extends AttributeSupport implements Muta
 		return propertyRegistry;
 	}
 
+	@Override
 	public void setPropertyRegistry( EntityPropertyRegistry propertyRegistry ) {
+		Assert.notNull( propertyRegistry );
 		this.propertyRegistry = propertyRegistry;
+	}
+
+	@Override
+	public EntityMessageCodeResolver getEntityMessageCodeResolver() {
+		return entityMessageCodeResolver;
+	}
+
+	@Override
+	public void setEntityMessageCodeResolver( EntityMessageCodeResolver entityMessageCodeResolver ) {
+		Assert.notNull( entityMessageCodeResolver );
+		this.entityMessageCodeResolver = entityMessageCodeResolver;
 	}
 
 	@Deprecated
