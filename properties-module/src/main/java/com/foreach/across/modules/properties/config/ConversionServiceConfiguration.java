@@ -30,7 +30,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.format.support.DefaultFormattingConversionService;
 
 /**
  * The PropertiesModule requires a ConversionService to be present.
@@ -75,13 +74,12 @@ public class ConversionServiceConfiguration
 			}
 			else {
 				HierarchicalConversionService conversionService =
-						HierarchicalConversionService.defaultConversionService(
-						getConversionServiceBeanFromParent()
-				);
+						HierarchicalConversionService.defaultConversionService( getConversionServiceBeanFromParent() );
 
 				if ( conversionService.getParent() == null ) {
 					// We created default conversion service, expose it
-					currentModuleInfo.getBootstrapConfiguration().addExposeFilter( new ClassBeanFilter( ConversionService.class ) );
+					currentModuleInfo.getBootstrapConfiguration()
+					                 .addExposeFilter( new ClassBeanFilter( ConversionService.class ) );
 				}
 
 				conversionServiceToUse = conversionService;

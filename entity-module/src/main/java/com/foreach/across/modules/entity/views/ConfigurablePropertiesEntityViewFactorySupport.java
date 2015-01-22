@@ -71,7 +71,7 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 	/**
 	 * @param conversionService The conversion service to attach to the property views.
 	 */
-	@Autowired
+	@Autowired(required = false)
 	public void setConversionService( ConversionService conversionService ) {
 		this.conversionService = conversionService;
 	}
