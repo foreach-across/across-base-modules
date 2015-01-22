@@ -52,6 +52,7 @@ public class RepositoryEntityViewsBuilder
 	private void buildListView( MutableEntityConfiguration entityConfiguration, CrudRepository repository ) {
 		EntityListViewFactory viewFactory = new EntityListViewFactory();
 		viewFactory.setConversionService( conversionService );
+		viewFactory.setMessagePrefixes( "entityViews.listView", "entityViews" );
 
 		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(
 				entityConfiguration.getPropertyRegistry()

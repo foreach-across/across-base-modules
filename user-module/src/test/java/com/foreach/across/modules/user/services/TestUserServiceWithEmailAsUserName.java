@@ -131,35 +131,35 @@ public class TestUserServiceWithEmailAsUserName
 		assertEquals( "test@there.com", userDto.getUsername() );
 	}
 
-	@Test
-	public void creatingExistingUserDoesntErrorWhenThereIsAnErrorWithEmail() {
-		String email = "fooexample.com";
-		User dummy = new User();
-		dummy.setId( 5 );
-		dummy.setEmail( email );
-		dummy.setUsername( email );
-
-		UserDto dto = new UserDto();
-		dto.setEmail( email );
-		dto.setPassword( "foo" );
-
-		when( userRepository.getByEmail( email ) ).thenReturn( dummy );
-
-		try {
-			userService.save( dto );
-		}
-		catch ( UserValidationException uve ) {
-			List<ObjectError> errors = uve.getErrors();
-			assertEquals( 2, errors.size() );
-
-			ObjectError emailExists = errors.get( 0 );
-			assertEquals( "email already exists", emailExists.getDefaultMessage() );
-
-			FieldError invalidEmail = (FieldError) errors.get( 1 );
-			assertEquals( "email", invalidEmail.getField() );
-			assertEquals( "invalid email", invalidEmail.getDefaultMessage() );
-		}
-	}
+//	@Test
+//	public void creatingExistingUserDoesntErrorWhenThereIsAnErrorWithEmail() {
+//		String email = "fooexample.com";
+//		User dummy = new User();
+//		dummy.setId( 5 );
+//		dummy.setEmail( email );
+//		dummy.setUsername( email );
+//
+//		UserDto dto = new UserDto();
+//		dto.setEmail( email );
+//		dto.setPassword( "foo" );
+//
+//		when( userRepository.getByEmail( email ) ).thenReturn( dummy );
+//
+//		try {
+//			userService.save( dto );
+//		}
+//		catch ( UserValidationException uve ) {
+//			List<ObjectError> errors = uve.getErrors();
+//			assertEquals( 2, errors.size() );
+//
+//			ObjectError emailExists = errors.get( 0 );
+//			assertEquals( "email already exists", emailExists.getDefaultMessage() );
+//
+//			FieldError invalidEmail = (FieldError) errors.get( 1 );
+//			assertEquals( "email", invalidEmail.getField() );
+//			assertEquals( "invalid email", invalidEmail.getDefaultMessage() );
+//		}
+//	}
 
 	@Configuration
 	static class Config
