@@ -8,6 +8,7 @@
     <file url="file://$PROJECT_DIR$/application-info" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/debug-web" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/entity-module" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/logging-module" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oauth2-module" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/properties-module" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring-security" charset="UTF-8" />

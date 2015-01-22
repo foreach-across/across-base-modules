@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.debugweb.controllers;
+package com.foreach.across.modules.logging.controllers;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -21,7 +21,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
+import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.Event;
+import com.foreach.across.core.annotations.Refreshable;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
@@ -36,6 +38,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @DebugWebController
+@Refreshable
+@AcrossDepends(required = "DebugWebModule")
 public class LogController
 {
 	@Event

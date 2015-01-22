@@ -21,9 +21,11 @@ import com.foreach.across.modules.user.business.User;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.internal.constraintvalidators.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+@Service
 public class UserValidator implements Validator
 {
 	@Autowired
@@ -67,7 +69,7 @@ public class UserValidator implements Validator
 				}
 			}
 
-			if ( !errors.hasErrors() ) {
+			if ( !errors.hasFieldErrors( "email" ) ) {
 				String principalName = userDto.getUsername();
 
 				if ( userService.isUseEmailAsUsername() && StringUtils.isBlank( principalName ) ) {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.debugweb.servlet.logging;
+package com.foreach.across.modules.logging.requestresponse;
 
 import org.apache.commons.io.input.TeeInputStream;
 

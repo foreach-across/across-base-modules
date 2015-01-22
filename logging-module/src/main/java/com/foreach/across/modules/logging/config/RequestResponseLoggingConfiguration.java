@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.debugweb.config;
+package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.AcrossException;
 import com.foreach.across.core.annotations.AcrossCondition;
-import com.foreach.across.modules.debugweb.DebugWebModuleSettings;
-import com.foreach.across.modules.debugweb.servlet.logging.RequestResponseLogConfiguration;
-import com.foreach.across.modules.debugweb.servlet.logging.RequestResponseLogController;
-import com.foreach.across.modules.debugweb.servlet.logging.RequestResponseLogRegistry;
-import com.foreach.across.modules.debugweb.servlet.logging.RequestResponseLoggingFilter;
+import com.foreach.across.modules.logging.LoggingModuleSettings;
+import com.foreach.across.modules.logging.controllers.RequestResponseLogController;
+import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
+import com.foreach.across.modules.logging.requestresponse.RequestResponseLogRegistry;
+import com.foreach.across.modules.logging.requestresponse.RequestResponseLoggingFilter;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,16 +38,16 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 /**
- * Registers debug request/response logging.
+ * @author Andy Somers
  */
 @Configuration
 @AcrossCondition("settings.requestResponseLogEnabled")
-public class DebugWebLoggingConfiguration extends AcrossWebDynamicServletConfigurer
+public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServletConfigurer
 {
-	private static final Logger LOG = LoggerFactory.getLogger( DebugWebLoggingConfiguration.class );
+	private static final Logger LOG = LoggerFactory.getLogger( RequestResponseLoggingConfiguration.class );
 
 	@Autowired
-	private DebugWebModuleSettings settings;
+	private LoggingModuleSettings settings;
 
 	@Bean
 	public RequestResponseLogRegistry requestResponseLogRegistry() {
@@ -65,7 +65,8 @@ public class DebugWebLoggingConfiguration extends AcrossWebDynamicServletConfigu
 	@Bean
 	@Lazy
 	public RequestResponseLoggingFilter requestResponseLoggingFilter() {
-		RequestResponseLoggingFilter filter = new RequestResponseLoggingFilter( requestResponseLogRegistry(), logConfiguration().isPaused() );
+		RequestResponseLoggingFilter filter = new RequestResponseLoggingFilter( requestResponseLogRegistry(),
+		                                                                        logConfiguration().isPaused() );
 
 		if ( logConfiguration().getIncludedPathPatterns() != null ) {
 			filter.setIncludedPathPatterns( logConfiguration().getIncludedPathPatterns() );
@@ -104,11 +105,12 @@ public class DebugWebLoggingConfiguration extends AcrossWebDynamicServletConfigu
 	@Override
 	protected void dynamicConfigurationDenied( ServletContext servletContext ) throws ServletException {
 		LOG.warn(
-				"DebugWeb request/response logging is configured, but I am unable to add RequestResponseLoggingFilter dynamically." );
+				"Request/response logging is configured, but I am unable to add RequestResponseLoggingFilter dynamically." );
 	}
 
 	private RequestResponseLogConfiguration logConfiguration() {
-		return settings.getProperty( DebugWebModuleSettings.REQUEST_RESPONSE_LOG_CONFIGURATION,
+		return settings.getProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_CONFIGURATION,
 		                             RequestResponseLogConfiguration.class );
 	}
+
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.debugweb.servlet.logging;
+package com.foreach.across.modules.logging.requestresponse;
 
 import java.io.ByteArrayOutputStream;
 
@@ -35,9 +35,10 @@ public class FixedByteArrayOutputStream extends ByteArrayOutputStream
 
 	@Override
 	public synchronized void write( byte[] b, int off, int len ) {
-		if( maximumNotReached() ) {
+		if ( maximumNotReached() ) {
 			super.write( b, off, len );
-		} else {
+		}
+		else {
 			maximumReached = true;
 		}
 		byteCount = byteCount + len;
@@ -45,9 +46,10 @@ public class FixedByteArrayOutputStream extends ByteArrayOutputStream
 
 	@Override
 	public synchronized void write( int b ) {
-		if( maximumNotReached() ) {
+		if ( maximumNotReached() ) {
 			super.write( b );
-		} else {
+		}
+		else {
 			maximumReached = true;
 		}
 		byteCount++;

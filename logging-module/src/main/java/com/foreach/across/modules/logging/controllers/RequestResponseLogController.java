@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.debugweb.servlet.logging;
+package com.foreach.across.modules.logging.controllers;
 
+import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.Event;
+import com.foreach.across.core.annotations.Refreshable;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
+import com.foreach.across.modules.logging.requestresponse.RequestResponseLogRegistry;
+import com.foreach.across.modules.logging.requestresponse.RequestResponseLoggingFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +34,8 @@ import java.util.List;
 import java.util.UUID;
 
 @DebugWebController
+@Refreshable
+@AcrossDepends(required = "DebugWebModule")
 public class RequestResponseLogController
 {
 	@Autowired
