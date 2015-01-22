@@ -1,5 +1,6 @@
 package com.foreach.across.modules.entity.config;
 
+import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.converters.EntityConverter;
 import com.foreach.across.modules.entity.converters.StringToEntityConfigurationConverter;
@@ -9,10 +10,13 @@ import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistries;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
 import com.foreach.across.modules.entity.services.EntityFormRenderer;
+import com.foreach.across.modules.entity.views.EntityCreateViewFactory;
+import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 
@@ -68,6 +72,20 @@ public class EntityModuleConfiguration
 		messageSource.setBasename( EntityModule.class.getPackage().getName() + ".messages.EntityModule" );
 
 		return messageSource;
+	}
+
+	@Bean
+	@Exposed
+	@Scope("prototype")
+	public EntityListViewFactory entityListViewFactory() {
+		return new EntityListViewFactory();
+	}
+
+	@Bean
+	@Exposed
+	@Scope("prototype")
+	public EntityCreateViewFactory entityCreateViewFactory() {
+		return new EntityCreateViewFactory();
 	}
 
 /*

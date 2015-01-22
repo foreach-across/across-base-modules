@@ -4,12 +4,12 @@ import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.adminweb.menu.AdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.entity.EntityModule;
-import com.foreach.across.modules.entity.business.EntityForm;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
+import com.foreach.across.modules.entity.views.EntityCreateView;
 import com.foreach.across.modules.entity.views.EntityListView;
+import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import com.foreach.across.modules.web.resource.WebResource;
@@ -71,43 +71,42 @@ public class EntityController
 	}
 
 	@RequestMapping(value = "/{entityConfig}/create", method = RequestMethod.GET)
-	public String createEntity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
-	                            Model model ) throws Exception {
-		//EntityViewFactory view = entityConfiguration.getViewFactory( "crud-create" );
-
+	public ModelAndView createEntity(
+			@PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
+			Model model ) throws Exception {
 		model.addAttribute( "entityMenu",
 		                    menuFactory.buildMenu( new EntityAdminMenu<>( entityConfiguration.getEntityType() ) ) );
 
-		EntityForm entityForm = formFactory.create( entityConfiguration );
-		entityForm.setEntity( entityConfiguration.getEntityType().newInstance() );
-
-		model.addAttribute( "entityForm", entityForm );
-		model.addAttribute( "existing", false );
-		model.addAttribute( "entityConfiguration", entityConfiguration );
-		model.addAttribute( "entity", entityConfiguration.getEntityType().newInstance() );
-
-		return "th/entity/edit";
+		EntityViewFactory view = entityConfiguration.getViewFactory( EntityCreateView.VIEW_NAME );
+		return view.create( entityConfiguration, model );
 	}
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/{entityConfig}/{entityId}/update", method = RequestMethod.GET)
-	public String modifyEntity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
+	public ModelAndView modifyEntity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
 	                            @PathVariable("entityId") Serializable entityId,
 	                            AdminMenu adminMenu,
 	                            Model model ) throws Exception {
+		Object entity = conversionService.convert( entityId, entityConfiguration.getEntityType() );
+		model.addAttribute( EntityView.ATTRIBUTE_ENTITY, entity );
+
+		/*
 		EntityModel entityModel = entityConfiguration.getEntityModel();
 
 		Serializable coercedEntityId = (Serializable) conversionService.convert( entityId, entityModel.getIdType() );
 		Object entity = entityModel.findOne( coercedEntityId );
-
+*/
 		//EntityWrapper entity = entityConfiguration.wrap( entityConfiguration.getRepository().getById( entityId ) );
-
 		//adminMenu.getLowestSelectedItem().addItem( "/selectedEntity", entity.getEntityLabel() ).setSelected( true );
 
 		model.addAttribute( "entityMenu",
 		                    menuFactory.buildMenu( new EntityAdminMenu( entityConfiguration.getEntityType(),
 		                                                                entity ) ) );
 
+		EntityViewFactory view = entityConfiguration.getViewFactory( EntityCreateView.VIEW_NAME );
+		return view.create( entityConfiguration, model );
+
+		/*
 		EntityForm entityForm = formFactory.create( entityConfiguration );
 		entityForm.setEntity( entity );
 
@@ -117,6 +116,6 @@ public class EntityController
 		model.addAttribute( "original", entity );
 		model.addAttribute( "entity", entity );
 
-		return "th/entity/edit";
+		return "th/entity/edit";*/
 	}
 }

@@ -5,14 +5,13 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilte
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.registry.properties.MergingEntityPropertyRegistry;
 import com.foreach.across.modules.entity.registry.properties.SimpleEntityPropertyDescriptor;
-import com.foreach.across.modules.entity.views.EntityListView;
-import com.foreach.across.modules.entity.views.EntityListViewFactory;
-import com.foreach.across.modules.entity.views.RepositoryEntityListViewPageFetcher;
+import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
 import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -32,6 +31,9 @@ public class RepositoryEntityViewsBuilder
 {
 	private static final Logger LOG = LoggerFactory.getLogger( RepositoryEntityViewsBuilder.class );
 
+	@Autowired
+	private BeanFactory beanFactory;
+
 	@Autowired(required = false)
 	private ConversionService conversionService;
 
@@ -45,12 +47,28 @@ public class RepositoryEntityViewsBuilder
 	}
 
 	public void createViews( MutableEntityConfiguration entityConfiguration ) {
-		// Get the repository
+		buildCreateView( entityConfiguration );
+
+		// todo: support regular repository to be used instead of specific CrudRepository interface (use repo information)
 		buildListView( entityConfiguration, (CrudRepository) entityConfiguration.getAttribute( Repository.class ) );
 	}
 
+	private void buildCreateView( MutableEntityConfiguration entityConfiguration ) {
+		EntityCreateViewFactory viewFactory = beanFactory.getBean( EntityCreateViewFactory.class );
+		viewFactory.setMessagePrefixes( "entityViews.createView", "entityViews" );
+
+		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(
+				entityConfiguration.getPropertyRegistry()
+		);
+
+		viewFactory.setPropertyRegistry( registry );
+		viewFactory.setTemplate( EntityCreateView.VIEW_TEMPLATE );
+
+		entityConfiguration.registerView( EntityCreateView.VIEW_NAME, viewFactory );
+	}
+
 	private void buildListView( MutableEntityConfiguration entityConfiguration, CrudRepository repository ) {
-		EntityListViewFactory viewFactory = new EntityListViewFactory();
+		EntityListViewFactory viewFactory = beanFactory.getBean( EntityListViewFactory.class );
 		viewFactory.setConversionService( conversionService );
 		viewFactory.setMessagePrefixes( "entityViews.listView", "entityViews" );
 

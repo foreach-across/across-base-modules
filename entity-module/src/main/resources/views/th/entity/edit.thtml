@@ -20,7 +20,7 @@
 <body th:fragment="content">
 
 <h4 class="page-header" th:if="${existing}" th:text="|Modify ${T(org.apache.commons.lang3.StringUtils).uncapitalize(entityConfiguration.displayName)}: ${entity}|">Modify entity: name</h4>
-<h4 class="page-header" th:unless="${existing}" th:text="|Create a new ${T(org.apache.commons.lang3.StringUtils).uncapitalize(entityConfiguration.displayName)}|">Create a new entity</h4>
+<h4 class="page-header" th:unless="${existing}" th:text="${messages.createAction()}">Create a new entity</h4>
 
 <div class="tabbable filled">
 	<ul class="nav nav-tabs">
@@ -87,7 +87,7 @@
 						</div>
 
 						<input class="btn btn-primary" type="submit" value="Save"/>
-						<a class="btn btn-link" th:href="@{${@adminWeb.path('/entities/' + entityConfiguration.name)}}">Cancel</a>
+						<a class="btn btn-link" th:href="@{${entityLinks.overview()}}">Cancel</a>
 
 					</div>
 				</div>

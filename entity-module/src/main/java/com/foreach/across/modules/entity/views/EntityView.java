@@ -29,6 +29,7 @@ import java.util.List;
  */
 public class EntityView extends ModelAndView
 {
+	public static final String ATTRIBUTE_ENTITY = "entity";
 	public static final String ATTRIBUTE_ENTITY_CONFIGURATION = "entityConfiguration";
 	public static final String ATTRIBUTE_ENTITY_LINKS = "entityLinks";
 	public static final String ATTRIBUTE_MESSAGES = "messages";
@@ -71,4 +72,11 @@ public class EntityView extends ModelAndView
 		getModelMap().put( ATTRIBUTE_PROPERTIES, entityProperties );
 	}
 
+	public Object getEntity() {
+		return getModelMap().get( ATTRIBUTE_ENTITY );
+	}
+
+	public void setEntity( Object entity ) {
+		getModelMap().put( ATTRIBUTE_ENTITY, entity );
+	}
 }

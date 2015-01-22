@@ -28,9 +28,7 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegis
 import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.ClientRepository;
 import com.foreach.across.modules.entity.testmodules.springdata.SpringDataJpaModule;
-import com.foreach.across.modules.entity.views.EntityListView;
-import com.foreach.across.modules.entity.views.EntityListViewFactory;
-import com.foreach.across.modules.entity.views.EntityViewFactory;
+import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Test;
@@ -197,6 +195,15 @@ public class TestRepositoryEntityRegistrar
 		assertEquals( 50, viewFactory.getPageSize() );
 		assertNull( viewFactory.getSortableProperties() );
 		assertEquals( new Sort( "name" ), viewFactory.getDefaultSort() );
+	}
+
+	@Test
+	public void verifyCreateView() {
+		EntityConfiguration<Client> configuration = entityRegistry.getEntityConfiguration( Client.class );
+		assertTrue( configuration.hasView( EntityCreateView.VIEW_NAME ) );
+
+		EntityCreateViewFactory viewFactory = configuration.getViewFactory( EntityCreateView.VIEW_NAME );
+		assertNotNull( viewFactory );
 	}
 
 	@Configuration
