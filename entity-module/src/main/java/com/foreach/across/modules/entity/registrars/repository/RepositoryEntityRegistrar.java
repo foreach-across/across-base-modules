@@ -112,15 +112,9 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 					buildMessageCodeResolver( entityConfiguration, moduleInfo )
 			);
 
-			entityConfiguration.setEntityModel(
-					entityModelBuilder.buildEntityModel( repositoryFactoryInformation, repository )
-			);
-
-			entityConfiguration.setPropertyRegistry(
-					propertyRegistryBuilder.buildEntityPropertyRegistry( entityType, repositoryFactoryInformation )
-			);
-
-			viewsBuilder.createViews( entityConfiguration );
+			propertyRegistryBuilder.buildEntityPropertyRegistry( entityConfiguration );
+			entityModelBuilder.buildEntityModel( entityConfiguration );
+			viewsBuilder.buildViews( entityConfiguration );
 
 			entityRegistry.register( entityConfiguration );
 		}

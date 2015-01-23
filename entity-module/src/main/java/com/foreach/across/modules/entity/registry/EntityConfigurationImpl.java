@@ -112,6 +112,26 @@ public class EntityConfigurationImpl<T> extends AttributeSupport implements Muta
 		this.entityMessageCodeResolver = entityMessageCodeResolver;
 	}
 
+	@Override
+	public boolean isNew( T entity ) {
+		return entityModel.isNew( entity );
+	}
+
+	@Override
+	public Class<?> getIdType() {
+		return entityModel.getIdType();
+	}
+
+	@Override
+	public Serializable getId( T entity ) {
+		return entityModel.getId( entity );
+	}
+
+	@Override
+	public String getLabel( T entity ) {
+		return entityModel.getLabel( entity );
+	}
+
 	@Deprecated
 	/**
 	 * Wraps an entity with an access wrapper configured according to the configuration.

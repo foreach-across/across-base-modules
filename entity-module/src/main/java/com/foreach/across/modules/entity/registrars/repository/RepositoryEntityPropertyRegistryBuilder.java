@@ -1,6 +1,7 @@
 package com.foreach.across.modules.entity.registrars.repository;
 
 import com.foreach.across.modules.entity.EntityAttributes;
+import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
@@ -31,8 +32,11 @@ public class RepositoryEntityPropertyRegistryBuilder
 	@Autowired
 	private EntityPropertyRegistries entityPropertyRegistries;
 
-	public <T> EntityPropertyRegistry buildEntityPropertyRegistry( Class<T> entityType,
-	                                                               RepositoryFactoryInformation<T, ?> repositoryFactoryInformation ) {
+	public <T> void buildEntityPropertyRegistry( MutableEntityConfiguration<T> entityConfiguration ) {
+		Class<T> entityType = entityConfiguration.getEntityType();
+		RepositoryFactoryInformation<T, ?> repositoryFactoryInformation
+				= entityConfiguration.getAttribute( RepositoryFactoryInformation.class );
+
 		MutableEntityPropertyRegistry registry =
 				(MutableEntityPropertyRegistry) entityPropertyRegistries.getRegistry( entityType );
 
@@ -41,7 +45,7 @@ public class RepositoryEntityPropertyRegistryBuilder
 		configureDefaultOrder( entityType, registry );
 		configureKnownDescriptors( entityType, registry );
 
-		return registry;
+		entityConfiguration.setPropertyRegistry( registry );
 	}
 
 	private void configureDefaultFilter( Class<?> entityType, MutableEntityPropertyRegistry registry ) {

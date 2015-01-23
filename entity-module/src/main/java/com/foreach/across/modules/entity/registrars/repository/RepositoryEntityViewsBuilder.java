@@ -11,10 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.Repository;
+import org.springframework.format.support.DefaultFormattingConversionService;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
@@ -39,11 +39,11 @@ public class RepositoryEntityViewsBuilder
 		if ( conversionService == null ) {
 			LOG.info(
 					"No ConversionService found for the EntityModule - creating default conversion service for views." );
-			conversionService = new DefaultConversionService();
+			conversionService = new DefaultFormattingConversionService();
 		}
 	}
 
-	public void createViews( MutableEntityConfiguration entityConfiguration ) {
+	public void buildViews( MutableEntityConfiguration entityConfiguration ) {
 		buildCreateView( entityConfiguration );
 		buildUpdateView( entityConfiguration );
 

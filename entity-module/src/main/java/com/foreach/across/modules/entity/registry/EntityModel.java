@@ -18,13 +18,19 @@ package com.foreach.across.modules.entity.registry;
 import org.springframework.data.repository.core.EntityInformation;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 /**
  * @author Arne Vandamme
  */
 public interface EntityModel<T, ID extends Serializable> extends EntityInformation<T, ID>
 {
-	String getGeneratedLabel( T entity );
+	/**
+	 * @return The default generated label for an entity.
+	 */
+	String getLabel( T entity );
+
+	String getLabel( T entity, Locale locale );
 
 	T createNew( Object... args );
 

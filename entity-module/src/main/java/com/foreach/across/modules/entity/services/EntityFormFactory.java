@@ -23,7 +23,7 @@ public class EntityFormFactory
 	@Autowired
 	private EntityRegistryImpl entityRegistry;
 
-	@Autowired
+	@Autowired(required=false)
 	private ConversionService conversionService;
 
 	public FormElement createFormElement( EntityPropertyDescriptor descriptor,

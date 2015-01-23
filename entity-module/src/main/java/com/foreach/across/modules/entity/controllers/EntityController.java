@@ -1,15 +1,11 @@
 package com.foreach.across.modules.entity.controllers;
 
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
-import com.foreach.across.modules.adminweb.menu.AdminMenu;
-import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.services.EntityFormFactory;
-import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
-import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import com.foreach.across.modules.web.resource.WebResource;
@@ -23,8 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.io.Serializable;
 
 @AdminWebController
 @RequestMapping(EntityController.PATH)
@@ -66,38 +60,6 @@ public class EntityController
 		model.addAttribute( EntityListView.ATTRIBUTE_PAGEABLE, pageable );
 
 		EntityViewFactory view = entityConfiguration.getViewFactory( EntityListView.VIEW_NAME );
-
-		return view.create( entityConfiguration, model );
-	}
-
-	@RequestMapping(value = "/{entityConfig}/create", method = RequestMethod.GET)
-	public ModelAndView createEntity(
-			@PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
-			Model model ) throws Exception {
-		model.addAttribute( "entityMenu",
-		                    menuFactory.buildMenu( new EntityAdminMenu<>( entityConfiguration.getEntityType() ) ) );
-
-		EntityViewFactory view = entityConfiguration.getViewFactory( EntityFormView.CREATE_VIEW_NAME );
-		return view.create( entityConfiguration, model );
-	}
-
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/{entityConfig}/{entityId}/update", method = RequestMethod.GET)
-	public ModelAndView modifyEntity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
-	                                  @PathVariable("entityId") Serializable entityId,
-	                                  AdminMenu adminMenu,
-	                                  Model model ) throws Exception {
-		Object entity = conversionService.convert( entityId, entityConfiguration.getEntityType() );
-		model.addAttribute( EntityView.ATTRIBUTE_ENTITY, entity );
-
-		//EntityWrapper entity = entityConfiguration.wrap( entityConfiguration.getRepository().getById( entityId ) );
-		//adminMenu.getLowestSelectedItem().addItem( "/selectedEntity", entity.getEntityLabel() ).setSelected( true );
-
-		model.addAttribute( "entityMenu",
-		                    menuFactory.buildMenu( new EntityAdminMenu( entityConfiguration.getEntityType(),
-		                                                                entity ) ) );
-
-		EntityViewFactory view = entityConfiguration.getViewFactory( EntityFormView.UPDATE_VIEW_NAME );
 		return view.create( entityConfiguration, model );
 	}
 }

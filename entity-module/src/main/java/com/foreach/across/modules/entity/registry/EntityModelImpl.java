@@ -15,10 +15,13 @@
  */
 package com.foreach.across.modules.entity.registry;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.repository.core.CrudInvoker;
 import org.springframework.data.repository.core.EntityInformation;
+import org.springframework.format.Printer;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 /**
  * @author Arne Vandamme
@@ -28,6 +31,7 @@ public class EntityModelImpl<T, ID extends Serializable> implements EntityModel<
 	private EntityFactory<T> entityFactory;
 	private EntityInformation<T, ID> entityInformation;
 	private CrudInvoker<T> crudInvoker;
+	private Printer<T> labelPrinter;
 
 	public void setEntityFactory( EntityFactory<T> entityFactory ) {
 		this.entityFactory = entityFactory;
@@ -41,9 +45,18 @@ public class EntityModelImpl<T, ID extends Serializable> implements EntityModel<
 		this.crudInvoker = crudInvoker;
 	}
 
+	public void setLabelPrinter( Printer<T> labelPrinter ) {
+		this.labelPrinter = labelPrinter;
+	}
+
 	@Override
-	public String getGeneratedLabel( T entity ) {
-		return getId( entity ).toString();
+	public String getLabel( T entity ) {
+		return getLabel( entity, LocaleContextHolder.getLocale() );
+	}
+
+	@Override
+	public String getLabel( T entity, Locale locale ) {
+		return labelPrinter.print( entity, locale );
 	}
 
 	@Override

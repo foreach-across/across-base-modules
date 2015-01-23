@@ -6,7 +6,8 @@ import com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
 import com.foreach.across.modules.entity.config.PostProcessor;
 import com.foreach.across.modules.entity.controllers.EntityController;
-import com.foreach.across.modules.entity.controllers.EntitySaveController;
+import com.foreach.across.modules.entity.controllers.EntityCreateController;
+import com.foreach.across.modules.entity.controllers.EntityUpdateController;
 import com.foreach.across.modules.entity.handlers.MenuEventsHandler;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
@@ -32,8 +33,12 @@ public class AdminWebConfiguration implements EntityConfigurer
 	}
 
 	@Bean
-	public EntitySaveController entitySaveController() {
-		return new EntitySaveController();
+	public EntityCreateController entityCreateController() {
+		return new EntityCreateController();
+	}
+	@Bean
+	public EntityUpdateController entitySaveController() {
+		return new EntityUpdateController();
 	}
 
 	@Override

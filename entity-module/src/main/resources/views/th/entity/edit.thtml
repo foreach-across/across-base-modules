@@ -19,7 +19,7 @@
 </head>
 <body th:fragment="content">
 
-<h4 class="page-header" th:if="${existing}" th:text="|Modify ${T(org.apache.commons.lang3.StringUtils).uncapitalize(entityConfiguration.displayName)}: ${entity}|">Modify entity: name</h4>
+<h4 class="page-header" th:if="${existing}" th:text="|${messages.updateAction()}: ${entityConfiguration.getLabel(originalEntity)}|">Modify entity: name</h4>
 <h4 class="page-header" th:unless="${existing}" th:text="${messages.createAction()}">Create a new entity</h4>
 
 <div class="tabbable filled">
@@ -84,6 +84,8 @@
 									</li>
 								</ul>
 							</div>
+
+							<span style="color:red" class="error" th:each="error : ${#fields.errors(element.name)}" th:text="${error}">Error message.</span>
 						</div>
 
 						<input class="btn btn-primary" type="submit" value="Save"/>

@@ -24,4 +24,12 @@ public interface EntityConfiguration<T> extends ReadableAttributes
 	EntityPropertyRegistry getPropertyRegistry();
 
 	EntityMessageCodeResolver getEntityMessageCodeResolver();
+
+	boolean isNew( T entity );
+
+	Class<?> getIdType();
+
+	Serializable getId( T entity );
+
+	String getLabel( T entity );
 }

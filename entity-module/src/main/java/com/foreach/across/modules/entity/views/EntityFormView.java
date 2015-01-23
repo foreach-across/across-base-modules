@@ -23,4 +23,7 @@ public class EntityFormView extends EntityView
 	public static final String CREATE_VIEW_NAME = "createView";
 	public static final String UPDATE_VIEW_NAME = "updateView";
 	public static final String VIEW_TEMPLATE = "th/entity/edit";
+
+	// Will contain the original (unmodified) entity for which the form is being rendered
+	public static final String ATTRIBUTE_ORIGINAL_ENTITY = "originalEntity";
 }

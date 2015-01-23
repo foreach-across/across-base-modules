@@ -162,6 +162,8 @@ public class TestRepositoryEntityRegistrar
 		created.setNewEntityId( 10L );
 		created.setName( "Some name" );
 
+		assertEquals( "Some name", model.getLabel( created ) );
+
 		created = model.save( created );
 		assertEquals( Long.valueOf( 10 ), created.getId() );
 		assertFalse( model.isNew( created ) );
@@ -169,6 +171,7 @@ public class TestRepositoryEntityRegistrar
 		existing = model.findOne( 10L );
 		assertNotNull( existing );
 		assertEquals( "Some name", existing.getName() );
+		assertEquals( "Some name", model.getLabel( created ) );
 
 		Client dto = model.createDto( created );
 		assertNotSame( created, dto );
@@ -181,6 +184,7 @@ public class TestRepositoryEntityRegistrar
 		existing = model.findOne( 10L );
 		assertNotNull( existing );
 		assertEquals( "Modified name", existing.getName() );
+		assertEquals( "Modified name", model.getLabel( existing ) );
 	}
 
 	@Test

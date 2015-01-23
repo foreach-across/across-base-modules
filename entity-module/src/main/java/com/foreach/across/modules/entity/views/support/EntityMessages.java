@@ -38,19 +38,27 @@ public class EntityMessages
 	}
 
 	public String createAction( Object... arguments ) {
-		return messageWithFallback( ACTION_CREATE, messageCodeResolver.getNameSingularInline(), arguments );
+		return messageWithFallback( ACTION_CREATE,
+		                            messageCodeResolver.getNameSingular(),
+		                            messageCodeResolver.getNameSingularInline(), arguments );
 	}
 
 	public String updateAction( Object... arguments ) {
-		return messageWithFallback( ACTION_UPDATE, messageCodeResolver.getNameSingularInline(), arguments );
+		return messageWithFallback( ACTION_UPDATE,
+		                            messageCodeResolver.getNameSingular(),
+		                            messageCodeResolver.getNameSingularInline(), arguments );
 	}
 
 	public String deleteAction( Object... arguments ) {
-		return messageWithFallback( ACTION_DELETE, messageCodeResolver.getNameSingularInline(), arguments );
+		return messageWithFallback( ACTION_DELETE,
+		                            messageCodeResolver.getNameSingular(),
+		                            messageCodeResolver.getNameSingularInline(), arguments );
 	}
 
 	public String viewAction( Object... arguments ) {
-		return messageWithFallback( ACTION_VIEW, messageCodeResolver.getNameSingularInline(), arguments );
+		return messageWithFallback( ACTION_VIEW,
+		                            messageCodeResolver.getNameSingular(),
+		                            messageCodeResolver.getNameSingularInline(), arguments );
 	}
 
 	public String message( String code, Object... arguments ) {
