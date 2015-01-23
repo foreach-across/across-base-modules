@@ -1,15 +1,15 @@
 package com.foreach.across.modules.entity.services;
 
 import com.foreach.across.modules.entity.business.EntityForm;
-import com.foreach.across.modules.entity.business.FormElement;
 import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
-import com.foreach.across.modules.entity.form.HiddenFormElement;
-import com.foreach.across.modules.entity.form.TextFormElement;
-import com.foreach.across.modules.entity.form.TextboxFormElement;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
+import com.foreach.across.modules.entity.views.form.FormElement;
+import com.foreach.across.modules.entity.views.form.HiddenFormElement;
+import com.foreach.across.modules.entity.views.form.TextFormElement;
+import com.foreach.across.modules.entity.views.form.TextboxFormElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class EntityFormFactory
 	@Autowired
 	private EntityRegistryImpl entityRegistry;
 
-	@Autowired(required=false)
+	@Autowired(required = false)
 	private ConversionService conversionService;
 
 	public FormElement createFormElement( EntityPropertyDescriptor descriptor,

@@ -1,6 +1,5 @@
-package com.foreach.across.modules.entity.form;
+package com.foreach.across.modules.entity.views.form;
 
-import com.foreach.across.modules.entity.business.FormElement;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.properties.ConversionServicePrintablePropertyView;

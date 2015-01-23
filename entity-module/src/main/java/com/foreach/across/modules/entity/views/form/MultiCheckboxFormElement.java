@@ -1,13 +1,12 @@
-package com.foreach.across.modules.entity.form;
+package com.foreach.across.modules.entity.views.form;
 
-import com.foreach.across.modules.entity.business.FormElement;
 import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 
 import java.beans.PropertyDescriptor;
 import java.util.Collection;
 
-public abstract class SelectFormElement implements FormElement
+public abstract class MultiCheckboxFormElement implements FormElement
 {
 	private final EntityRegistryImpl registry;
 	private Object entity;
@@ -16,9 +15,9 @@ public abstract class SelectFormElement implements FormElement
 	private String name, label;
 	private Object value;
 
-	public SelectFormElement( EntityRegistryImpl registry,
-	                          PropertyDescriptor propertyDescriptor,
-	                          Collection<?> possibleValues ) {
+	public MultiCheckboxFormElement( EntityRegistryImpl registry,
+	                                 PropertyDescriptor propertyDescriptor,
+	                                 Collection<?> possibleValues ) {
 		this.registry = registry;
 		this.possibleValues = possibleValues;
 
@@ -26,9 +25,9 @@ public abstract class SelectFormElement implements FormElement
 		setLabel( propertyDescriptor.getDisplayName() );
 	}
 
-	public SelectFormElement( EntityRegistryImpl registry,
-	                          FormPropertyDescriptor propertyDescriptor,
-	                          Collection<?> possibleValues ) {
+	public MultiCheckboxFormElement( EntityRegistryImpl registry,
+	                                 FormPropertyDescriptor propertyDescriptor,
+	                                 Collection<?> possibleValues ) {
 		this.registry = registry;
 		this.possibleValues = possibleValues;
 
@@ -59,7 +58,7 @@ public abstract class SelectFormElement implements FormElement
 
 	@Override
 	public String getElementType() {
-		return "select";
+		return "multi-checkbox";
 	}
 
 	public Collection<?> getPossibleValues() {
