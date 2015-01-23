@@ -26,22 +26,20 @@ public class MenuEventsHandler
 
 		for ( EntityConfiguration entityConfiguration : entityRegistry.getEntities() ) {
 			EntityMessageCodeResolver messageCodeResolver = entityConfiguration.getEntityMessageCodeResolver();
+			EntityMessages messages = new EntityMessages( messageCodeResolver );
 
 			builder
 					.item( "/entities/" + entityConfiguration.getName(), messageCodeResolver.getNameSingular() )
 					.and()
 					.item( "/entities/" + entityConfiguration.getName() + "/create",
-					       messageCodeResolver.getMessageWithFallback(
-							       EntityMessages.ACTION_CREATE,
-							       new Object[] { messageCodeResolver.getNameSingularInline() },
-							       null
-					       )
+					       messages.createAction()
 					);
 
 		}
 	}
 
 	@Event
+	@SuppressWarnings("unchecked")
 	public void entityMenu( EntityAdminMenuEvent<IdBasedEntity> menu ) {
 		PathBasedMenuBuilder builder = menu.builder();
 
@@ -49,8 +47,7 @@ public class MenuEventsHandler
 
 		if ( menu.isForUpdate() ) {
 			builder.item(
-					"/entities/" + entityConfiguration.getName() + "/" + entityConfiguration.getEntityModel().getId(
-							menu.getEntity() ),
+					"/entities/" + entityConfiguration.getName() + "/" + entityConfiguration.getId( menu.getEntity() ),
 					"General" )
 			       .order( Ordered.HIGHEST_PRECEDENCE );
 		}

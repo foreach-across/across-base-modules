@@ -5,7 +5,6 @@ import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 
 import java.beans.PropertyDescriptor;
-import java.io.Serializable;
 import java.util.Collection;
 
 public abstract class MultiCheckboxFormElement implements FormElement
@@ -61,14 +60,6 @@ public abstract class MultiCheckboxFormElement implements FormElement
 	@Override
 	public String getElementType() {
 		return "multi-checkbox";
-	}
-
-	public String entityLabel( Object entity ) {
-		return registry.wrap( entity ).getEntityLabel();
-	}
-
-	public Serializable entityId( Object entity ) {
-		return registry.wrap( entity ).getId();
 	}
 
 	public Collection<?> getPossibleValues() {

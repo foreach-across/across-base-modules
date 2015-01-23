@@ -53,7 +53,7 @@
 	</tr>
 	</thead>
 	<tbody>
-	<tr th:each="entity,entityStats:${page.content}" th:with="wrapped=${entityConfiguration.wrap(entity)}">
+	<tr th:each="entity,entityStats:${page.content}" >
 		<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
 		<td th:each="prop : ${properties}">
 			<!--/*
@@ -82,10 +82,10 @@
 	</tr>
 	</thead>
 	<tbody>
-	<tr th:each="entity,entityStats:${page.content}" th:with="wrapped=${entityConfiguration.wrap(entity)}">
+	<tr th:each="entity,entityStats:${page.content}">
 		<td th:text="${entityStats.count}"></td>
-		<td th:text="${wrapped.entityLabel}"></td>
-		<td><a th:href="@{${@adminWeb.path('/entities/' + entityConfiguration.name + '/' + wrapped.id)}}">edit</a></td>
+		<td th:text="${entityConfiguration.getLabel(entity)}"></td>
+		<td><a th:href="@{${entityLinks.update(entity)}}">edit</a></td>
 	</tr>
 	</tbody>
 </table>

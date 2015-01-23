@@ -1,13 +1,11 @@
 package com.foreach.across.modules.entity.registry;
 
-import com.foreach.across.modules.entity.business.EntityWrapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 import java.util.*;
 
@@ -131,16 +129,5 @@ public class EntityRegistryImpl implements MutableEntityRegistry
 	@Override
 	public <T> MutableEntityConfiguration<T> getMutableEntityConfiguration( Class<T> entityType ) {
 		return (MutableEntityConfiguration<T>) getEntityConfiguration( entityType );
-	}
-
-	@Deprecated
-	public EntityWrapper wrap( Object entity ) {
-		EntityConfiguration<?> config = getEntityConfiguration( ClassUtils.getUserClass( entity ) );
-
-		if ( config == null ) {
-			config = new EntityConfigurationImpl<>( ClassUtils.getUserClass( entity ) );
-		}
-
-		return null;
 	}
 }

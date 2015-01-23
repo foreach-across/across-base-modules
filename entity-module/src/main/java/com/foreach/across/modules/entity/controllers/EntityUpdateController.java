@@ -3,7 +3,6 @@ package com.foreach.across.modules.entity.controllers;
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.adminweb.menu.AdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
-import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.views.EntityFormView;
@@ -11,8 +10,6 @@ import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.web.menu.MenuFactory;
-import com.foreach.across.modules.web.resource.WebResource;
-import com.foreach.across.modules.web.resource.WebResourceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.ui.Model;
@@ -21,13 +18,14 @@ import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.io.Serializable;
 
 @AdminWebController
 @RequestMapping(EntityController.PATH + "/{entityConfig}/{entityId}/update")
-public class EntityUpdateController
+public class EntityUpdateController extends EntityControllerSupport
 {
 	@Autowired
 	private MenuFactory menuFactory;
@@ -41,13 +39,6 @@ public class EntityUpdateController
 	@InitBinder
 	protected void initBinder( WebDataBinder binder ) {
 		binder.setValidator( entityValidatorFactory );
-	}
-
-	@ModelAttribute
-	public void init( WebResourceRegistry registry ) {
-		registry.addWithKey( WebResource.CSS, EntityModule.NAME, "/css/entity/entity-module.css", WebResource.VIEWS );
-		registry.addWithKey( WebResource.JAVASCRIPT_PAGE_END, EntityModule.NAME,
-		                     "/js/entity/entity-module.js", WebResource.VIEWS );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -89,7 +80,8 @@ public class EntityUpdateController
 	                                @ModelAttribute(EntityView.ATTRIBUTE_ENTITY) @Valid Object entity,
 	                                BindingResult bindingResult,
 	                                Model model,
-	                                AdminMenu adminMenu ) {
+	                                AdminMenu adminMenu,
+	                                RedirectAttributes redirectAttributes ) {
 		EntityModel entityModel = entityConfiguration.getEntityModel();
 
 		if ( !bindingResult.hasErrors() ) {
@@ -100,38 +92,12 @@ public class EntityUpdateController
 					"redirect:" + entityConfiguration.getAttribute( EntityLinkBuilder.class ).update( entity )
 			);
 
+			redirectAttributes.addFlashAttribute( "successMessage", "feedback.entityUpdated" );
+
 			return mav;
 		}
 		else {
 			return showUpdateEntityForm( entityConfiguration, entity, adminMenu, model );
-//			EntityWrapper originalEntity = (EntityWrapper) model.asMap().get( "original" );
-//
-//			if ( originalEntity != null ) {
-//				adminMenu.getLowestSelectedItem()
-//				         .addItem( "/selectedEntity", originalEntity.getEntityLabel() )
-//				         .setSelected( true );
-//				model.addAttribute( "entityMenu",
-//				                    menuFactory.buildMenu(
-//						                    new EntityAdminMenu(
-//								                    entityConfiguration.getEntityType(),
-//								                    originalEntity.getEntity()
-//						                    )
-//				                    )
-//				);
-//			}
-//			else {
-//				model.addAttribute( "entityMenu",
-//				                    menuFactory.buildMenu(
-//						                    new EntityAdminMenu( entityConfiguration.getEntityType() )
-//				                    )
-//				);
-//			}
-//
-//			EntityViewFactory viewFactory = entityConfiguration.getViewFactory(
-//					entityModel.isNew( entity ) ? EntityFormView.CREATE_VIEW_NAME : EntityFormView.UPDATE_VIEW_NAME
-//			);
-//
-//			return viewFactory.create( entityConfiguration, model );
 		}
 	}
 }

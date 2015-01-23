@@ -122,7 +122,7 @@ public class TestEntityMessageCodeResolver
 		assertEquals( "Default for create", createMessage );
 
 		createMessage = messages.getMessageWithFallback( "actions.create",
-		                                                 new Object[] { messages.getNameSingularInline() },
+		                                                 new Object[] { "", messages.getNameSingularInline() },
 		                                                 "Default for create" );
 		assertEquals( "Create a new client", createMessage );
 

@@ -1,6 +1,5 @@
 package com.foreach.across.modules.entity.registry;
 
-import com.foreach.across.modules.entity.business.EntityWrapper;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.registry.support.AttributeSupport;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
@@ -130,15 +129,5 @@ public class EntityConfigurationImpl<T> extends AttributeSupport implements Muta
 	@Override
 	public String getLabel( T entity ) {
 		return entityModel.getLabel( entity );
-	}
-
-	@Deprecated
-	/**
-	 * Wraps an entity with an access wrapper configured according to the configuration.
-	 *
-	 * @param entity instance to wrap
-	 */
-	public EntityWrapper wrap( Object entity ) {
-		return new EntityWrapper( this, entity );
 	}
 }
