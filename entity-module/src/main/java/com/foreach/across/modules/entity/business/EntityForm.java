@@ -1,5 +1,7 @@
 package com.foreach.across.modules.entity.business;
 
+import com.foreach.across.modules.entity.views.forms.FormElement;
+
 import java.util.Collection;
 import java.util.LinkedList;
 

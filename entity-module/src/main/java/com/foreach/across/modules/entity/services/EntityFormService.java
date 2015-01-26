@@ -1,15 +1,14 @@
 package com.foreach.across.modules.entity.services;
 
+import com.foreach.across.core.annotations.RefreshableCollection;
 import com.foreach.across.modules.entity.business.EntityForm;
 import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.form.FormElement;
-import com.foreach.across.modules.entity.views.form.HiddenFormElement;
-import com.foreach.across.modules.entity.views.form.TextFormElement;
-import com.foreach.across.modules.entity.views.form.TextboxFormElement;
+import com.foreach.across.modules.entity.views.forms.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
@@ -17,8 +16,11 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ *
+ */
 @Service
-public class EntityFormFactory
+public class EntityFormService
 {
 	@Autowired
 	private EntityRegistryImpl entityRegistry;
@@ -26,20 +28,90 @@ public class EntityFormFactory
 	@Autowired(required = false)
 	private ConversionService conversionService;
 
-	public FormElement createFormElement( EntityPropertyDescriptor descriptor,
+	@RefreshableCollection(incremental = true, includeModuleInternals = true)
+	private Collection<FormElementTypeLookupStrategy> elementTypeLookupStrategies;
+
+	@RefreshableCollection(incremental = true, includeModuleInternals = true)
+	private Collection<FormElementBuilderFactoryAssembler> builderFactoryAssemblers;
+
+	public FormElement createFormElement( EntityConfiguration entityConfiguration,
+	                                      EntityPropertyRegistry entityPropertyRegistry,
+	                                      EntityPropertyDescriptor descriptor,
 	                                      EntityMessageCodeResolver messageCodeResolver ) {
-		if ( descriptor.isHidden() ) {
-			return new HiddenFormElement( messageCodeResolver, conversionService, descriptor );
+		FormElementBuilderFactory builderFactory
+				= getOrCreateBuilderFactory( entityConfiguration, entityPropertyRegistry, descriptor );
+
+		if ( builderFactory != null ) {
+			FormElementBuilder builder = builderFactory.createBuilder();
+
+			if ( builder != null ) {
+				builder.setMessageCodeResolver( messageCodeResolver );
+
+				return builder.createFormElement();
+			}
 		}
 
-		if ( descriptor.isWritable() ) {
-			return new TextboxFormElement( messageCodeResolver, conversionService, descriptor );
-		}
-		else {
-			return new TextFormElement( messageCodeResolver, conversionService, descriptor );
-		}
+		return null;
 	}
 
+	public FormElementBuilderFactory getOrCreateBuilderFactory(
+			EntityConfiguration entityConfiguration,
+			EntityPropertyRegistry entityPropertyRegistry,
+			EntityPropertyDescriptor propertyDescriptor
+	) {
+		// Get builder factory
+		FormElementBuilderFactory builderFactory = propertyDescriptor.getAttribute( FormElementBuilderFactory.class );
+
+		if ( builderFactory == null ) {
+			builderFactory = createBuilderFactory( entityConfiguration, entityPropertyRegistry, propertyDescriptor );
+		}
+
+		return builderFactory;
+	}
+
+	public FormElementBuilderFactory createBuilderFactory(
+			EntityConfiguration entityConfiguration,
+			EntityPropertyRegistry entityPropertyRegistry,
+			EntityPropertyDescriptor propertyDescriptor
+	) {
+		String elementType = findElementType( entityConfiguration, propertyDescriptor );
+
+		if ( elementType == null ) {
+			return null;
+		}
+
+		FormElementBuilderFactoryAssembler builderFactoryAssembler = findAssemblerForType( elementType );
+
+		if ( builderFactoryAssembler == null ) {
+			return null;
+		}
+
+		return builderFactoryAssembler
+				.createBuilderFactory( entityConfiguration, entityPropertyRegistry, propertyDescriptor );
+	}
+
+	private String findElementType( EntityConfiguration entityConfiguration, EntityPropertyDescriptor descriptor ) {
+		for ( FormElementTypeLookupStrategy lookupStrategy : elementTypeLookupStrategies ) {
+			String elementType = lookupStrategy.findElementType( entityConfiguration, descriptor );
+			if ( elementType != null ) {
+				return elementType;
+			}
+		}
+
+		return null;
+	}
+
+	private FormElementBuilderFactoryAssembler findAssemblerForType( String elementType ) {
+		for ( FormElementBuilderFactoryAssembler assembler : builderFactoryAssemblers ) {
+			if ( assembler.supports( elementType ) ) {
+				return assembler;
+			}
+		}
+
+		return null;
+	}
+
+	@Deprecated
 	public EntityForm create( Collection<FormPropertyDescriptor> descriptors ) {
 		EntityForm form = new EntityForm();
 

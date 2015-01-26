@@ -9,11 +9,10 @@ import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenuEvent;
 import com.foreach.across.modules.entity.business.EntityForm;
 import com.foreach.across.modules.entity.business.EntityWrapper;
-import com.foreach.across.modules.entity.business.FormElement;
 import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
-import com.foreach.across.modules.entity.services.EntityFormFactory;
+import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.hibernate.business.IdBasedEntity;
 import com.foreach.across.modules.properties.business.EntityProperties;
 import com.foreach.across.modules.properties.config.EntityPropertiesDescriptor;
@@ -44,7 +43,7 @@ public class EntityPropertiesController
 	private EntityRegistryImpl entityRegistry;
 
 	@Autowired
-	private EntityFormFactory formFactory;
+	private EntityFormService formFactory;
 
 	@Autowired
 	private MenuFactory menuFactory;
@@ -142,9 +141,9 @@ public class EntityPropertiesController
 
 		EntityForm entityForm = formFactory.create( descriptors );
 
-		for ( FormElement element : entityForm.getElements() ) {
-			//element.setValue( properties.getValue( element.getName() ) );
-		}
+//		for ( FormElement element : entityForm.getElements() ) {
+//			//element.setValue( properties.getValue( element.getName() ) );
+//		}
 
 		model.addAttribute( "entityForm", entityForm );
 

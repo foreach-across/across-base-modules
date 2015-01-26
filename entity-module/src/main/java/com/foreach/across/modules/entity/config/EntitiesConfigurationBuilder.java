@@ -23,8 +23,8 @@ import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
-import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
-import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
+import com.foreach.across.modules.entity.views.support.SpelValueFetcher;
+import com.foreach.across.modules.entity.views.support.ValueFetcher;
 import org.springframework.util.Assert;
 
 import java.util.Collection;

@@ -44,10 +44,10 @@
 			      data-tbl="entity-list"
 			      class="sortable"
 			      th:attr="data-tbl-sort-property=${prop.sortableProperty}">
-				<span th:text="${prop.displayName}">Property name</span>
+				<span th:text="${prop.label}">Property name</span>
 				<span class="caret"></span>
 			</span>
-			<span th:unless="${prop.sortable}" th:text="${prop.displayName}">Name</span>
+			<span th:unless="${prop.sortable}" th:text="${prop.label}">Name</span>
 		</th>
 		<th></th>
 	</tr>

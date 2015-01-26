@@ -2,8 +2,8 @@ package com.foreach.across.modules.entity.registry.properties;
 
 import com.foreach.across.modules.entity.registry.support.AttributeSupport;
 import com.foreach.across.modules.entity.util.EntityUtils;
-import com.foreach.across.modules.entity.views.helpers.PropertyDescriptorValueFetcher;
-import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
+import com.foreach.across.modules.entity.views.support.PropertyDescriptorValueFetcher;
+import com.foreach.across.modules.entity.views.support.ValueFetcher;
 import org.springframework.beans.BeanUtils;
 import org.thymeleaf.util.StringUtils;
 

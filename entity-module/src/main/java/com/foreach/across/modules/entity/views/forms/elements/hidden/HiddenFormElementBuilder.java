@@ -13,28 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.helpers;
+package com.foreach.across.modules.entity.views.forms.elements.hidden;
 
-import java.beans.PropertyDescriptor;
+import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderSupport;
 
 /**
  * @author Arne Vandamme
  */
-public class PropertyDescriptorValueFetcher<T> implements ValueFetcher<T>
+public class HiddenFormElementBuilder extends FormElementBuilderSupport<HiddenFormElement>
 {
-	private final PropertyDescriptor descriptor;
-
-	public PropertyDescriptorValueFetcher( PropertyDescriptor descriptor ) {
-		this.descriptor = descriptor;
-	}
-
-	@Override
-	public Object getValue( T entity ) {
-		try {
-			return descriptor.getReadMethod().invoke( entity );
-		}
-		catch ( Exception e ) {
-			return null;
-		}
+	public HiddenFormElementBuilder() {
+		super( HiddenFormElement.class );
 	}
 }

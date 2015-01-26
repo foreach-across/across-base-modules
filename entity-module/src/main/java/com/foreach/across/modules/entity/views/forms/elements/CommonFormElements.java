@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.registry.properties;
-
-import com.foreach.across.modules.entity.registry.support.WritableAttributes;
-import com.foreach.across.modules.entity.views.support.ValueFetcher;
+package com.foreach.across.modules.entity.views.forms.elements;
 
 /**
  * @author Arne Vandamme
  */
-public interface MutableEntityPropertyDescriptor extends EntityPropertyDescriptor, WritableAttributes
+public interface CommonFormElements
 {
-	void setDisplayName( String displayName );
-
-	void setReadable( boolean readable );
-
-	void setWritable( boolean writable );
-
-	void setHidden( boolean hidden );
-
-	void setPropertyType( Class<?> propertyType );
-
-	void setValueFetcher( ValueFetcher<?> valueFetcher );
+	String TEXTBOX = "textbox";
+	String HIDDEN = "hidden";
 }

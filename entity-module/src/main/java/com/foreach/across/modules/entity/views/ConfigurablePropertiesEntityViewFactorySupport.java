@@ -80,12 +80,13 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 	protected void buildViewModel( EntityConfiguration entityConfiguration,
 	                               EntityMessageCodeResolver messageCodeResolver,
 	                               T view ) {
-		view.setEntityProperties( getEntityProperties( messageCodeResolver ) );
+		view.setEntityProperties( getEntityProperties( entityConfiguration, messageCodeResolver ) );
 
 		extendViewModel( entityConfiguration, view );
 	}
 
-	private List<PrintablePropertyView> getEntityProperties( EntityMessageCodeResolver messageCodeResolver ) {
+	private List<PrintablePropertyView> getEntityProperties( EntityConfiguration entityConfiguration,
+	                                                         EntityMessageCodeResolver messageCodeResolver ) {
 		EntityPropertyFilter filter = getPropertyFilter() != null ? getPropertyFilter() : EntityPropertyFilters.NoOp;
 
 		List<EntityPropertyDescriptor> descriptors;
@@ -100,14 +101,16 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 		List<PrintablePropertyView> propertyViews = new ArrayList<>( descriptors.size() );
 
 		for ( EntityPropertyDescriptor descriptor : descriptors ) {
-			propertyViews.add( createPropertyView( descriptor, messageCodeResolver ) );
+			propertyViews.add( createPropertyView( entityConfiguration, descriptor, messageCodeResolver ) );
 		}
 
 		return propertyViews;
 	}
 
-	protected PrintablePropertyView createPropertyView( EntityPropertyDescriptor descriptor,
-	                                                    EntityMessageCodeResolver messageCodeResolver ) {
+	protected PrintablePropertyView createPropertyView(
+			EntityConfiguration entityConfiguration,
+			EntityPropertyDescriptor descriptor,
+			EntityMessageCodeResolver messageCodeResolver ) {
 		return new ConversionServicePrintablePropertyView( messageCodeResolver, conversionService, descriptor );
 	}
 

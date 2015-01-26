@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.helpers;
+package com.foreach.across.modules.entity.views.support;
 
 /**
+ * Single interface providing fetching a value from an entity
+ * and printing it to a String if required.
+ *
  * @author Arne Vandamme
  */
-public interface ValueFetcher<T>
+public interface ValuePrinter<T> extends ValueFetcher<T>
 {
-	Object getValue( T entity );
+	/**
+	 * Print the object of type T for display.
+	 *
+	 * @param object the instance to print
+	 * @return the printed text string
+	 */
+	String print( T object );
 }

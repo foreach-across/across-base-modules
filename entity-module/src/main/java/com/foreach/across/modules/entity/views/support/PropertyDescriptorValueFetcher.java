@@ -13,14 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.form;
+package com.foreach.across.modules.entity.views.support;
+
+import java.beans.PropertyDescriptor;
 
 /**
- * Base interface to create a single {@link FormElement} instance.
- *
  * @author Arne Vandamme
  */
-public interface FormElementBuilder<T extends FormElement>
+public class PropertyDescriptorValueFetcher<T> implements ValueFetcher<T>
 {
-	T createFormElement();
+	private final PropertyDescriptor descriptor;
+
+	public PropertyDescriptorValueFetcher( PropertyDescriptor descriptor ) {
+		this.descriptor = descriptor;
+	}
+
+	@Override
+	public Object getValue( T entity ) {
+		try {
+			return descriptor.getReadMethod().invoke( entity );
+		}
+		catch ( Exception e ) {
+			return null;
+		}
+	}
 }

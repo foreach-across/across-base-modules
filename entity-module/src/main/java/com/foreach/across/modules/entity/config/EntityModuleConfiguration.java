@@ -8,10 +8,13 @@ import com.foreach.across.modules.entity.registrars.ModuleEntityRegistration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistries;
-import com.foreach.across.modules.entity.services.EntityFormFactory;
-import com.foreach.across.modules.entity.services.EntityFormRenderer;
+import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.views.EntityFormViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
+import com.foreach.across.modules.entity.views.forms.CommonFormElementTypeLookupStrategy;
+import com.foreach.across.modules.entity.views.forms.FormElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.forms.elements.hidden.HiddenFormElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.forms.elements.textbox.TextboxFormElementBuilderFactoryAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -57,13 +60,23 @@ public class EntityModuleConfiguration
 	}
 
 	@Bean
-	public EntityFormFactory entityFormFactory() {
-		return new EntityFormFactory();
+	public EntityFormService entityFormFactory() {
+		return new EntityFormService();
 	}
 
 	@Bean
-	public EntityFormRenderer entityFormRenderer() {
-		return new EntityFormRenderer();
+	public FormElementBuilderFactoryAssembler textboxFormElementBuilderFactoryAssembler() {
+		return new TextboxFormElementBuilderFactoryAssembler();
+	}
+
+	@Bean
+	public FormElementBuilderFactoryAssembler hiddenFormElementBuilderFactoryAsssembler() {
+		return new HiddenFormElementBuilderFactoryAssembler();
+	}
+
+	@Bean
+	public CommonFormElementTypeLookupStrategy commonFormElementTypeLookupStrategy() {
+		return new CommonFormElementTypeLookupStrategy();
 	}
 
 	@Bean
@@ -87,6 +100,8 @@ public class EntityModuleConfiguration
 	public EntityFormViewFactory entityCreateViewFactory() {
 		return new EntityFormViewFactory();
 	}
+
+
 
 /*
 	@Bean

@@ -3,7 +3,7 @@ package com.foreach.across.modules.entity.registrars.repository;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.views.*;
-import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
+import com.foreach.across.modules.entity.views.support.SpelValueFetcher;
 import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.slf4j.Logger;

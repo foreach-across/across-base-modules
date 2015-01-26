@@ -45,7 +45,7 @@ public class ConversionServicePrintablePropertyView implements PrintableProperty
 	}
 
 	@Override
-	public String getDisplayName() {
+	public String getLabel() {
 		return messageCodeResolver.getPropertyDisplayName( descriptor );
 	}
 

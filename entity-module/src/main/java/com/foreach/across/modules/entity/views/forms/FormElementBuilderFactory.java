@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.form;
+package com.foreach.across.modules.entity.views.forms;
 
 /**
+ * Creates a {@link com.foreach.across.modules.entity.views.forms.FormElementBuilder} that creates a
+ * specific {@link FormElement} type.  The factory is expected to be immutable and create a builder
+ * usually using a base builder as a template.  The builder itself can then be modified for a particular
+ * view before creating the actual FormElement.
+ *
  * @author Arne Vandamme
  */
 public interface FormElementBuilderFactory<T extends FormElementBuilder>

@@ -1,6 +1,6 @@
 package com.foreach.across.modules.entity.registry.properties;
 
-import com.foreach.across.modules.entity.views.helpers.NestedValueFetcher;
+import com.foreach.across.modules.entity.views.support.NestedValueFetcher;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.ReflectionUtils;

@@ -20,14 +20,16 @@
 <body th:fragment="content">
 
 <h4 class="page-header" th:if="${existing}" th:text="|${messages.updateAction()}: ${entityConfiguration.getLabel(originalEntity)}|">
-	Modify entity: name</h4>
+	Modify entity: name
+</h4>
 <h4 class="page-header" th:unless="${existing}" th:text="${messages.createAction()}">Create a new entity</h4>
 
 <div th:if="${successMessage}" class="alert alert-success alert-dismissible" role="alert">
 	<span th:text="${messages.withNameSingular(successMessage, entityConfiguration.getLabel(entity))}">
-	Entity has been saved succesfully.
+		Entity has been saved succesfully.
 	</span>
-	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
+	</button>
 </div>
 
 <div class="tabbable filled">
@@ -40,13 +42,13 @@
 	<div class="tab-content">
 		<div class="tab-pane active">
 			<form method="post" th:action="@{${existing ? entityLinks.update(entity) : entityLinks.create()}}" th:object="${entity}" role="form">
-
 				<div class="row">
 					<div class="col-md-4">
 						<div class="form-group" th:each="element : ${properties}" th:classappend="${#fields.hasErrors(element.name)}? has-error">
 							<!--/* label */-->
 							<div th:if="${element.elementType eq 'text'}">
 								<label th:for="${element.name}" th:text="${element.label}">label</label>
+
 								<div th:text="${element.value(entity)}">text value</div>
 							</div>
 							<!--/* hidden */-->
@@ -56,7 +58,8 @@
 							<!--/* textbox */-->
 							<div th:if="${element.elementType eq 'textbox'}">
 								<label th:for="${#ids.next(element.name)}" th:text="${element.label}">label</label>
-								<input th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}" class="form-control" th:value="${element.value(entity)}"/>
+								<input th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}"
+								       class="form-control" th:value="${element.print(entity)}"/>
 							</div>
 							<!--/* checkbox */-->
 							<div th:if="${element.elementType eq 'checkbox'}" class="checkbox">

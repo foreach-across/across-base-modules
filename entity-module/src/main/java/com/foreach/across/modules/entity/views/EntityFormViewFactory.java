@@ -18,7 +18,7 @@ package com.foreach.across.modules.entity.views;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.services.EntityFormFactory;
+import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFactorySupport
 {
 	@Autowired
-	private EntityFormFactory formFactory;
+	private EntityFormService formFactory;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -52,9 +52,11 @@ public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFacto
 	}
 
 	@Override
-	protected PrintablePropertyView createPropertyView( EntityPropertyDescriptor descriptor,
+	protected PrintablePropertyView createPropertyView( EntityConfiguration entityConfiguration,
+	                                                    EntityPropertyDescriptor descriptor,
 	                                                    EntityMessageCodeResolver messageCodeResolver ) {
-		return formFactory.createFormElement( descriptor, messageCodeResolver );
+		return formFactory.createFormElement( entityConfiguration, getPropertyRegistry(), descriptor,
+		                                      messageCodeResolver );
 	}
 
 	@Override

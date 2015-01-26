@@ -13,30 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.helpers;
+package com.foreach.across.modules.entity.views.forms;
 
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 
 /**
+ * Strategy interface that looks up the most fitting
+ * {@link com.foreach.across.modules.entity.views.forms.FormElement} type to create.
+ *
  * @author Arne Vandamme
  */
-public class SpelValueFetcher<T> implements ValueFetcher<T>
+public interface FormElementTypeLookupStrategy
 {
-	private static final ExpressionParser PARSER;
-
-	static {
-		PARSER = new SpelExpressionParser();
-	}
-
-	private final String expression;
-
-	public SpelValueFetcher( String expression ) {
-		this.expression = expression;
-	}
-
-	@Override
-	public Object getValue( T entity ) {
-		return PARSER.parseExpression( expression ).getValue( entity, Object.class );
-	}
+	/**
+	 * @return element type or null if none could be determined.
+	 */
+	String findElementType( EntityConfiguration entityConfiguration, EntityPropertyDescriptor descriptor );
 }

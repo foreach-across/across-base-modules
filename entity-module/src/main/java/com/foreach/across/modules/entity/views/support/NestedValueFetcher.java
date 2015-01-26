@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.registry.properties;
-
-import com.foreach.across.modules.entity.registry.support.WritableAttributes;
-import com.foreach.across.modules.entity.views.support.ValueFetcher;
+package com.foreach.across.modules.entity.views.support;
 
 /**
  * @author Arne Vandamme
  */
-public interface MutableEntityPropertyDescriptor extends EntityPropertyDescriptor, WritableAttributes
+public class NestedValueFetcher implements ValueFetcher<Object>
 {
-	void setDisplayName( String displayName );
+	private final ValueFetcher parent, child;
 
-	void setReadable( boolean readable );
+	public NestedValueFetcher( ValueFetcher parent, ValueFetcher child ) {
+		this.parent = parent;
+		this.child = child;
+	}
 
-	void setWritable( boolean writable );
-
-	void setHidden( boolean hidden );
-
-	void setPropertyType( Class<?> propertyType );
-
-	void setValueFetcher( ValueFetcher<?> valueFetcher );
+	@SuppressWarnings( "unchecked" )
+	@Override
+	public Object getValue( Object entity ) {
+		Object topLevelValue = parent.getValue( entity );
+		return topLevelValue != null ? child.getValue( topLevelValue ) : null;
+	}
 }

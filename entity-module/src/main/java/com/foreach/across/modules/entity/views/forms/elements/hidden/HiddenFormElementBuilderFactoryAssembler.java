@@ -13,24 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.helpers;
+package com.foreach.across.modules.entity.views.forms.elements.hidden;
+
+import com.foreach.across.modules.entity.views.forms.elements.CommonFormElements;
+import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderFactoryAssemblerSupport;
 
 /**
  * @author Arne Vandamme
  */
-public class NestedValueFetcher implements ValueFetcher<Object>
+public class HiddenFormElementBuilderFactoryAssembler
+		extends FormElementBuilderFactoryAssemblerSupport<HiddenFormElementBuilder>
 {
-	private final ValueFetcher parent, child;
-
-	public NestedValueFetcher( ValueFetcher parent, ValueFetcher child ) {
-		this.parent = parent;
-		this.child = child;
-	}
-
-	@SuppressWarnings( "unchecked" )
-	@Override
-	public Object getValue( Object entity ) {
-		Object topLevelValue = parent.getValue( entity );
-		return topLevelValue != null ? child.getValue( topLevelValue ) : null;
+	public HiddenFormElementBuilderFactoryAssembler() {
+		super( HiddenFormElementBuilder.class, CommonFormElements.HIDDEN );
 	}
 }

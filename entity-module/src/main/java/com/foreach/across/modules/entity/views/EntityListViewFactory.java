@@ -130,10 +130,11 @@ public class EntityListViewFactory extends ConfigurablePropertiesEntityViewFacto
 	}
 
 	@Override
-	protected PrintablePropertyView createPropertyView( EntityPropertyDescriptor descriptor,
+	protected PrintablePropertyView createPropertyView( EntityConfiguration entityConfiguration,
+	                                                    EntityPropertyDescriptor descriptor,
 	                                                    EntityMessageCodeResolver messageCodeResolver ) {
 		SortablePropertyView sortablePropertyView = new SortablePropertyView(
-				super.createPropertyView( descriptor, messageCodeResolver )
+				super.createPropertyView( entityConfiguration, descriptor, messageCodeResolver )
 		);
 		sortablePropertyView.setSortableProperty( determineSortableProperty( descriptor ) );
 
@@ -165,8 +166,8 @@ public class EntityListViewFactory extends ConfigurablePropertiesEntityViewFacto
 		}
 
 		@Override
-		public String getDisplayName() {
-			return wrapped.getDisplayName();
+		public String getLabel() {
+			return wrapped.getLabel();
 		}
 
 		@Override

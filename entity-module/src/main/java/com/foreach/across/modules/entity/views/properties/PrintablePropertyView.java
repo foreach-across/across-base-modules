@@ -20,10 +20,19 @@ package com.foreach.across.modules.entity.views.properties;
  */
 public interface PrintablePropertyView
 {
+	/**
+	 * @return Unique name of the property.
+	 */
 	String getName();
 
-	String getDisplayName();
+	/**
+	 * @return Label to show for the property.
+	 */
+	String getLabel();
 
+	/**
+	 * @return Custom template to use when rendering this property (null for default template).
+	 */
 	String getCustomTemplate();
 
 	Object value( Object entity );

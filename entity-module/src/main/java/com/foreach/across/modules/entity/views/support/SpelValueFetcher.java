@@ -13,25 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.registry.properties;
+package com.foreach.across.modules.entity.views.support;
 
-import com.foreach.across.modules.entity.registry.support.WritableAttributes;
-import com.foreach.across.modules.entity.views.support.ValueFetcher;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 /**
  * @author Arne Vandamme
  */
-public interface MutableEntityPropertyDescriptor extends EntityPropertyDescriptor, WritableAttributes
+public class SpelValueFetcher<T> implements ValueFetcher<T>
 {
-	void setDisplayName( String displayName );
+	private static final ExpressionParser PARSER;
 
-	void setReadable( boolean readable );
+	static {
+		PARSER = new SpelExpressionParser();
+	}
 
-	void setWritable( boolean writable );
+	private final String expression;
 
-	void setHidden( boolean hidden );
+	public SpelValueFetcher( String expression ) {
+		this.expression = expression;
+	}
 
-	void setPropertyType( Class<?> propertyType );
-
-	void setValueFetcher( ValueFetcher<?> valueFetcher );
+	@Override
+	public Object getValue( T entity ) {
+		return PARSER.parseExpression( expression ).getValue( entity, Object.class );
+	}
 }

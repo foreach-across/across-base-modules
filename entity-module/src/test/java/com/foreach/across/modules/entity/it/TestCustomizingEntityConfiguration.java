@@ -33,7 +33,7 @@ import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewF
 import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.entity.views.SimpleEntityViewFactorySupport;
-import com.foreach.across.modules.entity.views.helpers.SpelValueFetcher;
+import com.foreach.across.modules.entity.views.support.SpelValueFetcher;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;

@@ -13,25 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.registry.properties;
+package com.foreach.across.modules.entity.views.forms.elements.textbox;
 
-import com.foreach.across.modules.entity.registry.support.WritableAttributes;
-import com.foreach.across.modules.entity.views.support.ValueFetcher;
+import com.foreach.across.modules.entity.views.forms.elements.CommonFormElements;
+import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderFactoryAssemblerSupport;
 
 /**
  * @author Arne Vandamme
  */
-public interface MutableEntityPropertyDescriptor extends EntityPropertyDescriptor, WritableAttributes
+public class TextboxFormElementBuilderFactoryAssembler
+		extends FormElementBuilderFactoryAssemblerSupport<TextboxFormElementBuilder>
 {
-	void setDisplayName( String displayName );
-
-	void setReadable( boolean readable );
-
-	void setWritable( boolean writable );
-
-	void setHidden( boolean hidden );
-
-	void setPropertyType( Class<?> propertyType );
-
-	void setValueFetcher( ValueFetcher<?> valueFetcher );
+	public TextboxFormElementBuilderFactoryAssembler() {
+		super( TextboxFormElementBuilder.class, CommonFormElements.TEXTBOX );
+	}
 }

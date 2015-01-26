@@ -1,7 +1,7 @@
 package com.foreach.across.modules.entity.registry.properties;
 
 import com.foreach.across.modules.entity.registry.support.ReadableAttributes;
-import com.foreach.across.modules.entity.views.helpers.ValueFetcher;
+import com.foreach.across.modules.entity.views.support.ValueFetcher;
 
 public interface EntityPropertyDescriptor extends ReadableAttributes
 {
