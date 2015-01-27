@@ -20,6 +20,7 @@ import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.EntityModule;
+import com.foreach.across.modules.entity.annotations.EntityValidator;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
@@ -27,6 +28,7 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescr
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.ClientRepository;
+import com.foreach.across.modules.entity.testmodules.springdata.Customer;
 import com.foreach.across.modules.entity.testmodules.springdata.SpringDataJpaModule;
 import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
@@ -45,6 +47,9 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.validation.Validator;
+
+import javax.validation.metadata.PropertyDescriptor;
 
 import static org.junit.Assert.*;
 
@@ -65,9 +70,12 @@ public class TestRepositoryEntityRegistrar
 	@Autowired
 	private ClientRepository clientRepository;
 
+	@EntityValidator
+	private Validator entityValidator;
+
 	@Test
 	public void clientShouldBeRegisteredWithRepositoryInformation() {
-		assertEquals( 1, entityRegistry.getEntities().size() );
+		assertEquals( 2, entityRegistry.getEntities().size() );
 		assertTrue( entityRegistry.contains( Client.class ) );
 
 		EntityConfiguration<?> configuration = entityRegistry.getEntityConfiguration( Client.class );
@@ -92,17 +100,36 @@ public class TestRepositoryEntityRegistrar
 		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
 		EntityPropertyRegistry registry = configuration.getPropertyRegistry();
 
-		assertProperty( registry, "name", "Name", true );
-		assertProperty( registry, "id", "Id", true );
-		assertProperty( registry, "newEntityId", "New entity id", false );
-		assertProperty( registry, "nameWithId", "Name with id", false );
-		assertProperty( registry, "class", "Class", false );
+		assertProperty( registry, "name", "Name", true, true );
+		assertProperty( registry, "id", "Id", true, false );
+		assertProperty( registry, "newEntityId", "New entity id", false, false );
+		assertProperty( registry, "nameWithId", "Name with id", false, false );
+		assertProperty( registry, "class", "Class", false, false );
+	}
+
+	@Test
+	public void validatorShouldBeRegistered() {
+		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
+		Validator validator = configuration.getAttribute( Validator.class );
+
+		assertNotNull( validator );
+		assertSame( entityValidator, validator );
+
+		configuration = entityRegistry.getEntityConfiguration( Customer.class );
+		assertNotNull( configuration );
+
+		validator = configuration.getAttribute( Validator.class );
+		assertNotNull( validator );
+		assertNotSame( entityValidator, validator );
+
+		validator.validate( new Customer(), null );
 	}
 
 	private void assertProperty( EntityPropertyRegistry registry,
 	                             String propertyName,
 	                             String displayName,
-	                             boolean sortable ) {
+	                             boolean sortable,
+	                             boolean hasValidators ) {
 		EntityPropertyDescriptor descriptor = registry.getProperty( propertyName );
 		assertNotNull( propertyName );
 		assertEquals( propertyName, descriptor.getName() );
@@ -113,6 +140,13 @@ public class TestRepositoryEntityRegistrar
 		}
 		else {
 			assertFalse( descriptor.hasAttribute( EntityAttributes.SORTABLE_PROPERTY ) );
+		}
+
+		if ( hasValidators ) {
+			assertNotNull( descriptor.getAttribute( PropertyDescriptor.class ) );
+		}
+		else {
+			assertFalse( descriptor.hasAttribute( PropertyDescriptor.class ) );
 		}
 	}
 
@@ -222,7 +256,7 @@ public class TestRepositoryEntityRegistrar
 		@Override
 		public void configure( AcrossContext context ) {
 			context.addModule( new EntityModule() );
-
+context.setDevelopmentMode( true );
 			AcrossHibernateJpaModule hibernateModule = new AcrossHibernateJpaModule();
 			hibernateModule.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
 			context.addModule( hibernateModule );

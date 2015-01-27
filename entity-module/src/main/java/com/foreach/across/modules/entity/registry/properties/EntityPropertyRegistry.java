@@ -15,7 +15,7 @@ public interface EntityPropertyRegistry
 	 */
 	boolean contains( String propertyName );
 
-	void register( EntityPropertyDescriptor descriptor );
+	void register( MutableEntityPropertyDescriptor descriptor );
 
 	EntityPropertyDescriptor getProperty( String propertyName );
 

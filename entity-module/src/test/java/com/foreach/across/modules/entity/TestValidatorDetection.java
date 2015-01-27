@@ -39,7 +39,7 @@ public class TestValidatorDetection
 		assertNull( descriptor );
 
 		descriptor = beanDescriptor.getConstraintsForProperty( "name" );
-		assertEquals( 2, descriptor.getConstraintDescriptors().size() );
+		assertEquals( 1, descriptor.getConstraintDescriptors().size() );
 	}
 
 	@Test
@@ -64,6 +64,6 @@ public class TestValidatorDetection
 			validators.put( descriptor.getAnnotation().annotationType().getName(), parameters );
 		}
 
-		assertEquals( 2, validators.size() );
+		assertEquals( 1, validators.size() );
 	}
 }

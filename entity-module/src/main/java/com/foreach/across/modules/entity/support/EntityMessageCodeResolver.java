@@ -27,6 +27,8 @@ import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.util.Assert;
+import org.springframework.validation.DefaultMessageCodesResolver;
+import org.springframework.validation.MessageCodesResolver;
 
 import java.util.Locale;
 
@@ -35,7 +37,7 @@ import java.util.Locale;
  *
  * @author Arne Vandamme
  */
-public class EntityMessageCodeResolver implements MessageSourceAware
+public class EntityMessageCodeResolver implements MessageSourceAware, MessageCodesResolver
 {
 	private static class PrefixedEntityMessageCodeResolver extends EntityMessageCodeResolver
 	{
@@ -52,8 +54,17 @@ public class EntityMessageCodeResolver implements MessageSourceAware
 	private MessageSource messageSource;
 	private EntityConfiguration<?> entityConfiguration;
 
+	private MessageCodesResolver errorCodesResolver;
+
 	private String[] prefix = new String[0];
 	private String[] fallbackCollections = new String[0];
+
+	public EntityMessageCodeResolver() {
+		DefaultMessageCodesResolver errorCodesResolver = new DefaultMessageCodesResolver();
+		errorCodesResolver.setPrefix( "validation." );
+
+		this.errorCodesResolver = errorCodesResolver;
+	}
 
 	public void setPrefixes( String... prefix ) {
 		Assert.notNull( prefix );
@@ -63,6 +74,11 @@ public class EntityMessageCodeResolver implements MessageSourceAware
 	public void setFallbackCollections( String... fallbackCollections ) {
 		Assert.notNull( fallbackCollections );
 		this.fallbackCollections = fallbackCollections;
+	}
+
+	public void setErrorCodesResolver( MessageCodesResolver errorCodesResolver ) {
+		Assert.notNull( errorCodesResolver );
+		this.errorCodesResolver = errorCodesResolver;
 	}
 
 	@Override
@@ -173,6 +189,24 @@ public class EntityMessageCodeResolver implements MessageSourceAware
 				),
 				locale
 		);
+	}
+
+	@Override
+	public String[] resolveMessageCodes( String errorCode, String objectName ) {
+		return addPrefixesToMessageCodes( errorCodesResolver.resolveMessageCodes( errorCode, objectName ), true );
+	}
+
+	@Override
+	public String[] resolveMessageCodes( String errorCode, String objectName, String field, Class<?> fieldType ) {
+		return addPrefixesToMessageCodes(
+				errorCodesResolver.resolveMessageCodes( errorCode, objectName, field, fieldType ), true
+		);
+	}
+
+	public String[] addPrefixesToMessageCodes( String[] codes, boolean includeFallback ) {
+		return includeFallback
+				? addPrefix( ArrayUtils.addAll( prefix, fallbackCollections ), codes )
+				: addPrefix( prefix, codes );
 	}
 
 	public EntityMessageCodeResolver prefixedResolver( String... additionalPrefixes ) {

@@ -33,4 +33,9 @@ public class ClientConfig
 
 		return messageSource;
 	}
+
+	@Bean
+	public CustomerValidator customerValidator() {
+		return new CustomerValidator();
+	}
 }

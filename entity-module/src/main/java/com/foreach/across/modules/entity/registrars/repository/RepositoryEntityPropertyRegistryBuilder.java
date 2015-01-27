@@ -5,6 +5,11 @@ import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +18,8 @@ import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +36,10 @@ public class RepositoryEntityPropertyRegistryBuilder
 {
 	private static final Logger LOG = LoggerFactory.getLogger( RepositoryEntityPropertyRegistryBuilder.class );
 
+	private final BeanMetaDataManager metaDataManager = new BeanMetaDataManager(
+			new ConstraintHelper(), new ExecutableHelper( new TypeResolutionHelper() )
+	);
+
 	@Autowired
 	private EntityPropertyRegistries entityPropertyRegistries;
 
@@ -41,6 +52,7 @@ public class RepositoryEntityPropertyRegistryBuilder
 				(MutableEntityPropertyRegistry) entityPropertyRegistries.getRegistry( entityType );
 
 		configureSortableProperties( registry, repositoryFactoryInformation.getPersistentEntity() );
+		configureValidatorDescriptors( entityConfiguration, registry );
 		configureDefaultFilter( entityType, registry );
 		configureDefaultOrder( entityType, registry );
 		configureKnownDescriptors( entityType, registry );
@@ -117,6 +129,29 @@ public class RepositoryEntityPropertyRegistryBuilder
 
 				if ( mutable != null ) {
 					mutable.addAttribute( EntityAttributes.SORTABLE_PROPERTY, persistentProperty.getName() );
+				}
+			}
+		}
+	}
+
+	private void configureValidatorDescriptors( MutableEntityConfiguration<?> entityConfiguration,
+	                                            MutableEntityPropertyRegistry registry ) {
+		BeanMetaData<?> metaData = metaDataManager.getBeanMetaData( entityConfiguration.getEntityType() );
+		BeanDescriptor beanDescriptor = metaData.getBeanDescriptor();
+
+		if ( beanDescriptor != null ) {
+			entityConfiguration.addAttribute( BeanDescriptor.class, beanDescriptor );
+
+			for ( EntityPropertyDescriptor descriptor : registry.getRegisteredDescriptors() ) {
+				PropertyDescriptor validatorDescriptor
+						= beanDescriptor.getConstraintsForProperty( descriptor.getName() );
+
+				if ( validatorDescriptor != null ) {
+					MutableEntityPropertyDescriptor mutable = registry.getMutableProperty( descriptor.getName() );
+
+					if ( mutable != null ) {
+						mutable.addAttribute( PropertyDescriptor.class, validatorDescriptor );
+					}
 				}
 			}
 		}

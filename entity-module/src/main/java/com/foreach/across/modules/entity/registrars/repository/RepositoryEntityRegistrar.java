@@ -18,11 +18,9 @@ package com.foreach.across.modules.entity.registrars.repository;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.entity.EntityModule;
+import com.foreach.across.modules.entity.annotations.EntityValidator;
 import com.foreach.across.modules.entity.registrars.EntityRegistrar;
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.registry.EntityConfigurationImpl;
-import com.foreach.across.modules.entity.registry.EntityRegistry;
-import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
+import com.foreach.across.modules.entity.registry.*;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,7 +32,10 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 import org.springframework.util.ClassUtils;
+import org.springframework.validation.Validator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,6 +61,9 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 
 	@Autowired
 	private MessageSource messageSource;
+
+	@EntityValidator
+	private Validator entityValidator;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -108,6 +112,8 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 			entityConfiguration.addAttribute( RepositoryFactoryInformation.class, repositoryFactoryInformation );
 			entityConfiguration.addAttribute( Repository.class, repository );
 
+			findDefaultValidatorInModuleContext( entityConfiguration, moduleInfo.getApplicationContext() );
+
 			entityConfiguration.setEntityMessageCodeResolver(
 					buildMessageCodeResolver( entityConfiguration, moduleInfo )
 			);
@@ -122,6 +128,33 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 			LOG.warn( "Skipping registration of entity type {} as no unique name could be determined",
 			          entityType.getName() );
 		}
+	}
+
+	private void findDefaultValidatorInModuleContext( MutableEntityConfiguration entityConfiguration,
+	                                                  ApplicationContext applicationContext ) {
+		Validator validatorToUse = entityValidator;
+
+		Map<String, Validator> validatorMap = applicationContext.getBeansOfType( Validator.class );
+		List<Validator> candidates = new ArrayList<>();
+
+		for ( Validator validator : validatorMap.values() ) {
+			if ( validator != entityValidator && validator.supports( entityConfiguration.getEntityType() ) ) {
+				candidates.add( validator );
+			}
+		}
+
+		if ( candidates.size() > 1 ) {
+			LOG.debug(
+					"Module has more than one validator that supports {} - unable to decide, sticking to default entity validator",
+					entityConfiguration.getEntityType() );
+		}
+		else if ( !candidates.isEmpty() ) {
+			validatorToUse = candidates.get( 0 );
+			LOG.debug( "Auto-registering validator bean of type {} as default validator for entity {}",
+			           ClassUtils.getUserClass( validatorToUse ).getName(), entityConfiguration.getEntityType() );
+		}
+
+		entityConfiguration.addAttribute( Validator.class, validatorToUse );
 	}
 
 	private EntityMessageCodeResolver buildMessageCodeResolver( EntityConfiguration entityConfiguration,

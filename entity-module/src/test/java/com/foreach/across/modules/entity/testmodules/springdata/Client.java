@@ -22,7 +22,6 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 
 @Entity
 public class Client extends SettableIdBasedEntity<Client>
@@ -40,7 +39,6 @@ public class Client extends SettableIdBasedEntity<Client>
 	private Long id;
 
 	@NotBlank
-	@Min(value = 10)
 	@Column(unique = true)
 	private String name;
 

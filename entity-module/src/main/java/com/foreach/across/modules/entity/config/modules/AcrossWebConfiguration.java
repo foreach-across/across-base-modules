@@ -16,10 +16,14 @@
 package com.foreach.across.modules.entity.config.modules;
 
 import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.modules.entity.EntityModuleSettings;
+import com.foreach.across.modules.entity.annotations.EntityValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.validation.Validator;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.annotation.PostConstruct;
 
@@ -29,13 +33,32 @@ import javax.annotation.PostConstruct;
 @AcrossDepends(required = "AcrossWebModule")
 @Configuration
 @EnableSpringDataWebSupport
-public class AcrossWebConfiguration
+public class AcrossWebConfiguration extends WebMvcConfigurerAdapter
 {
+	@EntityValidator
+	@SuppressWarnings( "unused" )
+	private Validator entityValidator;
+
+	@Autowired
+	private EntityModuleSettings settings;
+
 	@Autowired
 	private PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver;
 
 	@PostConstruct
 	public void removeFallbackPageable() {
 		pageableHandlerMethodArgumentResolver.setFallbackPageable( null );
+	}
+
+	/**
+	 * Register the entity validator as the default web mvc validator if necessary.
+	 */
+	@Override
+	public Validator getValidator() {
+		if ( entityValidator != null && settings.shouldRegisterEntityValidatorForMvc() ) {
+			return entityValidator;
+		}
+
+		return null;
 	}
 }

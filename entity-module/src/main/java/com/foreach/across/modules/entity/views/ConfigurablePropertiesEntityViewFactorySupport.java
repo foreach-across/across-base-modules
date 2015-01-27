@@ -101,7 +101,12 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 		List<PrintablePropertyView> propertyViews = new ArrayList<>( descriptors.size() );
 
 		for ( EntityPropertyDescriptor descriptor : descriptors ) {
-			propertyViews.add( createPropertyView( entityConfiguration, descriptor, messageCodeResolver ) );
+			PrintablePropertyView propertyView = createPropertyView( entityConfiguration, descriptor,
+			                                                         messageCodeResolver );
+
+			if ( propertyView != null ) {
+				propertyViews.add( propertyView );
+			}
 		}
 
 		return propertyViews;

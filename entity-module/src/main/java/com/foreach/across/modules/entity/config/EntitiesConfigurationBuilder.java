@@ -231,7 +231,7 @@ public class EntitiesConfigurationBuilder
 		protected void apply( EntityPropertyRegistry entityPropertyRegistry ) {
 			for ( Descriptor configured : descriptors.values() ) {
 				EntityPropertyDescriptor descriptor = entityPropertyRegistry.getProperty( configured.name );
-				EntityPropertyDescriptor merged = configured.merge( descriptor );
+				MutableEntityPropertyDescriptor merged = (MutableEntityPropertyDescriptor) configured.merge( descriptor );
 
 				entityPropertyRegistry.register( merged );
 			}

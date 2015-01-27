@@ -2,6 +2,7 @@ package com.foreach.across.modules.entity.config;
 
 import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.Exposed;
+import com.foreach.across.core.context.support.AcrossModuleMessageSource;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.converters.EntityConverter;
 import com.foreach.across.modules.entity.converters.StringToEntityConfigurationConverter;
@@ -22,11 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.format.support.DefaultFormattingConversionService;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.annotation.PostConstruct;
 
@@ -40,12 +41,13 @@ public class EntityModuleConfiguration
 
 	@PostConstruct
 	public void registerConverters() {
-		if ( conversionService != null ) {
-			EntityRegistry entityRegistry = entityRegistry();
+		ConfigurableConversionService converterRegistry =
+				conversionService != null ? conversionService : entityConversionService();
 
-			conversionService.addConverter( new StringToEntityConfigurationConverter( entityRegistry ) );
-			conversionService.addConverter( new EntityConverter<>( conversionService, entityRegistry ) );
-		}
+		EntityRegistry entityRegistry = entityRegistry();
+
+		converterRegistry.addConverter( new StringToEntityConfigurationConverter( entityRegistry ) );
+		converterRegistry.addConverter( new EntityConverter<>( converterRegistry, entityRegistry ) );
 	}
 
 	@Bean
@@ -54,11 +56,18 @@ public class EntityModuleConfiguration
 	}
 
 	@Bean
-	@Primary
-	@AcrossCondition("getBeanFactory().getBeansOfType(T(org.springframework.core.convert.ConversionService)).empty")
+	@Exposed
+	@AcrossCondition("not hasBeanOfType(T(org.springframework.core.convert.ConversionService))")
 	public ConfigurableConversionService entityConversionService() {
-		LOG.warn( "No ConversionService found in Across context - creating a local ConversionService bean" );
-		return new DefaultConversionService();
+		LOG.warn( "No ConversionService found in Across context - creating and exposing a ConversionService bean" );
+		return new DefaultFormattingConversionService();
+	}
+
+	@Bean(name = EntityModule.VALIDATOR)
+	@Exposed
+	@AcrossCondition("not hasBean('" + EntityModule.VALIDATOR + "')")
+	public Validator entityValidator() {
+		return new LocalValidatorFactoryBean();
 	}
 
 	/**
@@ -96,10 +105,7 @@ public class EntityModuleConfiguration
 
 	@Bean
 	public MessageSource messageSource() {
-		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-		messageSource.setBasename( EntityModule.class.getPackage().getName() + ".messages.EntityModule" );
-
-		return messageSource;
+		return new AcrossModuleMessageSource();
 	}
 
 	@Bean

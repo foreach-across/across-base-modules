@@ -14,9 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Validator;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -31,15 +32,7 @@ public class EntityUpdateController extends EntityControllerSupport
 	private MenuFactory menuFactory;
 
 	@Autowired
-	private Validator entityValidatorFactory;
-
-	@Autowired
 	private ConversionService conversionService;
-
-	@InitBinder
-	protected void initBinder( WebDataBinder binder ) {
-		binder.setValidator( entityValidatorFactory );
-	}
 
 	@SuppressWarnings("unchecked")
 	@ModelAttribute(EntityView.ATTRIBUTE_ENTITY)

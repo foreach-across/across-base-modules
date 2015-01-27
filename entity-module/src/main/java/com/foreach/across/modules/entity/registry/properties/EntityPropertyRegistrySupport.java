@@ -141,7 +141,7 @@ public abstract class EntityPropertyRegistrySupport implements MutableEntityProp
 	}
 
 	@Override
-	public void register( EntityPropertyDescriptor descriptor ) {
+	public void register( MutableEntityPropertyDescriptor descriptor ) {
 		descriptorMap.put( descriptor.getName(), descriptor );
 	}
 }

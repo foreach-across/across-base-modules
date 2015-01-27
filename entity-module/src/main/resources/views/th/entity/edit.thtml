@@ -48,7 +48,6 @@
 							<!--/* label */-->
 							<div th:if="${element.elementType eq 'text'}">
 								<label th:for="${element.name}" th:text="${element.label}">label</label>
-
 								<div th:text="${element.value(entity)}">text value</div>
 							</div>
 							<!--/* hidden */-->
@@ -57,9 +56,14 @@
 							</div>
 							<!--/* textbox */-->
 							<div th:if="${element.elementType eq 'textbox'}">
-								<label th:for="${#ids.next(element.name)}" th:text="${element.label}">label</label>
+								<label th:for="${#ids.next(element.name)}">
+									<span th:text="${element.label}">label text</span>
+									<sup th:if="${element.required}"><strong>*</strong></sup>
+								</label>
 								<input th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}"
-								       class="form-control" th:value="${element.print(entity)}"/>
+								       class="form-control" th:value="${element.print(entity)}"
+										th:attr="maxlength=${element.maxLength}"
+										/>
 							</div>
 							<!--/* checkbox */-->
 							<div th:if="${element.elementType eq 'checkbox'}" class="checkbox">
@@ -96,7 +100,9 @@
 								</ul>
 							</div>
 
-							<span style="color:red" class="error" th:each="error : ${#fields.errors(element.name)}" th:text="${error}">Error message.</span>
+							<div class="small text-danger" th:if="${#fields.hasErrors(element.name)}">
+								<span th:each="error : ${#fields.errors(element.name)}" th:text="${error}">Error message.</span>
+							</div>
 						</div>
 
 						<input class="btn btn-primary" type="submit" value="Save"/>

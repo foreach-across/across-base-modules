@@ -16,9 +16,15 @@
 package com.foreach.across.modules.entity.controllers;
 
 import com.foreach.across.modules.entity.EntityModule;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.web.resource.WebResource;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
+import org.springframework.validation.Validator;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * @author Arne Vandamme
@@ -31,4 +37,17 @@ public abstract class EntityControllerSupport
 		registry.addWithKey( WebResource.JAVASCRIPT_PAGE_END, EntityModule.NAME,
 		                     "/js/entity/entity-module.js", WebResource.VIEWS );
 	}
+
+	@InitBinder(EntityView.ATTRIBUTE_ENTITY)
+	protected void initBinder( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
+	                           WebDataBinder binder ) {
+		binder.setMessageCodesResolver( entityConfiguration.getEntityMessageCodeResolver() );
+
+		Validator validator = entityConfiguration.getAttribute( Validator.class );
+
+		if ( validator != null ) {
+			binder.setValidator( validator );
+		}
+	}
+
 }

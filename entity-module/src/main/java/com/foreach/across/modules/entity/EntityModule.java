@@ -4,10 +4,12 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
 
 @AcrossDepends(
-		optional = { "AdminWebModule" }
+		optional = { "AcrossWebModule", "AdminWebModule" }
 )
 public class EntityModule extends AcrossModule
 {
+	public static final String VALIDATOR = "entityValidator";
+
 	public static final String NAME = "EntityModule";
 	public static final String RESOURCES = "entity";
 
