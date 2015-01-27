@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.forms;
+package com.foreach.across.modules.entity.views.forms.elements.textbox;
 
-import com.foreach.across.modules.entity.views.forms.elements.textbox.TextboxFormElement;
 import com.foreach.across.modules.entity.views.support.ValuePrinter;
 import org.junit.Test;
 

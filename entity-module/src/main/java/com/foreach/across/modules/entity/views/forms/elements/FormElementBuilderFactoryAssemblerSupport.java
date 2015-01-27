@@ -79,7 +79,19 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 		template.setLabelCode( "properties." + descriptor.getName() );
 		template.setValuePrinter( createValuePrinter( descriptor ) );
 
+		assembleTemplate( entityConfiguration, registry, descriptor, template );
+
 		return template;
+	}
+
+	/**
+	 * Simple implementations should override this method to extend the base template already created.
+	 */
+	protected void assembleTemplate( EntityConfiguration entityConfiguration,
+	                                 EntityPropertyRegistry registry,
+	                                 EntityPropertyDescriptor descriptor,
+	                                 T template ) {
+
 	}
 
 	protected ValuePrinter createValuePrinter( EntityPropertyDescriptor descriptor ) {

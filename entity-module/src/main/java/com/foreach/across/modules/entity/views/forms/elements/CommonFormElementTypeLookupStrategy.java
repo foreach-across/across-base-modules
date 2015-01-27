@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.forms;
+package com.foreach.across.modules.entity.views.forms.elements;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.views.forms.elements.CommonFormElements;
+import com.foreach.across.modules.entity.views.forms.FormElementTypeLookupStrategy;
 
 /**
  * @author Arne Vandamme

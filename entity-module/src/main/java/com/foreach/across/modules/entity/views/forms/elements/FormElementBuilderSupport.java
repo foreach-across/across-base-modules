@@ -29,6 +29,7 @@ public abstract class FormElementBuilderSupport<T extends FormElementSupport> im
 {
 	private final Class<T> builderClass;
 
+	private boolean required;
 	private String name, label, labelCode, customTemplate;
 
 	private EntityMessageCodeResolver messageCodeResolver;
@@ -87,6 +88,14 @@ public abstract class FormElementBuilderSupport<T extends FormElementSupport> im
 		this.customTemplate = customTemplate;
 	}
 
+	public boolean isRequired() {
+		return required;
+	}
+
+	public void setRequired( boolean required ) {
+		this.required = required;
+	}
+
 	protected String resolve( String code, String defaultMessage ) {
 		if ( messageCodeResolver != null && code != null ) {
 			return messageCodeResolver.getMessageWithFallback( code, defaultMessage );
@@ -137,12 +146,13 @@ public abstract class FormElementBuilderSupport<T extends FormElementSupport> im
 				&& Objects.equals( label, that.label )
 				&& Objects.equals( labelCode, that.labelCode )
 				&& Objects.equals( messageCodeResolver, that.messageCodeResolver )
-				&& Objects.equals( valuePrinter, that.valuePrinter );
+				&& Objects.equals( valuePrinter, that.valuePrinter )
+				&& Objects.equals( required, that.required );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( name, customTemplate, label, labelCode, messageCodeResolver, valuePrinter );
+		return Objects.hash( name, customTemplate, label, labelCode, messageCodeResolver, valuePrinter, required );
 	}
 
 }

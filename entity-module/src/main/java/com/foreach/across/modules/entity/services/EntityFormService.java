@@ -4,13 +4,10 @@ import com.foreach.across.core.annotations.RefreshableCollection;
 import com.foreach.across.modules.entity.business.EntityForm;
 import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.forms.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -22,12 +19,6 @@ import java.util.List;
 @Service
 public class EntityFormService
 {
-	@Autowired
-	private EntityRegistryImpl entityRegistry;
-
-	@Autowired(required = false)
-	private ConversionService conversionService;
-
 	@RefreshableCollection(incremental = true, includeModuleInternals = true)
 	private Collection<FormElementTypeLookupStrategy> elementTypeLookupStrategies;
 

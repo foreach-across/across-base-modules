@@ -26,6 +26,7 @@ public abstract class FormElementSupport implements FormElement
 {
 	private final String elementType;
 
+	private boolean required;
 	private String name, label, customTemplate;
 	private ValuePrinter valuePrinter;
 
@@ -63,6 +64,14 @@ public abstract class FormElementSupport implements FormElement
 
 	public void setCustomTemplate( String customTemplate ) {
 		this.customTemplate = customTemplate;
+	}
+
+	public boolean isRequired() {
+		return required;
+	}
+
+	public void setRequired( boolean required ) {
+		this.required = required;
 	}
 
 	public ValuePrinter getValuePrinter() {
