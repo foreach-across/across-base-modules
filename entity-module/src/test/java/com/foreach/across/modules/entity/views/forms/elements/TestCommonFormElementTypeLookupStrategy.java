@@ -16,9 +16,22 @@
 package com.foreach.across.modules.entity.views.forms.elements;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.testmodules.springdata.Client;
+import com.foreach.across.modules.entity.testmodules.springdata.CompanyStatus;
+import com.foreach.common.test.MockedLoader;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.math.BigDecimal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -27,9 +40,16 @@ import static org.mockito.Mockito.*;
 /**
  * @author Arne Vandamme
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext
+@ContextConfiguration(classes = TestCommonFormElementTypeLookupStrategy.Config.class, loader = MockedLoader.class)
 public class TestCommonFormElementTypeLookupStrategy
 {
-	private CommonFormElementTypeLookupStrategy strategy = new CommonFormElementTypeLookupStrategy();
+	@Autowired
+	private CommonFormElementTypeLookupStrategy strategy;
+
+	@Autowired
+	private EntityRegistry entityRegistry;
 
 	private EntityConfiguration entityConfiguration = mock( EntityConfiguration.class );
 	private EntityPropertyDescriptor descriptor = mock( EntityPropertyDescriptor.class );
@@ -37,20 +57,38 @@ public class TestCommonFormElementTypeLookupStrategy
 	@Before
 	public void resetMocks() {
 		reset( entityConfiguration, descriptor );
+
+		when( descriptor.isWritable() ).thenReturn( true );
 	}
 
 	@Test
 	public void hiddenType() {
 		when( descriptor.isHidden() ).thenReturn( true );
-
 		assertEquals( CommonFormElements.HIDDEN, lookup() );
 	}
 
 	@Test
-	public void textboxType() {
-		when( descriptor.isWritable() ).thenReturn( true );
+	public void textboxTypeForPrimitives() {
+		assertEquals( CommonFormElements.TEXTBOX, lookup( String.class ) );
+		assertEquals( CommonFormElements.TEXTBOX, lookup( Integer.class ) );
+		assertEquals( CommonFormElements.TEXTBOX, lookup( Long.class ) );
+		assertEquals( CommonFormElements.TEXTBOX, lookup( BigDecimal.class ) );
+	}
 
-		assertEquals( CommonFormElements.TEXTBOX, lookup() );
+	@Test
+	public void enumValueShouldReturnSelectType() {
+		assertEquals( CommonFormElements.SELECT, lookup( CompanyStatus.class ) );
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void singleEntityTypeShouldReturnSelectType() {
+		EntityConfiguration clientConfig = mock( EntityConfiguration.class );
+
+		when( entityConfiguration.getEntityType() ).thenReturn( (Class) Client.class );
+		when( entityRegistry.getEntityConfiguration( Client.class ) ).thenReturn( clientConfig );
+
+		assertEquals( CommonFormElements.SELECT, lookup( Client.class ) );
 	}
 
 	@Test
@@ -58,7 +96,22 @@ public class TestCommonFormElementTypeLookupStrategy
 		assertNull( lookup() );
 	}
 
+	@SuppressWarnings("unchecked")
+	private String lookup( Class propertyType ) {
+		when( descriptor.getPropertyType() ).thenReturn( propertyType );
+		return strategy.findElementType( entityConfiguration, descriptor );
+	}
+
 	private String lookup() {
 		return strategy.findElementType( entityConfiguration, descriptor );
+	}
+
+	@Configuration
+	protected static class Config
+	{
+		@Bean
+		public CommonFormElementTypeLookupStrategy lookupStrategy() {
+			return new CommonFormElementTypeLookupStrategy();
+		}
 	}
 }

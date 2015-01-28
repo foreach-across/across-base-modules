@@ -17,6 +17,7 @@ package com.foreach.across.modules.entity.testmodules.springdata;
 
 import org.springframework.data.domain.Persistable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -24,10 +25,13 @@ import javax.persistence.Id;
  * @author Arne Vandamme
  */
 @Entity
-public class Customer implements Persistable<String>
+public class Company implements Persistable<String>
 {
 	@Id
 	private String id;
+
+	@Column
+	private CompanyStatus status;
 
 	@Override
 	public String getId() {
@@ -37,5 +41,13 @@ public class Customer implements Persistable<String>
 	@Override
 	public boolean isNew() {
 		return true;
+	}
+
+	public CompanyStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus( CompanyStatus status ) {
+		this.status = status;
 	}
 }

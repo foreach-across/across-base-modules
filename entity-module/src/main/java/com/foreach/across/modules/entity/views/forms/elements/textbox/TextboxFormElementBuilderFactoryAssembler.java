@@ -15,19 +15,13 @@
  */
 package com.foreach.across.modules.entity.views.forms.elements.textbox;
 
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.views.forms.elements.CommonFormElements;
 import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderFactoryAssemblerSupport;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 
 /**
  * @author Arne Vandamme
@@ -40,31 +34,15 @@ public class TextboxFormElementBuilderFactoryAssembler
 	}
 
 	@Override
-	protected void assembleTemplate( EntityConfiguration entityConfiguration,
-	                                 EntityPropertyRegistry registry,
-	                                 EntityPropertyDescriptor descriptor,
-	                                 TextboxFormElementBuilder template ) {
-		PropertyDescriptor validationDescriptor = descriptor.getAttribute( PropertyDescriptor.class );
-
-		if ( validationDescriptor != null && validationDescriptor.hasConstraints() ) {
-			for ( ConstraintDescriptor constraint : validationDescriptor.getConstraintDescriptors() ) {
-				handleConstraint( template, constraint );
-			}
-		}
-	}
-
-	private void handleConstraint( TextboxFormElementBuilder template, ConstraintDescriptor constraint ) {
-		Class<?> type = constraint.getAnnotation().annotationType();
-
+	protected void handleConstraint( TextboxFormElementBuilder template,
+	                                 Class<? extends Annotation> type,
+	                                 ConstraintDescriptor constraint ) {
 		if ( Size.class.equals( type ) || Length.class.equals( type ) ) {
 			Integer max = (Integer) constraint.getAttributes().get( "max" );
 
 			if ( max != Integer.MAX_VALUE ) {
 				template.setMaxLength( max );
 			}
-		}
-		else if ( NotBlank.class.equals( type ) || NotNull.class.equals( type ) || NotEmpty.class.equals( type ) ) {
-			template.setRequired( true );
 		}
 	}
 }

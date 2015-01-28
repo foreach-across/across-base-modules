@@ -9,11 +9,12 @@ import java.util.List;
 public class EntityUtils
 {
 	public static String generateDisplayName( String propertyName ) {
-		String cleaned = propertyName.replace( '.', ' ' ).replaceAll("[^\\p{L}\\p{Nd} ]+", "");
+		String cleaned = propertyName.replace( '.', ' ' ).replace( '_', ' ' ).replaceAll( "[^\\p{L}\\p{Nd} ]+", "" );
 
 		List<String> finished = new LinkedList<>();
 		for ( String part : StringUtils.split( cleaned, ' ' ) ) {
-			String capitalized = StringUtils.capitalize( part );
+			String capitalized = StringUtils.isAllUpperCase( part )
+					? StringUtils.capitalize( StringUtils.lowerCase( part ) ) : StringUtils.capitalize( part );
 
 			for ( String subPart : StringUtils.splitByCharacterTypeCamelCase( capitalized ) ) {
 				finished.add( finished.isEmpty() ? subPart : StringUtils.lowerCase( subPart ) );

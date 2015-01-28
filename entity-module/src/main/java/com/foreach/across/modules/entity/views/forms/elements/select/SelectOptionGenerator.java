@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.testmodules.springdata;
+package com.foreach.across.modules.entity.views.forms.elements.select;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
+
+import java.util.Collection;
 
 /**
+ * Interface for implementation that creates select options.
+ *
  * @author Arne Vandamme
  */
-public interface CustomerRepository extends JpaRepository<Customer, String>
+public interface SelectOptionGenerator
 {
+	Collection<SelectOption> generateOptions( EntityMessageCodeResolver codeResolver );
 }

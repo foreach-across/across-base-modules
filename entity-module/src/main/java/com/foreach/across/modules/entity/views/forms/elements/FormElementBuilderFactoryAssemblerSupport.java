@@ -24,9 +24,15 @@ import com.foreach.across.modules.entity.views.forms.FormElementBuilderFactoryAs
 import com.foreach.across.modules.entity.views.support.ConversionServiceConvertingValuePrinter;
 import com.foreach.across.modules.entity.views.support.ValueFetcher;
 import com.foreach.across.modules.entity.views.support.ValuePrinter;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -81,7 +87,30 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 
 		assembleTemplate( entityConfiguration, registry, descriptor, template );
 
+		handleConstraints( descriptor, template );
+
 		return template;
+	}
+
+	protected void handleConstraints( EntityPropertyDescriptor descriptor, T template ) {
+		PropertyDescriptor validationDescriptor = descriptor.getAttribute( PropertyDescriptor.class );
+
+		if ( validationDescriptor != null && validationDescriptor.hasConstraints() ) {
+			for ( ConstraintDescriptor constraint : validationDescriptor.getConstraintDescriptors() ) {
+				Class<? extends Annotation> type = constraint.getAnnotation().annotationType();
+
+				if ( NotBlank.class.equals( type ) || NotNull.class.equals( type ) || NotEmpty.class.equals( type ) ) {
+					template.setRequired( true );
+				}
+				else {
+					handleConstraint( template, type, constraint );
+				}
+			}
+		}
+	}
+
+	protected void handleConstraint( T template, Class<? extends Annotation> type, ConstraintDescriptor constraint ) {
+
 	}
 
 	/**

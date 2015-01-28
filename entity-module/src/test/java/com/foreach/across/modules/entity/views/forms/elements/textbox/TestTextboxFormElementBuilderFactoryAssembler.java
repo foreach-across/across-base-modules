@@ -15,24 +15,12 @@
  */
 package com.foreach.across.modules.entity.views.forms.elements.textbox;
 
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
-import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.forms.CloningFormElementBuilderFactory;
-import com.foreach.across.modules.entity.views.support.ConversionServiceConvertingValuePrinter;
+import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderFactoryAssemblerSupport;
+import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderFactoryAssemblerTestSupport;
 import com.foreach.common.test.MockedLoader;
-import com.mysema.util.ReflectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +32,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 /**
  * @author Arne Vandamme
@@ -60,46 +42,21 @@ import static org.mockito.Mockito.*;
 @DirtiesContext
 @ContextConfiguration(classes = TestTextboxFormElementBuilderFactoryAssembler.Config.class, loader = MockedLoader.class)
 public class TestTextboxFormElementBuilderFactoryAssembler
+		extends FormElementBuilderFactoryAssemblerTestSupport<TextboxFormElementBuilder>
 {
 	@Autowired
 	private TextboxFormElementBuilderFactoryAssembler assembler;
 
-	@Autowired
-	private EntityConfiguration entityConfiguration;
-
-	@Autowired
-	private EntityPropertyRegistry registry;
-
 	private TextboxFormElementBuilder template;
-	private Map<String, EntityPropertyDescriptor> properties = new HashMap<>();
 
-	@Before
-	public void before() {
-		reset( entityConfiguration, registry );
+	@Override
+	protected Class getTestClass() {
+		return Validators.class;
+	}
 
-		when( entityConfiguration.getEntityMessageCodeResolver() )
-				.thenReturn( mock( EntityMessageCodeResolver.class ) );
-
-		if ( properties.isEmpty() ) {
-			BeanMetaDataManager manager = new BeanMetaDataManager(
-					new ConstraintHelper(), new ExecutableHelper( new TypeResolutionHelper() )
-			);
-
-			BeanMetaData<Validators> metaData = manager.getBeanMetaData( Validators.class );
-			BeanDescriptor beanDescriptor = metaData.getBeanDescriptor();
-
-			for ( Field field : ReflectionUtils.getFields( Validators.class ) ) {
-				String propertyName = field.getName();
-				PropertyDescriptor validationDescriptor = beanDescriptor.getConstraintsForProperty( field.getName() );
-
-				EntityPropertyDescriptor descriptor = mock( EntityPropertyDescriptor.class );
-				when( descriptor.getName() ).thenReturn( propertyName );
-				when( descriptor.getDisplayName() ).thenReturn( StringUtils.lowerCase( propertyName ) );
-				when( descriptor.getAttribute( PropertyDescriptor.class ) ).thenReturn( validationDescriptor );
-
-				properties.put( propertyName, descriptor );
-			}
-		}
+	@Override
+	protected FormElementBuilderFactoryAssemblerSupport getAssembler() {
+		return assembler;
 	}
 
 	@Test
@@ -149,30 +106,6 @@ public class TestTextboxFormElementBuilderFactoryAssembler
 		template = assembleAndVerify( "combinedValidator" );
 		assertEquals( Integer.valueOf( 50 ), template.getMaxLength() );
 		assertTrue( template.isRequired() );
-	}
-
-	private TextboxFormElementBuilder assembleAndVerify( String propertyName ) {
-		TextboxFormElementBuilder template = assemble( properties.get( propertyName ) );
-
-		assertEquals( propertyName, template.getName() );
-		assertEquals( StringUtils.lowerCase( propertyName ), template.getLabel() );
-		assertEquals( "properties." + propertyName, template.getLabelCode() );
-		assertNull( template.getCustomTemplate() );
-		assertNotNull( template.getMessageCodeResolver() );
-		assertNotNull( template.getValuePrinter() );
-		assertTrue( template.getValuePrinter() instanceof ConversionServiceConvertingValuePrinter );
-
-		return template;
-	}
-
-	private TextboxFormElementBuilder assemble( EntityPropertyDescriptor descriptor ) {
-		CloningFormElementBuilderFactory builderFactory =
-				(CloningFormElementBuilderFactory) assembler.createBuilderFactory(
-						entityConfiguration, registry, descriptor
-				);
-		assertNotNull( builderFactory );
-
-		return (TextboxFormElementBuilder) builderFactory.getBuilderTemplate();
 	}
 
 	@Configuration

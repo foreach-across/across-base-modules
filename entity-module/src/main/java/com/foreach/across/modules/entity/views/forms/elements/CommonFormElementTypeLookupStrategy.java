@@ -16,14 +16,20 @@
 package com.foreach.across.modules.entity.views.forms.elements;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.views.forms.FormElementTypeLookupStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Arne Vandamme
  */
 public class CommonFormElementTypeLookupStrategy implements FormElementTypeLookupStrategy
 {
+	@Autowired
+	private EntityRegistry entityRegistry;
+
 	@Override
 	public String findElementType( EntityConfiguration entityConfiguration, EntityPropertyDescriptor descriptor ) {
 		if ( descriptor.isHidden() ) {
@@ -31,7 +37,23 @@ public class CommonFormElementTypeLookupStrategy implements FormElementTypeLooku
 		}
 
 		if ( descriptor.isWritable() ) {
-			return CommonFormElements.TEXTBOX;
+			Class propertyType = descriptor.getPropertyType();
+
+			if ( propertyType != null ) {
+				if ( propertyType.isEnum() ) {
+					return CommonFormElements.SELECT;
+				}
+
+				if ( !ClassUtils.isPrimitiveOrWrapper( propertyType ) ) {
+					EntityConfiguration member = entityRegistry.getEntityConfiguration( propertyType );
+
+					if ( member != null ) {
+						return CommonFormElements.SELECT;
+					}
+				}
+
+				return CommonFormElements.TEXTBOX;
+			}
 		}
 
 		return null;

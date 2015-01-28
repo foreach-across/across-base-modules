@@ -13,14 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.forms.elements;
+package com.foreach.across.modules.entity.testmodules.springdata;
+
+import com.foreach.across.modules.entity.annotations.EntityValidator;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Arne Vandamme
  */
-public interface CommonFormElements
+public class CompanyValidator implements Validator
 {
-	String TEXTBOX = "textbox";
-	String HIDDEN = "hidden";
-	String SELECT = "select";
+	@EntityValidator
+	private Validator entityValidator;
+
+	@Override
+	public boolean supports( Class<?> clazz ) {
+		return clazz.isAssignableFrom( Company.class );
+	}
+
+	@Override
+	public void validate( Object target, Errors errors ) {
+		assertNotNull( entityValidator );
+	}
 }

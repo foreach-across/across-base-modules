@@ -36,5 +36,7 @@ public class TestEntityUtils
 		assertEquals( "Generated label", EntityUtils.generateDisplayName( "Generated label" ) );
 		assertEquals( "Basic security principal", EntityUtils.generateDisplayName( "BasicSecurityPrincipal" ) );
 		assertEquals( "Permission group", EntityUtils.generateDisplayName( "PermissionGroup" ) );
+		assertEquals( "Some field name", EntityUtils.generateDisplayName( "_someFieldName" ) );
+		assertEquals( "Test for me", EntityUtils.generateDisplayName( "_TEST_FOR_ME" ) );
 	}
 }

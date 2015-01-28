@@ -13,14 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.forms.elements;
+package com.foreach.across.modules.entity.views.forms.elements.select;
+
+import com.foreach.across.modules.entity.views.forms.elements.CommonFormElements;
+import com.foreach.across.modules.entity.views.forms.elements.FormElementSupport;
+
+import java.util.Collection;
 
 /**
  * @author Arne Vandamme
  */
-public interface CommonFormElements
+public class SelectFormElement extends FormElementSupport
 {
-	String TEXTBOX = "textbox";
-	String HIDDEN = "hidden";
-	String SELECT = "select";
+	public static final String TYPE = CommonFormElements.SELECT;
+
+	private Collection<SelectOption> options;
+
+	public SelectFormElement() {
+		super( TYPE );
+	}
+
+	public Collection<SelectOption> getOptions() {
+		return options;
+	}
+
+	public void setOptions( Collection<SelectOption> options ) {
+		this.options = options;
+	}
+
 }

@@ -35,7 +35,7 @@ public class ClientConfig
 	}
 
 	@Bean
-	public CustomerValidator customerValidator() {
-		return new CustomerValidator();
+	public CompanyValidator customerValidator() {
+		return new CompanyValidator();
 	}
 }

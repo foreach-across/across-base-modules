@@ -28,7 +28,7 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescr
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.ClientRepository;
-import com.foreach.across.modules.entity.testmodules.springdata.Customer;
+import com.foreach.across.modules.entity.testmodules.springdata.Company;
 import com.foreach.across.modules.entity.testmodules.springdata.SpringDataJpaModule;
 import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
@@ -115,14 +115,14 @@ public class TestRepositoryEntityRegistrar
 		assertNotNull( validator );
 		assertSame( entityValidator, validator );
 
-		configuration = entityRegistry.getEntityConfiguration( Customer.class );
+		configuration = entityRegistry.getEntityConfiguration( Company.class );
 		assertNotNull( configuration );
 
 		validator = configuration.getAttribute( Validator.class );
 		assertNotNull( validator );
 		assertNotSame( entityValidator, validator );
 
-		validator.validate( new Customer(), null );
+		validator.validate( new Company(), null );
 	}
 
 	private void assertProperty( EntityPropertyRegistry registry,

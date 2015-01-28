@@ -65,6 +65,20 @@
 										th:attr="maxlength=${element.maxLength}"
 										/>
 							</div>
+							<!--/* select */-->
+							<div th:if="${element.elementType eq 'select'}">
+								<label th:for="${#ids.next(element.name)}">
+									<span th:text="${element.label}">label text</span>
+									<sup th:if="${element.required}"><strong>*</strong></sup>
+								</label>
+								<select th:id="${#ids.seq(element.name)}" class="form-control" th:name="${element.name}">
+									<option></option>
+									<option th:each="option : ${element.options}"
+									        th:value="${option.value}"
+									        th:selected="${element.value(entity) != null and option.isSelected(element.value(entity))}"
+									        th:text="${option.label}"/>
+								</select>
+							</div>
 							<!--/* checkbox */-->
 							<div th:if="${element.elementType eq 'checkbox'}" class="checkbox">
 								<label>
@@ -73,17 +87,7 @@
 									<span th:text="${element.label}">label</span>
 								</label>
 							</div>
-							<!--/* select */-->
-							<div th:if="${element.elementType eq 'select'}">
-								<label th:for="${element.name}" th:text="${element.label}">label</label>
-								<select class="form-control" th:name="${element.name}">
-									<option value=""></option>
-									<option th:each="possibleValue : ${element.possibleValues}"
-									        th:value="${element.entityId(possibleValue)}"
-									        th:selected="${possibleValue.equals(element.value)}"
-									        th:text="${element.entityLabel(possibleValue)}"/>
-								</select>
-							</div>
+
 							<!--/* multi checkbox */-->
 							<div th:if="${element.elementType eq 'multi-checkbox'}">
 								<label th:text="${element.label}">Multi-checkbox label</label>

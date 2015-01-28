@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.forms.elements;
+package com.foreach.across.modules.entity.testmodules.springdata;
 
 /**
  * @author Arne Vandamme
  */
-public interface CommonFormElements
+public enum CompanyStatus
 {
-	String TEXTBOX = "textbox";
-	String HIDDEN = "hidden";
-	String SELECT = "select";
+	IN_BUSINESS( "In business" ),
+	BROKE( "Broke" );
+
+	private String name;
+
+	CompanyStatus( String name ) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
 }

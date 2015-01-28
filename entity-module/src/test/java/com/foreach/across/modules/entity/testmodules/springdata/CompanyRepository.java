@@ -15,27 +15,11 @@
  */
 package com.foreach.across.modules.entity.testmodules.springdata;
 
-import com.foreach.across.modules.entity.annotations.EntityValidator;
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
-
-import static org.junit.Assert.assertNotNull;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author Arne Vandamme
  */
-public class CustomerValidator implements Validator
+public interface CompanyRepository extends JpaRepository<Company, String>
 {
-	@EntityValidator
-	private Validator entityValidator;
-
-	@Override
-	public boolean supports( Class<?> clazz ) {
-		return clazz.isAssignableFrom( Customer.class );
-	}
-
-	@Override
-	public void validate( Object target, Errors errors ) {
-		assertNotNull( entityValidator );
-	}
 }

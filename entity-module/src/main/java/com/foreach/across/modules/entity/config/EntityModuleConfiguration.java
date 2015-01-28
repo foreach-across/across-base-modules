@@ -13,9 +13,9 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegis
 import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.views.EntityFormViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
-import com.foreach.across.modules.entity.views.forms.FormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.forms.elements.CommonFormElementTypeLookupStrategy;
 import com.foreach.across.modules.entity.views.forms.elements.hidden.HiddenFormElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.forms.elements.select.SelectFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.forms.elements.textbox.TextboxFormElementBuilderFactoryAssembler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,13 +89,18 @@ public class EntityModuleConfiguration
 	}
 
 	@Bean
-	public FormElementBuilderFactoryAssembler textboxFormElementBuilderFactoryAssembler() {
+	public TextboxFormElementBuilderFactoryAssembler textboxFormElementBuilderFactoryAssembler() {
 		return new TextboxFormElementBuilderFactoryAssembler();
 	}
 
 	@Bean
-	public FormElementBuilderFactoryAssembler hiddenFormElementBuilderFactoryAsssembler() {
+	public HiddenFormElementBuilderFactoryAssembler hiddenFormElementBuilderFactoryAsssembler() {
 		return new HiddenFormElementBuilderFactoryAssembler();
+	}
+
+	@Bean
+	public SelectFormElementBuilderFactoryAssembler selectFormElementBuilderFactoryAssembler() {
+		return new SelectFormElementBuilderFactoryAssembler();
 	}
 
 	@Bean
