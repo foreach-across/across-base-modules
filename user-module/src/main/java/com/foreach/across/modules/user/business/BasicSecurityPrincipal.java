@@ -192,27 +192,4 @@ public abstract class BasicSecurityPrincipal<T extends SettableIdBasedEntity<?>>
 	public final String toString() {
 		return getPrincipalName();
 	}
-
-	@Override
-	public boolean equals( Object o ) {
-		if ( this == o ) {
-			return true;
-		}
-		if ( !( o instanceof BasicSecurityPrincipal ) ) {
-			return false;
-		}
-
-		BasicSecurityPrincipal that = (BasicSecurityPrincipal) o;
-
-		if ( getId() != that.getId() ) {
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash( getId() );
-	}
 }

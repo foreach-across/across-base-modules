@@ -21,7 +21,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 /**
  * Represents a generic named entity that can be used for ACL control.
@@ -87,24 +86,5 @@ public class AclSecurityEntity extends SettableIdAuditableEntity<AclSecurityEnti
 		BeanUtils.copyProperties( this, entity );
 
 		return entity;
-	}
-
-	@Override
-	public boolean equals( Object o ) {
-		if ( this == o ) {
-			return true;
-		}
-		if ( o == null || getClass() != o.getClass() ) {
-			return false;
-		}
-
-		AclSecurityEntity that = (AclSecurityEntity) o;
-
-		return Objects.equals( id, that.id );
-	}
-
-	@Override
-	public int hashCode() {
-		return (int) ( id ^ ( id >>> 32 ) );
 	}
 }
