@@ -56,6 +56,7 @@ public class TestUser
 		Permission permB = new Permission( "PermB" );
 
 		Role roleA = new Role();
+		roleA.setAuthority( "RoleA" );
 		roleA.setName( "RoleA" );
 		roleA.getPermissions().addAll( Arrays.asList( permA, permB ) );
 

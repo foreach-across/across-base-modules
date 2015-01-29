@@ -20,9 +20,9 @@ import com.foreach.across.modules.user.business.Permission;
 import com.foreach.across.modules.user.business.Role;
 import com.foreach.across.modules.user.repositories.PermissionRepository;
 import com.foreach.across.modules.user.repositories.RoleRepository;
-import liquibase.util.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +47,9 @@ public class RoleServiceImpl implements RoleService
 	private RoleRepository roleRepository;
 
 	@Override
-	public Role defineRole( String name, String description, Collection<String> permissionNames ) {
-		Role role = new Role( name, description );
+	public Role defineRole( String authority, String name, Collection<String> permissionNames ) {
+		Assert.isTrue( StringUtils.isNotEmpty( name ) );
+		Role role = new Role( authority, name );
 
 		Set<Permission> permissions = new TreeSet<>();
 
@@ -66,7 +67,7 @@ public class RoleServiceImpl implements RoleService
 
 	@Override
 	public Role defineRole( Role role ) {
-		Role existing = roleRepository.findByName( role.getName() );
+		Role existing = roleRepository.findByAuthority( role.getAuthority() );
 
 		if ( existing != null ) {
 			if ( existing.getPermissions().size() != role.getPermissions().size() ) {
@@ -101,8 +102,8 @@ public class RoleServiceImpl implements RoleService
 	}
 
 	@Override
-	public Role getRole( String name ) {
-		return roleRepository.findByName( name );
+	public Role getRole( String authority ) {
+		return roleRepository.findByAuthority( authority );
 	}
 
 	@Transactional(HibernateJpaConfiguration.TRANSACTION_MANAGER)

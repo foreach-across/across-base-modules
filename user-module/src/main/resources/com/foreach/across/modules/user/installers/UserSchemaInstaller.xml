@@ -407,10 +407,10 @@
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="${table.principal_group}"/>
 		</preConditions>
-		
+
 		<comment>Drop existing principal_group table</comment>
-		
-		<dropTable tableName="${table.principal_group}" />
+
+		<dropTable tableName="${table.principal_group}"/>
 	</changeSet>
 
 	<changeSet id="201408221354B" author="arne">
@@ -532,6 +532,43 @@
 		                         constraintName="fk_um_machine_pid"
 		                         referencedTableName="${table.principal}"
 		                         referencedColumnNames="id"/>
+	</changeSet>
+
+	<changeSet id="201501291601" author="arne">
+		<preConditions onFail="MARK_RAN">
+			<indexExists tableName="${table.role}" indexName="ix_um_role_name"/>
+		</preConditions>
+
+		<dropIndex tableName="${table.role}" indexName="ix_um_role_name"/>
+	</changeSet>
+
+	<changeSet id="201501291602" author="arne">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="${table.role}" columnName="authority"/>
+			</not>
+		</preConditions>
+
+		<addColumn tableName="${table.role}">
+			<column name="authority" type="java.sql.Types.VARCHAR(100)">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+
+		<sql>
+			UPDATE ${table.role} SET authority = name
+		</sql>
+
+		<sql>
+			UPDATE ${table.role} SET name = description
+		</sql>
+
+		<addNotNullConstraint tableName="${table.role}" columnName="authority"
+		                      columnDataType="java.sql.Types.VARCHAR(100)"/>
+
+		<createIndex tableName="${table.role}" indexName="ix_um_role_auth" unique="true">
+			<column name="authority"/>
+		</createIndex>
 	</changeSet>
 
 </databaseChangeLog>

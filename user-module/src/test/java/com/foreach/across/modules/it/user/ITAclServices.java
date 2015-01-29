@@ -112,7 +112,7 @@ public class ITAclServices
 	@Before
 	public void createUsers() {
 		permissionService.definePermission( "manage files", "Manage all files and folders", "unit-test" );
-		roleService.defineRole( "ROLE_FILE_MANAGER", "", Arrays.asList( "manage files" ) );
+		roleService.defineRole( "ROLE_FILE_MANAGER", "File manager", Arrays.asList( "manage files" ) );
 
 		group = createGroup();
 

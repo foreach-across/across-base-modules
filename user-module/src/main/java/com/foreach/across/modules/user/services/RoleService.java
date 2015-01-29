@@ -24,12 +24,12 @@ public interface RoleService
 	/**
 	 * Ensures a Role with the specified permissions exists.  The name is the unique key of the role.
 	 *
-	 * @param name        Name of the Role entity.
-	 * @param description Description of the Role.
+	 * @param authority   Unique authority of the Role entity.
+	 * @param name        Descriptive name of the Role.
 	 * @param permissions Permission names to apply to the role.
 	 * @return Role instance that was created or updated.
 	 */
-	Role defineRole( String name, String description, Collection<String> permissions );
+	Role defineRole( String authority, String name, Collection<String> permissions );
 
 	/**
 	 * Ensures the given Role exists based on the unique name.
@@ -46,12 +46,12 @@ public interface RoleService
 	Collection<Role> getRoles();
 
 	/**
-	 * Get the Role entity with the given name.
+	 * Get the Role entity with the given authority.
 	 *
-	 * @param name Unique name of the Role.
+	 * @param authority Unique authority of the Role.
 	 * @return Role entity or null;
 	 */
-	Role getRole( String name );
+	Role getRole( String authority );
 
 	/**
 	 * Save the given Role entity.

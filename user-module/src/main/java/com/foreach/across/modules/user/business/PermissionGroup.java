@@ -21,8 +21,10 @@ import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -37,17 +39,21 @@ public class PermissionGroup extends SettableIdBasedEntity<PermissionGroup>
 			strategy = AcrossSequenceGenerator.STRATEGY,
 			parameters = {
 					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "seq_um_permission_group_id"),
-					@org.hibernate.annotations.Parameter(name = "allocationSize", value = "5")
+					@org.hibernate.annotations.Parameter(name = "allocationSize", value = "1")
 			}
 	)
 	private long id;
 
+	@NotBlank
+	@Size(max = 255)
 	@Column(name = "name", nullable = false, unique = true)
 	private String name;
 
+	@Size(max = 255)
 	@Column(name = "title")
 	private String title;
 
+	@Size(max = 2000)
 	@Column(name = "description")
 	private String description;
 

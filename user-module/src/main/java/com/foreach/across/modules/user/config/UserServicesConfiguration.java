@@ -16,10 +16,6 @@
 package com.foreach.across.modules.user.config;
 
 import com.foreach.across.modules.user.UserModuleSettings;
-import com.foreach.across.modules.user.converters.ObjectToGroupConverter;
-import com.foreach.across.modules.user.converters.ObjectToPermissionConverter;
-import com.foreach.across.modules.user.converters.ObjectToRoleConverter;
-import com.foreach.across.modules.user.converters.ObjectToUserConverter;
 import com.foreach.across.modules.user.services.*;
 import org.hibernate.validator.internal.constraintvalidators.EmailValidator;
 import org.slf4j.Logger;
@@ -30,8 +26,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import javax.annotation.PostConstruct;
 
 @Configuration
 public class UserServicesConfiguration
@@ -44,6 +38,7 @@ public class UserServicesConfiguration
 	@Autowired
 	private UserModuleSettings settings;
 
+	/*
 	@PostConstruct
 	void registerConverters() {
 		if ( conversionService != null ) {
@@ -58,6 +53,7 @@ public class UserServicesConfiguration
 			LOG.debug( "No ConfigurableConversionService found - unable to auto-register user converters" );
 		}
 	}
+	*/
 
 	@Bean
 	public PermissionService permissionService() {

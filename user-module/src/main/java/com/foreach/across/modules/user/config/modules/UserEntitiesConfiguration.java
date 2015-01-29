@@ -4,7 +4,6 @@ import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
 import com.foreach.across.modules.entity.views.EntityListView;
-import com.foreach.across.modules.user.business.Role;
 import com.foreach.across.modules.user.business.User;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,12 +35,14 @@ public class UserEntitiesConfiguration implements EntityConfigurer
 				.property( "group-membership", "Groups", "groups.size()" )
 				.property( "role-membership", "Roles", "roles.size()" );
 
+		/*
 		configuration.entity( Role.class )
 		             .properties()
 		             .property( "name", "Key" )
 		             .property( "description", "Name" )
 		             .and()
 		             .view( EntityListView.VIEW_NAME ).properties( "description", "name" );
+		             */
 
 	}
 }

@@ -21,9 +21,11 @@ import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Set;
 import java.util.TreeSet;
@@ -40,14 +42,22 @@ public class Role extends SettableIdBasedEntity<Role>
 			strategy = AcrossSequenceGenerator.STRATEGY,
 			parameters = {
 					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "seq_um_role_id"),
-					@org.hibernate.annotations.Parameter(name = "allocationSize", value = "5")
+					@org.hibernate.annotations.Parameter(name = "allocationSize", value = "1")
 			}
 	)
-	private long id;
+	private Long id;
 
+	@NotBlank
+	@Size(max = 255)
+	@Column(name = "authority", nullable = false, unique = true)
+	private String authority;
+
+	@NotBlank
+	@Size(max = 255)
 	@Column(name = "name", nullable = false, unique = true)
 	private String name;
 
+	@Size(max = 2000)
 	@Column(name = "description")
 	private String description;
 
@@ -62,13 +72,13 @@ public class Role extends SettableIdBasedEntity<Role>
 	public Role() {
 	}
 
-	public Role( String name ) {
-		setName( name );
+	public Role( String authority ) {
+		setAuthority( authority );
 	}
 
-	public Role( String name, String description ) {
+	public Role( String authority, String name ) {
+		setAuthority( authority );
 		setName( name );
-		this.description = description;
 	}
 
 	@Override
@@ -79,6 +89,14 @@ public class Role extends SettableIdBasedEntity<Role>
 	@Override
 	public void setId( Long id ) {
 		this.id = id;
+	}
+
+	public String getAuthority() {
+		return authority;
+	}
+
+	public void setAuthority( String authority ) {
+		this.authority = authority;
 	}
 
 	public String getName() {
@@ -127,11 +145,6 @@ public class Role extends SettableIdBasedEntity<Role>
 
 	public boolean hasPermission( Permission permission ) {
 		return getPermissions().contains( permission );
-	}
-
-	@Override
-	public String getAuthority() {
-		return getName();
 	}
 
 	@Override

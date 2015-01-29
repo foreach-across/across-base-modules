@@ -17,11 +17,13 @@ package com.foreach.across.modules.user.business;
 
 import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 /**
  * Represents a SecurityPrincipal identity that is like a user account, but no physical person.
@@ -33,7 +35,9 @@ import javax.persistence.Table;
 @Table(name = UserSchemaConfiguration.TABLE_MACHINE_PRINCIPAL)
 public class MachinePrincipal extends GroupedPrincipal<MachinePrincipal> implements Comparable<MachinePrincipal>
 {
-	@Column(name = "name")
+	@NotBlank
+	@Size(max = 100)
+	@Column(name = "name", unique = true)
 	private String name;
 
 	public String getName() {

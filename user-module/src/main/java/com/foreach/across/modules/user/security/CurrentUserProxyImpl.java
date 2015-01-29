@@ -41,8 +41,8 @@ public class CurrentUserProxyImpl implements CurrentUserProxy
 	}
 
 	@Override
-	public boolean hasRole( String name ) {
-		return isAuthenticated() && getUser().hasRole( name );
+	public boolean hasRole( String authority ) {
+		return isAuthenticated() && getUser().hasRole( authority );
 	}
 
 	@Override

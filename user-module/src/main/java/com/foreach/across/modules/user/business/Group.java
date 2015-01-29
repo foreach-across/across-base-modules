@@ -23,6 +23,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 @Entity
 @DiscriminatorValue("group")
@@ -30,6 +31,7 @@ import javax.persistence.Table;
 public class Group extends BasicSecurityPrincipal<Group> implements Comparable<Group>
 {
 	@NotBlank
+	@Size(max = 255)
 	@Column(name = "name")
 	private String name;
 

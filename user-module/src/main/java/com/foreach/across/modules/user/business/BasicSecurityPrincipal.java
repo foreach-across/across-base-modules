@@ -145,8 +145,8 @@ public abstract class BasicSecurityPrincipal<T extends SettableIdBasedEntity<?>>
 		this.roles = roles;
 	}
 
-	public boolean hasRole( String name ) {
-		return hasRole( new Role( name ) );
+	public boolean hasRole( String authority ) {
+		return hasRole( new Role( authority ) );
 	}
 
 	public boolean hasRole( Role role ) {

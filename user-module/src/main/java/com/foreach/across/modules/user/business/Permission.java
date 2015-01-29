@@ -25,6 +25,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -51,17 +52,19 @@ public class Permission
 	)
 	private long id;
 
-	@NotBlank
-	@Column(name = "name", nullable = false, unique = true)
-	private String name;
-
-	@Column(name = "description")
-	private String description;
-
 	@NotNull
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "permission_group_id")
 	private PermissionGroup group;
+
+	@NotBlank
+	@Size(max = 255)
+	@Column(name = "name", nullable = false, unique = true)
+	private String name;
+
+	@Size(max = 2000)
+	@Column(name = "description")
+	private String description;
 
 	public Permission() {
 	}

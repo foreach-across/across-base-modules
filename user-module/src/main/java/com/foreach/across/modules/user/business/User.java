@@ -20,6 +20,7 @@ import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import com.foreach.across.modules.user.converters.HibernateUserRestriction;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -27,6 +28,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -36,21 +38,30 @@ import java.util.Set;
 @Table(name = UserSchemaConfiguration.TABLE_USER)
 public class User extends GroupedPrincipal<User> implements UserDetails, Undeletable
 {
+	// todo: cant just use validation for controller since current version only sets username after
+	// validation in case email as username is set
+	@NotBlank
+	@Size(max = 255)
 	@Column(nullable = false, name = "username")
 	private String username;
 
+	@Size(max = 255)
 	@Column(name = "first_name")
 	private String firstName;
 
+	@Size(max = 255)
 	@Column(name = "last_name")
 	private String lastName;
 
+	@Size(max = 255)
 	@Column(name = "display_name")
 	private String displayName;
 
+	@Size(max = 255)
 	@Column(name = "email")
 	private String email;
 
+	@Size(max = 255)
 	@Column(name = "password")
 	private String password;
 
