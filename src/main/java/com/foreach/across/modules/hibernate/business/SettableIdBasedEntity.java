@@ -3,6 +3,7 @@ package com.foreach.across.modules.hibernate.business;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.Transient;
+import java.util.Objects;
 
 /**
  * Base class for an entity with a unique long id, that allows the id to be manually set.
@@ -50,5 +51,32 @@ public abstract class SettableIdBasedEntity<T extends Persistable<Long>>
 	 */
 	public Long getNewEntityId() {
 		return getId() == null ? newEntityId : null;
+	}
+
+	/**
+	 * Two non-new entities are considered equal if they have the same id.
+	 * New entities are only considered equal if they are in fact the same instance.
+	 */
+	@Override
+	public boolean equals( Object o ) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		SettableIdBasedEntity that = (SettableIdBasedEntity) o;
+
+		if ( isNew() && that.isNew() ) {
+			return this == that;
+		}
+
+		return getId().equals( that.getId() );
+	}
+
+	@Override
+	public int hashCode() {
+		return isNew() ? super.hashCode() : Objects.hash( getId() );
 	}
 }
