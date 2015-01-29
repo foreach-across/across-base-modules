@@ -48,8 +48,8 @@ public class TestOAuth2ClientRepository
 		permissionService.definePermission( "perm two", "", "test-perms" );
 		permissionService.definePermission( "perm three", "", "test-perms" );
 
-		roleService.defineRole( "role one", "", Arrays.asList( "perm one", "perm two" ) );
-		roleService.defineRole( "role two", "", Arrays.asList( "perm two", "perm three" ) );
+		roleService.defineRole( "role one", "Role one", Arrays.asList( "perm one", "perm two" ) );
+		roleService.defineRole( "role two", "Role two", Arrays.asList( "perm two", "perm three" ) );
 	}
 
 	@Test

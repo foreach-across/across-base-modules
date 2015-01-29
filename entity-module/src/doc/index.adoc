@@ -1,0 +1,49 @@
+= EntityModule
+:toc:
+
+== General information
+
+=== Artifact
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+	<dependencies>
+		<dependency>
+			<groupId>across-standard-modules</groupId>
+			<artifactId>entity-module</artifactId>
+			<version>{across-version}</version>
+		</dependency>
+	</dependencies>
+----
+
+=== Module dependencies
+
+.Module dependencies
+|===
+|Module |Type |Description
+
+|<<integration:adminwebmodule>>
+|optional
+|Enables auto generated forms for managing the registered entities.
+|===
+
+=== Module settings
+
+|===
+|Property |Description |Default
+
+|entityModule.entityValidator.registerForMvc
+|Should the entity Validator instance be registered as the default validator for MVC databinding.
+|true
+|===
+
+== About the EntityModule
+
+=== Integration with Spring Data repositories
+
+=== Creating an EntityConfiguration manually
+
+=== Integration with other modules
+
+[[integration:adminwebmodule]]
+==== AdminWebModule
