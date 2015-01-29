@@ -25,8 +25,18 @@ public class SelectFormElementBuilder extends FormElementBuilderSupport<SelectFo
 {
 	private SelectOptionGenerator optionGenerator;
 
+	private String elementType = SelectFormElement.TYPE;
+
 	public SelectFormElementBuilder() {
 		super( SelectFormElement.class );
+	}
+
+	public String getElementType() {
+		return elementType;
+	}
+
+	public void setElementType( String elementType ) {
+		this.elementType = elementType;
 	}
 
 	public SelectOptionGenerator getOptionGenerator() {

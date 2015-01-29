@@ -2,6 +2,7 @@ package com.foreach.across.modules.entity.registry.properties;
 
 import com.foreach.across.modules.entity.registry.support.ReadableAttributes;
 import com.foreach.across.modules.entity.views.support.ValueFetcher;
+import org.springframework.core.ResolvableType;
 
 public interface EntityPropertyDescriptor extends ReadableAttributes
 {
@@ -19,6 +20,11 @@ public interface EntityPropertyDescriptor extends ReadableAttributes
 	boolean isHidden();
 
 	Class<?> getPropertyType();
+
+	/**
+	 * @return more detailed information about the property type (supporting generics)
+	 */
+	ResolvableType getPropertyResolvableType();
 
 	/**
 	 * @return Associated instance that can fetch the property value from an instance.

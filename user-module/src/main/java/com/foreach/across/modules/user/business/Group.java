@@ -18,7 +18,6 @@ package com.foreach.across.modules.user.business;
 import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.BeanUtils;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -41,14 +40,6 @@ public class Group extends BasicSecurityPrincipal<Group> implements Comparable<G
 	public void setName( String name ) {
 		this.name = name;
 		setPrincipalName( "group:" + name );
-	}
-
-	@Override
-	public Group toDto() {
-		Group group = new Group();
-		BeanUtils.copyProperties( this, group );
-
-		return group;
 	}
 
 	@Override

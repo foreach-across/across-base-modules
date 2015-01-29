@@ -21,7 +21,6 @@ import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -94,14 +93,6 @@ public class PermissionGroup extends SettableIdBasedEntity<PermissionGroup>
 
 	public void setPermissions( Set<Permission> permissions ) {
 		this.permissions = permissions;
-	}
-
-	@Override
-	public PermissionGroup toDto() {
-		PermissionGroup dto = new PermissionGroup();
-		BeanUtils.copyProperties( this, dto );
-
-		return dto;
 	}
 
 	@Override

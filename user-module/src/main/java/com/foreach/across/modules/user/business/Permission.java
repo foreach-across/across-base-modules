@@ -21,7 +21,6 @@ import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -140,14 +139,6 @@ public class Permission
 	@Override
 	public String toString() {
 		return getName();
-	}
-
-	@Override
-	public Permission toDto() {
-		Permission permission = new Permission();
-		BeanUtils.copyProperties( this, permission );
-
-		return permission;
 	}
 
 	private void writeObject( ObjectOutputStream oos ) throws IOException {

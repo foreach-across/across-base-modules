@@ -33,6 +33,11 @@ public class SelectFormElement extends FormElementSupport
 		super( TYPE );
 	}
 
+	@Override
+	public void setElementType( String elementType ) {
+		super.setElementType( elementType );
+	}
+
 	public Collection<SelectOption> getOptions() {
 		return options;
 	}

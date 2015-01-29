@@ -5,9 +5,11 @@ import com.foreach.across.modules.entity.util.EntityUtils;
 import com.foreach.across.modules.entity.views.support.PropertyDescriptorValueFetcher;
 import com.foreach.across.modules.entity.views.support.ValueFetcher;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.ResolvableType;
 import org.thymeleaf.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 
 public class SimpleEntityPropertyDescriptor extends AttributeSupport implements MutableEntityPropertyDescriptor
 {
@@ -16,6 +18,7 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 
 	private ValueFetcher valueFetcher;
 	private Class<?> propertyType;
+	private ResolvableType propertyResolvableType;
 
 	/**
 	 * @return Property name.
@@ -88,6 +91,14 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 		this.propertyType = propertyType;
 	}
 
+	public ResolvableType getPropertyResolvableType() {
+		return propertyResolvableType;
+	}
+
+	public void setPropertyResolvableType( ResolvableType propertyResolvableType ) {
+		this.propertyResolvableType = propertyResolvableType;
+	}
+
 	@Override
 	public ValueFetcher getValueFetcher() {
 		return valueFetcher;
@@ -104,6 +115,9 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 
 		if ( other.getPropertyType() != null ) {
 			descriptor.setPropertyType( other.getPropertyType() );
+		}
+		if ( other.getPropertyResolvableType() != null ) {
+			descriptor.setPropertyResolvableType( other.getPropertyResolvableType() );
 		}
 		if ( other.getValueFetcher() != null ) {
 			descriptor.setValueFetcher( other.getValueFetcher() );
@@ -132,13 +146,23 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 			descriptor.setDisplayName( prop.getDisplayName() );
 		}
 
-		descriptor.setWritable( prop.getWriteMethod() != null );
-		descriptor.setReadable( prop.getReadMethod() != null );
+		Method writeMethod = prop.getWriteMethod();
+		Method readMethod = prop.getReadMethod();
+
+		descriptor.setWritable( writeMethod != null );
+		descriptor.setReadable( readMethod != null );
 		descriptor.setHidden( prop.isHidden() );
 		descriptor.setPropertyType( prop.getPropertyType() );
 
 		if ( descriptor.isReadable() ) {
+			descriptor.setPropertyResolvableType( ResolvableType.forMethodReturnType( readMethod ) );
 			descriptor.setValueFetcher( new PropertyDescriptorValueFetcher( prop ) );
+		}
+		else if ( descriptor.isWritable() ) {
+			descriptor.setPropertyResolvableType( ResolvableType.forMethodParameter( writeMethod, 0 ) );
+		}
+		else {
+			descriptor.setPropertyResolvableType( ResolvableType.forType( prop.getPropertyType() ) );
 		}
 
 		return descriptor;

@@ -1,5 +1,6 @@
 package com.foreach.across.modules.hibernate.business;
 
+import com.foreach.across.modules.hibernate.util.DtoUtils;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.Transient;
@@ -51,6 +52,12 @@ public abstract class SettableIdBasedEntity<T extends Persistable<Long>>
 	 */
 	public Long getNewEntityId() {
 		return getId() == null ? newEntityId : null;
+	}
+
+	@Override
+	@SuppressWarnings( "unchecked" )
+	public T toDto() {
+		return (T) DtoUtils.createDto( this );
 	}
 
 	/**

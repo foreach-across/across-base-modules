@@ -17,7 +17,6 @@ package com.foreach.across.modules.user.business;
 
 import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -44,14 +43,6 @@ public class MachinePrincipal extends GroupedPrincipal<MachinePrincipal> impleme
 	public void setName( String name ) {
 		this.name = name;
 		setPrincipalName( name );
-	}
-
-	@Override
-	public MachinePrincipal toDto() {
-		MachinePrincipal machinePrincipal = new MachinePrincipal();
-		BeanUtils.copyProperties( this, machinePrincipal );
-
-		return machinePrincipal;
 	}
 
 	@Override

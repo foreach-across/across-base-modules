@@ -21,7 +21,6 @@ import com.foreach.across.modules.user.config.UserSchemaConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -128,14 +127,6 @@ public class Role extends SettableIdBasedEntity<Role>
 
 	public boolean hasPermission( Permission permission ) {
 		return getPermissions().contains( permission );
-	}
-
-	@Override
-	public Role toDto() {
-		Role role = new Role();
-		BeanUtils.copyProperties( this, role );
-
-		return role;
 	}
 
 	@Override

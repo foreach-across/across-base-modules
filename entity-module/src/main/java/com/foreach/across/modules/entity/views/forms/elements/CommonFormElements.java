@@ -23,4 +23,5 @@ public interface CommonFormElements
 	String TEXTBOX = "textbox";
 	String HIDDEN = "hidden";
 	String SELECT = "select";
+	String MULTI_CHECKBOX = "multi-checkbox";
 }

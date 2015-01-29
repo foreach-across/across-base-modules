@@ -60,11 +60,6 @@ public class TestSettableIdBasedEntity
 		}
 
 		@Override
-		public Entity toDto() {
-			return new Entity();
-		}
-
-		@Override
 		public Long getId() {
 			return id;
 		}

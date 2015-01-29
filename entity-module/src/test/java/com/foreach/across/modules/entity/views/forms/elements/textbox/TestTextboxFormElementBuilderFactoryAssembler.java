@@ -64,6 +64,15 @@ public class TestTextboxFormElementBuilderFactoryAssembler
 		template = assembleAndVerify( "sizeValidator" );
 		assertEquals( Integer.valueOf( 200 ), template.getMaxLength() );
 		assertFalse( template.isRequired() );
+		assertFalse( template.isMultiLine() );
+	}
+
+	@Test
+	public void sizeForMultiLineValidator() {
+		template = assembleAndVerify( "sizeForMultiLineValidator" );
+		assertEquals( Integer.valueOf( 201 ), template.getMaxLength() );
+		assertFalse( template.isRequired() );
+		assertTrue( template.isMultiLine() );
 	}
 
 	@Test
@@ -71,13 +80,23 @@ public class TestTextboxFormElementBuilderFactoryAssembler
 		template = assembleAndVerify( "lengthValidator" );
 		assertEquals( Integer.valueOf( 10 ), template.getMaxLength() );
 		assertFalse( template.isRequired() );
+		assertFalse( template.isMultiLine() );
 	}
 
 	@Test
-	public void createWithoutValidators() {
+	public void noValidator() {
 		template = assembleAndVerify( "noValidator" );
 		assertNull( template.getMaxLength() );
 		assertFalse( template.isRequired() );
+		assertTrue( template.isMultiLine() );
+	}
+
+	@Test
+	public void noValidatorNumber() {
+		template = assembleAndVerify( "noValidatorNumber" );
+		assertNull( template.getMaxLength() );
+		assertFalse( template.isRequired() );
+		assertFalse( template.isMultiLine() );
 	}
 
 	@Test
@@ -85,6 +104,7 @@ public class TestTextboxFormElementBuilderFactoryAssembler
 		template = assembleAndVerify( "notNullValidator" );
 		assertNull( template.getMaxLength() );
 		assertTrue( template.isRequired() );
+		assertTrue( template.isMultiLine() );
 	}
 
 	@Test
@@ -92,6 +112,7 @@ public class TestTextboxFormElementBuilderFactoryAssembler
 		template = assembleAndVerify( "notBlankValidator" );
 		assertNull( template.getMaxLength() );
 		assertTrue( template.isRequired() );
+		assertTrue( template.isMultiLine() );
 	}
 
 	@Test
@@ -99,6 +120,7 @@ public class TestTextboxFormElementBuilderFactoryAssembler
 		template = assembleAndVerify( "notEmptyValidator" );
 		assertNull( template.getMaxLength() );
 		assertTrue( template.isRequired() );
+		assertTrue( template.isMultiLine() );
 	}
 
 	@Test
@@ -106,6 +128,7 @@ public class TestTextboxFormElementBuilderFactoryAssembler
 		template = assembleAndVerify( "combinedValidator" );
 		assertEquals( Integer.valueOf( 50 ), template.getMaxLength() );
 		assertTrue( template.isRequired() );
+		assertFalse( template.isMultiLine() );
 	}
 
 	@Configuration
@@ -113,13 +136,17 @@ public class TestTextboxFormElementBuilderFactoryAssembler
 	{
 		@Bean
 		public TextboxFormElementBuilderFactoryAssembler textboxFormElementBuilderFactoryAssembler() {
-			return new TextboxFormElementBuilderFactoryAssembler();
+			TextboxFormElementBuilderFactoryAssembler assembler = new TextboxFormElementBuilderFactoryAssembler();
+			assembler.setMaximumSingleLineLength( 200 );
+			return assembler;
 		}
 	}
 
 	private static class Validators
 	{
 		public String noValidator;
+
+		public int noValidatorNumber;
 
 		@NotNull
 		public String notNullValidator;
@@ -132,6 +159,9 @@ public class TestTextboxFormElementBuilderFactoryAssembler
 
 		@Size(min = 5, max = 200)
 		public String sizeValidator;
+
+		@Size(max = 201)
+		public String sizeForMultiLineValidator;
 
 		@Length(min = 1, max = 10)
 		public String lengthValidator;

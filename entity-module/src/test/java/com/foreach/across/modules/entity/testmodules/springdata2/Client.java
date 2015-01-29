@@ -18,7 +18,6 @@ package com.foreach.across.modules.entity.testmodules.springdata2;
 import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 
@@ -61,13 +60,5 @@ public class Client extends SettableIdBasedEntity<Client>
 
 	public void setName( String name ) {
 		this.name = name;
-	}
-
-	@Override
-	public Client toDto() {
-		Client client = new Client();
-		BeanUtils.copyProperties( this, client );
-
-		return client;
 	}
 }

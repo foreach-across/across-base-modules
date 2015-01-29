@@ -17,6 +17,8 @@ package com.foreach.across.modules.entity.views.forms.elements.select;
 
 import org.apache.commons.lang3.ObjectUtils;
 
+import java.util.Collection;
+
 /**
  * Represents a single option in the select.
  */
@@ -50,6 +52,10 @@ public class SelectOption implements Comparable<SelectOption>
 	}
 
 	public boolean isSelected( Object value ) {
+		if ( value instanceof Collection ) {
+			return ((Collection) value).contains( getRawValue() );
+		}
+
 		return value != null && value.equals( getRawValue() );
 	}
 

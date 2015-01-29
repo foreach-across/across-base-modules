@@ -15,6 +15,9 @@
  */
 package com.foreach.across.modules.entity.views.forms.elements.textbox;
 
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.views.forms.elements.CommonFormElements;
 import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderFactoryAssemblerSupport;
 import org.hibernate.validator.constraints.Length;
@@ -29,8 +32,24 @@ import java.lang.annotation.Annotation;
 public class TextboxFormElementBuilderFactoryAssembler
 		extends FormElementBuilderFactoryAssemblerSupport<TextboxFormElementBuilder>
 {
+	private int maximumSingleLineLength = 300;
+
 	public TextboxFormElementBuilderFactoryAssembler() {
 		super( TextboxFormElementBuilder.class, CommonFormElements.TEXTBOX );
+	}
+
+	public void setMaximumSingleLineLength( int maximumSingleLineLength ) {
+		this.maximumSingleLineLength = maximumSingleLineLength;
+	}
+
+	@Override
+	protected void assembleTemplate( EntityConfiguration entityConfiguration,
+	                                 EntityPropertyRegistry registry,
+	                                 EntityPropertyDescriptor descriptor,
+	                                 TextboxFormElementBuilder template ) {
+		if ( !descriptor.getPropertyType().equals( String.class ) ) {
+			template.setMultiLine( false );
+		}
 	}
 
 	@Override
@@ -42,6 +61,7 @@ public class TextboxFormElementBuilderFactoryAssembler
 
 			if ( max != Integer.MAX_VALUE ) {
 				template.setMaxLength( max );
+				template.setMultiLine( max > maximumSingleLineLength );
 			}
 		}
 	}

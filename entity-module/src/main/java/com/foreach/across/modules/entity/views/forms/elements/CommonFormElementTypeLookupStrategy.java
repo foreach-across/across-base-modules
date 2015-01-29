@@ -22,6 +22,8 @@ import com.foreach.across.modules.entity.views.forms.FormElementTypeLookupStrate
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ClassUtils;
 
+import java.util.Collection;
+
 /**
  * @author Arne Vandamme
  */
@@ -40,6 +42,10 @@ public class CommonFormElementTypeLookupStrategy implements FormElementTypeLooku
 			Class propertyType = descriptor.getPropertyType();
 
 			if ( propertyType != null ) {
+				if ( propertyType.isArray() || Collection.class.isAssignableFrom( propertyType ) ) {
+					return CommonFormElements.MULTI_CHECKBOX;
+				}
+
 				if ( propertyType.isEnum() ) {
 					return CommonFormElements.SELECT;
 				}

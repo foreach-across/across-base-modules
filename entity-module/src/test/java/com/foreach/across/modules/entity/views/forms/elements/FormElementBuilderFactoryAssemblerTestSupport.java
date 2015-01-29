@@ -31,6 +31,7 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ResolvableType;
 
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
@@ -84,6 +85,7 @@ public abstract class FormElementBuilderFactoryAssemblerTestSupport<T extends Fo
 				when( descriptor.getDisplayName() ).thenReturn( StringUtils.lowerCase( propertyName ) );
 				when( descriptor.getAttribute( PropertyDescriptor.class ) ).thenReturn( validationDescriptor );
 				when( descriptor.getPropertyType() ).thenReturn( (Class) field.getType() );
+				when( descriptor.getPropertyResolvableType() ).thenReturn( ResolvableType.forField( field ) );
 
 				properties.put( propertyName, descriptor );
 			}

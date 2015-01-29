@@ -45,13 +45,13 @@ public class DefaultEntityPropertyRegistry extends EntityPropertyRegistrySupport
 		ReflectionUtils.doWithFields( entityType, new ReflectionUtils.FieldCallback()
 		{
 			private Class declaringClass;
-			private int declaringClassOffset = 10000;
+			private int declaringClassOffset = 0;
 
 			@Override
 			public void doWith( Field field ) throws IllegalArgumentException, IllegalAccessException {
 				if ( !field.getDeclaringClass().equals( declaringClass ) ) {
 					declaringClass = field.getDeclaringClass();
-					declaringClassOffset -= 1000;
+					declaringClassOffset += 1000;
 				}
 
 				if ( contains( field.getName() ) ) {
@@ -66,13 +66,13 @@ public class DefaultEntityPropertyRegistry extends EntityPropertyRegistrySupport
 		ReflectionUtils.doWithMethods( entityType, new ReflectionUtils.MethodCallback()
 		{
 			private Class declaringClass;
-			private int declaringClassOffset = 1000000;
+			private int declaringClassOffset = 0;
 
 			@Override
 			public void doWith( Method method ) throws IllegalArgumentException, IllegalAccessException {
 				if ( !method.getDeclaringClass().equals( declaringClass ) ) {
 					declaringClass = method.getDeclaringClass();
-					declaringClassOffset -= 1000;
+					declaringClassOffset += 1000;
 				}
 
 				if ( !methodIndex.containsKey( method ) ) {
@@ -154,6 +154,7 @@ public class DefaultEntityPropertyRegistry extends EntityPropertyRegistrySupport
 		descriptor.setName( name );
 		descriptor.setDisplayName( name );
 		descriptor.setPropertyType( child.getPropertyType() );
+		descriptor.setPropertyResolvableType( child.getPropertyResolvableType() );
 		descriptor.setReadable( child.isReadable() );
 		descriptor.setWritable( child.isWritable() );
 		descriptor.setHidden( child.isHidden() );

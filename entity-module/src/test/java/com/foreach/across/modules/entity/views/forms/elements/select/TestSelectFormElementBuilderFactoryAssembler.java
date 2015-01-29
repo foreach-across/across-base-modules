@@ -18,6 +18,7 @@ package com.foreach.across.modules.entity.views.forms.elements.select;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.CompanyStatus;
+import com.foreach.across.modules.entity.views.forms.elements.CommonFormElements;
 import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderFactoryAssemblerSupport;
 import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderFactoryAssemblerTestSupport;
 import com.foreach.common.test.MockedLoader;
@@ -33,6 +34,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -75,7 +77,7 @@ public class TestSelectFormElementBuilderFactoryAssembler
 	}
 
 	@Test
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public void clientProperty() {
 		EntityConfiguration clientConfig = mock( EntityConfiguration.class );
 		when( entityRegistry.getEntityConfiguration( Client.class ) ).thenReturn( clientConfig );
@@ -83,6 +85,20 @@ public class TestSelectFormElementBuilderFactoryAssembler
 
 		template = assembleAndVerify( "client" );
 		assertNotNull( template.getOptionGenerator() );
+		assertEquals( CommonFormElements.SELECT, template.getElementType() );
+		assertTrue( template.getOptionGenerator() instanceof EntityCrudRepositoryOptionGenerator );
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void othersProperty() {
+		EntityConfiguration clientConfig = mock( EntityConfiguration.class );
+		when( entityRegistry.getEntityConfiguration( Client.class ) ).thenReturn( clientConfig );
+		when( clientConfig.getAttribute( Repository.class ) ).thenReturn( mock( CrudRepository.class ) );
+
+		template = assembleAndVerify( "others" );
+		assertNotNull( template.getOptionGenerator() );
+		assertEquals( CommonFormElements.MULTI_CHECKBOX, template.getElementType() );
 		assertTrue( template.getOptionGenerator() instanceof EntityCrudRepositoryOptionGenerator );
 	}
 
@@ -103,5 +119,7 @@ public class TestSelectFormElementBuilderFactoryAssembler
 		public CompanyStatus notNullValidator;
 
 		public Client client;
+
+		public Set<Client> others;
 	}
 }

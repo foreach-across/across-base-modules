@@ -24,19 +24,23 @@ import org.springframework.util.Assert;
  */
 public abstract class FormElementSupport implements FormElement
 {
-	private final String elementType;
+	private String elementType;
 
 	private boolean required;
 	private String name, label, customTemplate;
 	private ValuePrinter valuePrinter;
 
 	protected FormElementSupport( String elementType ) {
-		this.elementType = elementType;
+		setElementType( elementType );
 	}
 
 	@Override
 	public String getElementType() {
 		return elementType;
+	}
+
+	protected void setElementType( String elementType ) {
+		this.elementType = elementType;
 	}
 
 	@Override

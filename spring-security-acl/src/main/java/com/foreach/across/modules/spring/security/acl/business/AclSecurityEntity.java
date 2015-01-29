@@ -18,7 +18,6 @@ package com.foreach.across.modules.spring.security.acl.business;
 import com.foreach.across.modules.hibernate.business.SettableIdAuditableEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 
@@ -78,13 +77,5 @@ public class AclSecurityEntity extends SettableIdAuditableEntity<AclSecurityEnti
 
 	public void setParent( AclSecurityEntity parent ) {
 		this.parent = parent;
-	}
-
-	@Override
-	public AclSecurityEntity toDto() {
-		AclSecurityEntity entity = new AclSecurityEntity();
-		BeanUtils.copyProperties( this, entity );
-
-		return entity;
 	}
 }

@@ -66,8 +66,7 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 		T template
 				= createTemplate( entityConfiguration, propertyRegistry, descriptor );
 
-		CloningFormElementBuilderFactory<T> builderFactory =
-				new CloningFormElementBuilderFactory<>( builderClass );
+		CloningFormElementBuilderFactory<T> builderFactory = new CloningFormElementBuilderFactory<>( builderClass );
 		builderFactory.setBuilderTemplate( template );
 
 		return builderFactory;

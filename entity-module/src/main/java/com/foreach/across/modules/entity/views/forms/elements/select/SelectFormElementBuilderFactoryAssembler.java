@@ -22,8 +22,11 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegis
 import com.foreach.across.modules.entity.views.forms.elements.CommonFormElements;
 import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderFactoryAssemblerSupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ResolvableType;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.Repository;
+
+import java.util.Collection;
 
 /**
  * @author Arne Vandamme
@@ -35,7 +38,7 @@ public class SelectFormElementBuilderFactoryAssembler
 	private EntityRegistry entityRegistry;
 
 	public SelectFormElementBuilderFactoryAssembler() {
-		super( SelectFormElementBuilder.class, CommonFormElements.SELECT );
+		super( SelectFormElementBuilder.class, CommonFormElements.SELECT, CommonFormElements.MULTI_CHECKBOX );
 	}
 
 	@Override
@@ -44,23 +47,52 @@ public class SelectFormElementBuilderFactoryAssembler
 	                                 EntityPropertyRegistry registry,
 	                                 EntityPropertyDescriptor descriptor,
 	                                 SelectFormElementBuilder template ) {
-		Class<?> propertyType = descriptor.getPropertyType();
+		boolean isCollection = isCollection( descriptor );
+		Class<?> memberType = isCollection ? determineCollectionMemberType( descriptor ) : descriptor.getPropertyType();
 
-		if ( propertyType.isEnum() ) {
-			template.setOptionGenerator( new EnumSelectOptionGenerator( (Class<? extends Enum>) propertyType ) );
+		if ( memberType == null ) {
+			throw new RuntimeException( "Unable to determine property type specific enough for form element assembly "
+					                            + descriptor.getName() );
+		}
+
+		if ( memberType.isEnum() ) {
+			template.setOptionGenerator( new EnumSelectOptionGenerator( (Class<? extends Enum>) memberType ) );
 		}
 		else {
-			EntityConfiguration member = entityRegistry.getEntityConfiguration( propertyType );
+			EntityConfiguration optionType = entityRegistry.getEntityConfiguration( memberType );
 
-			if ( member != null ) {
-				Repository repository = member.getAttribute( Repository.class );
+			if ( optionType != null ) {
+				Repository repository = optionType.getAttribute( Repository.class );
 
 				if ( repository != null && repository instanceof CrudRepository ) {
 					template.setOptionGenerator(
-							new EntityCrudRepositoryOptionGenerator( member, (CrudRepository) repository )
+							new EntityCrudRepositoryOptionGenerator( optionType, (CrudRepository) repository )
 					);
 				}
 			}
 		}
+
+		if ( isCollection ) {
+			template.setElementType( CommonFormElements.MULTI_CHECKBOX );
+		}
+	}
+
+	private boolean isCollection( EntityPropertyDescriptor descriptor ) {
+		return descriptor.getPropertyType().isArray() || Collection.class.isAssignableFrom(
+				descriptor.getPropertyType() );
+	}
+
+	private Class determineCollectionMemberType( EntityPropertyDescriptor descriptor ) {
+		if ( descriptor.getPropertyType().isArray() ) {
+			return descriptor.getPropertyType().getComponentType();
+		}
+
+		ResolvableType resolvableType = descriptor.getPropertyResolvableType();
+
+		if ( resolvableType != null && resolvableType.hasGenerics() ) {
+			return resolvableType.resolveGeneric( 0 );
+		}
+
+		return null;
 	}
 }

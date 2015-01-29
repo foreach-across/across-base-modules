@@ -27,11 +27,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.ResolvableType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -89,6 +91,21 @@ public class TestCommonFormElementTypeLookupStrategy
 		when( entityRegistry.getEntityConfiguration( Client.class ) ).thenReturn( clientConfig );
 
 		assertEquals( CommonFormElements.SELECT, lookup( Client.class ) );
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void collectionEntityTypeShouldReturnMultiCheckbox() {
+		EntityConfiguration clientConfig = mock( EntityConfiguration.class );
+
+		when( entityConfiguration.getEntityType() ).thenReturn( (Class) Client.class );
+		when( entityRegistry.getEntityConfiguration( Client.class ) ).thenReturn( clientConfig );
+
+		when( descriptor.getPropertyType() ).thenReturn( (Class) List.class );
+		when( descriptor.getPropertyResolvableType() )
+				.thenReturn( ResolvableType.forClassWithGenerics( List.class, Client.class ) );
+
+		assertEquals( CommonFormElements.MULTI_CHECKBOX, strategy.findElementType( entityConfiguration, descriptor ) );
 	}
 
 	@Test

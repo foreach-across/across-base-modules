@@ -47,12 +47,13 @@ public class TestProperties
 
 		List<EntityPropertyDescriptor> descriptors = registry.getProperties();
 		assertEquals( 6, descriptors.size() );
-		assertEquals( "id", descriptors.get( 0 ).getName() );
-		assertEquals( "name", descriptors.get( 1 ).getName() );
-		assertEquals( "address", descriptors.get( 2 ).getName() );
-		assertEquals( "class", descriptors.get( 3 ).getName() );
-		assertEquals( "displayName", descriptors.get( 4 ).getName() );
-		assertEquals( "someValue", descriptors.get( 5 ).getName() );
+
+		assertEquals( "name", descriptors.get( 0 ).getName() );
+		assertEquals( "address", descriptors.get( 1 ).getName() );
+		assertEquals( "displayName", descriptors.get( 2 ).getName() );
+		assertEquals( "someValue", descriptors.get( 3 ).getName() );
+		assertEquals( "id", descriptors.get( 4 ).getName() );
+		assertEquals( "class", descriptors.get( 5 ).getName() );
 	}
 
 	@Test
@@ -63,9 +64,9 @@ public class TestProperties
 		);
 
 		assertEquals( 3, descriptors.size() );
-		assertEquals( "id", descriptors.get( 0 ).getName() );
-		assertEquals( "name", descriptors.get( 1 ).getName() );
-		assertEquals( "displayName", descriptors.get( 2 ).getName() );
+		assertEquals( "name", descriptors.get( 0 ).getName() );
+		assertEquals( "displayName", descriptors.get( 1 ).getName() );
+		assertEquals( "id", descriptors.get( 2 ).getName() );
 	}
 
 	@Test
@@ -78,8 +79,8 @@ public class TestProperties
 		assertEquals( 4, descriptors.size() );
 		assertEquals( "name", descriptors.get( 0 ).getName() );
 		assertEquals( "address", descriptors.get( 1 ).getName() );
-		assertEquals( "class", descriptors.get( 2 ).getName() );
-		assertEquals( "someValue", descriptors.get( 3 ).getName() );
+		assertEquals( "someValue", descriptors.get( 2 ).getName() );
+		assertEquals( "class", descriptors.get( 3 ).getName() );
 	}
 
 	@Test
@@ -89,11 +90,11 @@ public class TestProperties
 
 		List<EntityPropertyDescriptor> descriptors = registry.getProperties();
 		assertEquals( 5, descriptors.size() );
-		assertEquals( "id", descriptors.get( 0 ).getName() );
-		assertEquals( "name", descriptors.get( 1 ).getName() );
-		assertEquals( "address", descriptors.get( 2 ).getName() );
-		assertEquals( "displayName", descriptors.get( 3 ).getName() );
-		assertEquals( "someValue", descriptors.get( 4 ).getName() );
+		assertEquals( "name", descriptors.get( 0 ).getName() );
+		assertEquals( "address", descriptors.get( 1 ).getName() );
+		assertEquals( "displayName", descriptors.get( 2 ).getName() );
+		assertEquals( "someValue", descriptors.get( 3 ).getName() );
+		assertEquals( "id", descriptors.get( 4 ).getName() );
 
 		descriptors = registry.getProperties( EntityPropertyFilters.exclude( "id", "displayName" ) );
 

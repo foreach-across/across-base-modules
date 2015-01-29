@@ -19,7 +19,6 @@ import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
 import com.foreach.across.modules.oauth2.config.OAuth2SchemaConfiguration;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -71,13 +70,5 @@ public class OAuth2Scope extends SettableIdBasedEntity<OAuth2Scope>
 
 	public void setOAuth2ClientScopes( Set<OAuth2ClientScope> oAuth2ClientScopes ) {
 		this.oAuth2ClientScopes = oAuth2ClientScopes;
-	}
-
-	@Override
-	public OAuth2Scope toDto() {
-		OAuth2Scope scope = new OAuth2Scope();
-		BeanUtils.copyProperties( this, scope );
-
-		return scope;
 	}
 }

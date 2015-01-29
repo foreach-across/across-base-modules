@@ -19,7 +19,6 @@ import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 
@@ -67,13 +66,5 @@ public class Client extends SettableIdBasedEntity<Client>
 
 	public String getNameWithId() {
 		return String.format( "%s (%s)", getName(), getId() );
-	}
-
-	@Override
-	public Client toDto() {
-		Client client = new Client();
-		BeanUtils.copyProperties( this, client );
-
-		return client;
 	}
 }

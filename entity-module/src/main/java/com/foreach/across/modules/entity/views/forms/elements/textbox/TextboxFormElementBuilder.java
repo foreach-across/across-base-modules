@@ -23,6 +23,7 @@ import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilder
 public class TextboxFormElementBuilder extends FormElementBuilderSupport<TextboxFormElement>
 {
 	private Integer maxLength;
+	private boolean multiLine = true;
 
 	public TextboxFormElementBuilder() {
 		super( TextboxFormElement.class );
@@ -36,12 +37,20 @@ public class TextboxFormElementBuilder extends FormElementBuilderSupport<Textbox
 		this.maxLength = maxLength;
 	}
 
+	public boolean isMultiLine() {
+		return multiLine;
+	}
+
+	public void setMultiLine( boolean multiLine ) {
+		this.multiLine = multiLine;
+	}
+
 	@Override
 	public boolean equals( Object o ) {
 		if ( this == o ) {
 			return true;
 		}
-		if ( !( o instanceof TextboxFormElementBuilder ) ) {
+		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
 		if ( !super.equals( o ) ) {
@@ -50,6 +59,9 @@ public class TextboxFormElementBuilder extends FormElementBuilderSupport<Textbox
 
 		TextboxFormElementBuilder that = (TextboxFormElementBuilder) o;
 
+		if ( multiLine != that.multiLine ) {
+			return false;
+		}
 		if ( maxLength != null ? !maxLength.equals( that.maxLength ) : that.maxLength != null ) {
 			return false;
 		}
@@ -61,6 +73,7 @@ public class TextboxFormElementBuilder extends FormElementBuilderSupport<Textbox
 	public int hashCode() {
 		int result = super.hashCode();
 		result = 31 * result + ( maxLength != null ? maxLength.hashCode() : 0 );
+		result = 31 * result + ( multiLine ? 1 : 0 );
 		return result;
 	}
 }
