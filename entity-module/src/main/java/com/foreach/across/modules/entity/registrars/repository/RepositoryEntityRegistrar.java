@@ -60,6 +60,9 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 	private RepositoryEntityViewsBuilder viewsBuilder;
 
 	@Autowired
+	private RepositoryEntityAssociationsBuilder associationsBuilder;
+
+	@Autowired
 	private MessageSource messageSource;
 
 	@EntityValidator
@@ -75,6 +78,8 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 		Map<String, RepositoryFactoryInformation> repositoryFactoryInformationMap
 				= applicationContext.getBeansOfType( RepositoryFactoryInformation.class );
 
+		List<MutableEntityConfiguration> registered = new ArrayList<>( repositoryFactoryInformationMap.size() );
+
 		for ( Map.Entry<String, RepositoryFactoryInformation> informationBean
 				: repositoryFactoryInformationMap.entrySet() ) {
 			RepositoryFactoryInformation repositoryFactoryInformation = informationBean.getValue();
@@ -89,17 +94,29 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 			if ( !entityRegistry.contains( entityType ) ) {
 				LOG.debug( "Auto registering entity type {} as repository", entityType.getName() );
 
-				registerEntity( moduleInfo, entityRegistry, entityType, repositoryFactoryInformation, repository );
+				MutableEntityConfiguration entityConfiguration =
+						registerEntity( moduleInfo, entityRegistry, entityType, repositoryFactoryInformation,
+						                repository );
+
+				if ( entityConfiguration != null ) {
+					registered.add( entityConfiguration );
+				}
 			}
 			else {
 				LOG.info( "Skipping auto registration of entity type {} as it is already registered",
 				          entityType.getName() );
 			}
 		}
+
+		for ( MutableEntityConfiguration entityConfiguration : registered ) {
+			associationsBuilder.buildAssociations( entityRegistry, entityConfiguration );
+		}
+
+		LOG.info( "Registered {} entities from module {}", registered.size(), moduleInfo.getName() );
 	}
 
 	@SuppressWarnings("unchecked")
-	private void registerEntity(
+	private MutableEntityConfiguration registerEntity(
 			AcrossModuleInfo moduleInfo,
 			MutableEntityRegistry entityRegistry,
 			Class<?> entityType,
@@ -123,11 +140,15 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 			viewsBuilder.buildViews( entityConfiguration );
 
 			entityRegistry.register( entityConfiguration );
+
+			return entityConfiguration;
 		}
 		else {
 			LOG.warn( "Skipping registration of entity type {} as no unique name could be determined",
 			          entityType.getName() );
 		}
+
+		return null;
 	}
 
 	private void findDefaultValidatorInModuleContext( MutableEntityConfiguration entityConfiguration,

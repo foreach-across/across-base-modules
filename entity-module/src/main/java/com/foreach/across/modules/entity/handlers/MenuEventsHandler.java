@@ -13,6 +13,8 @@ import com.foreach.across.modules.web.menu.PathBasedMenuBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 
+import java.util.List;
+
 @AcrossEventHandler
 public class MenuEventsHandler
 {
@@ -46,10 +48,26 @@ public class MenuEventsHandler
 		EntityConfiguration entityConfiguration = entityRegistry.getEntityConfiguration( menu.getEntityType() );
 
 		if ( menu.isForUpdate() ) {
-			builder.item(
-					"/entities/" + entityConfiguration.getName() + "/" + entityConfiguration.getId( menu.getEntity() ),
-					"General" )
-			       .order( Ordered.HIGHEST_PRECEDENCE );
+			String path = "/entities/" + entityConfiguration.getName() + "/"
+					+ entityConfiguration.getId( menu.getEntity() );
+			builder.item( path, "General" ).order( Ordered.HIGHEST_PRECEDENCE );
+
+			// Get associations
+
+			List<Class> associations = entityConfiguration.getAttribute( "associations" );
+
+			if ( associations != null ) {
+				for ( Class associationType : associations ) {
+					EntityConfiguration associated = entityRegistry.getEntityConfiguration( associationType );
+					EntityMessageCodeResolver messageCodeResolver = associated.getEntityMessageCodeResolver();
+
+					builder.item(
+							associated.getName(),
+							messageCodeResolver.getNamePlural(),
+							path + "/associations/" + associated.getName()
+					);
+				}
+			}
 		}
 		else {
 			builder.item( "/entities/" + entityConfiguration.getName() + "/create",

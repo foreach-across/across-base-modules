@@ -50,6 +50,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.Validator;
 
 import javax.validation.metadata.PropertyDescriptor;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -96,12 +97,23 @@ public class TestRepositoryEntityRegistrar
 	}
 
 	@Test
+	public void companyShouldHaveAnAssociationToItsClients() {
+		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Company.class );
+		List<Class> associations = configuration.getAttribute( "associations" );
+
+		assertNotNull( associations );
+		assertEquals( 1, associations.size() );
+		assertTrue( associations.contains( Client.class ) );
+	}
+
+	@Test
 	public void verifyPropertyRegistry() {
 		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
 		EntityPropertyRegistry registry = configuration.getPropertyRegistry();
 
 		assertProperty( registry, "name", "Name", true, true );
 		assertProperty( registry, "id", "Id", true, false );
+		assertProperty( registry, "company", "Company", true, false );
 		assertProperty( registry, "newEntityId", "New entity id", false, false );
 		assertProperty( registry, "nameWithId", "Name with id", false, false );
 		assertProperty( registry, "class", "Class", false, false );
@@ -256,7 +268,7 @@ public class TestRepositoryEntityRegistrar
 		@Override
 		public void configure( AcrossContext context ) {
 			context.addModule( new EntityModule() );
-context.setDevelopmentMode( true );
+			context.setDevelopmentMode( true );
 			AcrossHibernateJpaModule hibernateModule = new AcrossHibernateJpaModule();
 			hibernateModule.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
 			context.addModule( hibernateModule );

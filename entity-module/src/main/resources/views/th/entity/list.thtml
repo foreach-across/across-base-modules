@@ -19,27 +19,35 @@
 </head>
 <body th:fragment="content">
 
-<div class="text-right">
-	<a class="btn btn-primary"
-	   th:href="@{${entityLinks.create()}}"
-	   th:text="|${messages.createAction()}|">create a new entity</a>
-</div>
+<div class="tabbable filled" th:remove="${entityMenu} ? none: tag">
+	<ul class="nav nav-tabs" th:if="${entityMenu}">
+		<li th:each="tab : ${entityMenu.items}" th:classappend="${tab.selected}? 'active'">
+			<a th:href="@{${tab.url}}" th:text="${tab.title}">tab menu</a>
+		</li>
+	</ul>
 
-<div>
-	<span th:text="${messages.resultsFound(page)}">Number of items found.</span><br/>
-	<a th:unless="${page.first}" href="#" data-tbl="entity-list"
-	   th:attr="data-tbl-page=${page.number - 1}" th:text="${messages.previousPage(page)}">previous page</a>
-	<span th:if="${page.totalPages gt 1}" th:text="${messages.pagerText(page)}">Showing page 1 of 13</span>
-	<a th:unless="${page.last}" href="#" data-tbl="entity-list"
-	   th:attr="data-tbl-page=${page.number + 1}" th:text="${messages.nextPage(page)}">next</a>
-</div>
+	<div class="tab-content" th:remove="${entityMenu} ? none: tag">
+		<div class="text-right">
+			<a class="btn btn-primary"
+			   th:href="@{${entityLinks.create()}}"
+			   th:text="|${messages.createAction()}|">create a new entity</a>
+		</div>
 
-<table class="table table-striped table-hover" th:unless="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"
-       th:attr="data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
-	<thead>
-	<tr>
-		<th th:if="${showResultNumber}">#</th>
-		<th th:each="prop : ${properties}">
+		<div>
+			<span th:text="${messages.resultsFound(page)}">Number of items found.</span><br/>
+			<a th:unless="${page.first}" href="#" data-tbl="entity-list"
+			   th:attr="data-tbl-page=${page.number - 1}" th:text="${messages.previousPage(page)}">previous page</a>
+			<span th:if="${page.totalPages gt 1}" th:text="${messages.pagerText(page)}">Showing page 1 of 13</span>
+			<a th:unless="${page.last}" href="#" data-tbl="entity-list"
+			   th:attr="data-tbl-page=${page.number + 1}" th:text="${messages.nextPage(page)}">next</a>
+		</div>
+
+		<table class="table table-striped table-hover" th:unless="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"
+		       th:attr="data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
+			<thead>
+			<tr>
+				<th th:if="${showResultNumber}">#</th>
+				<th th:each="prop : ${properties}">
 			<span th:if="${prop.sortable}"
 			      data-tbl="entity-list"
 			      class="sortable"
@@ -47,47 +55,49 @@
 				<span th:text="${prop.label}">Property name</span>
 				<span class="caret"></span>
 			</span>
-			<span th:unless="${prop.sortable}" th:text="${prop.label}">Name</span>
-		</th>
-		<th></th>
-	</tr>
-	</thead>
-	<tbody>
-	<tr th:each="entity,entityStats:${page.content}" >
-		<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
-		<td th:each="prop : ${properties}">
-			<!--/*
-			<span th:if="${prop.name eq 'createdDate'}" th:remove="tag">
-				<div th:replace="|th/entity/${prop.name}|">DATUM</div>
-			</span>
-			*/-->
-			<span th:utext="${prop.print(entity)}">value</span>
-		</td>
-		<td>
-			<a th:href="@{${entityLinks.update(entity)}}" th:title="${messages.updateAction(entity)}">
-				<span class="glyphicon glyphicon-edit"></span>
-			</a>
-		</td>
-	</tr>
-	</tbody>
-</table>
+					<span th:unless="${prop.sortable}" th:text="${prop.label}">Name</span>
+				</th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr th:each="entity,entityStats:${page.content}">
+				<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
+				<td th:each="prop : ${properties}">
+					<!--/*
+					<span th:if="${prop.name eq 'createdDate'}" th:remove="tag">
+						<div th:replace="|th/entity/${prop.name}|">DATUM</div>
+					</span>
+					*/-->
+					<span th:utext="${prop.print(entity)}">value</span>
+				</td>
+				<td>
+					<a th:href="@{${entityLinks.update(entity)}}" th:title="${messages.updateAction(entity)}">
+						<span class="glyphicon glyphicon-edit"></span>
+					</a>
+				</td>
+			</tr>
+			</tbody>
+		</table>
 
-<table class="table table-striped table-hover" th:if="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"
-       th:attr="data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
-	<thead>
-	<tr>
-		<th>#</th>
-		<th>Name</th>
-		<th></th>
-	</tr>
-	</thead>
-	<tbody>
-	<tr th:each="entity,entityStats:${page.content}">
-		<td th:text="${entityStats.count}"></td>
-		<td th:text="${entityConfiguration.getLabel(entity)}"></td>
-		<td><a th:href="@{${entityLinks.update(entity)}}">edit</a></td>
-	</tr>
-	</tbody>
-</table>
+		<table class="table table-striped table-hover" th:if="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"
+		       th:attr="data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
+			<thead>
+			<tr>
+				<th>#</th>
+				<th>Name</th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr th:each="entity,entityStats:${page.content}">
+				<td th:text="${entityStats.count}"></td>
+				<td th:text="${entityConfiguration.getLabel(entity)}"></td>
+				<td><a th:href="@{${entityLinks.update(entity)}}">edit</a></td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
 </body>
 </html>

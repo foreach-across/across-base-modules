@@ -108,8 +108,10 @@
 							</div>
 							<!--/* checkbox */-->
 							<div th:if="${element.elementType eq 'checkbox'}" class="checkbox">
-								<label>
-									<input type="checkbox" th:id="${#ids.seq(element.name)}" th:name="${element.name}" th:checked="${element.value}"/>
+								<label th:for="${#ids.next(element.name)}">
+									<input type="checkbox" th:id="${#ids.seq(element.name)}"
+									       th:name="${element.name}"
+									       th:checked="${element.isChecked(entity)}"/>
 									<input type="hidden" th:name="|_${element.name}|" value="on"/>
 									<span th:text="${element.label}">label</span>
 								</label>

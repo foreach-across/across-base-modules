@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ClassUtils;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Arne Vandamme
@@ -56,6 +57,11 @@ public class CommonFormElementTypeLookupStrategy implements FormElementTypeLooku
 					if ( member != null ) {
 						return CommonFormElements.SELECT;
 					}
+				}
+
+				if ( ClassUtils.isAssignable( Boolean.class, propertyType )
+						|| ClassUtils.isAssignable( AtomicBoolean.class, propertyType ) ) {
+					return CommonFormElements.CHECKBOX;
 				}
 
 				return CommonFormElements.TEXTBOX;

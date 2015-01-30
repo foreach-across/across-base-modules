@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.forms.elements;
+package com.foreach.across.modules.entity.views.forms.elements.checkbox;
+
+import com.foreach.across.modules.entity.views.forms.elements.CommonFormElements;
+import com.foreach.across.modules.entity.views.forms.elements.FormElementBuilderFactoryAssemblerSupport;
 
 /**
  * @author Arne Vandamme
  */
-public interface CommonFormElements
+public class CheckboxFormElementBuilderFactoryAssembler
+		extends FormElementBuilderFactoryAssemblerSupport<CheckboxFormElementBuilder>
 {
-	String TEXTBOX = "textbox";
-	String HIDDEN = "hidden";
-	String SELECT = "select";
-	String MULTI_CHECKBOX = "multi-checkbox";
-	String CHECKBOX = "checkbox";
+	public CheckboxFormElementBuilderFactoryAssembler() {
+		super( CheckboxFormElementBuilder.class, CommonFormElements.CHECKBOX );
+	}
 }

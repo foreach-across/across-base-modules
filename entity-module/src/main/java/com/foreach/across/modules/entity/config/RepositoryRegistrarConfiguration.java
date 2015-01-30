@@ -1,9 +1,6 @@
 package com.foreach.across.modules.entity.config;
 
-import com.foreach.across.modules.entity.registrars.repository.RepositoryEntityModelBuilder;
-import com.foreach.across.modules.entity.registrars.repository.RepositoryEntityPropertyRegistryBuilder;
-import com.foreach.across.modules.entity.registrars.repository.RepositoryEntityRegistrar;
-import com.foreach.across.modules.entity.registrars.repository.RepositoryEntityViewsBuilder;
+import com.foreach.across.modules.entity.registrars.repository.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,5 +30,10 @@ public class RepositoryRegistrarConfiguration
 	@Bean
 	protected RepositoryEntityPropertyRegistryBuilder repositoryEntityPropertyRegistryBuilder() {
 		return new RepositoryEntityPropertyRegistryBuilder();
+	}
+
+	@Bean
+	protected RepositoryEntityAssociationsBuilder repositoryEntityAssociationsBuilder() {
+		return new RepositoryEntityAssociationsBuilder();
 	}
 }

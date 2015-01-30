@@ -41,6 +41,9 @@ public class Client extends SettableIdBasedEntity<Client>
 	@Column(unique = true)
 	private String name;
 
+	@ManyToOne
+	private Company company;
+
 	public Client() {
 	}
 
@@ -66,5 +69,13 @@ public class Client extends SettableIdBasedEntity<Client>
 
 	public String getNameWithId() {
 		return String.format( "%s (%s)", getName(), getId() );
+	}
+
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany( Company company ) {
+		this.company = company;
 	}
 }

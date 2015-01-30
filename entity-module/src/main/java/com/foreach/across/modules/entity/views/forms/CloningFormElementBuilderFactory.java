@@ -16,7 +16,6 @@
 package com.foreach.across.modules.entity.views.forms;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
 
 /**
  * Simple implementation of a {@link com.foreach.across.modules.entity.views.forms.FormElementBuilderFactory}

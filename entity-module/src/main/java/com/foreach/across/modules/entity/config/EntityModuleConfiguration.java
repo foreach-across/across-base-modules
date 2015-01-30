@@ -14,6 +14,7 @@ import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.views.EntityFormViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import com.foreach.across.modules.entity.views.forms.elements.CommonFormElementTypeLookupStrategy;
+import com.foreach.across.modules.entity.views.forms.elements.checkbox.CheckboxFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.forms.elements.hidden.HiddenFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.forms.elements.select.SelectFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.forms.elements.textbox.TextboxFormElementBuilderFactoryAssembler;
@@ -101,6 +102,11 @@ public class EntityModuleConfiguration
 	@Bean
 	public SelectFormElementBuilderFactoryAssembler selectFormElementBuilderFactoryAssembler() {
 		return new SelectFormElementBuilderFactoryAssembler();
+	}
+
+	@Bean
+	public CheckboxFormElementBuilderFactoryAssembler checkboxFormElementBuilderFactoryAssembler() {
+		return new CheckboxFormElementBuilderFactoryAssembler();
 	}
 
 	@Bean

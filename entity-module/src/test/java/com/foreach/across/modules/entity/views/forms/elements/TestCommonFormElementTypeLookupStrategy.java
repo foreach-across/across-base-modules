@@ -34,6 +34,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -73,8 +75,17 @@ public class TestCommonFormElementTypeLookupStrategy
 	public void textboxTypeForPrimitives() {
 		assertEquals( CommonFormElements.TEXTBOX, lookup( String.class ) );
 		assertEquals( CommonFormElements.TEXTBOX, lookup( Integer.class ) );
+		assertEquals( CommonFormElements.TEXTBOX, lookup( int.class ) );
+		assertEquals( CommonFormElements.TEXTBOX, lookup( AtomicInteger.class ) );
 		assertEquals( CommonFormElements.TEXTBOX, lookup( Long.class ) );
 		assertEquals( CommonFormElements.TEXTBOX, lookup( BigDecimal.class ) );
+	}
+
+	@Test
+	public void checkboxTypeForBooleans() {
+		assertEquals( CommonFormElements.CHECKBOX, lookup( Boolean.class ) );
+		assertEquals( CommonFormElements.CHECKBOX, lookup( boolean.class ) );
+		assertEquals( CommonFormElements.CHECKBOX, lookup( AtomicBoolean.class ) );
 	}
 
 	@Test
