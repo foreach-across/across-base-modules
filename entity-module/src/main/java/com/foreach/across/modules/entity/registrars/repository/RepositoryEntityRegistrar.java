@@ -126,6 +126,7 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 
 		if ( entityTypeName != null ) {
 			EntityConfigurationImpl entityConfiguration = new EntityConfigurationImpl<>( entityTypeName, entityType );
+			entityConfiguration.addAttribute( AcrossModuleInfo.class, moduleInfo );
 			entityConfiguration.addAttribute( RepositoryFactoryInformation.class, repositoryFactoryInformation );
 			entityConfiguration.addAttribute( Repository.class, repository );
 

@@ -16,8 +16,6 @@ public class TestEntityLinkBuilder
 	@Test
 	@SuppressWarnings("unchecked")
 	public void generatedPathsWithNumberId() {
-		PrefixingPathContext ctx = new PrefixingPathContext( "/secure" );
-
 		EntityConfiguration entityConfiguration = mock( EntityConfiguration.class );
 		when( entityConfiguration.getName() ).thenReturn( "basicPrincipal" );
 
@@ -26,13 +24,13 @@ public class TestEntityLinkBuilder
 
 		when( entityConfiguration.getEntityModel() ).thenReturn( model );
 
-		EntityLinkBuilder url = new EntityLinkBuilder( ctx, EntityController.PATH, entityConfiguration );
+		EntityLinkBuilder url = new EntityLinkBuilder( EntityController.PATH, entityConfiguration );
 
-		assertEquals( "/secure/entities/basicPrincipal", url.overview() );
-		assertEquals( "/secure/entities/basicPrincipal/create", url.create() );
-		assertEquals( "/secure/entities/basicPrincipal/10001", url.view( "someEntity" ) );
-		assertEquals( "/secure/entities/basicPrincipal/10001/update", url.update( "someEntity" ) );
-		assertEquals( "/secure/entities/basicPrincipal/10001/delete", url.delete( "someEntity" ) );
+		assertEquals( "/entities/basicPrincipal", url.overview() );
+		assertEquals( "/entities/basicPrincipal/create", url.create() );
+		assertEquals( "/entities/basicPrincipal/10001", url.view( "someEntity" ) );
+		assertEquals( "/entities/basicPrincipal/10001/update", url.update( "someEntity" ) );
+		assertEquals( "/entities/basicPrincipal/10001/delete", url.delete( "someEntity" ) );
 	}
 
 	@Test
@@ -49,12 +47,12 @@ public class TestEntityLinkBuilder
 
 		when( entityConfiguration.getEntityModel() ).thenReturn( model );
 
-		EntityLinkBuilder url = new EntityLinkBuilder( ctx, EntityController.PATH, entityConfiguration );
+		EntityLinkBuilder url = new EntityLinkBuilder( EntityController.PATH, entityConfiguration );
 
-		assertEquals( "/secure/entities/basicPrincipal", url.overview() );
-		assertEquals( "/secure/entities/basicPrincipal/create", url.create() );
-		assertEquals( "/secure/entities/basicPrincipal/someStringId", url.view( "someEntity" ) );
-		assertEquals( "/secure/entities/basicPrincipal/someStringId/update", url.update( "someEntity" ) );
-		assertEquals( "/secure/entities/basicPrincipal/someStringId/delete", url.delete( "someEntity" ) );
+		assertEquals( "/entities/basicPrincipal", url.overview() );
+		assertEquals( "/entities/basicPrincipal/create", url.create() );
+		assertEquals( "/entities/basicPrincipal/someStringId", url.view( "someEntity" ) );
+		assertEquals( "/entities/basicPrincipal/someStringId/update", url.update( "someEntity" ) );
+		assertEquals( "/entities/basicPrincipal/someStringId/delete", url.delete( "someEntity" ) );
 	}
 }

@@ -21,6 +21,7 @@ import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.annotations.EntityValidator;
+import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
@@ -99,11 +100,10 @@ public class TestRepositoryEntityRegistrar
 	@Test
 	public void companyShouldHaveAnAssociationToItsClients() {
 		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Company.class );
-		List<Class> associations = configuration.getAttribute( "associations" );
+		EntityAssociation association = configuration.association( Client.class );
 
-		assertNotNull( associations );
-		assertEquals( 1, associations.size() );
-		assertTrue( associations.contains( Client.class ) );
+		assertNotNull( association );
+		assertTrue( association.hasView( EntityListView.VIEW_NAME ));
 	}
 
 	@Test

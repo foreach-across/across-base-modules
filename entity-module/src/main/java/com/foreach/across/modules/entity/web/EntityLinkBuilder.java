@@ -2,19 +2,17 @@ package com.foreach.across.modules.entity.web;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
-import com.foreach.across.modules.web.context.PrefixingPathContext;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
 
 /**
- * Creates context dependant links to entity views/controllers.
+ * Creates links to entity views and standard controllers.
  * By default crud and list views are included.
  */
 public class EntityLinkBuilder
 {
-	private final PrefixingPathContext prefixingPathContext;
 	private final String rootPath;
 	private final EntityConfiguration entityConfiguration;
 
@@ -24,10 +22,7 @@ public class EntityLinkBuilder
 	private String updatePath = "{0}/{1}/{2,number,#}/update";
 	private String deletePath = "{0}/{1}/{2,number,#}/delete";
 
-	public EntityLinkBuilder( PrefixingPathContext prefixingPathContext,
-	                          String rootPath,
-	                          EntityConfiguration entityConfiguration ) {
-		this.prefixingPathContext = prefixingPathContext;
+	public EntityLinkBuilder( String rootPath, EntityConfiguration entityConfiguration ) {
 		this.rootPath = rootPath;
 		this.entityConfiguration = entityConfiguration;
 
@@ -89,16 +84,12 @@ public class EntityLinkBuilder
 	}
 
 	private String format( String pattern ) {
-		return prefixingPathContext.path(
-				MessageFormat.format( pattern, rootPath, entityConfiguration.getName(), null )
-		);
+		return MessageFormat.format( pattern, rootPath, entityConfiguration.getName(), null );
 	}
 
 	@SuppressWarnings("unchecked")
 	private String format( String pattern, Object entity ) {
 		Serializable id = entityConfiguration.getEntityModel().getId( entity );
-		return prefixingPathContext.path(
-				MessageFormat.format( pattern, rootPath, entityConfiguration.getName(), id )
-		);
+		return MessageFormat.format( pattern, rootPath, entityConfiguration.getName(), id );
 	}
 }

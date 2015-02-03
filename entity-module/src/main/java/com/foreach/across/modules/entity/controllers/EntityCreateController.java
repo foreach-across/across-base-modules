@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.controllers;
 
+import com.foreach.across.modules.adminweb.AdminWeb;
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
@@ -44,6 +45,9 @@ import javax.validation.Valid;
 public class EntityCreateController extends EntityControllerSupport
 {
 	@Autowired
+	private AdminWeb adminWeb;
+
+	@Autowired
 	private MenuFactory menuFactory;
 
 	@ModelAttribute(EntityView.ATTRIBUTE_ENTITY)
@@ -67,7 +71,7 @@ public class EntityCreateController extends EntityControllerSupport
 
 			ModelAndView mav = new ModelAndView();
 			mav.setViewName(
-					"redirect:" + entityConfiguration.getAttribute( EntityLinkBuilder.class ).update( entity )
+					adminWeb.redirect( entityConfiguration.getAttribute( EntityLinkBuilder.class ).update( entity ) )
 			);
 
 			redirectAttributes.addFlashAttribute( "successMessage", "feedback.entityCreated" );
@@ -82,10 +86,15 @@ public class EntityCreateController extends EntityControllerSupport
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView showCreateEntityForm(
 			@PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration, Model model ) {
-		model.addAttribute( "entityMenu",
-		                    menuFactory.buildMenu( new EntityAdminMenu<>( entityConfiguration.getEntityType() ) ) );
+		EntityViewFactory viewFactory = entityConfiguration.getViewFactory( EntityFormView.CREATE_VIEW_NAME );
 
-		EntityViewFactory view = entityConfiguration.getViewFactory( EntityFormView.CREATE_VIEW_NAME );
-		return view.create( entityConfiguration, model );
+		EntityView view = viewFactory.create( entityConfiguration, model );
+		view.setEntityMenu( menuFactory.buildMenu( new EntityAdminMenu<>( entityConfiguration.getEntityType() ) ) );
+
+		if ( view.getPageTitle() == null ) {
+			view.setPageTitle( view.getEntityMessages().createPageTitle() );
+		}
+
+		return view;
 	}
 }

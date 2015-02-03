@@ -13,25 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.adminweb.menu;
+package com.foreach.across.modules.entity.registry;
 
-import com.foreach.across.modules.web.menu.Menu;
+import com.foreach.across.modules.entity.registry.support.WritableAttributes;
+import com.foreach.across.modules.entity.views.EntityViewFactory;
 
-public class AdminMenu extends Menu
+/**
+ * @author Arne Vandamme
+ */
+public interface MutableEntityAssociation<T> extends EntityAssociation<T>, WritableAttributes
 {
-	public static final String NAME = "adminMenu";
-
-	public AdminMenu() {
-		super( NAME );
-	}
-
-	/**
-	 * Shortcut to specify the leaf point of the current breadcrumb by adding an additional
-	 * item to the path.
-	 *
-	 * @param title text for the leaf.
-	 */
-	public void breadcrumbLeaf( String title ) {
-		getLowestSelectedItem().addItem( "/breadcrumbLeaf", title ).setSelected( true );
-	}
+	void registerView( String viewName, EntityViewFactory viewFactory );
 }

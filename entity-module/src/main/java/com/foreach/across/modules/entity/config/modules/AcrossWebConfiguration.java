@@ -20,12 +20,16 @@ import com.foreach.across.modules.entity.EntityModuleSettings;
 import com.foreach.across.modules.entity.annotations.EntityValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.data.web.SortHandlerMethodArgumentResolver;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.validation.Validator;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Arne Vandamme
@@ -36,19 +40,29 @@ import javax.annotation.PostConstruct;
 public class AcrossWebConfiguration extends WebMvcConfigurerAdapter
 {
 	@EntityValidator
-	@SuppressWarnings( "unused" )
+	@SuppressWarnings("unused")
 	private Validator entityValidator;
 
 	@Autowired
 	private EntityModuleSettings settings;
 
 	@Autowired
+	private SortHandlerMethodArgumentResolver sortHandlerMethodArgumentResolver;
+
+	@Autowired
 	private PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver;
 
 	@PostConstruct
-	public void removeFallbackPageable() {
+	public void removeFallbackPageableAndSetFallbackSort() {
+		// Must return an empty Sort instance or a nullpointer will occur in case of paging without Sort
+		List<Sort.Order> orders = new ArrayList<>( 1 );
+		orders.add( new Sort.Order( "name" ) );
+		sortHandlerMethodArgumentResolver.setFallbackSort( new Sort( orders ) );
+		orders.clear();
+
 		pageableHandlerMethodArgumentResolver.setFallbackPageable( null );
 	}
+
 
 	/**
 	 * Register the entity validator as the default web mvc validator if necessary.

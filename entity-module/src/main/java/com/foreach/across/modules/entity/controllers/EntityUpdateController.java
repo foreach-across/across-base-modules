@@ -1,5 +1,6 @@
 package com.foreach.across.modules.entity.controllers;
 
+import com.foreach.across.modules.adminweb.AdminWeb;
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.adminweb.menu.AdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
@@ -29,6 +30,9 @@ import java.io.Serializable;
 public class EntityUpdateController extends EntityControllerSupport
 {
 	@Autowired
+	private AdminWeb adminWeb;
+
+	@Autowired
 	private MenuFactory menuFactory;
 
 	@Autowired
@@ -54,17 +58,24 @@ public class EntityUpdateController extends EntityControllerSupport
 	                                          @ModelAttribute(EntityView.ATTRIBUTE_ENTITY) Object entity,
 	                                          AdminMenu adminMenu,
 	                                          Model model ) {
-		Object originalEntity = model.asMap().get( EntityFormView.ATTRIBUTE_ORIGINAL_ENTITY );
+		Object original = model.asMap().get( EntityFormView.ATTRIBUTE_ORIGINAL_ENTITY );
 
-		adminMenu.getLowestSelectedItem()
-		         .addItem( "/selectedEntity", entityConfiguration.getLabel( originalEntity ) ).setSelected( true );
+		adminMenu.breadcrumbLeaf( entityConfiguration.getLabel( original ) );
 
-		model.addAttribute( "entityMenu",
-		                    menuFactory.buildMenu( new EntityAdminMenu( entityConfiguration.getEntityType(),
-		                                                                originalEntity ) ) );
+		EntityViewFactory viewFactory = entityConfiguration.getViewFactory( EntityFormView.UPDATE_VIEW_NAME );
+		EntityView view = viewFactory.create( entityConfiguration, model );
+		view.setEntityMenu(
+				menuFactory.buildMenu( new EntityAdminMenu( entityConfiguration.getEntityType(),
+				                                            original ) )
+		);
 
-		EntityViewFactory view = entityConfiguration.getViewFactory( EntityFormView.UPDATE_VIEW_NAME );
-		return view.create( entityConfiguration, model );
+		if ( view.getPageTitle() == null ) {
+			view.setPageTitle(
+					view.getEntityMessages().updatePageTitle( entityConfiguration.getLabel( original ) )
+			);
+		}
+
+		return view;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -82,7 +93,7 @@ public class EntityUpdateController extends EntityControllerSupport
 
 			ModelAndView mav = new ModelAndView();
 			mav.setViewName(
-					"redirect:" + entityConfiguration.getAttribute( EntityLinkBuilder.class ).update( entity )
+					adminWeb.redirect( entityConfiguration.getAttribute( EntityLinkBuilder.class ).update( entity ) )
 			);
 
 			redirectAttributes.addFlashAttribute( "successMessage", "feedback.entityUpdated" );

@@ -26,22 +26,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * @author Arne Vandamme
  */
-public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFactorySupport
+public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFactorySupport<EntityFormView>
 {
 	@Autowired
 	private EntityFormService formFactory;
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void extendViewModel( EntityConfiguration entityConfiguration, EntityView view ) {
+	protected void extendViewModel( EntityConfiguration entityConfiguration, EntityFormView view ) {
 		EntityModel entityModel = entityConfiguration.getEntityModel();
 
 		Object entity = retrieveOrCreateEntity( entityModel, view );
 		view.setEntity( entity );
-		view.addObject( "existing", !entityModel.isNew( entity ) );
+
+		Object original = view.getOriginalEntity();
+
+		if ( original == null ) {
+			original = entity;
+		}
+
+		boolean newEntity = entityModel.isNew( entity );
+		view.addObject( "existing", !newEntity );
+		view.setFormAction( newEntity
+				                    ? view.getEntityLinkBuilder().create()
+				                    : view.getEntityLinkBuilder().update( original )
+		);
 	}
 
-	private Object retrieveOrCreateEntity( EntityModel entityModel, EntityView view ) {
+	private Object retrieveOrCreateEntity( EntityModel entityModel, EntityFormView view ) {
 		Object entity = view.getEntity();
 
 		if ( entity == null ) {
@@ -60,7 +72,7 @@ public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFacto
 	}
 
 	@Override
-	protected EntityView createEntityView() {
+	protected EntityFormView createEntityView() {
 		return new EntityFormView();
 	}
 }

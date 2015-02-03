@@ -6,6 +6,7 @@ import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 public interface EntityConfiguration<T> extends ReadableAttributes
 {
@@ -24,6 +25,12 @@ public interface EntityConfiguration<T> extends ReadableAttributes
 	EntityPropertyRegistry getPropertyRegistry();
 
 	EntityMessageCodeResolver getEntityMessageCodeResolver();
+
+	Collection<EntityAssociation> getAssociations();
+
+	<V> EntityAssociation<V> association( Class<V> entityType );
+
+	<V> EntityAssociation<V> association( EntityConfiguration<V> associatedEntityConfiguration );
 
 	boolean isNew( T entity );
 

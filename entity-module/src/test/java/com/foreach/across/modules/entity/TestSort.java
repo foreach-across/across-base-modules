@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.adminweb.menu;
+package com.foreach.across.modules.entity;
 
-import com.foreach.across.modules.web.menu.Menu;
-
-public class AdminMenu extends Menu
+/**
+ * Unit test that verifies the behavior of Sort has not been changed from Spring Data.
+ * An empty sort is required as otherwise there is a possibility of nullpointer on default pageable.
+ *
+ * @author Arne Vandamme
+ */
+public class TestSort
 {
-	public static final String NAME = "adminMenu";
-
-	public AdminMenu() {
-		super( NAME );
-	}
-
-	/**
-	 * Shortcut to specify the leaf point of the current breadcrumb by adding an additional
-	 * item to the path.
-	 *
-	 * @param title text for the leaf.
-	 */
-	public void breadcrumbLeaf( String title ) {
-		getLowestSelectedItem().addItem( "/breadcrumbLeaf", title ).setSelected( true );
-	}
 }

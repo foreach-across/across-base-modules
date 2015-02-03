@@ -19,10 +19,9 @@
 </head>
 <body th:fragment="content">
 
-<h4 class="page-header" th:if="${existing}" th:text="|${messages.updateAction()}: ${entityConfiguration.getLabel(originalEntity)}|">
-	Modify entity: name
+<h4 class="page-header" th:if="${pageTitle != null}" th:text="${pageTitle}">
+	Page title
 </h4>
-<h4 class="page-header" th:unless="${existing}" th:text="${messages.createAction()}">Create a new entity</h4>
 
 <div th:if="${successMessage}" class="alert alert-success alert-dismissible" role="alert">
 	<span th:text="${messages.withNameSingular(successMessage, entityConfiguration.getLabel(entity))}">
@@ -41,9 +40,10 @@
 
 	<div class="tab-content">
 		<div class="tab-pane active">
-			<form method="post" th:action="@{${existing ? entityLinks.update(entity) : entityLinks.create()}}" th:object="${entity}" role="form">
+			<form method="post" th:action="@{${@adminWeb.path(formAction)}}" th:object="${entity}" role="form">
 				<div class="row">
 					<div class="col-md-4">
+
 						<div class="form-group" th:each="element : ${properties}" th:classappend="${#fields.hasErrors(element.name)}? has-error">
 							<!--/* label */-->
 							<div th:if="${element.elementType eq 'text'}">
@@ -125,7 +125,7 @@
 						</div>
 
 						<input class="btn btn-primary" type="submit" value="Save"/>
-						<a class="btn btn-link" th:href="@{${entityLinks.overview()}}">Cancel</a>
+						<a class="btn btn-link" th:href="@{${@adminWeb.path(entityLinks.overview())}}">Cancel</a>
 
 					</div>
 				</div>

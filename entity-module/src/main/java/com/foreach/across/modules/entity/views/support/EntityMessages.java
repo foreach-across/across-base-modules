@@ -31,6 +31,11 @@ public class EntityMessages
 	public static final String ACTION_DELETE = "actions.delete";
 	public static final String ACTION_VIEW = "actions.view";
 
+	public static final String PAGE_TITLE_CREATE = "pageTitle.create";
+	public static final String PAGE_TITLE_UPDATE = "pageTitle.update";
+	public static final String PAGE_TITLE_DELETE = "pageTitle.delete";
+	public static final String PAGE_TITLE_VIEW = "pageTitle.view";
+
 	protected final EntityMessageCodeResolver messageCodeResolver;
 
 	public EntityMessages( EntityMessageCodeResolver messageCodeResolver ) {
@@ -51,6 +56,22 @@ public class EntityMessages
 
 	public String viewAction( Object... arguments ) {
 		return withNameSingular( ACTION_VIEW, arguments );
+	}
+
+	public String createPageTitle( Object... arguments ) {
+		return withNameSingular( PAGE_TITLE_CREATE, arguments );
+	}
+
+	public String updatePageTitle( Object... arguments ) {
+		return withNameSingular( PAGE_TITLE_UPDATE, arguments );
+	}
+
+	public String deletePageTitle( Object... arguments ) {
+		return withNameSingular( PAGE_TITLE_DELETE, arguments );
+	}
+
+	public String viewPageTitle( Object... arguments ) {
+		return withNameSingular( PAGE_TITLE_VIEW, arguments );
 	}
 
 	public String withNameSingular( String code, Object... arguments ) {
@@ -79,7 +100,7 @@ public class EntityMessages
 		if ( candidates.length > 0 ) {
 			int last = candidates.length - 1;
 			if ( ObjectUtils.isArray( candidates[last] ) ) {
-				ArrayUtils.addAll(
+				return ArrayUtils.addAll(
 						ArrayUtils.subarray( candidates, 0, last ),
 						(Object[]) candidates[last]
 				);

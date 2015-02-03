@@ -23,4 +23,12 @@ public interface MutableEntityConfiguration<T> extends EntityConfiguration<T>, W
 	void registerView( String viewName, EntityViewFactory viewFactory );
 
 	void setEntityMessageCodeResolver( EntityMessageCodeResolver entityMessageCodeResolver );
+
+	@Override
+	<V> MutableEntityAssociation<V> association( Class<V> entityType );
+
+	@Override
+	<V> MutableEntityAssociation<V> association( EntityConfiguration<V> associatedEntityConfiguration );
+
+	<V> MutableEntityAssociation<V> createAssociation( MutableEntityConfiguration<V> associatedEntityConfiguration );
 }

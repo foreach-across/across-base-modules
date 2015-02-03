@@ -15,13 +15,16 @@
  */
 package com.foreach.across.modules.entity.registrars.repository;
 
+import com.foreach.across.core.context.AcrossContextUtils;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewPageFetcher;
 import com.foreach.across.modules.entity.views.EntityView;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +41,12 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 
+import javax.persistence.EntityManager;
 import javax.persistence.ManyToOne;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Builds the list of associations and their views.
@@ -90,25 +92,20 @@ public class RepositoryEntityAssociationsBuilder
 	private void createAssociationFromTo( MutableEntityConfiguration from,
 	                                      MutableEntityConfiguration to,
 	                                      PersistentProperty property ) {
-		List<Class> associations = from.getAttribute( "associations" );
+		MutableEntityAssociation association = from.createAssociation( to );
+		association.addAttribute( PersistentProperty.class, property );
 
-		if ( associations == null ) {
-			associations = new ArrayList<>();
-			from.addAttribute( "associations", associations );
-		}
-
-		associations.add( to.getEntityType() );
-
-		buildAssociationListView( from, to, property );
+		buildAssociationListView( association, property );
 	}
 
-	private void buildAssociationListView( MutableEntityConfiguration from,
-	                                       MutableEntityConfiguration to,
-	                                       final PersistentProperty property ) {
+	private void buildAssociationListView( MutableEntityAssociation association, final PersistentProperty property ) {
+		EntityConfiguration to = association.getAssociatedEntityConfiguration();
+
 		EntityListViewFactory viewFactory = beanFactory.getBean( EntityListViewFactory.class );
 		BeanUtils.copyProperties( to.getViewFactory( EntityListView.VIEW_NAME ), viewFactory );
 
-		viewFactory.setMessagePrefixes( "entityViews." + to.getName() + ".listView", "entityViews.listView",
+		viewFactory.setMessagePrefixes( "entityViews.association." + association.getName() + ".listView",
+		                                "entityViews.listView",
 		                                "entityViews" );
 
 		Repository repository = to.getAttribute( Repository.class );
@@ -141,6 +138,6 @@ public class RepositoryEntityAssociationsBuilder
 			System.err.println( "Repository not matching for: " + to.getName() );
 		}
 
-		from.registerView( to.getName() + "_" + EntityListView.VIEW_NAME, viewFactory );
+		association.registerView( EntityListView.VIEW_NAME, viewFactory );
 	}
 }

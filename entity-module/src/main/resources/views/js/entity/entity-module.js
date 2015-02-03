@@ -33,9 +33,7 @@ var TablePager = function ( element )
         var pairs = props[i].split( ':' );
         sort.push( { property: pairs[0], direction: pairs[1].trim() } );
 
-        $( "[data-tbl='" + id + "'][data-tbl-sort-property='" + pairs[0] + "']" ).addClass(
-                pairs[1].trim() == 'ASC' ? 'dropdown' : 'dropup'
-        )
+        $( "[data-tbl='" + id + "'][data-tbl-sort-property='" + pairs[0] + "']" ).addClass( pairs[1].trim() == 'ASC' ? 'dropdown' : 'dropup' )
     }
 
     var pager = this;
@@ -106,7 +104,10 @@ function paramReplace( name, string, value )
 
     if ( matches === null ) {
         // if there are no params, append the parameter
-        if ( string.indexOf( '?' ) >= 0 ) {
+        if ( value == null || value == '' ) {
+            newString = string;
+        }
+        else if ( string.indexOf( '?' ) >= 0 ) {
             newString = string + '&' + name + '=' + value;
         }
         else {
@@ -115,7 +116,13 @@ function paramReplace( name, string, value )
     }
     else {
         var delimeter = matches[0].charAt( 0 );
-        newString = string.replace( re, delimeter + name + "=" + value );
+
+        if ( value == null || value == '' ) {
+            newString = string.replace( re, delimeter );
+        }
+        else {
+            newString = string.replace( re, delimeter + name + "=" + value );
+        }
     }
     return newString;
 }

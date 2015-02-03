@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ public class EntityConfigurationImpl<T> extends AttributeSupport implements Muta
 	private final String name;
 	private final Class<T> entityType;
 	private final Map<String, EntityViewFactory> registeredViews = new HashMap<>();
+	private final Map<Class, EntityAssociation> entityAssociations = new HashMap<>();
 
 	private EntityMessageCodeResolver entityMessageCodeResolver;
 
@@ -129,5 +131,35 @@ public class EntityConfigurationImpl<T> extends AttributeSupport implements Muta
 	@Override
 	public String getLabel( T entity ) {
 		return entityModel.getLabel( entity );
+	}
+
+	@Override
+	public <V> MutableEntityAssociation<V> association( EntityConfiguration<V> associatedEntityConfiguration ) {
+		return association( associatedEntityConfiguration.getEntityType() );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <V> MutableEntityAssociation<V> association( Class<V> entityType ) {
+		return (MutableEntityAssociation<V>) entityAssociations.get( entityType );
+	}
+
+	@Override
+	public Collection<EntityAssociation> getAssociations() {
+		return entityAssociations.values();
+	}
+
+	@Override
+	public <V> MutableEntityAssociation<V> createAssociation(
+			MutableEntityConfiguration<V> associatedEntityConfiguration
+	) {
+		Class<V> associatedType = associatedEntityConfiguration.getEntityType();
+
+		if ( !entityAssociations.containsKey( associatedType ) ) {
+			entityAssociations.put( associatedType, new EntityAssociationImpl<>( this,
+			                                                                     associatedEntityConfiguration ) );
+		}
+
+		return association( associatedType );
 	}
 }

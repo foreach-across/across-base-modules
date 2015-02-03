@@ -19,6 +19,7 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
+import com.foreach.across.modules.web.menu.Menu;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,6 +35,8 @@ public class EntityView extends ModelAndView
 	public static final String ATTRIBUTE_ENTITY_LINKS = "entityLinks";
 	public static final String ATTRIBUTE_MESSAGES = "messages";
 	public static final String ATTRIBUTE_PROPERTIES = "properties";
+	public static final String ATTRIBUTE_ENTITY_MENU = "entityMenu";
+	public static final String ATTRIBUTE_PAGE_TITLE = "pageTitle";
 
 	public void addModel( Model model ) {
 		addAllObjects( model.asMap() );
@@ -78,5 +81,21 @@ public class EntityView extends ModelAndView
 
 	public void setEntity( Object entity ) {
 		getModelMap().put( ATTRIBUTE_ENTITY, entity );
+	}
+
+	public void setPageTitle( String pageTitle ) {
+		getModelMap().put( ATTRIBUTE_PAGE_TITLE, pageTitle );
+	}
+
+	public String getPageTitle() {
+		return (String) getModelMap().get( ATTRIBUTE_PAGE_TITLE );
+	}
+
+	public void setEntityMenu( Menu menu ) {
+		getModelMap().put( ATTRIBUTE_ENTITY_MENU, menu );
+	}
+
+	public Menu getEntityMenu() {
+		return (Menu) getModelMap().get( ATTRIBUTE_ENTITY_MENU );
 	}
 }

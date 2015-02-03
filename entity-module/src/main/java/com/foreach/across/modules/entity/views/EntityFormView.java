@@ -26,4 +26,21 @@ public class EntityFormView extends EntityView
 
 	// Will contain the original (unmodified) entity for which the form is being rendered
 	public static final String ATTRIBUTE_ORIGINAL_ENTITY = "originalEntity";
+	public static final String ATTRIBUTE_FORM_ACTION = "formAction";
+
+	public Object getOriginalEntity() {
+		return getModelMap().get( ATTRIBUTE_ORIGINAL_ENTITY );
+	}
+
+	public void setOriginalEntity( Object entity ) {
+		getModelMap().put( ATTRIBUTE_ORIGINAL_ENTITY, entity );
+	}
+
+	public String getFormAction() {
+		return (String) getModelMap().get( ATTRIBUTE_FORM_ACTION );
+	}
+
+	public void setFormAction( String action ) {
+		getModelMap().put( ATTRIBUTE_FORM_ACTION, action );
+	}
 }

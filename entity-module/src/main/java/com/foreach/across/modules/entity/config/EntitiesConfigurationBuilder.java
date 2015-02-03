@@ -41,7 +41,7 @@ public class EntitiesConfigurationBuilder
 
 	private final Map<Object, Object> attributes = new HashMap<>();
 
-	private final Collection<PostProcessor<MutableEntityConfiguration>> postProcessors = new LinkedList<>();
+	private final Collection<PostProcessor<MutableEntityConfiguration<?>>> postProcessors = new LinkedList<>();
 
 	public synchronized EntityConfigurationBuilder entity( Class<?> entityType ) {
 		Assert.notNull( entityType );
@@ -68,7 +68,7 @@ public class EntitiesConfigurationBuilder
 		return this;
 	}
 
-	public void addPostProcessor( PostProcessor<MutableEntityConfiguration> postProcessor ) {
+	public void addPostProcessor( PostProcessor<MutableEntityConfiguration<?>> postProcessor ) {
 		postProcessors.add( postProcessor );
 	}
 
@@ -97,13 +97,13 @@ public class EntitiesConfigurationBuilder
 			builder.apply( entityRegistry );
 		}
 
-		// Apply post processors
+		// Apply post processors - post processors run one after the other for the entire set
 		// todo: if different instance is returned, update registry
-		for ( EntityConfiguration entityConfiguration : entityRegistry.getEntities() ) {
-			MutableEntityConfiguration mutableEntityConfiguration
-					= entityRegistry.getMutableEntityConfiguration( entityConfiguration.getEntityType() );
+		for ( PostProcessor<MutableEntityConfiguration<?>> postProcessor : postProcessors ) {
+			for ( EntityConfiguration entityConfiguration : entityRegistry.getEntities() ) {
+				MutableEntityConfiguration mutableEntityConfiguration
+						= entityRegistry.getMutableEntityConfiguration( entityConfiguration.getEntityType() );
 
-			for ( PostProcessor<MutableEntityConfiguration> postProcessor : postProcessors ) {
 				postProcessor.process( mutableEntityConfiguration );
 			}
 		}
@@ -231,7 +231,8 @@ public class EntitiesConfigurationBuilder
 		protected void apply( EntityPropertyRegistry entityPropertyRegistry ) {
 			for ( Descriptor configured : descriptors.values() ) {
 				EntityPropertyDescriptor descriptor = entityPropertyRegistry.getProperty( configured.name );
-				MutableEntityPropertyDescriptor merged = (MutableEntityPropertyDescriptor) configured.merge( descriptor );
+				MutableEntityPropertyDescriptor merged = (MutableEntityPropertyDescriptor) configured.merge(
+						descriptor );
 
 				entityPropertyRegistry.register( merged );
 			}

@@ -19,17 +19,24 @@
 </head>
 <body th:fragment="content">
 
-<div class="tabbable filled" th:remove="${entityMenu} ? none: tag">
-	<ul class="nav nav-tabs" th:if="${entityMenu}">
+<h4 class="page-header" th:if="${pageTitle != null}" th:text="${pageTitle}">
+	Page title
+</h4>
+
+<div class="tabbable filled"
+     th:with="hasMenu = ${entityMenu != null and entityMenu.hasItems()}"
+     th:remove="${hasMenu} ? none: tag">
+
+	<ul class="nav nav-tabs" th:if="${hasMenu}">
 		<li th:each="tab : ${entityMenu.items}" th:classappend="${tab.selected}? 'active'">
 			<a th:href="@{${tab.url}}" th:text="${tab.title}">tab menu</a>
 		</li>
 	</ul>
 
-	<div class="tab-content" th:remove="${entityMenu} ? none: tag">
+	<div class="tab-content" th:remove="${hasMenu} ? none: tag">
 		<div class="text-right">
 			<a class="btn btn-primary"
-			   th:href="@{${entityLinks.create()}}"
+			   th:href="@{${@adminWeb.path(entityLinks.create())}}"
 			   th:text="|${messages.createAction()}|">create a new entity</a>
 		</div>
 
@@ -72,7 +79,7 @@
 					<span th:utext="${prop.print(entity)}">value</span>
 				</td>
 				<td>
-					<a th:href="@{${entityLinks.update(entity)}}" th:title="${messages.updateAction(entity)}">
+					<a th:href="@{${@adminWeb.path(entityLinks.update(entity))}}" th:title="${messages.updateAction(entity)}">
 						<span class="glyphicon glyphicon-edit"></span>
 					</a>
 				</td>

@@ -28,38 +28,45 @@
 	      th:href="@{${css.data}}"/>
 </head>
 <body>
-<div sec:authorize="isAuthenticated()" class="container">
+<div sec:authorize="isAuthenticated()">
 	<!-- Main menu navigation -->
-	<div class="row">
-		<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-			<div class="container-fluid">
-				<div class="navbar-header admin-navbar-title">
-					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-top-navbar" aria-expanded="true" aria-controls="navbar">
-						<span class="sr-only">Toggle navigation</span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-					<a class="navbar-brand" th:if="${@adminWeb.title}" th:href="@{${@adminWeb.path('/')}}" th:text="${@adminWeb.title}">
-						application name
-					</a>
-				</div>
-				<div id="admin-top-navbar" class="navbar-collapse collapse in" aria-expanded="true">
-					<ul th:replace="th/bootstrap/menu :: navbar(${adminMenu})"></ul>
-
-					<ul class="nav navbar-nav navbar-right">
-						<li><a th:href="@{${@adminWeb.path('/logout')}}">Logout</a></li>
-					</ul>
-				</div>
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header admin-navbar-title">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-top-navbar" aria-expanded="true" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" th:if="${@adminWeb.title}" th:href="@{${@adminWeb.path('/')}}" th:text="${@adminWeb.title}">
+					application name
+				</a>
 			</div>
-		</nav>
-	</div>
+			<div id="admin-top-navbar" class="navbar-collapse collapse in" aria-expanded="true">
+				<ul th:replace="th/bootstrap/menu :: navbar(${adminMenu})"></ul>
+
+				<ul class="nav navbar-nav navbar-right">
+					<li><a th:href="@{${@adminWeb.path('/logout')}}">Logout</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
 	<!-- Content body -->
 	<div th:if="${childPage}" class="content for-navbar-fixed-top">
-		<ol th:replace="th/bootstrap/menu :: breadcrumb (${adminMenu})" th:if="${adminMenu}"></ol>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-2 sidebar no-padding">
+					<div th:replace="th/bootstrap/menu :: panels (${adminMenu})" th:if="${adminMenu}"></div>
+				</div>
+				<div class="col-sm-10 main">
+					<ol th:replace="th/bootstrap/menu :: breadcrumb (${adminMenu})" th:if="${adminMenu}"></ol>
 
-		<div th:replace="${childPage} :: content"></div>
+					<div th:replace="${childPage} :: content"></div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
