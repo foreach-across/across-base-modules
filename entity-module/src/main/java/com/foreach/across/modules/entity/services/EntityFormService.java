@@ -8,6 +8,8 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescr
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.forms.*;
+import com.foreach.across.modules.entity.views.properties.PrintablePropertyGroup;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -37,6 +39,16 @@ public class EntityFormService
 
 			if ( builder != null ) {
 				builder.setMessageCodeResolver( messageCodeResolver );
+
+				// todo: remove test section
+				if ( StringUtils.equals( "name", descriptor.getName() ) ) {
+					PrintablePropertyGroup group = new PrintablePropertyGroup();
+					group.setName( "name" );    // name must be a valid property on the entity, identifiable by beanwrapper
+					group.setLabel( "Name group" );
+					group.getChildren().add( builder.createFormElement() );
+
+					return group;
+				}
 
 				return builder.createFormElement();
 			}
