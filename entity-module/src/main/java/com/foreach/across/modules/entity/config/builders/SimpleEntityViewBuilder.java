@@ -26,12 +26,13 @@ import com.foreach.across.modules.entity.views.EntityView;
 /**
 * @author Arne Vandamme
 */
-public class CommonEntityViewBuilder extends EntityViewBuilder<ConfigurablePropertiesEntityViewFactorySupport>
+public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewFactorySupport, S extends SimpleEntityViewBuilder>
+		extends EntityViewBuilder<T, S>
 {
 	public static class EntityViewPropertyRegistryBuilder
-			extends EntityPropertyRegistryBuilderSupport<CommonEntityViewBuilder>
+			extends EntityPropertyRegistryBuilderSupport<SimpleEntityViewBuilder>
 	{
-		EntityViewPropertyRegistryBuilder( CommonEntityViewBuilder parent ) {
+		EntityViewPropertyRegistryBuilder( SimpleEntityViewBuilder parent ) {
 			super( parent );
 		}
 
@@ -45,9 +46,10 @@ public class CommonEntityViewBuilder extends EntityViewBuilder<ConfigurablePrope
 	private EntityViewPropertyRegistryBuilder propertyRegistryBuilder;
 	private EntityPropertyFilter viewPropertyFilter;
 
-	public CommonEntityViewBuilder template( String template ) {
+	@SuppressWarnings( "unchecked" )
+	public S template( String template ) {
 		this.template = template;
-		return this;
+		return (S) this;
 	}
 
 	public EntityViewPropertyRegistryBuilder properties() {
@@ -62,9 +64,10 @@ public class CommonEntityViewBuilder extends EntityViewBuilder<ConfigurablePrope
 		return properties().filter( propertyNames );
 	}
 
+	@SuppressWarnings( "unchecked" )
 	@Override
-	protected ConfigurablePropertiesEntityViewFactorySupport createFactoryInstance() {
-		return new ConfigurablePropertiesEntityViewFactorySupport()
+	protected T createFactoryInstance() {
+		return (T) new ConfigurablePropertiesEntityViewFactorySupport()
 		{
 			@Override
 			protected void extendViewModel( EntityConfiguration entityConfiguration, EntityView view ) {
@@ -79,7 +82,7 @@ public class CommonEntityViewBuilder extends EntityViewBuilder<ConfigurablePrope
 
 	@Override
 	protected void applyToFactory( EntityConfiguration configuration,
-	                               ConfigurablePropertiesEntityViewFactorySupport factory ) {
+	                               T factory ) {
 		if ( template != null ) {
 			factory.setTemplate( template );
 		}

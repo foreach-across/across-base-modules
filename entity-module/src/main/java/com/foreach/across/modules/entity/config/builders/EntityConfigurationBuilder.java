@@ -20,6 +20,8 @@ import com.foreach.across.modules.entity.registry.EntityConfigurationImpl;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.DefaultEntityPropertyRegistry;
+import com.foreach.across.modules.entity.views.EntityFormView;
+import com.foreach.across.modules.entity.views.EntityListView;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -64,10 +66,78 @@ public class EntityConfigurationBuilder extends EntityBuilderSupport<EntityConfi
 		return propertyRegistryBuilder;
 	}
 
-	public synchronized CommonEntityViewBuilder view( String name ) {
-		return view( name, CommonEntityViewBuilder.class );
+	/**
+	 * Returns a {@link com.foreach.across.modules.entity.config.builders.SimpleEntityViewBuilder} instance for the
+	 * view with the given name.  If there is already another builder for that view that does not extend the
+	 * SimpleEntityViewBuilder, an exception will be thrown.
+	 *
+	 * @param name Name of the view for which to retrieve a builder.
+	 * @return builder instance
+	 */
+	public SimpleEntityViewBuilder view( String name ) {
+		return view( name, SimpleEntityViewBuilder.class );
 	}
 
+	/**
+	 * Returns the default list view builder for the entity being configured.
+	 * A default list view is usually available.
+	 *
+	 * @return builder instance
+	 */
+	public EntityListViewBuilder listView() {
+		return listView( EntityListView.VIEW_NAME );
+	}
+
+	/**
+	 * Returns a list view builder for the view with the given name.
+	 *
+	 * @param name Name of the view for which to retrieve a builder.
+	 * @return builder instance
+	 */
+	public EntityListViewBuilder listView( String name ) {
+		return view( name, EntityListViewBuilder.class );
+	}
+
+	/**
+	 * Returns the default create form view builder for the entity being configured.
+	 * A default create form view is usually available.
+	 *
+	 * @return builder instance
+	 */
+	public EntityFormViewBuilder createFormView() {
+		return formView( EntityFormView.CREATE_VIEW_NAME );
+	}
+
+	/**
+	 * Returns the default update form view builder for the entity being configured.
+	 * A default update form view is usually available.
+	 *
+	 * @return builder instance
+	 */
+	public EntityFormViewBuilder updateFormView() {
+		return formView( EntityFormView.UPDATE_VIEW_NAME );
+	}
+
+	/**
+	 * Returns a form view builder for the view with the given name.
+	 *
+	 * @param name Name of the view for which to retrieve a builder.
+	 * @return builder instance
+	 */
+	public EntityFormViewBuilder formView( String name ) {
+		return view( name, EntityFormViewBuilder.class );
+	}
+
+	/**
+	 * Returns a builder for the view with the specified name.  Any existing builder is assumed to be of the given
+	 * type and a new instance of that type will be created if there is no builder yet.  Note that custom
+	 * builder types *must* have a parameterless constructor.
+	 *
+	 * @param name         Name of the view for which to retrieve a builder.
+	 * @param builderClass Type of the builder.
+	 * @param <T>          Specific builder implementation.
+	 * @return builder instance
+	 */
 	@SuppressWarnings("unchecked")
 	public synchronized <T extends EntityViewBuilder> T view( String name, Class<T> builderClass ) {
 		T builder = (T) viewBuilders.get( name );
@@ -88,6 +158,9 @@ public class EntityConfigurationBuilder extends EntityBuilderSupport<EntityConfi
 		return builder;
 	}
 
+	/**
+	 * @return the parent builder
+	 */
 	public EntitiesConfigurationBuilder and() {
 		return parent;
 	}

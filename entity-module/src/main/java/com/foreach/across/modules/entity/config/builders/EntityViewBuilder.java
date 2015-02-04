@@ -22,7 +22,7 @@ import com.foreach.across.modules.entity.views.EntityViewFactory;
 /**
 * @author Arne Vandamme
 */
-public abstract class EntityViewBuilder<T extends EntityViewFactory>
+public abstract class EntityViewBuilder<T extends EntityViewFactory, S extends EntityViewBuilder>
 {
 	private String name;
 	private EntityConfigurationBuilder parent;
@@ -37,9 +37,10 @@ public abstract class EntityViewBuilder<T extends EntityViewFactory>
 		this.parent = parent;
 	}
 
-	public EntityViewBuilder factory( T entityViewFactory ) {
+	@SuppressWarnings( "unchecked" )
+	public S factory( T entityViewFactory ) {
 		this.factory = entityViewFactory;
-		return this;
+		return (S) this;
 	}
 
 	public EntityConfigurationBuilder and() {

@@ -218,6 +218,11 @@ from `SelectFormElement` instances.
     </div>
 ----
 
+configuration:
+defining a custom view
+registering custom properties
+
+
 
 
 

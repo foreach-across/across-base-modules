@@ -25,7 +25,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -110,18 +112,38 @@ public class TestEntitiesConfigurationBuilder
 
 	@Test
 	public void globalPostProcessorsRunBeforeSeparateConfigurations() {
-		final AtomicInteger index = new AtomicInteger( 0 );
+		final List<String> processors = new ArrayList<>( 5 );
 
 		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
 		{
 			@Override
 			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
-				assertTrue( index.getAndIncrement() <= 1 );
+				processors.add( "one" );
+				return configuration;
+			}
+		} );
+
+		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
+		{
+			@Override
+			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
+				processors.add( "two" );
+				return configuration;
+			}
+		} );
+
+		builder.entity( Client.class ).addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
+		{
+			@Override
+			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
+				processors.add( "three" );
 				return configuration;
 			}
 		} );
 
 		builder.postProcess( entityRegistry );
+
+		assertEquals( Arrays.asList( "one", "one", "two", "two", "three" ), processors );
 	}
 
 	@Test

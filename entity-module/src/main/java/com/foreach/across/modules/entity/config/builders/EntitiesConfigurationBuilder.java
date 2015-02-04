@@ -90,6 +90,9 @@ public class EntitiesConfigurationBuilder extends EntityBuilderSupport<EntitiesC
 	public synchronized void postProcess( MutableEntityRegistry entityRegistry ) {
 		super.postProcess( entityRegistry );
 
+		for ( EntityConfigurationBuilder builder : builders.values() ) {
+			builder.postProcess( entityRegistry );
+		}
 	}
 
 	protected Collection<EntityConfiguration> entitiesToConfigure( MutableEntityRegistry entityRegistry ) {

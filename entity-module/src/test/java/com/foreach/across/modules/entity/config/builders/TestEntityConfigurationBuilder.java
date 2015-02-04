@@ -15,30 +15,39 @@
  */
 package com.foreach.across.modules.entity.config.builders;
 
+import com.foreach.across.modules.entity.config.PostProcessor;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.Company;
+import com.foreach.across.modules.entity.views.EntityFormView;
+import com.foreach.across.modules.entity.views.EntityListView;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Arne Vandamme
  */
 public class TestEntityConfigurationBuilder
 {
-	private EntitiesConfigurationBuilder builders;
+	private EntitiesConfigurationBuilder entities;
 	private MutableEntityRegistry entityRegistry;
 
 	private EntityConfigurationBuilder builder;
 	private MutableEntityConfiguration client, company;
 
 	@Before
-	public void reset() {
-		builders = new EntitiesConfigurationBuilder();
+	public void before() {
+		entities = new EntitiesConfigurationBuilder();
 
 		entityRegistry = new EntityRegistryImpl();
 
@@ -53,6 +62,89 @@ public class TestEntityConfigurationBuilder
 		entityRegistry.register( client );
 		entityRegistry.register( company );
 
-		builder = builders.entity( Client.class );
+		builder = entities.entity( Client.class );
+
+		reset( company );
+	}
+
+	@After
+	public void after() {
+		verifyZeroInteractions( company );
+	}
+
+	@Test
+	public void andReturnsParent() {
+		assertSame( entities, builder.and() );
+	}
+
+	@Test
+	public void attributesAreAdded() {
+		Company companyAttribute = new Company();
+
+		builder.attribute( Company.class, companyAttribute );
+		builder.attribute( "attributeKey", 123 );
+
+		builder.apply( entityRegistry );
+
+		verify( client ).addAttribute( Company.class, companyAttribute );
+		verify( client ).addAttribute( "attributeKey", 123 );
+	}
+
+	@Test
+	public void postProcessorsAreAppliedInOrder() {
+		final List<String> processors = new ArrayList<>( 2 );
+
+		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
+		{
+			@Override
+			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
+				assertSame( client, configuration );
+				processors.add( "one" );
+				return configuration;
+			}
+		} );
+
+		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
+		{
+			@Override
+			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
+				assertSame( client, configuration );
+				processors.add( "two" );
+				return configuration;
+			}
+		} );
+
+		builder.postProcess( entityRegistry );
+
+		assertEquals( Arrays.asList( "one", "two" ), processors );
+	}
+
+	@Test
+	public void viewBuildersAreSpecificType() {
+		EntityViewBuilder one = builder.view( "someView" );
+		assertNotNull( one );
+
+		EntityViewBuilder listOne = builder.listView();
+		assertNotNull( listOne );
+
+		EntityViewBuilder listTwo = builder.listView( EntityListView.VIEW_NAME );
+		assertSame( listOne, listTwo );
+
+		listTwo = builder.listView( "someListView" );
+		assertNotNull( listTwo );
+		assertNotSame( listOne, listTwo );
+
+		listOne = builder.view( "someListView" );
+		assertSame( listTwo, listOne );
+
+		one = builder.createFormView();
+		assertNotNull( one );
+		assertSame( one, builder.formView( EntityFormView.CREATE_VIEW_NAME ) );
+		assertSame( one, builder.view( EntityFormView.CREATE_VIEW_NAME ) );
+
+		one = builder.updateFormView();
+		assertNotNull( one );
+		assertSame( one, builder.formView( EntityFormView.UPDATE_VIEW_NAME ) );
+		assertSame( one, builder.view( EntityFormView.UPDATE_VIEW_NAME ) );
 	}
 }
