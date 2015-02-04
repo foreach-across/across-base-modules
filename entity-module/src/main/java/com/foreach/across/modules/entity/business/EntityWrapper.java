@@ -7,6 +7,7 @@ import java.io.Serializable;
 /**
  * Wraps around an entity instance providing access to the generated properties.
  */
+@Deprecated
 public class EntityWrapper
 {
 	private final EntityConfiguration entityConfiguration;

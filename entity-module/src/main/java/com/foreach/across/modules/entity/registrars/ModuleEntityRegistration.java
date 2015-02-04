@@ -24,13 +24,15 @@ import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.core.events.AcrossContextBootstrappedEvent;
 import com.foreach.across.core.events.AcrossModuleBootstrappedEvent;
-import com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
+import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Takes care of running all registered {@link com.foreach.across.modules.entity.registrars.EntityRegistrar}
@@ -43,7 +45,7 @@ import java.util.Collection;
  *
  * @author Arne Vandamme
  * @see com.foreach.across.modules.entity.config.EntityConfigurer
- * @see com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder.EntityConfigurationBuilder
+ * @see com.foreach.across.modules.entity.config.builders.EntityConfigurationBuilder
  * @see com.foreach.across.modules.entity.registrars.EntityRegistrar
  */
 @AcrossEventHandler
@@ -83,11 +85,24 @@ public class ModuleEntityRegistration
 		AcrossContextBeanRegistry beanRegistry
 				= AcrossContextUtils.getBeanRegistry( contextBootstrappedEvent.getContext() );
 
+		List<EntitiesConfigurationBuilder> builders = new ArrayList<>();
+
+		// Configure the builders
 		for ( EntityConfigurer configurer : beanRegistry.getBeansOfType( EntityConfigurer.class, true ) ) {
 			EntitiesConfigurationBuilder builder = new EntitiesConfigurationBuilder();
 			configurer.configure( builder );
 
+			builders.add( builder );
+		}
+
+		// Apply the builders to the registry
+		for ( EntitiesConfigurationBuilder builder : builders ) {
 			builder.apply( entityRegistry );
+		}
+
+		// Run the builder post processors
+		for ( EntitiesConfigurationBuilder builder : builders ) {
+			builder.postProcess( entityRegistry );
 		}
 	}
 

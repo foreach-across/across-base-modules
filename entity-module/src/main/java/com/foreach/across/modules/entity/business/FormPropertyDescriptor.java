@@ -2,6 +2,7 @@ package com.foreach.across.modules.entity.business;
 
 import org.springframework.core.ResolvableType;
 
+@Deprecated
 public class FormPropertyDescriptor
 {
 	private String name, displayName;

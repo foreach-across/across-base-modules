@@ -1,7 +1,7 @@
 package com.foreach.across.modules.entity.config.modules;
 
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder;
+import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
 import com.foreach.across.modules.entity.config.PostProcessor;
 import com.foreach.across.modules.entity.controllers.AssociatedEntityController;

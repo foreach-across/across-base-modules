@@ -15,6 +15,14 @@
  */
 package com.foreach.across.modules.entity;
 
+import org.junit.Test;
+import org.springframework.data.domain.Sort;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+
 /**
  * Unit test that verifies the behavior of Sort has not been changed from Spring Data.
  * An empty sort is required as otherwise there is a possibility of nullpointer on default pageable.
@@ -23,4 +31,15 @@ package com.foreach.across.modules.entity;
  */
 public class TestSort
 {
+	@Test
+	public void springDataSortBehavior() {
+		List<Sort.Order> orders = new ArrayList<>( 1 );
+		orders.add( new Sort.Order( "name" ) );
+
+		Sort emptySort = new Sort( orders );
+
+		orders.clear();
+
+		assertFalse( emptySort.iterator().hasNext() );
+	}
 }

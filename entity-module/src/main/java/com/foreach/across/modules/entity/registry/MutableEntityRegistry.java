@@ -18,11 +18,11 @@ package com.foreach.across.modules.entity.registry;
 /**
  * Base interface for managing registered entity types.  Usually only automatic registration interacts directly
  * with the EntityRegistry.  Manual configuration or customization should be done using the
- * {@link com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder.EntityConfigurationBuilder} classes.
+ * {@link com.foreach.across.modules.entity.config.builders.EntityConfigurationBuilder} classes.
  *
  * @author Arne Vandamme
  * @see com.foreach.across.modules.entity.registrars.repository.RepositoryEntityRegistrar
- * @see com.foreach.across.modules.entity.config.EntitiesConfigurationBuilder.EntityConfigurationBuilder
+ * @see com.foreach.across.modules.entity.config.builders.EntityConfigurationBuilder
  */
 public interface MutableEntityRegistry extends EntityRegistry
 {

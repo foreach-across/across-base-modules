@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.ArrayList;
 import java.util.Collection;
 
+// todo: current implementation is not uptodate
 @AdminWebController
 @RequestMapping("/entities/{entityConfig}/{entityId}")
 public class EntityPropertiesController
