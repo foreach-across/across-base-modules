@@ -80,6 +80,7 @@ public class EntityModuleConfiguration
 	}
 
 	@Bean
+	@Exposed
 	public EntityPropertyRegistries entityPropertyRegistries() {
 		return new EntityPropertyRegistries();
 	}
