@@ -18,10 +18,7 @@ package com.foreach.across.modules.entity.views;
 import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilter;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilters;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
+import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.registry.properties.meta.PropertyPersistenceMetadata;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.properties.ConversionServicePrintablePropertyView;
@@ -43,6 +40,7 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 		extends SimpleEntityViewFactorySupport<T>
 {
 
+	private EntityPropertyRegistries entityPropertyRegistries;
 	private MutableEntityRegistry entityRegistry;
 
 	private ConversionService conversionService;
@@ -75,6 +73,11 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 	}
 
 	@Autowired
+	public void setEntityPropertyRegistries( EntityPropertyRegistries entityPropertyRegistries ) {
+		this.entityPropertyRegistries = entityPropertyRegistries;
+	}
+
+	@Autowired
 	public void setEntityRegistry( MutableEntityRegistry entityRegistry ) {
 		this.entityRegistry = entityRegistry;
 	}
@@ -96,6 +99,22 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 		extendViewModel( entityConfiguration, view );
 	}
 
+	private List<PrintablePropertyView> getEntityProperties( Class<?> entityType,
+	                                                         EntityMessageCodeResolver messageCodeResolver,
+	                                                         EntityConfiguration entityConfiguration ) {
+		List<PrintablePropertyView> propertyViews = new ArrayList<>();
+		EntityPropertyRegistry registry = entityPropertyRegistries.getRegistry( entityType );
+		for ( EntityPropertyDescriptor descriptor : registry.getProperties() ) {
+			descriptor.getDisplayName();
+			PrintablePropertyView propertyView = createPropertyView( entityConfiguration, descriptor,
+			                                                         messageCodeResolver );
+			if ( propertyView != null ) {
+				propertyViews.add( propertyView );
+			}
+		}
+		return propertyViews;
+	}
+
 	private List<PrintablePropertyView> getEntityProperties( EntityConfiguration entityConfiguration,
 	                                                         EntityMessageCodeResolver messageCodeResolver ) {
 		EntityPropertyFilter filter = getPropertyFilter() != null ? getPropertyFilter() : EntityPropertyFilters.NoOp;
@@ -115,8 +134,7 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 			PropertyPersistenceMetadata propertyPersistenceMetadata = descriptor.getAttribute(
 					EntityAttributes.PROPERTY_PERSISTENCE_METADATA, PropertyPersistenceMetadata.class );
 			if ( propertyPersistenceMetadata != null && propertyPersistenceMetadata.isEmbedded() ) {
-				propertyViews.addAll( getEntityProperties( entityRegistry.getMutableEntityConfiguration(
-						descriptor.getPropertyType() ), messageCodeResolver ) );
+				propertyViews.addAll( getEntityProperties( descriptor.getPropertyType(), messageCodeResolver, entityConfiguration ) );
 			}
 			else {
 				PrintablePropertyView propertyView = createPropertyView( entityConfiguration, descriptor,
