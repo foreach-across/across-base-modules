@@ -38,7 +38,6 @@ import java.util.List;
 public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends EntityView>
 		extends SimpleEntityViewFactorySupport<T>
 {
-
 	private EntityPropertyRegistries entityPropertyRegistries;
 
 	private ConversionService conversionService;
@@ -96,17 +95,17 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 	* @deprecated temporary solution until we have the concept of grouped attributes
 	*/
 	@Deprecated
-	private List<PrintablePropertyView> getEntityProperties( Class<?> entityType,
-	                                                         String prefix,
-	                                                         EntityMessageCodeResolver messageCodeResolver,
-	                                                         EntityConfiguration entityConfiguration ) {
-		List<PrintablePropertyView> propertyViews = new ArrayList<>();
+	private List<ViewElement> getEntityProperties( Class<?> entityType,
+	                                               String prefix,
+	                                               EntityMessageCodeResolver messageCodeResolver,
+	                                               EntityConfiguration entityConfiguration ) {
+		List<ViewElement> propertyViews = new ArrayList<>();
 		EntityPropertyRegistry registry = entityPropertyRegistries.getRegistry( entityType );
 		for ( EntityPropertyDescriptor descriptor : registry.getProperties() ) {
 			EntityPropertyDescriptor parentPropertyDescriptor = getPropertyRegistry().getProperty(
 					prefix + "." + descriptor.getName() );
-			PrintablePropertyView propertyView = createPropertyView( entityConfiguration, parentPropertyDescriptor,
-			                                                         messageCodeResolver );
+			ViewElement propertyView = createPropertyView( entityConfiguration, parentPropertyDescriptor,
+			                                               messageCodeResolver );
 			if ( propertyView != null ) {
 				propertyViews.add( propertyView );
 			}
@@ -114,8 +113,8 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 		return propertyViews;
 	}
 
-	private List<PrintablePropertyView> getEntityProperties( EntityConfiguration entityConfiguration,
-	                                                         EntityMessageCodeResolver messageCodeResolver ) {
+	private List<ViewElement> getEntityProperties( EntityConfiguration entityConfiguration,
+	                                               EntityMessageCodeResolver messageCodeResolver ) {
 		EntityPropertyFilter filter = getPropertyFilter() != null ? getPropertyFilter() : EntityPropertyFilters.NoOp;
 
 		List<EntityPropertyDescriptor> descriptors;
@@ -138,8 +137,8 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 				                                           messageCodeResolver, entityConfiguration ) );
 			}
 			else {
-				PrintablePropertyView propertyView = createPropertyView( entityConfiguration, descriptor,
-				                                                         messageCodeResolver );
+				ViewElement propertyView = createPropertyView( entityConfiguration, descriptor,
+				                                               messageCodeResolver );
 				if ( propertyView != null ) {
 					propertyViews.add( propertyView );
 				}
