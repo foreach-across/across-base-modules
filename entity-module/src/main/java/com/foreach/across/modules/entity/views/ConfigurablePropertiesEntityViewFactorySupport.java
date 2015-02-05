@@ -19,11 +19,10 @@ import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.registry.properties.meta.PropertyPersistenceMetadata;
+import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.properties.ConversionServicePrintablePropertyView;
-import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
+import com.foreach.across.modules.entity.views.elements.ViewElement;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 
 import java.util.ArrayList;
 import java.util.Comparator;

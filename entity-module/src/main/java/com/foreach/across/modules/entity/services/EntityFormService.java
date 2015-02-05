@@ -6,10 +6,12 @@ import com.foreach.across.modules.entity.business.FormPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
+import com.foreach.across.modules.entity.registry.properties.MergingEntityPropertyRegistry;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.forms.*;
-import com.foreach.across.modules.entity.views.properties.PrintablePropertyGroup;
-import org.apache.commons.lang3.StringUtils;
+import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
+import com.foreach.across.modules.entity.views.EntityFormViewFactory;
+import com.foreach.across.modules.entity.views.EntityListViewFactory;
+import com.foreach.across.modules.entity.views.elements.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,12 +69,12 @@ public class EntityFormService
 		return null;
 	}
 
-	public PrintablePropertyView createPrintablePropertyView( EntityConfiguration entityConfiguration,
-	                                                          EntityPropertyDescriptor descriptor,
-	                                                          EntityMessageCodeResolver messageCodeResolver,
-	                                                          ConfigurablePropertiesEntityViewFactorySupport factory ) {
+	public ViewElement createPrintablePropertyView( EntityConfiguration entityConfiguration,
+	                                                EntityPropertyDescriptor descriptor,
+	                                                EntityMessageCodeResolver messageCodeResolver,
+	                                                ConfigurablePropertiesEntityViewFactorySupport factory ) {
 		if ( factory instanceof EntityListViewFactory ) {
-			return new ConversionServicePrintablePropertyView( messageCodeResolver, conversionService, descriptor );
+			return new ConversionServiceViewElement( messageCodeResolver, conversionService, descriptor );
 		}
 		else if ( factory instanceof EntityFormViewFactory ) {
 
