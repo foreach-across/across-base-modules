@@ -146,8 +146,8 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 			EntityConfiguration entityConfiguration,
 			EntityPropertyDescriptor descriptor,
 			EntityMessageCodeResolver messageCodeResolver ) {
-		return entityFormService.createPrintablePropertyView( entityConfiguration, descriptor, messageCodeResolver,
-		                                                      this );
+		return entityFormService.createViewElement( entityConfiguration, descriptor, messageCodeResolver,
+		                                            this );
 	}
 
 	protected abstract void extendViewModel( EntityConfiguration entityConfiguration, T view );

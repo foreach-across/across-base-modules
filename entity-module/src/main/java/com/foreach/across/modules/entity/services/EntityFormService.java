@@ -90,10 +90,10 @@ public class EntityFormService
 		return builderFactory != null ? builderFactory.createBuilder() : null;
 	}
 
-	public ViewElement createPrintablePropertyView( EntityConfiguration entityConfiguration,
-	                                                EntityPropertyDescriptor descriptor,
-	                                                EntityMessageCodeResolver messageCodeResolver,
-	                                                ConfigurablePropertiesEntityViewFactorySupport factory ) {
+	public ViewElement createViewElement( EntityConfiguration entityConfiguration,
+	                                      EntityPropertyDescriptor descriptor,
+	                                      EntityMessageCodeResolver messageCodeResolver,
+	                                      ConfigurablePropertiesEntityViewFactorySupport factory ) {
 		if ( factory instanceof EntityListViewFactory ) {
 			return new ConversionServiceViewElement( messageCodeResolver, conversionService, descriptor );
 		}
