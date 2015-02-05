@@ -6,17 +6,12 @@ import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.entity.views.support.SpelValueFetcher;
 import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.Repository;
-import org.springframework.format.support.DefaultFormattingConversionService;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -26,22 +21,8 @@ import java.util.LinkedList;
  */
 public class RepositoryEntityViewsBuilder
 {
-	private static final Logger LOG = LoggerFactory.getLogger( RepositoryEntityViewsBuilder.class );
-
 	@Autowired
 	private BeanFactory beanFactory;
-
-	@Autowired(required = false)
-	private ConversionService conversionService;
-
-	@PostConstruct
-	protected void createDefaultConversionService() {
-		if ( conversionService == null ) {
-			LOG.info(
-					"No ConversionService found for the EntityModule - creating default conversion service for views." );
-			conversionService = new DefaultFormattingConversionService();
-		}
-	}
 
 	public void buildViews( MutableEntityConfiguration entityConfiguration ) {
 		buildCreateView( entityConfiguration );
@@ -97,7 +78,6 @@ public class RepositoryEntityViewsBuilder
 
 	private void buildListView( MutableEntityConfiguration entityConfiguration, CrudRepository repository ) {
 		EntityListViewFactory viewFactory = beanFactory.getBean( EntityListViewFactory.class );
-		viewFactory.setConversionService( conversionService );
 		viewFactory.setMessagePrefixes( "entityViews.listView", "entityViews" );
 
 		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(

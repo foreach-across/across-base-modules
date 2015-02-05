@@ -20,8 +20,8 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.registry.properties.meta.PropertyPersistenceMetadata;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.elements.ConversionServiceViewElement;
-import com.foreach.across.modules.entity.views.elements.ViewElement;
+import com.foreach.across.modules.entity.views.properties.ConversionServicePrintablePropertyView;
+import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 
@@ -38,9 +38,12 @@ import java.util.List;
 public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends EntityView>
 		extends SimpleEntityViewFactorySupport<T>
 {
+
 	private EntityPropertyRegistries entityPropertyRegistries;
 
-	private ConversionService conversionService;
+	@Autowired
+	private EntityFormService entityFormService;
+
 	private EntityPropertyRegistry propertyRegistry;
 	private EntityPropertyFilter propertyFilter;
 	private Comparator<EntityPropertyDescriptor> propertyComparator;
@@ -72,14 +75,6 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 	@Autowired
 	public void setEntityPropertyRegistries( EntityPropertyRegistries entityPropertyRegistries ) {
 		this.entityPropertyRegistries = entityPropertyRegistries;
-	}
-
-	/**
-	 * @param conversionService The conversion service to attach to the property views.
-	 */
-	@Autowired(required = false)
-	public void setConversionService( ConversionService conversionService ) {
-		this.conversionService = conversionService;
 	}
 
 	@Override
@@ -152,7 +147,8 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 			EntityConfiguration entityConfiguration,
 			EntityPropertyDescriptor descriptor,
 			EntityMessageCodeResolver messageCodeResolver ) {
-		return new ConversionServiceViewElement( messageCodeResolver, conversionService, descriptor );
+		return entityFormService.createPrintablePropertyView( entityConfiguration, descriptor, messageCodeResolver,
+		                                                      this );
 	}
 
 	protected abstract void extendViewModel( EntityConfiguration entityConfiguration, T view );

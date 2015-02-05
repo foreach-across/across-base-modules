@@ -17,20 +17,12 @@ package com.foreach.across.modules.entity.views;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.services.EntityFormService;
-import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.elements.ViewElement;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Arne Vandamme
  */
 public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFactorySupport<EntityFormView>
 {
-	@Autowired
-	private EntityFormService formFactory;
-
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void extendViewModel( EntityConfiguration entityConfiguration, EntityFormView view ) {
@@ -61,14 +53,6 @@ public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFacto
 		}
 
 		return entity;
-	}
-
-	@Override
-	protected ViewElement createPropertyView( EntityConfiguration entityConfiguration,
-	                                                    EntityPropertyDescriptor descriptor,
-	                                                    EntityMessageCodeResolver messageCodeResolver ) {
-		return formFactory.createFormElement( entityConfiguration, getPropertyRegistry(), descriptor,
-		                                      messageCodeResolver );
 	}
 
 	@Override

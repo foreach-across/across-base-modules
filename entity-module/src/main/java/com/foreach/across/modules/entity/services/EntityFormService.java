@@ -7,9 +7,17 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.elements.*;
+import com.foreach.across.modules.entity.views.forms.*;
+import com.foreach.across.modules.entity.views.properties.PrintablePropertyGroup;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,11 +27,25 @@ import java.util.List;
 @Service
 public class EntityFormService
 {
+	private static final Logger LOG = LoggerFactory.getLogger( EntityFormService.class );
+
 	@RefreshableCollection(incremental = true, includeModuleInternals = true)
 	private Collection<ViewElementTypeLookupStrategy> elementTypeLookupStrategies;
 
 	@RefreshableCollection(incremental = true, includeModuleInternals = true)
 	private Collection<ViewElementBuilderFactoryAssembler> builderFactoryAssemblers;
+
+	@Autowired(required = false)
+	private ConversionService conversionService;
+
+	@PostConstruct
+	protected void createDefaultConversionService() {
+		if ( conversionService == null ) {
+			LOG.info(
+					"No ConversionService found for the EntityModule - creating default conversion service for views." );
+			conversionService = new DefaultFormattingConversionService();
+		}
+	}
 
 	public ViewElement createFormElement( EntityConfiguration entityConfiguration,
 	                                      EntityPropertyRegistry entityPropertyRegistry,
@@ -42,6 +64,25 @@ public class EntityFormService
 			}
 		}
 
+		return null;
+	}
+
+	public PrintablePropertyView createPrintablePropertyView( EntityConfiguration entityConfiguration,
+	                                                          EntityPropertyDescriptor descriptor,
+	                                                          EntityMessageCodeResolver messageCodeResolver,
+	                                                          ConfigurablePropertiesEntityViewFactorySupport factory ) {
+		if ( factory instanceof EntityListViewFactory ) {
+			return new ConversionServicePrintablePropertyView( messageCodeResolver, conversionService, descriptor );
+		}
+		else if ( factory instanceof EntityFormViewFactory ) {
+
+			EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(
+					entityConfiguration.getPropertyRegistry()
+			);
+
+			return createFormElement( entityConfiguration, registry, descriptor,
+			                          messageCodeResolver );
+		}
 		return null;
 	}
 
