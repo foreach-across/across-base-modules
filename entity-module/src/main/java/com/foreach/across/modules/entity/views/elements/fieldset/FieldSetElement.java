@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
  * Represents a described group of other {@link com.foreach.across.modules.entity.views.elements.ViewElement}
  * instances.
  */
-public class FieldSetElement extends ViewElements implements ViewElement
+public class FieldsetElement extends ViewElements implements ViewElement
 {
 	public static final String TYPE = CommonViewElements.FIELDSET;
 
