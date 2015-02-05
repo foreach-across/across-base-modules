@@ -15,6 +15,9 @@
  */
 package com.foreach.across.modules.entity.registry.properties;
 
+import com.foreach.across.modules.entity.registry.handlers.EntityPropertyRegistryValidationConstraintHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +29,9 @@ import java.util.Map;
  */
 public class EntityPropertyRegistries
 {
+	@Autowired
+	private EntityPropertyRegistryValidationConstraintHandler validationConstraintHandler;
+
 	private final Map<Class<?>, EntityPropertyRegistry> registries = new HashMap<>();
 
 	public EntityPropertyRegistry getRegistry( Class<?> entityType ) {
@@ -37,6 +43,9 @@ public class EntityPropertyRegistries
 
 		if ( registry == null && createIfNotFound ) {
 			registry = new DefaultEntityPropertyRegistry( entityType, this );
+
+			validationConstraintHandler.handle( entityType, (MutableEntityPropertyRegistry) registry );
+
 			registries.put( entityType, registry );
 		}
 

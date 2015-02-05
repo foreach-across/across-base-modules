@@ -2,14 +2,25 @@ package com.foreach.across.modules.entity.generators.label;
 
 import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.views.support.SpelValueFetcher;
+import com.foreach.common.test.MockedLoader;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader = MockedLoader.class, classes = {TestProperties.Configuration.class})
 public class TestProperties
 {
+	@Autowired
+	private EntityPropertyRegistries entityPropertyRegistries;
+
 	@Test
 	public void propertiesAreDetected() {
 		EntityPropertyRegistry registry = new DefaultEntityPropertyRegistry( Customer.class, null );
@@ -133,8 +144,7 @@ public class TestProperties
 
 	@Test
 	public void includeNestedProperties() {
-		EntityPropertyRegistries registries = new EntityPropertyRegistries();
-		EntityPropertyRegistry registry = registries.getRegistry( Customer.class );
+		EntityPropertyRegistry registry = entityPropertyRegistries.getRegistry( Customer.class );
 
 		List<EntityPropertyDescriptor> descriptors = registry.getProperties(
 				EntityPropertyFilters.includeOrdered( "name", "address.street" )
@@ -147,8 +157,7 @@ public class TestProperties
 
 	@Test
 	public void valueFetchersAreCreated() {
-		EntityPropertyRegistries registries = new EntityPropertyRegistries();
-		EntityPropertyRegistry registry = registries.getRegistry( Customer.class );
+		EntityPropertyRegistry registry = entityPropertyRegistries.getRegistry( Customer.class );
 
 		Customer customer = new Customer();
 		customer.setName( "some name" );
@@ -169,8 +178,7 @@ public class TestProperties
 
 	@Test
 	public void customPropertyAndValueFetcher() {
-		EntityPropertyRegistries registries = new EntityPropertyRegistries();
-		EntityPropertyRegistry parent = registries.getRegistry( Customer.class );
+		EntityPropertyRegistry parent = entityPropertyRegistries.getRegistry( Customer.class );
 		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry( parent );
 
 		SimpleEntityPropertyDescriptor calculated = new SimpleEntityPropertyDescriptor();
@@ -266,6 +274,15 @@ public class TestProperties
 
 		public void setSomeValue( String someValue ) {
 			value = someValue;
+		}
+	}
+
+	@org.springframework.context.annotation.Configuration
+	public static class Configuration
+	{
+		@Bean
+		public EntityPropertyRegistries entityPropertyRegistries() {
+			return new EntityPropertyRegistries();
 		}
 	}
 }

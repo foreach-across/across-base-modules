@@ -15,11 +15,14 @@
  */
 package com.foreach.across.modules.entity.views;
 
+import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilter;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilters;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
+import com.foreach.across.modules.entity.registry.properties.meta.PropertyPersistenceMetadata;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.properties.ConversionServicePrintablePropertyView;
 import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
@@ -39,6 +42,9 @@ import java.util.List;
 public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends EntityView>
 		extends SimpleEntityViewFactorySupport<T>
 {
+
+	private MutableEntityRegistry entityRegistry;
+
 	private ConversionService conversionService;
 	private EntityPropertyRegistry propertyRegistry;
 	private EntityPropertyFilter propertyFilter;
@@ -66,6 +72,11 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 
 	public void setPropertyComparator( Comparator<EntityPropertyDescriptor> propertyComparator ) {
 		this.propertyComparator = propertyComparator;
+	}
+
+	@Autowired
+	public void setEntityRegistry( MutableEntityRegistry entityRegistry ) {
+		this.entityRegistry = entityRegistry;
 	}
 
 	/**
@@ -101,11 +112,18 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 		List<PrintablePropertyView> propertyViews = new ArrayList<>( descriptors.size() );
 
 		for ( EntityPropertyDescriptor descriptor : descriptors ) {
-			PrintablePropertyView propertyView = createPropertyView( entityConfiguration, descriptor,
-			                                                         messageCodeResolver );
-
-			if ( propertyView != null ) {
-				propertyViews.add( propertyView );
+			PropertyPersistenceMetadata propertyPersistenceMetadata = descriptor.getAttribute(
+					EntityAttributes.PROPERTY_PERSISTENCE_METADATA, PropertyPersistenceMetadata.class );
+			if ( propertyPersistenceMetadata != null && propertyPersistenceMetadata.isEmbedded() ) {
+				propertyViews.addAll( getEntityProperties( entityRegistry.getMutableEntityConfiguration(
+						descriptor.getPropertyType() ), messageCodeResolver ) );
+			}
+			else {
+				PrintablePropertyView propertyView = createPropertyView( entityConfiguration, descriptor,
+				                                                         messageCodeResolver );
+				if ( propertyView != null ) {
+					propertyViews.add( propertyView );
+				}
 			}
 		}
 
