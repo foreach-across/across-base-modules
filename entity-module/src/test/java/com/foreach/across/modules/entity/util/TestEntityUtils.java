@@ -39,4 +39,18 @@ public class TestEntityUtils
 		assertEquals( "Some field name", EntityUtils.generateDisplayName( "_someFieldName" ) );
 		assertEquals( "Test for me", EntityUtils.generateDisplayName( "_TEST_FOR_ME" ) );
 	}
+
+	@Test
+	public void mergeDisplayNames() {
+		assertEquals( "Name", EntityUtils.combineDisplayNames( "name" ) );
+		assertEquals( "Name principal name", EntityUtils.combineDisplayNames( "name", "principalName" ) );
+		assertEquals( "Address street customer address zip code", EntityUtils.combineDisplayNames( "address.street",
+		                                                                                           "customer.address.zipCode" ) );
+		assertEquals( "Groups size text with html members 0 length", EntityUtils.combineDisplayNames( "groups.size()",
+		                                                                                              "textWithHTML",
+		                                                                                              "members[0].length" ) );
+		assertEquals( "Basic security principal permission group some field name test for me",
+		              EntityUtils.combineDisplayNames( "BasicSecurityPrincipal", "PermissionGroup", "_someFieldName",
+		                                               "_TEST_FOR_ME" ) );
+	}
 }

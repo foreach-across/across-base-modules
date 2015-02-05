@@ -1,5 +1,6 @@
 package com.foreach.across.modules.entity.registry.properties;
 
+import com.foreach.across.modules.entity.util.EntityUtils;
 import com.foreach.across.modules.entity.views.support.NestedValueFetcher;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -152,7 +153,7 @@ public class DefaultEntityPropertyRegistry extends EntityPropertyRegistrySupport
 	                                                        EntityPropertyDescriptor child ) {
 		SimpleEntityPropertyDescriptor descriptor = new SimpleEntityPropertyDescriptor();
 		descriptor.setName( name );
-		descriptor.setDisplayName( name );
+		descriptor.setDisplayName( child.getDisplayName() );
 		descriptor.setPropertyType( child.getPropertyType() );
 		descriptor.setPropertyResolvableType( child.getPropertyResolvableType() );
 		descriptor.setReadable( child.isReadable() );
@@ -162,6 +163,8 @@ public class DefaultEntityPropertyRegistry extends EntityPropertyRegistrySupport
 		if ( descriptor.isReadable() ) {
 			descriptor.setValueFetcher( new NestedValueFetcher( parent.getValueFetcher(), child.getValueFetcher() ) );
 		}
+
+		descriptor.addAllAttributes( child.getAttributes() );
 
 		return descriptor;
 	}

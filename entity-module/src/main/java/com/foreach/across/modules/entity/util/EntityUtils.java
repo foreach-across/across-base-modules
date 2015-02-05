@@ -32,4 +32,13 @@ public class EntityUtils
 			return null;
 		}
 	}
+
+	public static String combineDisplayNames( String first, String... propertyNames ) {
+		List<String> finished = new LinkedList<>();
+		finished.add( generateDisplayName( first ) );
+		for ( String name : propertyNames ) {
+			finished.add( generateDisplayName( name ).toLowerCase() );
+		}
+		return StringUtils.join( finished, " " );
+	}
 }

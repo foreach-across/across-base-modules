@@ -27,7 +27,7 @@ public abstract class AttributeSupport implements ReadableAttributes, WritableAt
 			Assert.notNull( attribute.getKey() );
 
 			if ( attribute.getKey() instanceof String || attribute.getKey() instanceof Class ) {
-				attributes.put( attribute.getKey(), attribute.getValue() );
+				this.attributes.put( attribute.getKey(), attribute.getValue() );
 			}
 			else {
 				throw new RuntimeException(
