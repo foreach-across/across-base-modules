@@ -17,7 +17,6 @@ package com.foreach.across.modules.entity.views;
 
 import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.registry.properties.meta.PropertyPersistenceMetadata;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
@@ -41,7 +40,6 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 {
 
 	private EntityPropertyRegistries entityPropertyRegistries;
-	private MutableEntityRegistry entityRegistry;
 
 	private ConversionService conversionService;
 	private EntityPropertyRegistry propertyRegistry;
@@ -77,11 +75,6 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 		this.entityPropertyRegistries = entityPropertyRegistries;
 	}
 
-	@Autowired
-	public void setEntityRegistry( MutableEntityRegistry entityRegistry ) {
-		this.entityRegistry = entityRegistry;
-	}
-
 	/**
 	 * @param conversionService The conversion service to attach to the property views.
 	 */
@@ -99,14 +92,20 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 		extendViewModel( entityConfiguration, view );
 	}
 
+	/*
+	* @deprecated temporary solution until we have the concept of grouped attributes
+	*/
+	@Deprecated
 	private List<PrintablePropertyView> getEntityProperties( Class<?> entityType,
+	                                                         String prefix,
 	                                                         EntityMessageCodeResolver messageCodeResolver,
 	                                                         EntityConfiguration entityConfiguration ) {
 		List<PrintablePropertyView> propertyViews = new ArrayList<>();
 		EntityPropertyRegistry registry = entityPropertyRegistries.getRegistry( entityType );
 		for ( EntityPropertyDescriptor descriptor : registry.getProperties() ) {
-			descriptor.getDisplayName();
-			PrintablePropertyView propertyView = createPropertyView( entityConfiguration, descriptor,
+			EntityPropertyDescriptor parentPropertyDescriptor = getPropertyRegistry().getProperty(
+					prefix + "." + descriptor.getName() );
+			PrintablePropertyView propertyView = createPropertyView( entityConfiguration, parentPropertyDescriptor,
 			                                                         messageCodeResolver );
 			if ( propertyView != null ) {
 				propertyViews.add( propertyView );
@@ -134,7 +133,9 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 			PropertyPersistenceMetadata propertyPersistenceMetadata = descriptor.getAttribute(
 					EntityAttributes.PROPERTY_PERSISTENCE_METADATA, PropertyPersistenceMetadata.class );
 			if ( propertyPersistenceMetadata != null && propertyPersistenceMetadata.isEmbedded() ) {
-				propertyViews.addAll( getEntityProperties( descriptor.getPropertyType(), messageCodeResolver, entityConfiguration ) );
+				// TODO remove this temporary solution
+				propertyViews.addAll( getEntityProperties( descriptor.getPropertyType(), descriptor.getName(),
+				                                           messageCodeResolver, entityConfiguration ) );
 			}
 			else {
 				PrintablePropertyView propertyView = createPropertyView( entityConfiguration, descriptor,
