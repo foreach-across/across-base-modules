@@ -13,11 +13,11 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegis
 import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.views.EntityFormViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
-import com.foreach.across.modules.entity.views.forms.elements.CommonFormElementTypeLookupStrategy;
-import com.foreach.across.modules.entity.views.forms.elements.checkbox.CheckboxFormElementBuilderFactoryAssembler;
-import com.foreach.across.modules.entity.views.forms.elements.hidden.HiddenFormElementBuilderFactoryAssembler;
-import com.foreach.across.modules.entity.views.forms.elements.select.SelectFormElementBuilderFactoryAssembler;
-import com.foreach.across.modules.entity.views.forms.elements.textbox.TextboxFormElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.elements.CommonViewElementTypeLookupStrategy;
+import com.foreach.across.modules.entity.views.elements.form.checkbox.CheckboxFormElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.elements.form.hidden.HiddenFormElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.elements.form.select.SelectFormElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.elements.form.textbox.TextboxFormElementBuilderFactoryAssembler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,8 +110,8 @@ public class EntityModuleConfiguration
 	}
 
 	@Bean
-	public CommonFormElementTypeLookupStrategy commonFormElementTypeLookupStrategy() {
-		return new CommonFormElementTypeLookupStrategy();
+	public CommonViewElementTypeLookupStrategy commonFormElementTypeLookupStrategy() {
+		return new CommonViewElementTypeLookupStrategy();
 	}
 
 	@Bean

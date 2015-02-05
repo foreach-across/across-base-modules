@@ -16,7 +16,7 @@
 package com.foreach.across.modules.entity.views;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
+import com.foreach.across.modules.entity.views.elements.ViewElement;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.web.menu.Menu;
@@ -67,11 +67,11 @@ public class EntityView extends ModelAndView
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends PrintablePropertyView> List<T> getEntityProperties() {
+	public <T extends ViewElement> List<T> getEntityProperties() {
 		return (List<T>) getModelMap().get( ATTRIBUTE_PROPERTIES );
 	}
 
-	public <T extends PrintablePropertyView> void setEntityProperties( List<T> entityProperties ) {
+	public <T extends ViewElement> void setEntityProperties( List<T> entityProperties ) {
 		getModelMap().put( ATTRIBUTE_PROPERTIES, entityProperties );
 	}
 

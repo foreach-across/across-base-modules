@@ -20,7 +20,7 @@ import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
+import com.foreach.across.modules.entity.views.elements.ViewElement;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -64,7 +64,7 @@ public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFacto
 	}
 
 	@Override
-	protected PrintablePropertyView createPropertyView( EntityConfiguration entityConfiguration,
+	protected ViewElement createPropertyView( EntityConfiguration entityConfiguration,
 	                                                    EntityPropertyDescriptor descriptor,
 	                                                    EntityMessageCodeResolver messageCodeResolver ) {
 		return formFactory.createFormElement( entityConfiguration, getPropertyRegistry(), descriptor,

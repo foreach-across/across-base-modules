@@ -13,7 +13,7 @@
 		<!--/* label */-->
 		<div th:if="${element.elementType eq 'text'}">
 			<label th:for="${element.name}" th:text="${element.label}">label</label>
-			<div th:text="${element.value(entity)}">text value</div>
+			<div th:utext="${element.print(entity)}">text value</div>
 		</div>
 		<!--/* hidden */-->
 		<div th:if="${element.elementType eq 'hidden'}">

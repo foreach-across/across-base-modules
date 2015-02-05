@@ -19,7 +19,7 @@ import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
+import com.foreach.across.modules.entity.views.elements.ViewElement;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.views.support.ListViewEntityMessages;
 import org.springframework.data.domain.Page;
@@ -130,10 +130,10 @@ public class EntityListViewFactory extends ConfigurablePropertiesEntityViewFacto
 	}
 
 	@Override
-	protected PrintablePropertyView createPropertyView( EntityConfiguration entityConfiguration,
+	protected ViewElement createPropertyView( EntityConfiguration entityConfiguration,
 	                                                    EntityPropertyDescriptor descriptor,
 	                                                    EntityMessageCodeResolver messageCodeResolver ) {
-		SortablePropertyView sortablePropertyView = new SortablePropertyView(
+		SortablePropertyViewElement sortablePropertyView = new SortablePropertyViewElement(
 				super.createPropertyView( entityConfiguration, descriptor, messageCodeResolver )
 		);
 		sortablePropertyView.setSortableProperty( determineSortableProperty( descriptor ) );
@@ -151,13 +151,19 @@ public class EntityListViewFactory extends ConfigurablePropertiesEntityViewFacto
 		return sortableProperty;
 	}
 
-	public static class SortablePropertyView implements PrintablePropertyView
+	@Deprecated
+	public static class SortablePropertyViewElement implements ViewElement
 	{
-		private final PrintablePropertyView wrapped;
+		private final ViewElement wrapped;
 		private String sortableProperty;
 
-		public SortablePropertyView( PrintablePropertyView wrapped ) {
+		public SortablePropertyViewElement( ViewElement wrapped ) {
 			this.wrapped = wrapped;
+		}
+
+		@Override
+		public String getElementType() {
+			return "sortable-property";
 		}
 
 		@Override

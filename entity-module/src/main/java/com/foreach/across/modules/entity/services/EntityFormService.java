@@ -7,9 +7,7 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.forms.*;
-import com.foreach.across.modules.entity.views.properties.PrintablePropertyGroup;
-import org.apache.commons.lang3.StringUtils;
+import com.foreach.across.modules.entity.views.elements.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -22,48 +20,38 @@ import java.util.List;
 public class EntityFormService
 {
 	@RefreshableCollection(incremental = true, includeModuleInternals = true)
-	private Collection<FormElementTypeLookupStrategy> elementTypeLookupStrategies;
+	private Collection<ViewElementTypeLookupStrategy> elementTypeLookupStrategies;
 
 	@RefreshableCollection(incremental = true, includeModuleInternals = true)
-	private Collection<FormElementBuilderFactoryAssembler> builderFactoryAssemblers;
+	private Collection<ViewElementBuilderFactoryAssembler> builderFactoryAssemblers;
 
-	public FormElement createFormElement( EntityConfiguration entityConfiguration,
+	public ViewElement createFormElement( EntityConfiguration entityConfiguration,
 	                                      EntityPropertyRegistry entityPropertyRegistry,
 	                                      EntityPropertyDescriptor descriptor,
 	                                      EntityMessageCodeResolver messageCodeResolver ) {
-		FormElementBuilderFactory builderFactory
+		ViewElementBuilderFactory builderFactory
 				= getOrCreateBuilderFactory( entityConfiguration, entityPropertyRegistry, descriptor );
 
 		if ( builderFactory != null ) {
-			FormElementBuilder builder = builderFactory.createBuilder();
+			ViewElementBuilder builder = builderFactory.createBuilder();
 
 			if ( builder != null ) {
 				builder.setMessageCodeResolver( messageCodeResolver );
 
-				// todo: remove test section
-				if ( StringUtils.equals( "name", descriptor.getName() ) ) {
-					PrintablePropertyGroup group = new PrintablePropertyGroup();
-					group.setName( "name" );    // name must be a valid property on the entity, identifiable by beanwrapper
-					group.setLabel( "Name group" );
-					group.getChildren().add( builder.createFormElement() );
-
-					return group;
-				}
-
-				return builder.createFormElement();
+				return builder.createViewElement();
 			}
 		}
 
 		return null;
 	}
 
-	public FormElementBuilderFactory getOrCreateBuilderFactory(
+	public ViewElementBuilderFactory getOrCreateBuilderFactory(
 			EntityConfiguration entityConfiguration,
 			EntityPropertyRegistry entityPropertyRegistry,
 			EntityPropertyDescriptor propertyDescriptor
 	) {
 		// Get builder factory
-		FormElementBuilderFactory builderFactory = propertyDescriptor.getAttribute( FormElementBuilderFactory.class );
+		ViewElementBuilderFactory builderFactory = propertyDescriptor.getAttribute( ViewElementBuilderFactory.class );
 
 		if ( builderFactory == null ) {
 			builderFactory = createBuilderFactory( entityConfiguration, entityPropertyRegistry, propertyDescriptor );
@@ -72,7 +60,7 @@ public class EntityFormService
 		return builderFactory;
 	}
 
-	public FormElementBuilderFactory createBuilderFactory(
+	public ViewElementBuilderFactory createBuilderFactory(
 			EntityConfiguration entityConfiguration,
 			EntityPropertyRegistry entityPropertyRegistry,
 			EntityPropertyDescriptor propertyDescriptor
@@ -83,7 +71,7 @@ public class EntityFormService
 			return null;
 		}
 
-		FormElementBuilderFactoryAssembler builderFactoryAssembler = findAssemblerForType( elementType );
+		ViewElementBuilderFactoryAssembler builderFactoryAssembler = findAssemblerForType( elementType );
 
 		if ( builderFactoryAssembler == null ) {
 			return null;
@@ -94,7 +82,7 @@ public class EntityFormService
 	}
 
 	private String findElementType( EntityConfiguration entityConfiguration, EntityPropertyDescriptor descriptor ) {
-		for ( FormElementTypeLookupStrategy lookupStrategy : elementTypeLookupStrategies ) {
+		for ( ViewElementTypeLookupStrategy lookupStrategy : elementTypeLookupStrategies ) {
 			String elementType = lookupStrategy.findElementType( entityConfiguration, descriptor );
 			if ( elementType != null ) {
 				return elementType;
@@ -104,8 +92,8 @@ public class EntityFormService
 		return null;
 	}
 
-	private FormElementBuilderFactoryAssembler findAssemblerForType( String elementType ) {
-		for ( FormElementBuilderFactoryAssembler assembler : builderFactoryAssemblers ) {
+	private ViewElementBuilderFactoryAssembler findAssemblerForType( String elementType ) {
+		for ( ViewElementBuilderFactoryAssembler assembler : builderFactoryAssemblers ) {
 			if ( assembler.supports( elementType ) ) {
 				return assembler;
 			}

@@ -20,8 +20,8 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.registry.properties.meta.PropertyPersistenceMetadata;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.properties.ConversionServicePrintablePropertyView;
-import com.foreach.across.modules.entity.views.properties.PrintablePropertyView;
+import com.foreach.across.modules.entity.views.elements.ConversionServiceViewElement;
+import com.foreach.across.modules.entity.views.elements.ViewElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 
@@ -127,7 +127,7 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 			descriptors = getPropertyRegistry().getProperties( filter );
 		}
 
-		List<PrintablePropertyView> propertyViews = new ArrayList<>( descriptors.size() );
+		List<ViewElement> propertyViews = new ArrayList<>( descriptors.size() );
 
 		for ( EntityPropertyDescriptor descriptor : descriptors ) {
 			PropertyPersistenceMetadata propertyPersistenceMetadata = descriptor.getAttribute(
@@ -149,11 +149,11 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 		return propertyViews;
 	}
 
-	protected PrintablePropertyView createPropertyView(
+	protected ViewElement createPropertyView(
 			EntityConfiguration entityConfiguration,
 			EntityPropertyDescriptor descriptor,
 			EntityMessageCodeResolver messageCodeResolver ) {
-		return new ConversionServicePrintablePropertyView( messageCodeResolver, conversionService, descriptor );
+		return new ConversionServiceViewElement( messageCodeResolver, conversionService, descriptor );
 	}
 
 	protected abstract void extendViewModel( EntityConfiguration entityConfiguration, T view );

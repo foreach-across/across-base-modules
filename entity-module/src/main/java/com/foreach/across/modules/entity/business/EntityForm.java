@@ -1,13 +1,16 @@
 package com.foreach.across.modules.entity.business;
 
-import com.foreach.across.modules.entity.views.forms.FormElement;
+
+
+import com.foreach.across.modules.entity.views.elements.ViewElement;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
+@Deprecated
 public class EntityForm
 {
-	private Collection<FormElement> elements = new LinkedList<>();
+	private Collection<ViewElement> elements = new LinkedList<>();
 
 	public void setEntity( Object instance ) {
 		/*for ( FormElement element : elements ) {
@@ -21,11 +24,11 @@ public class EntityForm
 		}*/
 	}
 
-	public void addElement( FormElement formElement ) {
+	public void addElement( ViewElement formElement ) {
 		elements.add( formElement );
 	}
 
-	public Collection<FormElement> getElements() {
+	public Collection<ViewElement> getElements() {
 		return elements;
 	}
 }
