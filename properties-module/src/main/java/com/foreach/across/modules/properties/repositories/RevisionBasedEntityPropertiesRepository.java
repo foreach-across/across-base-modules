@@ -218,6 +218,11 @@ public class RevisionBasedEntityPropertiesRepository<T, R extends Revision<T>>
 		saveEntitiesForRevision( entities, owner, revisionNumber );
 	}
 
+	@Override
+	protected Collection<PropertyRevision<T>> convertToNewDtos( Collection<PropertyRevision<T>> entitiesForRevision ) {
+		return entitiesForRevision;
+	}
+
 	private Collection<PropertyRevision<T>> buildProperties( T owner, List<Map<String, Object>> properties ) {
 		List<PropertyRevision<T>> props = new LinkedList<>();
 
