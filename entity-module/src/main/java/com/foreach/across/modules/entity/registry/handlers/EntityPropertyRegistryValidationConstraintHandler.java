@@ -20,7 +20,6 @@ import javax.validation.metadata.PropertyDescriptor;
 @Component
 public class EntityPropertyRegistryValidationConstraintHandler
 {
-
 	private final BeanMetaDataManager metaDataManager = new BeanMetaDataManager(
 			new ConstraintHelper(), new ExecutableHelper( new TypeResolutionHelper() )
 	);
@@ -30,7 +29,6 @@ public class EntityPropertyRegistryValidationConstraintHandler
 		BeanDescriptor beanDescriptor = metaData.getBeanDescriptor();
 
 		if ( beanDescriptor != null ) {
-
 			for ( EntityPropertyDescriptor descriptor : registry.getRegisteredDescriptors() ) {
 				PropertyDescriptor validatorDescriptor
 						= beanDescriptor.getConstraintsForProperty( descriptor.getName() );

@@ -17,19 +17,105 @@ package com.foreach.across.modules.entity.views.elements.fieldset;
 
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.ViewElementBuilder;
+import com.foreach.across.modules.entity.views.elements.ViewElementBuilderContext;
+import com.foreach.across.modules.entity.views.support.ValuePrinter;
+import org.springframework.beans.BeanUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Arne Vandamme
  */
 public class FieldsetElementBuilder implements ViewElementBuilder<FieldsetElement>
 {
-	@Override
-	public void setMessageCodeResolver( EntityMessageCodeResolver messageCodeResolver ) {
+	private String name, label, labelCode, customTemplate;
 
+	private EntityMessageCodeResolver messageCodeResolver;
+	private ValuePrinter valuePrinter;
+
+	private Collection<String> properties = new ArrayList<>();
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName( String name ) {
+		this.name = name;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel( String label ) {
+		this.label = label;
+	}
+
+	public String getLabelCode() {
+		return labelCode;
+	}
+
+	public void setLabelCode( String labelCode ) {
+		this.labelCode = labelCode;
+	}
+
+	public String getCustomTemplate() {
+		return customTemplate;
+	}
+
+	public void setCustomTemplate( String customTemplate ) {
+		this.customTemplate = customTemplate;
+	}
+
+	public EntityMessageCodeResolver getMessageCodeResolver() {
+		return messageCodeResolver;
 	}
 
 	@Override
-	public FieldsetElement createViewElement() {
-		return null;
+	public void setMessageCodeResolver( EntityMessageCodeResolver messageCodeResolver ) {
+		this.messageCodeResolver = messageCodeResolver;
+	}
+
+	public ValuePrinter getValuePrinter() {
+		return valuePrinter;
+	}
+
+	public void setValuePrinter( ValuePrinter valuePrinter ) {
+		this.valuePrinter = valuePrinter;
+	}
+
+	public Collection<String> getProperties() {
+		return properties;
+	}
+
+	public void setProperties( Collection<String> properties ) {
+		this.properties = properties;
+	}
+
+	@Override
+	public FieldsetElement createViewElement( ViewElementBuilderContext builderContext ) {
+		// Create the fieldset element
+		FieldsetElement fieldset = new FieldsetElement();
+		BeanUtils.copyProperties( this, fieldset, "label" );
+		fieldset.setLabel( resolve( getLabelCode(), getLabel() ) );
+
+		// Add all children
+		for ( String property : properties ) {
+			ViewElementBuilder builder = builderContext.getBuilder( property );
+			builder.setMessageCodeResolver( messageCodeResolver );
+
+			fieldset.add( builder.createViewElement( builderContext ) );
+		}
+
+		return fieldset;
+	}
+
+	protected String resolve( String code, String defaultMessage ) {
+		if ( messageCodeResolver != null && code != null ) {
+			return messageCodeResolver.getMessageWithFallback( code, defaultMessage );
+		}
+
+		return defaultMessage;
 	}
 }

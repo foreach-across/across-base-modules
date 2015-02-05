@@ -14,6 +14,7 @@ import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.views.EntityFormViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import com.foreach.across.modules.entity.views.elements.CommonViewElementTypeLookupStrategy;
+import com.foreach.across.modules.entity.views.elements.fieldset.FieldsetElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.checkbox.CheckboxFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.hidden.HiddenFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.select.SelectFormElementBuilderFactoryAssembler;
@@ -110,6 +111,10 @@ public class EntityModuleConfiguration
 		return new CheckboxFormElementBuilderFactoryAssembler();
 	}
 
+	@Bean
+	public FieldsetElementBuilderFactoryAssembler fieldsetElementBuilderFactoryAssembler() {
+		return new FieldsetElementBuilderFactoryAssembler();
+	}
 	@Bean
 	public CommonViewElementTypeLookupStrategy commonFormElementTypeLookupStrategy() {
 		return new CommonViewElementTypeLookupStrategy();

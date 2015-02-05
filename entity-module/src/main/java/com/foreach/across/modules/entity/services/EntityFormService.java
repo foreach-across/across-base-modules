@@ -49,24 +49,45 @@ public class EntityFormService
 		}
 	}
 
+	/**
+	 * Create a builder context that can be used to retrieve builder instances.
+	 */
+	public ViewElementBuilderContext createBuilderContext(
+			EntityConfiguration entityConfiguration,
+			EntityPropertyRegistry entityPropertyRegistry,
+			EntityMessageCodeResolver messageCodeResolver
+	) {
+		ViewElementBuilderContext context = new ViewElementBuilderContext();
+		context.setEntityFormService( this );
+		context.setEntityConfiguration( entityConfiguration );
+		context.setPropertyRegistry( entityPropertyRegistry );
+		context.setMessageCodeResolver( messageCodeResolver );
+
+		return context;
+	}
+
 	public ViewElement createFormElement( EntityConfiguration entityConfiguration,
 	                                      EntityPropertyRegistry entityPropertyRegistry,
 	                                      EntityPropertyDescriptor descriptor,
 	                                      EntityMessageCodeResolver messageCodeResolver ) {
-		ViewElementBuilderFactory builderFactory
-				= getOrCreateBuilderFactory( entityConfiguration, entityPropertyRegistry, descriptor );
+		ViewElementBuilder builder = createBuilder( entityConfiguration, entityPropertyRegistry, descriptor );
 
-		if ( builderFactory != null ) {
-			ViewElementBuilder builder = builderFactory.createBuilder();
+		if ( builder != null ) {
+			builder.setMessageCodeResolver( messageCodeResolver );
 
-			if ( builder != null ) {
-				builder.setMessageCodeResolver( messageCodeResolver );
-
-				return builder.createViewElement();
-			}
+			return builder.createViewElement( null );
 		}
 
 		return null;
+	}
+
+	public ViewElementBuilder createBuilder( EntityConfiguration entityConfiguration,
+	                                         EntityPropertyRegistry entityPropertyRegistry,
+	                                         EntityPropertyDescriptor descriptor ) {
+		ViewElementBuilderFactory builderFactory
+				= getOrCreateBuilderFactory( entityConfiguration, entityPropertyRegistry, descriptor );
+
+		return builderFactory != null ? builderFactory.createBuilder() : null;
 	}
 
 	public ViewElement createPrintablePropertyView( EntityConfiguration entityConfiguration,

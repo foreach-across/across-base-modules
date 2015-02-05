@@ -35,7 +35,8 @@ public interface ViewElementBuilder<T extends ViewElement>
 	/**
 	 * Builds the actual element.  This will resolve all configured messages - if any.
 	 *
+	 * @param builderContext that provides access to other builders
 	 * @return instance to render the element.
 	 */
-	T createViewElement();
+	T createViewElement( ViewElementBuilderContext builderContext );
 }
