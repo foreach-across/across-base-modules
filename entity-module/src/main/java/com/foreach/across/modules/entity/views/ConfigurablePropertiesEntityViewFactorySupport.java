@@ -22,6 +22,7 @@ import com.foreach.across.modules.entity.registry.properties.meta.PropertyPersis
 import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.ViewElement;
+import com.foreach.across.modules.entity.views.elements.ViewElementMode;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -147,8 +148,10 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 			EntityPropertyDescriptor descriptor,
 			EntityMessageCodeResolver messageCodeResolver ) {
 		return entityFormService.createViewElement( entityConfiguration, descriptor, messageCodeResolver,
-		                                            this );
+		                                            getMode() );
 	}
+
+	protected abstract ViewElementMode getMode();
 
 	protected abstract void extendViewModel( EntityConfiguration entityConfiguration, T view );
 }

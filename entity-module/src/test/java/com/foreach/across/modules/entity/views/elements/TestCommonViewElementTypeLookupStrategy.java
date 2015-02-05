@@ -68,29 +68,40 @@ public class TestCommonViewElementTypeLookupStrategy
 	@Test
 	public void hiddenType() {
 		when( descriptor.isHidden() ).thenReturn( true );
-		assertEquals( CommonViewElements.HIDDEN, lookup() );
+		assertEquals( CommonViewElements.HIDDEN, lookup( ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( ViewElementMode.FOR_READING ) );
 	}
 
 	@Test
 	public void textboxTypeForPrimitives() {
-		assertEquals( CommonViewElements.TEXTBOX, lookup( String.class ) );
-		assertEquals( CommonViewElements.TEXTBOX, lookup( Integer.class ) );
-		assertEquals( CommonViewElements.TEXTBOX, lookup( int.class ) );
-		assertEquals( CommonViewElements.TEXTBOX, lookup( AtomicInteger.class ) );
-		assertEquals( CommonViewElements.TEXTBOX, lookup( Long.class ) );
-		assertEquals( CommonViewElements.TEXTBOX, lookup( BigDecimal.class ) );
+		assertEquals( CommonViewElements.TEXTBOX, lookup( String.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXTBOX, lookup( Integer.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXTBOX, lookup( int.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXTBOX, lookup( AtomicInteger.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXTBOX, lookup( Long.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXTBOX, lookup( BigDecimal.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( String.class, ViewElementMode.FOR_READING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( Integer.class, ViewElementMode.FOR_READING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( int.class, ViewElementMode.FOR_READING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( AtomicInteger.class, ViewElementMode.FOR_READING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( Long.class, ViewElementMode.FOR_READING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( BigDecimal.class, ViewElementMode.FOR_READING ) );
 	}
 
 	@Test
 	public void checkboxTypeForBooleans() {
-		assertEquals( CommonViewElements.CHECKBOX, lookup( Boolean.class ) );
-		assertEquals( CommonViewElements.CHECKBOX, lookup( boolean.class ) );
-		assertEquals( CommonViewElements.CHECKBOX, lookup( AtomicBoolean.class ) );
+		assertEquals( CommonViewElements.CHECKBOX, lookup( Boolean.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.CHECKBOX, lookup( boolean.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.CHECKBOX, lookup( AtomicBoolean.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( Boolean.class, ViewElementMode.FOR_READING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( boolean.class, ViewElementMode.FOR_READING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( AtomicBoolean.class, ViewElementMode.FOR_READING ) );
 	}
 
 	@Test
 	public void enumValueShouldReturnSelectType() {
-		assertEquals( CommonViewElements.SELECT, lookup( CompanyStatus.class ) );
+		assertEquals( CommonViewElements.SELECT, lookup( CompanyStatus.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( CompanyStatus.class, ViewElementMode.FOR_READING ) );
 	}
 
 	@Test
@@ -101,7 +112,8 @@ public class TestCommonViewElementTypeLookupStrategy
 		when( entityConfiguration.getEntityType() ).thenReturn( (Class) Client.class );
 		when( entityRegistry.getEntityConfiguration( Client.class ) ).thenReturn( clientConfig );
 
-		assertEquals( CommonViewElements.SELECT, lookup( Client.class ) );
+		assertEquals( CommonViewElements.SELECT, lookup( Client.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( Client.class, ViewElementMode.FOR_READING ) );
 	}
 
 	@Test
@@ -116,22 +128,26 @@ public class TestCommonViewElementTypeLookupStrategy
 		when( descriptor.getPropertyResolvableType() )
 				.thenReturn( ResolvableType.forClassWithGenerics( List.class, Client.class ) );
 
-		assertEquals( CommonViewElements.MULTI_CHECKBOX, strategy.findElementType( entityConfiguration, descriptor ) );
+		assertEquals( CommonViewElements.MULTI_CHECKBOX, strategy.findElementType( entityConfiguration, descriptor,
+		                                                                           ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXT, strategy.findElementType( entityConfiguration, descriptor,
+		                                                                 ViewElementMode.FOR_READING ) );
 	}
 
 	@Test
 	public void unknownType() {
-		assertNull( lookup() );
+		assertNull( lookup( ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( ViewElementMode.FOR_READING ) );
 	}
 
 	@SuppressWarnings("unchecked")
-	private String lookup( Class propertyType ) {
+	private String lookup( Class propertyType, ViewElementMode mode ) {
 		when( descriptor.getPropertyType() ).thenReturn( propertyType );
-		return strategy.findElementType( entityConfiguration, descriptor );
+		return strategy.findElementType( entityConfiguration, descriptor, mode );
 	}
 
-	private String lookup() {
-		return strategy.findElementType( entityConfiguration, descriptor );
+	private String lookup( ViewElementMode mode ) {
+		return strategy.findElementType( entityConfiguration, descriptor, mode );
 	}
 
 	@Configuration

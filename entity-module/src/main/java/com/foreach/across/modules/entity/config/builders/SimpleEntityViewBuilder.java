@@ -22,6 +22,7 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegis
 import com.foreach.across.modules.entity.registry.properties.MergingEntityPropertyRegistry;
 import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
 import com.foreach.across.modules.entity.views.EntityView;
+import com.foreach.across.modules.entity.views.elements.ViewElementMode;
 
 /**
 * @author Arne Vandamme
@@ -69,6 +70,11 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 	protected T createFactoryInstance() {
 		return (T) new ConfigurablePropertiesEntityViewFactorySupport()
 		{
+			@Override
+			protected ViewElementMode getMode() {
+				return ViewElementMode.FOR_READING;
+			}
+
 			@Override
 			protected void extendViewModel( EntityConfiguration entityConfiguration, EntityView view ) {
 			}

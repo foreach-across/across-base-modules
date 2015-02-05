@@ -17,6 +17,7 @@ package com.foreach.across.modules.entity.views;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
+import com.foreach.across.modules.entity.views.elements.ViewElementMode;
 
 /**
  * @author Arne Vandamme
@@ -53,6 +54,11 @@ public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFacto
 		}
 
 		return entity;
+	}
+
+	@Override
+	protected ViewElementMode getMode() {
+		return ViewElementMode.FOR_WRITING;
 	}
 
 	@Override

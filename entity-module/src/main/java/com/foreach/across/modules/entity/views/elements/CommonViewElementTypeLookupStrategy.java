@@ -33,7 +33,12 @@ public class CommonViewElementTypeLookupStrategy implements ViewElementTypeLooku
 	private EntityRegistry entityRegistry;
 
 	@Override
-	public String findElementType( EntityConfiguration entityConfiguration, EntityPropertyDescriptor descriptor ) {
+	public String findElementType( EntityConfiguration entityConfiguration,
+	                               EntityPropertyDescriptor descriptor,
+	                               ViewElementMode viewElementMode ) {
+		if ( viewElementMode == ViewElementMode.FOR_READING ) {
+			return CommonViewElements.TEXT;
+		}
 		if ( descriptor.isHidden() ) {
 			return CommonViewElements.HIDDEN;
 		}

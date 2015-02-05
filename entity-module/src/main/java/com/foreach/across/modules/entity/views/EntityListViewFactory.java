@@ -20,6 +20,7 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.ViewElement;
+import com.foreach.across.modules.entity.views.elements.ViewElementMode;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.views.support.ListViewEntityMessages;
 import org.springframework.data.domain.Page;
@@ -149,6 +150,11 @@ public class EntityListViewFactory extends ConfigurablePropertiesEntityViewFacto
 		}
 
 		return sortableProperty;
+	}
+
+	@Override
+	protected ViewElementMode getMode() {
+		return ViewElementMode.FOR_READING;
 	}
 
 	@Deprecated

@@ -19,6 +19,7 @@ import com.foreach.across.modules.entity.views.elements.form.checkbox.CheckboxFo
 import com.foreach.across.modules.entity.views.elements.form.hidden.HiddenFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.select.SelectFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.textbox.TextboxFormElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.elements.readonly.ConversionServiceViewElementBuilderFactoryAssembler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +95,11 @@ public class EntityModuleConfiguration
 	@Bean
 	public TextboxFormElementBuilderFactoryAssembler textboxFormElementBuilderFactoryAssembler() {
 		return new TextboxFormElementBuilderFactoryAssembler();
+	}
+
+	@Bean
+	public ConversionServiceViewElementBuilderFactoryAssembler conversionServiceViewElementBuilderFactoryAssembler() {
+		return new ConversionServiceViewElementBuilderFactoryAssembler();
 	}
 
 	@Bean

@@ -29,5 +29,7 @@ public interface ViewElementTypeLookupStrategy
 	/**
 	 * @return element type or null if none could be determined.
 	 */
-	String findElementType( EntityConfiguration entityConfiguration, EntityPropertyDescriptor descriptor );
+	String findElementType( EntityConfiguration entityConfiguration,
+	                        EntityPropertyDescriptor descriptor,
+	                        ViewElementMode viewElementMode );
 }

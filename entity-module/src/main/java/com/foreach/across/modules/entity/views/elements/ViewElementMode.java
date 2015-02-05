@@ -16,15 +16,9 @@
 package com.foreach.across.modules.entity.views.elements;
 
 /**
- * @author Arne Vandamme
+ * @author Andy Somers
  */
-public interface CommonViewElements
+public enum ViewElementMode
 {
-	String TEXTBOX = "textbox";
-	String HIDDEN = "hidden";
-	String SELECT = "select";
-	String MULTI_CHECKBOX = "multi-checkbox";
-	String CHECKBOX = "checkbox";
-	String FIELDSET = "fieldset";
-	String TEXT = "text";
+	FOR_READING, FOR_WRITING
 }
