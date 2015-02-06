@@ -8,9 +8,6 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescr
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.registry.properties.MergingEntityPropertyRegistry;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
-import com.foreach.across.modules.entity.views.EntityFormViewFactory;
-import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import com.foreach.across.modules.entity.views.elements.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,55 +46,66 @@ public class EntityFormService
 		}
 	}
 
-	public ViewElement createFormElement( EntityConfiguration entityConfiguration,
-	                                      EntityPropertyRegistry entityPropertyRegistry,
-	                                      EntityPropertyDescriptor descriptor,
-	                                      EntityMessageCodeResolver messageCodeResolver ) {
+	/**
+	 * Create a builder context that can be used to retrieve builder instances.
+	 */
+	public ViewElementBuilderContext createBuilderContext(
+			EntityConfiguration entityConfiguration,
+			EntityPropertyRegistry entityPropertyRegistry,
+			EntityMessageCodeResolver messageCodeResolver,
+			ViewElementMode mode
+	) {
+		ViewElementBuilderContext context = new ViewElementBuilderContext();
+		context.setEntityFormService( this );
+		context.setEntityConfiguration( entityConfiguration );
+		context.setPropertyRegistry( entityPropertyRegistry );
+		context.setMessageCodeResolver( messageCodeResolver );
+		context.setViewElementMode( mode );
+
+		return context;
+	}
+
+	public ViewElementBuilder createBuilder( EntityConfiguration entityConfiguration,
+	                                         EntityPropertyRegistry entityPropertyRegistry,
+	                                         EntityPropertyDescriptor descriptor, ViewElementMode mode ) {
 		ViewElementBuilderFactory builderFactory
-				= getOrCreateBuilderFactory( entityConfiguration, entityPropertyRegistry, descriptor );
+				= getOrCreateBuilderFactory( entityConfiguration, entityPropertyRegistry, descriptor, mode );
 
-		if ( builderFactory != null ) {
-			ViewElementBuilder builder = builderFactory.createBuilder();
-
-			if ( builder != null ) {
-				builder.setMessageCodeResolver( messageCodeResolver );
-
-				return builder.createViewElement();
-			}
-		}
-
-		return null;
+		return builderFactory != null ? builderFactory.createBuilder() : null;
 	}
 
 	public ViewElement createViewElement( EntityConfiguration entityConfiguration,
 	                                      EntityPropertyDescriptor descriptor,
 	                                      EntityMessageCodeResolver messageCodeResolver,
-	                                      ConfigurablePropertiesEntityViewFactorySupport factory ) {
-		if ( factory instanceof EntityListViewFactory ) {
-			return new ConversionServiceViewElement( messageCodeResolver, conversionService, descriptor );
-		}
-		else if ( factory instanceof EntityFormViewFactory ) {
+	                                      ViewElementMode mode ) {
 
-			EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(
-					entityConfiguration.getPropertyRegistry()
-			);
+		EntityPropertyRegistry registry = new MergingEntityPropertyRegistry(
+				entityConfiguration.getPropertyRegistry()
+		);
 
-			return createFormElement( entityConfiguration, registry, descriptor,
-			                          messageCodeResolver );
+		ViewElementBuilder builder = createBuilder( entityConfiguration, registry, descriptor, mode );
+
+		if ( builder != null ) {
+			builder.setMessageCodeResolver( messageCodeResolver );
+
+			return builder.createViewElement( null );
 		}
+
 		return null;
 	}
 
 	public ViewElementBuilderFactory getOrCreateBuilderFactory(
 			EntityConfiguration entityConfiguration,
 			EntityPropertyRegistry entityPropertyRegistry,
-			EntityPropertyDescriptor propertyDescriptor
+			EntityPropertyDescriptor propertyDescriptor,
+			ViewElementMode mode
 	) {
 		// Get builder factory
 		ViewElementBuilderFactory builderFactory = propertyDescriptor.getAttribute( ViewElementBuilderFactory.class );
 
 		if ( builderFactory == null ) {
-			builderFactory = createBuilderFactory( entityConfiguration, entityPropertyRegistry, propertyDescriptor );
+			builderFactory = createBuilderFactory( entityConfiguration, entityPropertyRegistry, propertyDescriptor,
+			                                       mode );
 		}
 
 		return builderFactory;
@@ -106,9 +114,10 @@ public class EntityFormService
 	public ViewElementBuilderFactory createBuilderFactory(
 			EntityConfiguration entityConfiguration,
 			EntityPropertyRegistry entityPropertyRegistry,
-			EntityPropertyDescriptor propertyDescriptor
+			EntityPropertyDescriptor propertyDescriptor,
+			ViewElementMode mode
 	) {
-		String elementType = findElementType( entityConfiguration, propertyDescriptor );
+		String elementType = findElementType( entityConfiguration, propertyDescriptor, mode );
 
 		if ( elementType == null ) {
 			return null;
@@ -124,9 +133,11 @@ public class EntityFormService
 				.createBuilderFactory( entityConfiguration, entityPropertyRegistry, propertyDescriptor );
 	}
 
-	private String findElementType( EntityConfiguration entityConfiguration, EntityPropertyDescriptor descriptor ) {
+	private String findElementType( EntityConfiguration entityConfiguration,
+	                                EntityPropertyDescriptor descriptor,
+	                                ViewElementMode mode ) {
 		for ( ViewElementTypeLookupStrategy lookupStrategy : elementTypeLookupStrategies ) {
-			String elementType = lookupStrategy.findElementType( entityConfiguration, descriptor );
+			String elementType = lookupStrategy.findElementType( entityConfiguration, descriptor, mode );
 			if ( elementType != null ) {
 				return elementType;
 			}

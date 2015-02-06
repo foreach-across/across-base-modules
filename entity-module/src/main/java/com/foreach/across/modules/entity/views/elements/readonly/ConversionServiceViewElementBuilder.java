@@ -19,6 +19,7 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescr
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.ConversionServiceViewElement;
 import com.foreach.across.modules.entity.views.elements.ViewElementBuilder;
+import com.foreach.across.modules.entity.views.elements.ViewElementBuilderContext;
 import org.springframework.core.convert.ConversionService;
 
 /**
@@ -57,7 +58,7 @@ public class ConversionServiceViewElementBuilder implements ViewElementBuilder<C
 	}
 
 	@Override
-	public ConversionServiceViewElement createViewElement() {
+	public ConversionServiceViewElement createViewElement( ViewElementBuilderContext builderContext ) {
 		return new ConversionServiceViewElement( messageCodeResolver, conversionService, descriptor );
 	}
 }

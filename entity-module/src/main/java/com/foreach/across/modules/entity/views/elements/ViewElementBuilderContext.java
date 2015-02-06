@@ -29,6 +29,7 @@ public class ViewElementBuilderContext
 	private EntityPropertyRegistry propertyRegistry;
 	private EntityMessageCodeResolver messageCodeResolver;
 	private EntityFormService entityFormService;
+	private ViewElementMode viewElementMode;
 
 	public EntityConfiguration getEntityConfiguration() {
 		return entityConfiguration;
@@ -62,9 +63,17 @@ public class ViewElementBuilderContext
 		this.entityFormService = entityFormService;
 	}
 
+	public ViewElementMode getViewElementMode() {
+		return viewElementMode;
+	}
+
+	public void setViewElementMode( ViewElementMode viewElementMode ) {
+		this.viewElementMode = viewElementMode;
+	}
+
 	public ViewElementBuilder getBuilder( String property ) {
 		return entityFormService.createBuilder(
-				entityConfiguration, propertyRegistry, propertyRegistry.getProperty( property )
+				entityConfiguration, propertyRegistry, propertyRegistry.getProperty( property ), viewElementMode
 		);
 	}
 }
