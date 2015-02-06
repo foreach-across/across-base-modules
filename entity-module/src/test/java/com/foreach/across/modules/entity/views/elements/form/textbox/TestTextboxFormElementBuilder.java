@@ -40,7 +40,7 @@ public class TestTextboxFormElementBuilder
 		builder.setMaxLength( 15 );
 		builder.setValuePrinter( valuePrinter );
 
-		TextboxFormElement element = builder.createViewElement();
+		TextboxFormElement element = builder.createViewElement( null );
 		assertNotNull( element );
 		assertEquals( "name", element.getName() );
 		assertEquals( "Property name", element.getLabel() );
@@ -56,7 +56,7 @@ public class TestTextboxFormElementBuilder
 		builder.setMaxLength( null );
 		builder.setCustomTemplate( null );
 
-		element = builder.createViewElement();
+		element = builder.createViewElement( null );
 		assertNotNull( element );
 		assertEquals( "name", element.getName() );
 		assertEquals( "Other property name", element.getLabel() );
