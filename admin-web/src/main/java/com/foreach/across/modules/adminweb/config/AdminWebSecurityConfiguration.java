@@ -61,9 +61,10 @@ public class AdminWebSecurityConfiguration extends SpringSecurityWebConfigurerAd
 
 		publisher.publish( new AdminWebUrlRegistry( adminWeb, urlRegistry ) );
 
-		// Only users with the "access administration " permission can login
-		urlRegistry.anyRequest().hasAuthority( "access administration" ).and().formLogin().defaultSuccessUrl(
-				adminWeb.path( "/" ) ).loginPage( adminWeb.path( "/login" ) ).permitAll().and().logout().permitAll();
+		// Only users with any of the configured admin permissions can login
+		urlRegistry.anyRequest().hasAnyAuthority( settings.getAccessPermissions() )
+		           .and().formLogin().defaultSuccessUrl( adminWeb.path( "/" ) ).loginPage( adminWeb.path( "/login" ) ).permitAll()
+		           .and().logout().permitAll();
 
 		configureRememberMe( http );
 	}
