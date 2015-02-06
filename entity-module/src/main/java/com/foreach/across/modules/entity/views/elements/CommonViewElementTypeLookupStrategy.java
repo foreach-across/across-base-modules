@@ -15,9 +15,11 @@
  */
 package com.foreach.across.modules.entity.views.elements;
 
+import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.registry.properties.meta.PropertyPersistenceMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ClassUtils;
 
@@ -39,8 +41,15 @@ public class CommonViewElementTypeLookupStrategy implements ViewElementTypeLooku
 		if ( viewElementMode == ViewElementMode.FOR_READING ) {
 			return CommonViewElements.TEXT;
 		}
+
 		if ( descriptor.isHidden() ) {
 			return CommonViewElements.HIDDEN;
+		}
+
+		PropertyPersistenceMetadata metadata = descriptor.getAttribute( EntityAttributes.PROPERTY_PERSISTENCE_METADATA );
+
+		if ( metadata != null && metadata.isEmbedded() ) {
+			return CommonViewElements.FIELDSET;
 		}
 
 		if ( descriptor.isWritable() ) {

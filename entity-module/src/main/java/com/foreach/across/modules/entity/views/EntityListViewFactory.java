@@ -20,6 +20,7 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.ViewElement;
+import com.foreach.across.modules.entity.views.elements.ViewElementBuilderContext;
 import com.foreach.across.modules.entity.views.elements.ViewElementMode;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.views.support.ListViewEntityMessages;
@@ -131,11 +132,10 @@ public class EntityListViewFactory extends ConfigurablePropertiesEntityViewFacto
 	}
 
 	@Override
-	protected ViewElement createPropertyView( EntityConfiguration entityConfiguration,
-	                                                    EntityPropertyDescriptor descriptor,
-	                                                    EntityMessageCodeResolver messageCodeResolver ) {
+	protected ViewElement createPropertyView( ViewElementBuilderContext builderContext,
+	                                          EntityPropertyDescriptor descriptor ) {
 		SortablePropertyViewElement sortablePropertyView = new SortablePropertyViewElement(
-				super.createPropertyView( entityConfiguration, descriptor, messageCodeResolver )
+				super.createPropertyView( builderContext, descriptor )
 		);
 		sortablePropertyView.setSortableProperty( determineSortableProperty( descriptor ) );
 

@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.views.elements.fieldset;
 
+import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistries;
@@ -76,7 +77,8 @@ public class FieldsetElementBuilderFactoryAssembler implements ViewElementBuilde
 		template.setValuePrinter( createValuePrinter( descriptor ) );
 
 		// Set the properties
-		PropertyPersistenceMetadata metadata = descriptor.getAttribute( PropertyPersistenceMetadata.class );
+		PropertyPersistenceMetadata metadata = descriptor.getAttribute( EntityAttributes.PROPERTY_PERSISTENCE_METADATA,
+		                                                                PropertyPersistenceMetadata.class );
 
 		List<String> properties = new ArrayList<>();
 
@@ -84,7 +86,9 @@ public class FieldsetElementBuilderFactoryAssembler implements ViewElementBuilde
 			EntityPropertyRegistry subRegistry = entityPropertyRegistries.getRegistry( descriptor.getPropertyType() );
 
 			for ( EntityPropertyDescriptor subDescriptor : subRegistry.getProperties() ) {
-				properties.add( descriptor.getName() + "."+ subDescriptor.getName() );
+				if ( subDescriptor.isWritable() ) {
+					properties.add( descriptor.getName() + "." + subDescriptor.getName() );
+				}
 			}
 		}
 

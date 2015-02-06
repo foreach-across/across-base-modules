@@ -1,11 +1,11 @@
 <th:block th:fragment="form_fields(properties)">
 	<div class="form-group" th:each="element : ${properties}"
 	     th:classappend="${#fields.hasErrors(element.name)}? has-error">
-		<!--/* group */-->
-		<div th:if="${element.elementType eq 'group'}">
+		<!--/* fieldset */-->
+		<div th:if="${element.elementType eq 'fieldset'}">
 			<fieldset>
-				<label>Group members</label>
-				<div th:replace="th/entity/formFields ::form_fields(${element.children})">
+				<legend th:text="${element.label}">Fieldset label</legend>
+				<div th:replace="th/entity/formFields ::form_fields(${element})">
 					group members
 				</div>
 			</fieldset>

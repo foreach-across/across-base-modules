@@ -1,6 +1,7 @@
 package com.foreach.across.modules.entity.views.elements;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
@@ -72,8 +73,31 @@ public class ViewElementBuilderContext
 	}
 
 	public ViewElementBuilder getBuilder( String property ) {
-		return entityFormService.createBuilder(
-				entityConfiguration, propertyRegistry, propertyRegistry.getProperty( property ), viewElementMode
-		);
+		return getBuilder( propertyRegistry.getProperty( property ) );
+	}
+
+	public ViewElementBuilder getBuilder( EntityPropertyDescriptor descriptor ) {
+		if ( descriptor != null ) {
+			return entityFormService.createBuilder( entityConfiguration, propertyRegistry, descriptor,
+			                                        viewElementMode );
+		}
+
+		return null;
+	}
+
+	public ViewElement getViewElement( String property ) {
+		return getViewElement( propertyRegistry.getProperty( property ) );
+	}
+
+	public ViewElement getViewElement( EntityPropertyDescriptor descriptor ) {
+		if ( descriptor != null ) {
+			ViewElementBuilder builder = getBuilder( descriptor );
+
+			if ( builder != null ) {
+				return builder.createViewElement( this );
+			}
+		}
+
+		return null;
 	}
 }
