@@ -177,12 +177,12 @@ public class EntityConfigurationBuilder extends EntityBuilderSupport<EntityConfi
 			entityRegistry.register( configuration );
 		}
 
-		for ( EntityViewBuilder viewBuilder : viewBuilders.values() ) {
-			viewBuilder.apply( configuration );
-		}
-
 		if ( propertyRegistryBuilder != null ) {
 			propertyRegistryBuilder.apply( configuration.getPropertyRegistry() );
+		}
+
+		for ( EntityViewBuilder viewBuilder : viewBuilders.values() ) {
+			viewBuilder.apply( configuration );
 		}
 	}
 }

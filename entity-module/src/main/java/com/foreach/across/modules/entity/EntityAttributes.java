@@ -10,4 +10,9 @@ public interface EntityAttributes
 	 */
 	String SORTABLE_PROPERTY = "sortableProperty";
 	String PROPERTY_PERSISTENCE_METADATA = "propertyPersistenceMetadata";
+
+	String ELEMENT_TYPE_READABLE = "elementTypeForReading";
+	String ELEMENT_TYPE_WRITABLE = "elementTypeForWriting";
+
+	String PROPERTY_GROUP = "propertyGroup";
 }

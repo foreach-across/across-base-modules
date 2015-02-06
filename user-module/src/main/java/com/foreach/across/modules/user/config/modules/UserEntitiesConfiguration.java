@@ -1,8 +1,8 @@
 package com.foreach.across.modules.user.config.modules;
 
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
+import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.user.business.User;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +32,7 @@ public class UserEntitiesConfiguration implements EntityConfigurer
 						"lastModifiedDate",
 						"lastModifiedBy"
 				)
-				.property( "group-membership", "Groups", "groups.size()" )
+				.property( "group-membership", "Groups", "groups.size()" ).and()
 				.property( "role-membership", "Roles", "roles.size()" );
 
 		/*

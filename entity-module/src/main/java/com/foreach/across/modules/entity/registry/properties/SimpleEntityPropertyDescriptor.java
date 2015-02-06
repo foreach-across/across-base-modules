@@ -20,6 +20,13 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 	private Class<?> propertyType;
 	private ResolvableType propertyResolvableType;
 
+	public SimpleEntityPropertyDescriptor() {
+	}
+
+	public SimpleEntityPropertyDescriptor( String name ) {
+		this.name = name;
+	}
+
 	/**
 	 * @return Property name.
 	 */

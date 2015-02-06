@@ -20,8 +20,8 @@ import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.EmptyAcrossModule;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.modules.entity.EntityModule;
-import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
+import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
@@ -152,18 +152,19 @@ public class TestCustomizingEntityConfiguration
 	protected static class ModuleConfig implements EntityConfigurer
 	{
 		@Override
+		@SuppressWarnings( "unchecked" )
 		public void configure( EntitiesConfigurationBuilder configuration ) {
 			configuration.attribute( EntityLinkBuilder.class, mock( EntityLinkBuilder.class ) );
 
 			configuration.entity( Client.class )
 			             .properties()
 			             .property( "someprop", "Some property", "'fixed'" )
-			             .and()
+			             .and().and()
 			             .view( "some-extra-view" )
 			             .template( "th/someTemplate" )
 			             .properties()
-			             .property( "calculated", "Calculated" )
-			             .property( "group-membership", "Group membership", "groups.size()" )
+			             .property( "calculated", "Calculated" ).and()
+			             .property( "group-membership", "Group membership", "groups.size()" ).and()
 			             .and()
 			             .and()
 			             .view( "some-other-view" ).factory( mock( ConfigurablePropertiesEntityViewFactorySupport.class ) );

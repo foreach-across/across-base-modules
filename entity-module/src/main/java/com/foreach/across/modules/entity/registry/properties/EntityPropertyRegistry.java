@@ -15,6 +15,7 @@ public interface EntityPropertyRegistry
 	 */
 	boolean contains( String propertyName );
 
+	// todo: move to mutable
 	void register( MutableEntityPropertyDescriptor descriptor );
 
 	EntityPropertyDescriptor getProperty( String propertyName );

@@ -5,6 +5,8 @@ import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.PersistentEntityFactory;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
+import com.foreach.across.modules.entity.registry.properties.SimpleEntityPropertyDescriptor;
+import com.foreach.across.modules.entity.views.support.SpelValueFetcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +77,17 @@ public class RepositoryEntityModelBuilder
 			}
 			if ( descriptor == null ) {
 				descriptor = propertyRegistry.getProperty( "title" );
+			}
+
+			if ( descriptor == null ) {
+				SimpleEntityPropertyDescriptor label = new SimpleEntityPropertyDescriptor();
+				label.setName( "#generatedLabel" );
+				label.setDisplayName( "Generated label" );
+				label.setValueFetcher( new SpelValueFetcher( "toString()" ) );
+
+				propertyRegistry.register( label );
+
+				descriptor = label;
 			}
 		}
 

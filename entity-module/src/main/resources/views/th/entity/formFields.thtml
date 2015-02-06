@@ -1,6 +1,6 @@
 <th:block th:fragment="form_fields(properties)">
 	<div class="form-group" th:each="element : ${properties}"
-	     th:classappend="${#fields.hasErrors(element.name)}? has-error">
+	     th:classappend="${element.elementType != 'fieldset' and #fields.hasErrors(element.name)}? has-error">
 		<!--/* fieldset */-->
 		<div th:if="${element.elementType eq 'fieldset'}">
 			<fieldset>
@@ -82,7 +82,7 @@
 			</label>
 		</div>
 
-		<div class="small text-danger" th:if="${#fields.hasErrors(element.name)}">
+		<div class="small text-danger" th:if="${element.elementType != 'fieldset' and #fields.hasErrors(element.name)}">
 			<span th:each="error : ${#fields.errors(element.name)}" th:text="${error}">Error message.</span>
 		</div>
 	</div>

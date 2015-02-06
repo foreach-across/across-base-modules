@@ -39,14 +39,27 @@ public class CommonViewElementTypeLookupStrategy implements ViewElementTypeLooku
 	                               EntityPropertyDescriptor descriptor,
 	                               ViewElementMode viewElementMode ) {
 		if ( viewElementMode == ViewElementMode.FOR_READING ) {
+			String preferredType = descriptor.getAttribute( EntityAttributes.ELEMENT_TYPE_READABLE );
+
+			if ( preferredType != null ) {
+				return preferredType;
+			}
+
 			return CommonViewElements.TEXT;
+		}
+
+		String preferredType = descriptor.getAttribute( EntityAttributes.ELEMENT_TYPE_WRITABLE );
+
+		if ( preferredType != null ) {
+			return preferredType;
 		}
 
 		if ( descriptor.isHidden() ) {
 			return CommonViewElements.HIDDEN;
 		}
 
-		PropertyPersistenceMetadata metadata = descriptor.getAttribute( EntityAttributes.PROPERTY_PERSISTENCE_METADATA );
+		PropertyPersistenceMetadata metadata = descriptor.getAttribute(
+				EntityAttributes.PROPERTY_PERSISTENCE_METADATA );
 
 		if ( metadata != null && metadata.isEmbedded() ) {
 			return CommonViewElements.FIELDSET;

@@ -15,11 +15,7 @@
  */
 package com.foreach.across.modules.entity.config.builders;
 
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
-import com.foreach.across.modules.entity.registry.properties.MutableEntityPropertyDescriptor;
-import com.foreach.across.modules.entity.registry.properties.SimpleEntityPropertyDescriptor;
-import com.foreach.across.modules.entity.views.support.SpelValueFetcher;
 import com.foreach.across.modules.entity.views.support.ValueFetcher;
 import org.springframework.util.Assert;
 
@@ -27,97 +23,61 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
-* @author Arne Vandamme
-*/
+ * @author Arne Vandamme
+ */
 public abstract class EntityPropertyRegistryBuilderSupport<T>
 {
 	private final T parent;
-	private final Map<String, Descriptor> descriptors = new HashMap<>();
+
+	private final Map<String, EntityPropertyDescriptorBuilder<EntityPropertyRegistryBuilderSupport<T>>> builders =
+			new HashMap<>();
 
 	public EntityPropertyRegistryBuilderSupport( T parent ) {
 		this.parent = parent;
 	}
 
-	public EntityPropertyRegistryBuilderSupport<T> property( String name, String displayName ) {
-		return property( name, displayName, (ValueFetcher) null );
-	}
-
-	public EntityPropertyRegistryBuilderSupport<T> property( String name, String displayName, String expression ) {
-		Assert.notNull( expression );
-
-		return property( name, displayName, new SpelValueFetcher( expression ) );
-	}
-
-	public EntityPropertyRegistryBuilderSupport<T> property( String name,
-	                                                         String displayName,
-	                                                         ValueFetcher valueFetcher ) {
+	public synchronized EntityPropertyDescriptorBuilder<EntityPropertyRegistryBuilderSupport<T>> property( String name ) {
 		Assert.notNull( name );
 
-		Descriptor descriptor = new Descriptor();
-		descriptor.name = name;
-		if ( displayName != null ) {
-			descriptor.displayName = displayName;
-		}
-		if ( valueFetcher != null ) {
-			descriptor.valueFetcher = valueFetcher;
+		EntityPropertyDescriptorBuilder<EntityPropertyRegistryBuilderSupport<T>> builder = builders.get( name );
+
+		if ( builder == null ) {
+			builder = new EntityPropertyDescriptorBuilder<>( this, name );
+			builders.put( name, builder );
 		}
 
-		descriptors.put( name, descriptor );
-
-		return this;
+		return builder;
 	}
 
+	public EntityPropertyDescriptorBuilder<EntityPropertyRegistryBuilderSupport<T>> property( String name,
+	                                                                                          String displayName ) {
+		return property( name ).displayName( displayName );
+	}
+
+	public EntityPropertyDescriptorBuilder<EntityPropertyRegistryBuilderSupport<T>> property( String name,
+	                                                                                          String displayName,
+	                                                                                          String expression ) {
+		Assert.notNull( expression );
+		return property( name ).displayName( displayName ).spelValueFetcher( expression );
+	}
+
+	public EntityPropertyDescriptorBuilder<EntityPropertyRegistryBuilderSupport<T>> property( String name,
+	                                                                                          String displayName,
+	                                                                                          ValueFetcher valueFetcher ) {
+		Assert.notNull( valueFetcher );
+		return property( name ).displayName( displayName ).valueFetcher( valueFetcher );
+	}
+
+	/**
+	 * @return parent builder
+	 */
 	public T and() {
 		return parent;
 	}
 
 	protected void apply( EntityPropertyRegistry entityPropertyRegistry ) {
-		for ( Descriptor configured : descriptors.values() ) {
-			EntityPropertyDescriptor descriptor = entityPropertyRegistry.getProperty( configured.name );
-			MutableEntityPropertyDescriptor merged = (MutableEntityPropertyDescriptor) configured.merge(
-					descriptor );
-
-			entityPropertyRegistry.register( merged );
-		}
-	}
-
-	private static class Descriptor
-	{
-		String name, displayName;
-		ValueFetcher valueFetcher;
-
-		EntityPropertyDescriptor merge( EntityPropertyDescriptor existing ) {
-			SimpleEntityPropertyDescriptor descriptor;
-
-			// Modify the existing if possible, or create a new one
-			if ( existing instanceof SimpleEntityPropertyDescriptor ) {
-				descriptor = (SimpleEntityPropertyDescriptor) existing;
-			}
-			else {
-				descriptor = new SimpleEntityPropertyDescriptor();
-				descriptor.setName( name );
-			}
-
-			// Update configured properties
-			if ( displayName != null ) {
-				descriptor.setDisplayName( displayName );
-			}
-
-			if ( valueFetcher != null ) {
-				descriptor.setValueFetcher( valueFetcher );
-				descriptor.setReadable( true );
-			}
-			else if ( existing == null ) {
-				descriptor.setValueFetcher( new SpelValueFetcher( name ) );
-				descriptor.setReadable( true );
-			}
-
-			// There was an existing descriptor, but not mutable, we created a custom merge
-			if ( existing != null && !( existing instanceof SimpleEntityPropertyDescriptor ) ) {
-				return existing.merge( descriptor );
-			}
-
-			return descriptor;
+		for ( EntityPropertyDescriptorBuilder builder : builders.values() ) {
+			builder.apply( entityPropertyRegistry );
 		}
 	}
 }

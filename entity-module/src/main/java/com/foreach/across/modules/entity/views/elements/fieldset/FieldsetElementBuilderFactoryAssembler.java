@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -90,6 +91,11 @@ public class FieldsetElementBuilderFactoryAssembler implements ViewElementBuilde
 					properties.add( descriptor.getName() + "." + subDescriptor.getName() );
 				}
 			}
+		}
+		else if ( descriptor.hasAttribute( EntityAttributes.PROPERTY_GROUP ) ) {
+			Collection<String> memberNamesInOrder = descriptor.getAttribute( EntityAttributes.PROPERTY_GROUP );
+
+			properties.addAll( memberNamesInOrder );
 		}
 
 		template.setProperties( properties );
