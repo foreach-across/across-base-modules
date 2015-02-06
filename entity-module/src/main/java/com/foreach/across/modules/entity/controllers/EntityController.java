@@ -6,6 +6,8 @@ import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
+import com.foreach.across.modules.web.template.WebTemplateInterceptor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +54,7 @@ public class EntityController extends EntityControllerSupport
 	public ModelAndView renderEntityView( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
 	                                      @PathVariable("entityId") Serializable entityId,
 	                                      @RequestParam(value = "view") String viewName,
+                                          @RequestParam(value= WebTemplateInterceptor.PARTIAL_PARAMETER, required = false) String partialFragment,
 	                                      Model model
 	) {
 		Object entity = conversionService.convert( entityId, entityConfiguration.getEntityType() );
@@ -59,6 +62,10 @@ public class EntityController extends EntityControllerSupport
 
 		EntityViewFactory view = entityConfiguration.getViewFactory( viewName );
 
-		return view.create( entityConfiguration, model );
+        EntityView entityView = view.create(entityConfiguration, model);
+        if (StringUtils.isNotBlank(partialFragment)) {
+            entityView.setViewName( StringUtils.join( new Object[] {entityView.getViewName(), partialFragment}, " :: " ) );
+        }
+        return entityView;
 	}
 }
