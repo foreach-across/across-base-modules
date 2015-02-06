@@ -25,9 +25,11 @@ import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.elements.ViewElementMode;
 import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Arne Vandamme
@@ -72,14 +74,30 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 		return properties().filter( propertyNames );
 	}
 
+	/**
+	 * Add a {@link com.foreach.across.modules.entity.views.processors.ViewPreProcessor} that
+	 * should be called before generating the view.
+	 *
+	 * @param preProcessor instance - should not be null
+	 * @return current builder
+	 */
 	@SuppressWarnings("unchecked")
 	public S addPreProcessor( ViewPreProcessor preProcessor ) {
+		Assert.notNull( preProcessor );
 		this.preProcessors.add( preProcessor );
 		return (S) this;
 	}
 
+	/**
+	 * Add a {@link com.foreach.across.modules.entity.views.processors.ViewPostProcessor} that
+	 * should be called after generating the view.
+	 *
+	 * @param postProcessor instance - should not be null
+	 * @return current builder
+	 */
 	@SuppressWarnings("unchecked")
 	public S addPostProcessor( ViewPostProcessor postProcessor ) {
+		Assert.notNull( postProcessor );
 		this.postProcessors.add( postProcessor );
 		return (S) this;
 	}
@@ -106,6 +124,7 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void applyToFactory( EntityConfiguration configuration,
 	                               T factory ) {
 		if ( template != null ) {
@@ -127,7 +146,20 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 			factory.setPropertyFilter( viewPropertyFilter );
 		}
 
-		factory.setPreProsessors( preProcessors );
-		factory.setPostProsessors( postProcessors );
+		if ( !preProcessors.isEmpty() ) {
+			factory.setPreProcessors( merge( factory.getPreProcessors(), preProcessors ) );
+		}
+
+		if ( !postProcessors.isEmpty() ) {
+			factory.setPostProcessors( merge( factory.getPostProcessors(), postProcessors ) );
+		}
+	}
+
+	private <V> Collection<V> merge( Collection<V> original, Collection<V> additional ) {
+		List<V> total = new ArrayList<>( original.size() + additional.size() );
+		total.addAll( original );
+		total.addAll( additional );
+
+		return total;
 	}
 }
