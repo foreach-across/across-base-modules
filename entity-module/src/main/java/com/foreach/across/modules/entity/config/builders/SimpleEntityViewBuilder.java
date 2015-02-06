@@ -23,10 +23,15 @@ import com.foreach.across.modules.entity.registry.properties.MergingEntityProper
 import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.elements.ViewElementMode;
+import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
+import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
-* @author Arne Vandamme
-*/
+ * @author Arne Vandamme
+ */
 public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewFactorySupport, S extends SimpleEntityViewBuilder>
 		extends EntityViewBuilder<T, S>
 {
@@ -46,8 +51,10 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 	private String template;
 	private EntityViewPropertyRegistryBuilder propertyRegistryBuilder;
 	private EntityPropertyFilter viewPropertyFilter;
+	private Collection<ViewPreProcessor> preProcessors = new ArrayList<>();
+	private Collection<ViewPostProcessor> postProcessors = new ArrayList<>();
 
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public S template( String template ) {
 		this.template = template;
 		return (S) this;
@@ -65,7 +72,19 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 		return properties().filter( propertyNames );
 	}
 
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
+	public S addPreProcessor( ViewPreProcessor preProcessor ) {
+		this.preProcessors.add( preProcessor );
+		return (S) this;
+	}
+
+	@SuppressWarnings("unchecked")
+	public S addPostProcessor( ViewPostProcessor postProcessor ) {
+		this.postProcessors.add( postProcessor );
+		return (S) this;
+	}
+
+	@SuppressWarnings("unchecked")
 	@Override
 	protected T createFactoryInstance() {
 		return (T) new ConfigurablePropertiesEntityViewFactorySupport()
@@ -107,5 +126,8 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 		if ( viewPropertyFilter != null ) {
 			factory.setPropertyFilter( viewPropertyFilter );
 		}
+
+		factory.setPreProsessors( preProcessors );
+		factory.setPostProsessors( postProcessors );
 	}
 }

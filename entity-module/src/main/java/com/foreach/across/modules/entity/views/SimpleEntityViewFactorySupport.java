@@ -17,10 +17,14 @@ package com.foreach.across.modules.entity.views;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
+import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
+import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.ui.Model;
+
+import java.util.Collection;
 
 /**
  * Base support class for entity view factories that support message resolving along with template specification.
@@ -30,6 +34,9 @@ import org.springframework.ui.Model;
  */
 public abstract class SimpleEntityViewFactorySupport<T extends EntityView> implements EntityViewFactory
 {
+
+	private Collection<ViewPreProcessor<T>> preProsessors;
+	private Collection<ViewPostProcessor<T>> postProsessors;
 	private String template;
 	private MessageSource messageSource;
 	private EntityMessageCodeResolver messageCodeResolver;
@@ -89,6 +96,24 @@ public abstract class SimpleEntityViewFactorySupport<T extends EntityView> imple
 		this.entityLinkBuilder = entityLinkBuilder;
 	}
 
+	/**
+	 * Set the ViewPreProcessors that should be handled before building the EntityView
+	 *
+	 * @param preProsessors A Collection of ViewPreProcessors
+	 */
+	public void setPreProsessors( Collection<ViewPreProcessor<T>> preProsessors ) {
+		this.preProsessors = preProsessors;
+	}
+
+	/**
+	 * Set the ViewPostProcessors that should be handled before building the EntityView
+	 *
+	 * @param postProsessors A Collection of ViewPostProcessors
+	 */
+	public void setPostProsessors( Collection<ViewPostProcessor<T>> postProsessors ) {
+		this.postProsessors = postProsessors;
+	}
+
 	@Override
 	public EntityView create( EntityConfiguration entityConfiguration, Model model ) {
 		T view = createEntityView();
@@ -103,9 +128,29 @@ public abstract class SimpleEntityViewFactorySupport<T extends EntityView> imple
 		EntityMessageCodeResolver codeResolver = createMessageCodeResolver( entityConfiguration );
 		view.setEntityMessages( createEntityMessages( codeResolver ) );
 
+		handlePreProcessors( view );
+
 		buildViewModel( entityConfiguration, codeResolver, view );
 
+		handlePostProcessors( view );
+
 		return view;
+	}
+
+	private void handlePreProcessors( T view ) {
+		if ( preProsessors != null ) {
+			for ( ViewPreProcessor<T> preProcessor : preProsessors ) {
+				preProcessor.preProcess( view );
+			}
+		}
+	}
+
+	private void handlePostProcessors( T view ) {
+		if ( postProsessors != null ) {
+			for ( ViewPostProcessor<T> postProcessor : postProsessors ) {
+				postProcessor.postProcess( view );
+			}
+		}
 	}
 
 	protected EntityMessages createEntityMessages( EntityMessageCodeResolver codeResolver ) {
