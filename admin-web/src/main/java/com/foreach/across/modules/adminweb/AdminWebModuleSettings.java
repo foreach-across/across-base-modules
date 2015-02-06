@@ -17,10 +17,11 @@ package com.foreach.across.modules.adminweb;
 
 import com.foreach.across.core.AcrossModuleSettings;
 import com.foreach.across.core.AcrossModuleSettingsRegistry;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 public class AdminWebModuleSettings extends AcrossModuleSettings
 {
