@@ -20,135 +20,171 @@ import com.foreach.across.modules.entity.views.elements.form.hidden.HiddenFormEl
 import com.foreach.across.modules.entity.views.elements.form.select.SelectFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.textbox.TextboxFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.readonly.ConversionServiceViewElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.thymeleaf.EntityModuleDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.format.support.DefaultFormattingConversionService;
+import org.springframework.util.ClassUtils;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import javax.annotation.PostConstruct;
 
 @Configuration
-public class EntityModuleConfiguration
-{
-	private static final Logger LOG = LoggerFactory.getLogger( EntityModuleConfiguration.class );
+public class EntityModuleConfiguration {
+    private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring4.SpringTemplateEngine";
+    private static final String CLASS_SPRING_SECURITY_DIALECT =
+            "org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect";
 
-	@Autowired(required = false)
-	private ConfigurableConversionService conversionService;
+    private static final Logger LOG = LoggerFactory.getLogger(EntityModuleConfiguration.class);
 
-	@PostConstruct
-	public void registerConverters() {
-		ConfigurableConversionService converterRegistry =
-				conversionService != null ? conversionService : entityConversionService();
+    @Autowired
+    private ApplicationContext applicationContext;
 
-		EntityRegistry entityRegistry = entityRegistry();
+    @Autowired(required = false)
+    private ConfigurableConversionService conversionService;
 
-		converterRegistry.addConverter( new StringToEntityConfigurationConverter( entityRegistry ) );
-		converterRegistry.addConverter( new EntityConverter<>( converterRegistry, entityRegistry ) );
-	}
+    @PostConstruct
+    public void init() {
+        ConfigurableConversionService converterRegistry =
+                conversionService != null ? conversionService : entityConversionService();
 
-	@Bean
-	public EntityRegistryImpl entityRegistry() {
-		return new EntityRegistryImpl();
-	}
+        EntityRegistry entityRegistry = entityRegistry();
 
-	@Bean
-	@Exposed
-	@AcrossCondition("not hasBeanOfType(T(org.springframework.core.convert.ConversionService))")
-	public ConfigurableConversionService entityConversionService() {
-		LOG.warn( "No ConversionService found in Across context - creating and exposing a ConversionService bean" );
-		return new DefaultFormattingConversionService();
-	}
+        converterRegistry.addConverter(new StringToEntityConfigurationConverter(entityRegistry));
+        converterRegistry.addConverter(new EntityConverter<>(converterRegistry, entityRegistry));
 
-	@Bean(name = EntityModule.VALIDATOR)
-	@Exposed
-	@AcrossCondition("not hasBean('" + EntityModule.VALIDATOR + "')")
-	public Validator entityValidator() {
-		return new LocalValidatorFactoryBean();
-	}
+        if (shouldRegisterThymeleafDialect()) {
+            LOG.debug("Registering Thymeleaf entity module dialect");
 
-	/**
-	 * Ensures modules can configure entities through either EntityRegistrar or EntityConfigurer beans.
-	 */
-	@Bean
-	public ModuleEntityRegistration moduleEntityRegistration() {
-		return new ModuleEntityRegistration();
-	}
+            Object springTemplateEngine = applicationContext.getBean("springTemplateEngine");
 
-	@Bean
-	@Exposed
-	public EntityPropertyRegistries entityPropertyRegistries() {
-		return new EntityPropertyRegistries();
-	}
+            if (springTemplateEngine instanceof SpringTemplateEngine) {
+                ((SpringTemplateEngine) springTemplateEngine).addDialect(new EntityModuleDialect());
+                LOG.debug("Thymeleaf entity module dialect registered successfully.");
+            } else {
+                LOG.warn(
+                        "Unable to register Thymeleaf entity module dialect as bean springTemplateEngine is not of the right type.");
+            }
+        }
+    }
 
-	@Bean
-	public EntityFormService entityFormService() {
-		return new EntityFormService();
-	}
+    @Bean
+    public EntityRegistryImpl entityRegistry() {
+        return new EntityRegistryImpl();
+    }
 
-	@Bean
-	public TextboxFormElementBuilderFactoryAssembler textboxFormElementBuilderFactoryAssembler() {
-		return new TextboxFormElementBuilderFactoryAssembler();
-	}
+    @Bean
+    @Exposed
+    @AcrossCondition("not hasBeanOfType(T(org.springframework.core.convert.ConversionService))")
+    public ConfigurableConversionService entityConversionService() {
+        LOG.warn("No ConversionService found in Across context - creating and exposing a ConversionService bean");
+        return new DefaultFormattingConversionService();
+    }
 
-	@Bean
-	public ConversionServiceViewElementBuilderFactoryAssembler conversionServiceViewElementBuilderFactoryAssembler() {
-		return new ConversionServiceViewElementBuilderFactoryAssembler();
-	}
+    @Bean(name = EntityModule.VALIDATOR)
+    @Exposed
+    @AcrossCondition("not hasBean('" + EntityModule.VALIDATOR + "')")
+    public Validator entityValidator() {
+        return new LocalValidatorFactoryBean();
+    }
 
-	@Bean
-	public HiddenFormElementBuilderFactoryAssembler hiddenFormElementBuilderFactoryAsssembler() {
-		return new HiddenFormElementBuilderFactoryAssembler();
-	}
+    /**
+     * Ensures modules can configure entities through either EntityRegistrar or EntityConfigurer beans.
+     */
+    @Bean
+    public ModuleEntityRegistration moduleEntityRegistration() {
+        return new ModuleEntityRegistration();
+    }
 
-	@Bean
-	public SelectFormElementBuilderFactoryAssembler selectFormElementBuilderFactoryAssembler() {
-		return new SelectFormElementBuilderFactoryAssembler();
-	}
+    @Bean
+    @Exposed
+    public EntityPropertyRegistries entityPropertyRegistries() {
+        return new EntityPropertyRegistries();
+    }
 
-	@Bean
-	public CheckboxFormElementBuilderFactoryAssembler checkboxFormElementBuilderFactoryAssembler() {
-		return new CheckboxFormElementBuilderFactoryAssembler();
-	}
+    @Bean
+    public EntityFormService entityFormService() {
+        return new EntityFormService();
+    }
 
-	@Bean
-	public FieldsetElementBuilderFactoryAssembler fieldsetElementBuilderFactoryAssembler() {
-		return new FieldsetElementBuilderFactoryAssembler();
-	}
-	@Bean
-	public CommonViewElementTypeLookupStrategy commonFormElementTypeLookupStrategy() {
-		return new CommonViewElementTypeLookupStrategy();
-	}
+    @Bean
+    public TextboxFormElementBuilderFactoryAssembler textboxFormElementBuilderFactoryAssembler() {
+        return new TextboxFormElementBuilderFactoryAssembler();
+    }
 
-	@Bean
-	public MessageSource messageSource() {
-		return new AcrossModuleMessageSource();
-	}
+    @Bean
+    public ConversionServiceViewElementBuilderFactoryAssembler conversionServiceViewElementBuilderFactoryAssembler() {
+        return new ConversionServiceViewElementBuilderFactoryAssembler();
+    }
 
-	@Bean
-	@Exposed
-	@Scope("prototype")
-	public EntityListViewFactory entityListViewFactory() {
-		return new EntityListViewFactory();
-	}
+    @Bean
+    public HiddenFormElementBuilderFactoryAssembler hiddenFormElementBuilderFactoryAsssembler() {
+        return new HiddenFormElementBuilderFactoryAssembler();
+    }
 
-	@Bean
-	@Exposed
-	@Scope("prototype")
-	public EntityFormViewFactory entityCreateViewFactory() {
-		return new EntityFormViewFactory();
-	}
+    @Bean
+    public SelectFormElementBuilderFactoryAssembler selectFormElementBuilderFactoryAssembler() {
+        return new SelectFormElementBuilderFactoryAssembler();
+    }
+
+    @Bean
+    public CheckboxFormElementBuilderFactoryAssembler checkboxFormElementBuilderFactoryAssembler() {
+        return new CheckboxFormElementBuilderFactoryAssembler();
+    }
+
+    @Bean
+    public FieldsetElementBuilderFactoryAssembler fieldsetElementBuilderFactoryAssembler() {
+        return new FieldsetElementBuilderFactoryAssembler();
+    }
+
+    @Bean
+    public CommonViewElementTypeLookupStrategy commonFormElementTypeLookupStrategy() {
+        return new CommonViewElementTypeLookupStrategy();
+    }
+
+    @Bean
+    public MessageSource messageSource() {
+        return new AcrossModuleMessageSource();
+    }
+
+    @Bean
+    @Exposed
+    @Scope("prototype")
+    public EntityListViewFactory entityListViewFactory() {
+        return new EntityListViewFactory();
+    }
+
+    @Bean
+    @Exposed
+    @Scope("prototype")
+    public EntityFormViewFactory entityCreateViewFactory() {
+        return new EntityFormViewFactory();
+    }
 
 
+    private boolean shouldRegisterThymeleafDialect() {
+        if (applicationContext.containsBean("springTemplateEngine")) {
+            ClassLoader threadClassLoader = Thread.currentThread().getContextClassLoader();
 
+            if (ClassUtils.isPresent(CLASS_THYMELEAF_TEMPLATE_ENGINE, threadClassLoader)) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
 /*
-	@Bean
+    @Bean
 	public LocalValidatorFactoryBean entityValidatorFactory() {
 		return new LocalValidatorFactoryBean();
 	}

@@ -68,7 +68,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			<tr th:each="entity,entityStats:${page.content}" th:attr="data-entity-id=${entityConfiguration.getId(entity)}">
+			<tr th:each="entity,entityStats:${page.content}" em:attributes="${rowProcessor.process(entity)}">
 				<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
 				<td th:each="prop : ${properties}">
 					<!--/*
@@ -106,8 +106,6 @@
 			</tbody>
 		</table>
 	</div>
-    <!-- TODO REMOVE ME! -->
-    <script src="/msm/static/js/subscription/expandable.js"></script>
 </div>
 </body>
 </html>
