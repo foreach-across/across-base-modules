@@ -15,12 +15,17 @@
  */
 package com.foreach.across.modules.entity.views;
 
-import org.springframework.ui.Model;
+import com.foreach.across.modules.entity.registry.EntityConfiguration;
 
 /**
  * @author Arne Vandamme
  */
-public interface EntityViewFactory<T extends ViewCreationContext>
+public interface ViewCreationContext
 {
-	EntityView create( String viewName, T creationContext, Model model );
+	/**
+ 	 * @return EntityConfiguration the view is generated for.
+	 */
+	EntityConfiguration getEntityConfiguration();
+
+	void setEntityConfiguration( EntityConfiguration entityConfiguration );
 }

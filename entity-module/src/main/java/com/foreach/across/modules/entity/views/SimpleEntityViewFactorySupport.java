@@ -36,8 +36,8 @@ import java.util.Collections;
  */
 public abstract class SimpleEntityViewFactorySupport<T extends EntityView> implements EntityViewFactory
 {
-	private Collection<ViewPreProcessor<T>> preProcessors = Collections.emptyList();
-	private Collection<ViewPostProcessor<T>> postProcessors = Collections.emptyList();
+	private Collection<ViewPreProcessor<ViewCreationContext, T>> preProcessors = Collections.emptyList();
+	private Collection<ViewPostProcessor<ViewCreationContext, T>> postProcessors = Collections.emptyList();
 	private String template;
 	private MessageSource messageSource;
 	private EntityMessageCodeResolver messageCodeResolver;
@@ -102,12 +102,12 @@ public abstract class SimpleEntityViewFactorySupport<T extends EntityView> imple
 	 *
 	 * @param preProcessors A Collection of ViewPreProcessors
 	 */
-	public void setPreProcessors( Collection<ViewPreProcessor<T>> preProcessors ) {
+	public void setPreProcessors( Collection<ViewPreProcessor<ViewCreationContext, T>> preProcessors ) {
 		Assert.notNull( preProcessors );
 		this.preProcessors = preProcessors;
 	}
 
-	public Collection<ViewPreProcessor<T>> getPreProcessors() {
+	public Collection<ViewPreProcessor<ViewCreationContext, T>> getPreProcessors() {
 		return preProcessors;
 	}
 
@@ -116,17 +116,20 @@ public abstract class SimpleEntityViewFactorySupport<T extends EntityView> imple
 	 *
 	 * @param postProcessors A Collection of ViewPostProcessors
 	 */
-	public void setPostProcessors( Collection<ViewPostProcessor<T>> postProcessors ) {
+	public void setPostProcessors( Collection<ViewPostProcessor<ViewCreationContext, T>> postProcessors ) {
 		Assert.notNull( postProcessors );
 		this.postProcessors = postProcessors;
 	}
 
-	public Collection<ViewPostProcessor<T>> getPostProcessors() {
+	public Collection<ViewPostProcessor<ViewCreationContext, T>> getPostProcessors() {
 		return postProcessors;
 	}
 
 	@Override
-	public EntityView create( EntityConfiguration entityConfiguration, Model model ) {
+	public EntityView create( String viewName, ViewCreationContext creationContext, Model model ) {
+		EntityConfiguration entityConfiguration = creationContext.getEntityConfiguration();
+		Assert.notNull( entityConfiguration );
+
 		T view = createEntityView();
 		view.setViewName( template );
 		view.setEntityConfiguration( entityConfiguration );
@@ -139,24 +142,24 @@ public abstract class SimpleEntityViewFactorySupport<T extends EntityView> imple
 		EntityMessageCodeResolver codeResolver = createMessageCodeResolver( entityConfiguration );
 		view.setEntityMessages( createEntityMessages( codeResolver ) );
 
-		handlePreProcessors( view );
+		handlePreProcessors( creationContext, view );
 
 		buildViewModel( entityConfiguration, codeResolver, view );
 
-		handlePostProcessors( view );
+		handlePostProcessors( creationContext, view );
 
 		return view;
 	}
 
-	private void handlePreProcessors( T view ) {
-		for ( ViewPreProcessor<T> preProcessor : preProcessors ) {
-			preProcessor.preProcess( view );
+	private void handlePreProcessors( ViewCreationContext creationContext, T view ) {
+		for ( ViewPreProcessor<ViewCreationContext, T> preProcessor : preProcessors ) {
+			preProcessor.preProcess( creationContext, view );
 		}
 	}
 
-	private void handlePostProcessors( T view ) {
-		for ( ViewPostProcessor<T> postProcessor : postProcessors ) {
-			postProcessor.postProcess( view );
+	private void handlePostProcessors( ViewCreationContext creationContext, T view ) {
+		for ( ViewPostProcessor<ViewCreationContext, T> postProcessor : postProcessors ) {
+			postProcessor.postProcess( creationContext, view );
 		}
 	}
 

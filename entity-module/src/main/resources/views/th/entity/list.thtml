@@ -72,7 +72,7 @@
 				<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
 				<td th:each="prop : ${properties}">
 					<!--/*
-					 em:attributes="${rowProcessor.attributes(entity)}"
+
 					<span th:if="${prop.name eq 'createdDate'}" th:remove="tag">
 						<div th:replace="|th/entity/${prop.name}|">DATUM</div>
 					</span>

@@ -24,6 +24,7 @@ import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
+import com.foreach.across.modules.entity.web.WebViewCreationContext;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -63,7 +64,8 @@ public class EntityCreateController extends EntityControllerSupport
 	                                @ModelAttribute(EntityView.ATTRIBUTE_ENTITY) @Valid Object entity,
 	                                BindingResult bindingResult,
 	                                Model model,
-	                                RedirectAttributes redirectAttributes ) {
+	                                RedirectAttributes redirectAttributes,
+	                                WebViewCreationContext creationContext ) {
 		EntityModel entityModel = entityConfiguration.getEntityModel();
 
 		if ( !bindingResult.hasErrors() ) {
@@ -79,16 +81,20 @@ public class EntityCreateController extends EntityControllerSupport
 			return mav;
 		}
 		else {
-			return showCreateEntityForm( entityConfiguration, model );
+			return showCreateEntityForm( entityConfiguration, model, creationContext );
 		}
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView showCreateEntityForm(
-			@PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration, Model model ) {
+			@PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
+			Model model,
+			WebViewCreationContext creationContext ) {
+		creationContext.setEntityConfiguration( entityConfiguration );
+
 		EntityViewFactory viewFactory = entityConfiguration.getViewFactory( EntityFormView.CREATE_VIEW_NAME );
 
-		EntityView view = viewFactory.create( entityConfiguration, model );
+		EntityView view = viewFactory.create( EntityFormView.CREATE_VIEW_NAME, creationContext, model );
 		view.setEntityMenu( menuFactory.buildMenu( new EntityAdminMenu<>( entityConfiguration.getEntityType() ) ) );
 
 		if ( view.getPageTitle() == null ) {

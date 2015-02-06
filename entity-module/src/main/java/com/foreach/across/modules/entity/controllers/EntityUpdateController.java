@@ -10,6 +10,7 @@ import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
+import com.foreach.across.modules.entity.web.WebViewCreationContext;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
@@ -57,13 +58,16 @@ public class EntityUpdateController extends EntityControllerSupport
 	public ModelAndView showUpdateEntityForm( @PathVariable("entityConfig") EntityConfiguration entityConfiguration,
 	                                          @ModelAttribute(EntityView.ATTRIBUTE_ENTITY) Object entity,
 	                                          AdminMenu adminMenu,
-	                                          Model model ) {
+	                                          Model model,
+	                                          WebViewCreationContext creationContext ) {
+		creationContext.setEntityConfiguration( entityConfiguration );
+
 		Object original = model.asMap().get( EntityFormView.ATTRIBUTE_ORIGINAL_ENTITY );
 
 		adminMenu.breadcrumbLeaf( entityConfiguration.getLabel( original ) );
 
 		EntityViewFactory viewFactory = entityConfiguration.getViewFactory( EntityFormView.UPDATE_VIEW_NAME );
-		EntityView view = viewFactory.create( entityConfiguration, model );
+		EntityView view = viewFactory.create( EntityFormView.UPDATE_VIEW_NAME, creationContext, model );
 		view.setEntityMenu(
 				menuFactory.buildMenu( new EntityAdminMenu( entityConfiguration.getEntityType(),
 				                                            original ) )
@@ -85,7 +89,8 @@ public class EntityUpdateController extends EntityControllerSupport
 	                                BindingResult bindingResult,
 	                                Model model,
 	                                AdminMenu adminMenu,
-	                                RedirectAttributes redirectAttributes ) {
+	                                RedirectAttributes redirectAttributes,
+	                                WebViewCreationContext creationContext ) {
 		EntityModel entityModel = entityConfiguration.getEntityModel();
 
 		if ( !bindingResult.hasErrors() ) {
@@ -101,7 +106,7 @@ public class EntityUpdateController extends EntityControllerSupport
 			return mav;
 		}
 		else {
-			return showUpdateEntityForm( entityConfiguration, entity, adminMenu, model );
+			return showUpdateEntityForm( entityConfiguration, entity, adminMenu, model, creationContext );
 		}
 	}
 }

@@ -18,13 +18,20 @@ package com.foreach.across.modules.entity.config.modules;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.entity.EntityModuleSettings;
 import com.foreach.across.modules.entity.annotations.EntityValidator;
+import com.foreach.across.modules.entity.views.ViewCreationContext;
+import com.foreach.across.modules.entity.web.WebViewCreationContextImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.data.web.SortHandlerMethodArgumentResolver;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.validation.Validator;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.annotation.PostConstruct;
@@ -63,6 +70,28 @@ public class AcrossWebConfiguration extends WebMvcConfigurerAdapter
 		pageableHandlerMethodArgumentResolver.setFallbackPageable( null );
 	}
 
+	@Override
+	public void addArgumentResolvers( List<HandlerMethodArgumentResolver> argumentResolvers ) {
+		// todo: move to a decent class - ensure only one creation context per request (?)
+		argumentResolvers.add( new HandlerMethodArgumentResolver()
+		{
+			@Override
+			public boolean supportsParameter( MethodParameter parameter ) {
+				return ViewCreationContext.class.isAssignableFrom( parameter.getParameterType() );
+			}
+
+			@Override
+			public Object resolveArgument( MethodParameter parameter,
+			                               ModelAndViewContainer mavContainer,
+			                               NativeWebRequest webRequest,
+			                               WebDataBinderFactory binderFactory ) throws Exception {
+				WebViewCreationContextImpl ctx = new WebViewCreationContextImpl();
+				ctx.setRequest( webRequest );
+
+				return ctx;
+			}
+		} );
+	}
 
 	/**
 	 * Register the entity validator as the default web mvc validator if necessary.

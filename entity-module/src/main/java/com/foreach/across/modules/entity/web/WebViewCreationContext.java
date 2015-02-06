@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views;
+package com.foreach.across.modules.entity.web;
 
-import org.springframework.ui.Model;
+import com.foreach.across.modules.entity.views.ViewCreationContext;
+import com.foreach.across.modules.web.resource.WebResourceRegistry;
+import org.springframework.web.context.request.NativeWebRequest;
 
 /**
  * @author Arne Vandamme
  */
-public interface EntityViewFactory<T extends ViewCreationContext>
+public interface WebViewCreationContext extends ViewCreationContext
 {
-	EntityView create( String viewName, T creationContext, Model model );
+	NativeWebRequest getRequest();
+
+	WebResourceRegistry getWebResourceRegistry();
 }

@@ -16,11 +16,12 @@
 package com.foreach.across.modules.entity.views.processors;
 
 import com.foreach.across.modules.entity.views.EntityView;
+import com.foreach.across.modules.entity.views.ViewCreationContext;
 
 /**
  * @author Andy Somers
  */
-public interface ViewPreProcessor<T extends EntityView>
+public interface ViewPreProcessor<T extends ViewCreationContext, U extends EntityView>
 {
-	void preProcess( T view );
+	void preProcess( T creationContext, U view );
 }

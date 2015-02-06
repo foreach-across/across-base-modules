@@ -25,6 +25,7 @@ import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
+import com.foreach.across.modules.entity.web.WebViewCreationContext;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
@@ -80,7 +81,10 @@ public class AssociatedEntityController extends EntityControllerSupport
 	                                            @PathVariable("associatedConfig") EntityConfiguration associatedConfig,
 	                                            AdminMenu adminMenu,
 	                                            Model model,
-	                                            Pageable pageable ) {
+	                                            Pageable pageable,
+	                                            WebViewCreationContext creationContext ) {
+		creationContext.setEntityConfiguration( associatedConfig );
+
 		model.addAttribute( EntityListView.ATTRIBUTE_PAGEABLE, pageable );
 
 		adminMenu.breadcrumbLeaf( entityConfiguration.getLabel( entity ) );
@@ -88,7 +92,7 @@ public class AssociatedEntityController extends EntityControllerSupport
 		EntityViewFactory viewFactory = entityConfiguration.association( associatedConfig.getEntityType() )
 		                                                   .getViewFactory( EntityListView.VIEW_NAME );
 
-		EntityView entityView = viewFactory.create( associatedConfig, model );
+		EntityView entityView = viewFactory.create( EntityListView.VIEW_NAME, creationContext, model );
 		entityView.setPageTitle(
 				new EntityMessages( entityConfiguration.getEntityMessageCodeResolver() )
 						.updatePageTitle( entityConfiguration.getLabel( entity ) )

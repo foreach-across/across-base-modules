@@ -16,19 +16,21 @@
 package com.foreach.across.modules.entity.views.processors;
 
 import com.foreach.across.modules.entity.views.EntityView;
+import com.foreach.across.modules.entity.views.ViewCreationContext;
 
 /**
  * @author Andy Somers
  */
-public class ViewProcessorAdapter<T extends EntityView> implements ViewPreProcessor<T>, ViewPostProcessor<T>
+public class ViewProcessorAdapter<T extends ViewCreationContext, U extends EntityView>
+		implements ViewPreProcessor<T, U>, ViewPostProcessor<T, U>
 {
 	@Override
-	public void postProcess( T view ) {
+	public void preProcess( T creationContext, U view ) {
 
 	}
 
 	@Override
-	public void preProcess( T view ) {
+	public void postProcess( T creationContext, U view ) {
 
 	}
 }
