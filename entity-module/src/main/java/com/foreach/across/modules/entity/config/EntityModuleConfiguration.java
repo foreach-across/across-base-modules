@@ -5,6 +5,7 @@ import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.context.support.AcrossModuleMessageSource;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.converters.EntityConverter;
+import com.foreach.across.modules.entity.converters.EntityToStringConverter;
 import com.foreach.across.modules.entity.converters.StringToEntityConfigurationConverter;
 import com.foreach.across.modules.entity.registrars.ModuleEntityRegistration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
@@ -52,6 +53,7 @@ public class EntityModuleConfiguration
 
 		converterRegistry.addConverter( new StringToEntityConfigurationConverter( entityRegistry ) );
 		converterRegistry.addConverter( new EntityConverter<>( converterRegistry, entityRegistry ) );
+		converterRegistry.addConverter( new EntityToStringConverter( entityRegistry ) );
 	}
 
 	@Bean
