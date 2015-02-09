@@ -44,6 +44,13 @@ public interface ViewElement
 	String getCustomTemplate();
 
 	/**
+	 * If a view element represents a field, the name is expected to be resolvable on the command object.
+	 *
+	 * @return True if the view element represent a command object field.
+	 */
+	boolean isField();
+
+	/**
 	 * Retrieve the raw value of this view element for a given entity.
 	 *
 	 * @param entity Entity for which to retrieve the value.

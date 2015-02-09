@@ -12,6 +12,7 @@ public class ViewElementBuilderSupport<T extends ViewElementSupport> implements 
 	private final Class<T> builderClass;
 
 	private String name, label, labelCode, customTemplate;
+	private boolean field;
 
 	private EntityMessageCodeResolver messageCodeResolver;
 	private ValuePrinter valuePrinter;
@@ -69,6 +70,14 @@ public class ViewElementBuilderSupport<T extends ViewElementSupport> implements 
 		this.customTemplate = customTemplate;
 	}
 
+	public boolean isField() {
+		return field;
+	}
+
+	public void setField( boolean field ) {
+		this.field = field;
+	}
+
 	protected String resolve( String code, String defaultMessage ) {
 		if ( messageCodeResolver != null && code != null ) {
 			return messageCodeResolver.getMessageWithFallback( code, defaultMessage );
@@ -118,12 +127,13 @@ public class ViewElementBuilderSupport<T extends ViewElementSupport> implements 
 				&& Objects.equals( customTemplate, that.customTemplate )
 				&& Objects.equals( label, that.label )
 				&& Objects.equals( labelCode, that.labelCode )
+				&& Objects.equals( field, that.field )
 				&& Objects.equals( messageCodeResolver, that.messageCodeResolver )
 				&& Objects.equals( valuePrinter, that.valuePrinter );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( name, customTemplate, label, labelCode, messageCodeResolver, valuePrinter );
+		return Objects.hash( name, customTemplate, label, labelCode, field, messageCodeResolver, valuePrinter );
 	}
 }

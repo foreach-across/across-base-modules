@@ -208,5 +208,10 @@ public class EntityListViewFactory extends ConfigurablePropertiesEntityViewFacto
 		public void setSortableProperty( String sortableProperty ) {
 			this.sortableProperty = sortableProperty;
 		}
+
+		@Override
+		public boolean isField() {
+			return false;
+		}
 	}
 }

@@ -17,6 +17,8 @@ public class FieldsetElement extends ViewElements implements ViewElement
 	private String name, label, customTemplate;
 	private ValuePrinter valuePrinter;
 
+	private boolean field;
+
 	@Override
 	public String getElementType() {
 		return TYPE;
@@ -56,6 +58,15 @@ public class FieldsetElement extends ViewElements implements ViewElement
 	public void setValuePrinter( ValuePrinter valuePrinter ) {
 		Assert.notNull( valuePrinter );
 		this.valuePrinter = valuePrinter;
+	}
+
+	@Override
+	public boolean isField() {
+		return field;
+	}
+
+	public void setField( boolean field ) {
+		this.field = field;
 	}
 
 	@Override

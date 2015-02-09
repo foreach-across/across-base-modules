@@ -84,6 +84,9 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 		template.setLabelCode( "properties." + descriptor.getName() );
 		template.setValuePrinter( createValuePrinter( descriptor ) );
 
+		// todo: only if *native* property
+		template.setField( true );
+
 		assembleTemplate( entityConfiguration, registry, descriptor, template );
 
 		handleConstraints( descriptor, template );

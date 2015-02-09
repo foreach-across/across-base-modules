@@ -22,9 +22,9 @@ import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.ViewElement;
 import com.foreach.across.modules.entity.views.elements.ViewElementBuilderContext;
 import com.foreach.across.modules.entity.views.elements.ViewElementMode;
+import com.foreach.across.modules.entity.views.elements.ViewElements;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -84,8 +84,8 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 		extendViewModel( entityConfiguration, view );
 	}
 
-	private List<ViewElement> getEntityProperties( EntityConfiguration entityConfiguration,
-	                                               EntityMessageCodeResolver messageCodeResolver ) {
+	private ViewElements getEntityProperties( EntityConfiguration entityConfiguration,
+	                                          EntityMessageCodeResolver messageCodeResolver ) {
 		EntityPropertyFilter filter = getPropertyFilter() != null ? getPropertyFilter() : EntityPropertyFilters.NoOp;
 
 		EntityPropertyRegistry registry = getPropertyRegistry();
@@ -107,7 +107,7 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 			descriptors = registry.getProperties( filter );
 		}
 
-		List<ViewElement> propertyViews = new ArrayList<>( descriptors.size() );
+		ViewElements propertyViews = new ViewElements();
 
 		for ( EntityPropertyDescriptor descriptor : descriptors ) {
 			ViewElement propertyView = createPropertyView( builderContext, descriptor );

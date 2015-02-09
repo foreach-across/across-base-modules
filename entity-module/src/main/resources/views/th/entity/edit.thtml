@@ -46,9 +46,6 @@
 
 						<div th:replace="th/entity/formFields :: form_fields(${properties})" />
 
-						<input class="btn btn-primary" type="submit" value="Save"/>
-						<a class="btn btn-link" th:href="@{${@adminWeb.path(entityLinks.overview())}}">Cancel</a>
-
 					</div>
 				</div>
 			</form>

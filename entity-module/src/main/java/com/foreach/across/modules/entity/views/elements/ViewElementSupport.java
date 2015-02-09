@@ -10,6 +10,8 @@ public class ViewElementSupport implements ViewElement
 	private String name, label, customTemplate;
 	private ValuePrinter valuePrinter;
 
+	private boolean field;
+
 	@Override
 	public String getElementType() {
 		return elementType;
@@ -40,6 +42,15 @@ public class ViewElementSupport implements ViewElement
 	@Override
 	public String getCustomTemplate() {
 		return customTemplate;
+	}
+
+	@Override
+	public boolean isField() {
+		return field;
+	}
+
+	public void setField( boolean field ) {
+		this.field = field;
 	}
 
 	public void setCustomTemplate( String customTemplate ) {

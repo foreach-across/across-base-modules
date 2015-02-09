@@ -17,7 +17,9 @@ package com.foreach.across.modules.entity.views;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
+import com.foreach.across.modules.entity.views.elements.CommonViewElements;
 import com.foreach.across.modules.entity.views.elements.ViewElementMode;
+import com.foreach.across.modules.entity.views.elements.button.ButtonViewElement;
 
 /**
  * @author Arne Vandamme
@@ -44,6 +46,23 @@ public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFacto
 				                    ? view.getEntityLinkBuilder().create()
 				                    : view.getEntityLinkBuilder().update( original )
 		);
+
+		ButtonViewElement button = new ButtonViewElement();
+		button.setName( "btn-save" );
+		button.setElementType( CommonViewElements.SUBMIT_BUTTON);
+		button.setLabel( "Save" );
+
+		ButtonViewElement cancel = new ButtonViewElement();
+		cancel.setName( "btn-cancel" );
+		cancel.setElementType( CommonViewElements.LINK_BUTTON );
+		cancel.setLink( view.getEntityLinkBuilder().overview() );
+
+		//@{${@adminWeb.path(entityLinks.overview())}}
+		cancel.setLabel( "Cancel" );
+
+		view.getEntityProperties().add( button );
+		view.getEntityProperties().add( cancel );
+
 	}
 
 	private Object retrieveOrCreateEntity( EntityModel entityModel, EntityFormView view ) {

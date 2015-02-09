@@ -40,6 +40,11 @@ public class ConversionServiceViewElement implements ViewElement
 	}
 
 	@Override
+	public boolean isField() {
+		return false;
+	}
+
+	@Override
 	public String getElementType() {
 		return "text";
 	}

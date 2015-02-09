@@ -1,89 +1,102 @@
 <th:block th:fragment="form_fields(properties)">
-	<div class="form-group" th:each="element : ${properties}"
-	     th:classappend="${element.elementType != 'fieldset' and #fields.hasErrors(element.name)}? has-error">
-		<!--/* fieldset */-->
-		<div th:if="${element.elementType eq 'fieldset'}">
-			<fieldset>
-				<legend th:text="${element.label}">Fieldset label</legend>
-				<div th:replace="th/entity/formFields ::form_fields(${element})">
-					group members
-				</div>
-			</fieldset>
-		</div>
-		<!--/* label */-->
-		<div th:if="${element.elementType eq 'text'}">
-			<label th:for="${element.name}" th:text="${element.label}">label</label>
-			<div th:utext="${element.print(entity)}">text value</div>
-		</div>
-		<!--/* hidden */-->
-		<div th:if="${element.elementType eq 'hidden'}">
-			<input type="hidden" th:name="${element.name}" th:value="${element.value(entity)}"/>
-		</div>
-		<!--/* textbox */-->
-		<div th:if="${element.elementType eq 'textbox'}">
-			<label th:for="${#ids.next(element.name)}">
-				<span th:text="${element.label}">label text</span>
-				<sup th:if="${element.required}"><strong>*</strong></sup>
-			</label>
-			<input th:unless="${element.multiLine}"
-			       th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}"
-			       class="form-control" th:value="${element.print(entity)}"
-			       th:attr="maxlength=${element.maxLength}"
-					/>
-			<textarea th:if="${element.multiLine}" class="form-control"
-			          th:id="${#ids.seq(element.name)}"
-			          th:name="${element.name}"
-			          th:text="${element.print(entity)}"
-			          th:attr="maxlength=${element.maxLength}"/>
-		</div>
-		<!--/* select */-->
-		<div th:if="${element.elementType eq 'select' and not element.options.empty}">
-			<label th:for="${#ids.next(element.name)}">
-				<span th:text="${element.label}">label text</span>
-				<sup th:if="${element.required}"><strong>*</strong></sup>
-			</label>
-			<select th:id="${#ids.seq(element.name)}" class="form-control" th:name="${element.name}"
-			        th:with="selectedValue = ${element.value(entity)}">
-				<option th:if="${not element.required or selectedValue == null}"></option>
-				<option th:each="option : ${element.options}"
-				        th:value="${option.value}"
-				        th:selected="${selectedValue != null and option.isSelected(selectedValue)}"
-				        th:text="${option.label}"/>
-			</select>
-		</div>
-		<!--/* multi checkbox */-->
-		<div th:if="${element.elementType eq 'multi-checkbox' and not element.options.empty}">
-			<label>
-				<span th:text="${element.label}">label text</span>
-				<sup th:if="${element.required}"><strong>*</strong></sup>
-			</label>
-			<div th:with="selectedValue = ${element.value(entity)}">
-				<div th:each="option : ${element.options}" class="checkbox">
-					<label th:for="${#ids.next(element.name)}">
-						<input type="checkbox"
-						       th:id="${#ids.seq(element.name)}"
-						       th:name="${element.name}"
-						       th:value="${option.value}"
-						       th:checked="${selectedValue != null and option.isSelected(selectedValue)}"/>
-						<span th:text="${option.label}">label text</span>
-					</label>
-					<input type="hidden" th:name="|_${element.name}|" value="on"/>
+	<th:block th:each="element : ${properties}">
+		<div th:remove="${element.field} ? 'none': 'tag'"
+		     class="form-group"
+		     th:classappend="${element.field and #fields.hasErrors(element.name)}? has-error">
+			<!--/* submit button */-->
+			<th:block th:if="${element.elementType eq 'submit'}">
+				<input type="submit" class="btn btn-primary" th:name="${element.name}" th:value="${element.label}" />
+			</th:block>
+			<!--/* link button */-->
+			<th:block th:if="${element.elementType eq 'button-link'}">
+				<a class="btn btn-link" th:href="@{${@adminWeb.path(element.link)}}" th:text="${element.label}">
+					link text
+				</a>
+			</th:block>
+			<!--/* fieldset */-->
+			<div th:if="${element.elementType eq 'fieldset'}">
+				<fieldset>
+					<legend th:text="${element.label}">Fieldset label</legend>
+					<div th:replace="th/entity/formFields ::form_fields(${element})">
+						group members
+					</div>
+				</fieldset>
+			</div>
+			<!--/* label */-->
+			<div th:if="${element.elementType eq 'text'}">
+				<label th:for="${element.name}" th:text="${element.label}">label</label>
+				<div th:utext="${element.print(entity)}">text value</div>
+			</div>
+			<!--/* hidden */-->
+			<div th:if="${element.elementType eq 'hidden'}">
+				<input type="hidden" th:name="${element.name}" th:value="${element.value(entity)}"/>
+			</div>
+			<!--/* textbox */-->
+			<div th:if="${element.elementType eq 'textbox'}">
+				<label th:for="${#ids.next(element.name)}">
+					<span th:text="${element.label}">label text</span>
+					<sup th:if="${element.required}"><strong>*</strong></sup>
+				</label>
+				<input th:unless="${element.multiLine}"
+				       th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}"
+				       class="form-control" th:value="${element.print(entity)}"
+				       th:attr="maxlength=${element.maxLength}"
+						/>
+				<textarea th:if="${element.multiLine}" class="form-control"
+				          th:id="${#ids.seq(element.name)}"
+				          th:name="${element.name}"
+				          th:text="${element.print(entity)}"
+				          th:attr="maxlength=${element.maxLength}"/>
+			</div>
+			<!--/* select */-->
+			<div th:if="${element.elementType eq 'select' and not element.options.empty}">
+				<label th:for="${#ids.next(element.name)}">
+					<span th:text="${element.label}">label text</span>
+					<sup th:if="${element.required}"><strong>*</strong></sup>
+				</label>
+				<select th:id="${#ids.seq(element.name)}" class="form-control" th:name="${element.name}"
+				        th:with="selectedValue = ${element.value(entity)}">
+					<option th:if="${not element.required or selectedValue == null}"></option>
+					<option th:each="option : ${element.options}"
+					        th:value="${option.value}"
+					        th:selected="${selectedValue != null and option.isSelected(selectedValue)}"
+					        th:text="${option.label}"/>
+				</select>
+			</div>
+			<!--/* multi checkbox */-->
+			<div th:if="${element.elementType eq 'multi-checkbox' and not element.options.empty}">
+				<label>
+					<span th:text="${element.label}">label text</span>
+					<sup th:if="${element.required}"><strong>*</strong></sup>
+				</label>
+				<div th:with="selectedValue = ${element.value(entity)}">
+					<div th:each="option : ${element.options}" class="checkbox">
+						<label th:for="${#ids.next(element.name)}">
+							<input type="checkbox"
+							       th:id="${#ids.seq(element.name)}"
+							       th:name="${element.name}"
+							       th:value="${option.value}"
+							       th:checked="${selectedValue != null and option.isSelected(selectedValue)}"/>
+							<span th:text="${option.label}">label text</span>
+						</label>
+						<input type="hidden" th:name="|_${element.name}|" value="on"/>
+					</div>
 				</div>
 			</div>
-		</div>
-		<!--/* checkbox */-->
-		<div th:if="${element.elementType eq 'checkbox'}" class="checkbox">
-			<label th:for="${#ids.next(element.name)}">
-				<input type="checkbox" th:id="${#ids.seq(element.name)}"
-				       th:name="${element.name}"
-				       th:checked="${element.isChecked(entity)}"/>
-				<input type="hidden" th:name="|_${element.name}|" value="on"/>
-				<span th:text="${element.label}">label</span>
-			</label>
-		</div>
+			<!--/* checkbox */-->
+			<div th:if="${element.elementType eq 'checkbox'}" class="checkbox">
+				<label th:for="${#ids.next(element.name)}">
+					<input type="checkbox" th:id="${#ids.seq(element.name)}"
+					       th:name="${element.name}"
+					       th:checked="${element.isChecked(entity)}"/>
+					<input type="hidden" th:name="|_${element.name}|" value="on"/>
+					<span th:text="${element.label}">label</span>
+				</label>
+			</div>
 
-		<div class="small text-danger" th:if="${element.elementType != 'fieldset' and #fields.hasErrors(element.name)}">
-			<span th:each="error : ${#fields.errors(element.name)}" th:text="${error}">Error message.</span>
+			<div class="small text-danger" th:if="${element.field and #fields.hasErrors(element.name)}">
+				<span th:each="error : ${#fields.errors(element.name)}" th:text="${error}">Error message.</span>
+			</div>
 		</div>
-	</div>
+	</th:block>
 </th:block>

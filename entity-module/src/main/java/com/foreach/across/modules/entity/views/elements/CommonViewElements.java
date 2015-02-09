@@ -27,4 +27,8 @@ public interface CommonViewElements
 	String CHECKBOX = "checkbox";
 	String FIELDSET = "fieldset";
 	String TEXT = "text";
+
+	String BUTTON = "button";
+	String SUBMIT_BUTTON = "submit";
+	String LINK_BUTTON = "button-link";
 }
