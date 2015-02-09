@@ -60,6 +60,8 @@ public class AdminWebModuleSettings extends AcrossModuleSettings
 	public static final String LOCALE_DEFAULT = "adminWebModule.locale.default";
 	public static final String LOCALE_OPTIONS = "adminWebModule.locale.options";
 
+	public static final String ADMIN_ACCESS_PERMISSIONS = "adminWebModule.access.permissions";
+
 	private String title;
 
 	@Override
@@ -75,6 +77,8 @@ public class AdminWebModuleSettings extends AcrossModuleSettings
 		                   "Default locale that should explicitly be set when accessing the administration interface if no specific locale." );
 		registry.register( LOCALE_OPTIONS, List.class, Collections.emptyList(),
 		                   "List of locales that can be selected on the login page." );
+		registry.register( ADMIN_ACCESS_PERMISSIONS, String[].class, new String[]{ "access administration" },
+		                   "List of permissions that grant access to the administration interface." );
 	}
 
 	public String getTitle() {
@@ -100,4 +104,9 @@ public class AdminWebModuleSettings extends AcrossModuleSettings
 	public List getLocaleOptions() {
 		return getProperty( LOCALE_OPTIONS, List.class );
 	}
+
+	public String[] getAccessPermissions() {
+		return getProperty( ADMIN_ACCESS_PERMISSIONS, String[].class );
+	}
+
 }

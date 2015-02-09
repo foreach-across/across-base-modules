@@ -15,8 +15,8 @@
  */
 package com.foreach.across.modules.user.security;
 
-import com.foreach.across.modules.user.business.User;
-import com.foreach.across.modules.user.services.UserService;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,29 +26,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService
 {
+
 	@Autowired
-	private UserService userService;
+	private SecurityPrincipalService securityPrincipalService;
 
 	@Override
 	public UserDetails loadUserByUsername( String username ) throws UsernameNotFoundException {
-		User user = retrieveUser( username );
-
-		if ( user == null ) {
+		SecurityPrincipal principal = securityPrincipalService.getPrincipalByName( username );
+		if( principal != null && principal instanceof UserDetails ){
+			return ( UserDetails ) principal;
+		} else {
 			throw new UsernameNotFoundException( "No user found with username: " + username );
 		}
-
-		return user;
 	}
 
-	private User retrieveUser( String usernameOrEmail ) {
-		if ( userService.isUseEmailAsUsername() ) {
-			User candidate = userService.getUserByEmail( usernameOrEmail );
-
-			if ( candidate != null ) {
-				return candidate;
-			}
-		}
-
-		return userService.getUserByUsername( usernameOrEmail );
-	}
 }
