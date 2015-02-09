@@ -88,8 +88,8 @@ public class AssociatedEntityCreateController extends EntityControllerSupport
 		EntityViewFactory viewFactory = entityConfiguration.association( associatedConfig.getEntityType() )
 		                                                   .getViewFactory( EntityFormView.CREATE_VIEW_NAME );
 		EntityView entityView = viewFactory.create( EntityFormView.CREATE_VIEW_NAME, creationContext, model );
-		entityView.setPageTitle( new EntityMessages( entityConfiguration.getEntityMessageCodeResolver() )
-				                         .updatePageTitle( entityConfiguration.getLabel( entity ) ) );
+		entityView.setPageTitle( new EntityMessages( associatedConfig.getEntityMessageCodeResolver() )
+				                         .updatePageTitle( associatedConfig.getLabel( entity ) ) );
 		entityView.setEntityMenu(
 				menuFactory.buildMenu( new EntityAdminMenu( associatedConfig.getEntityType(), entity ) ) );
 

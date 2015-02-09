@@ -39,6 +39,9 @@ public class MultipleAttributeProcessor extends AbstractAttributeModifierAttrPro
 		IStandardExpressionParser parser = StandardExpressions.getExpressionParser( configuration );
 		IStandardExpression expression = parser.parseExpression( configuration, arguments, attributeValue );
 		Object parseResult = expression.execute( configuration, arguments );
+		if ( parseResult == null ) {
+			return processedAttributes;
+		}
 		if ( !(parseResult instanceof Map)) {
 			throw new IllegalArgumentException(
 					"Expect argument of type Map<String, String> but was given" + parseResult.getClass() );
