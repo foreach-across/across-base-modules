@@ -68,7 +68,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			<tr th:each="entity,entityStats:${page.content}" em:attributes="${rowProcessor.process(entity)}">
+			<tr th:each="entity,entityStats:${page.content}" em:attributes="${rowProcessor.attributes(entity)}">
 				<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
 				<td th:each="prop : ${properties}">
 					<!--/*

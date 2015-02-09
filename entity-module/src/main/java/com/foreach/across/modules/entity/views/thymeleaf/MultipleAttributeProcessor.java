@@ -1,6 +1,5 @@
 package com.foreach.across.modules.entity.views.thymeleaf;
 
-import org.apache.commons.lang3.StringUtils;
 import org.thymeleaf.Arguments;
 import org.thymeleaf.Configuration;
 import org.thymeleaf.dom.Element;
@@ -28,6 +27,7 @@ public class MultipleAttributeProcessor extends AbstractAttributeModifierAttrPro
 		super( EntityModuleDialect.AttributeNames.ATTRIBUTES.getName() );
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Map<String, String> getModifiedAttributeValues( Arguments arguments,
 	                                                          Element element,
@@ -38,21 +38,15 @@ public class MultipleAttributeProcessor extends AbstractAttributeModifierAttrPro
 		String attributeValue = element.getAttributeValue( attributeName );
 		IStandardExpressionParser parser = StandardExpressions.getExpressionParser( configuration );
 		IStandardExpression expression = parser.parseExpression( configuration, arguments, attributeValue );
-		String parsedAttributeValue = (String) expression.execute( configuration, arguments );
-		if ( parsedAttributeValue != null ) {
-			for ( String attribute : parsedAttributeValue.split( "," ) ) {
-				if ( StringUtils.isBlank( attribute ) ) {
-					// empty can be ignored
-					continue;
-				}
-				String[] parts = attribute.split( "=" );
-				if ( parts.length != 2 ) {
-					throw new IllegalArgumentException(
-							"Invalid attribute: expect name=value, but was supplied: \"" + attribute + "\"" );
-				}
-				IStandardExpression parseExpression = parser.parseExpression( configuration, arguments, parts[1] );
-				processedAttributes.put( parts[0], parseExpression.execute( configuration, arguments ).toString() );
-			}
+		Object parseResult = expression.execute( configuration, arguments );
+		if ( !(parseResult instanceof Map)) {
+			throw new IllegalArgumentException(
+					"Expect argument of type Map<String, String> but was given" + parseResult.getClass() );
+		}
+		Map<String, String> parsedAttributeValue = (Map<String, String>) parseResult;
+		for ( Map.Entry<String, String> entry : parsedAttributeValue.entrySet() ) {
+			IStandardExpression parseExpression = parser.parseExpression( configuration, arguments, entry.getValue() );
+			processedAttributes.put( entry.getKey(), parseExpression.execute( configuration, arguments ).toString() );
 		}
 		return processedAttributes;
 	}
@@ -79,13 +73,13 @@ public class MultipleAttributeProcessor extends AbstractAttributeModifierAttrPro
 	}
 
 	/**
-	 * Sets the precedence for this processor to execute as the final processor.
-	 * This makes sure that all expressions have been parsed before reaching this process.
+	 * Sets the precedence for this processor to execute before other attribute processors.
+	 * This guarantees that we get our map back.
 	 *
-	 * @return Integer.MAX_VALUE
+	 * @return the precedence
 	 */
 	@Override
 	public int getPrecedence() {
-		return Integer.MAX_VALUE;
+		return 700;
 	}
 }
