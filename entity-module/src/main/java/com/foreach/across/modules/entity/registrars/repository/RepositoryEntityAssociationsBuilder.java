@@ -15,16 +15,11 @@
  */
 package com.foreach.across.modules.entity.registrars.repository;
 
-import com.foreach.across.core.context.AcrossContextUtils;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
-import com.foreach.across.modules.entity.views.EntityListView;
-import com.foreach.across.modules.entity.views.EntityListViewFactory;
-import com.foreach.across.modules.entity.views.EntityListViewPageFetcher;
-import com.foreach.across.modules.entity.views.EntityView;
-import org.springframework.aop.framework.AopProxyUtils;
+import com.foreach.across.modules.entity.views.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +36,6 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 
-import javax.persistence.EntityManager;
 import javax.persistence.ManyToOne;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -96,6 +90,7 @@ public class RepositoryEntityAssociationsBuilder
 		association.addAttribute( PersistentProperty.class, property );
 
 		buildAssociationListView( association, property );
+		buildAssociationCreateView( association );
 	}
 
 	private void buildAssociationListView( MutableEntityAssociation association, final PersistentProperty property ) {
@@ -139,5 +134,17 @@ public class RepositoryEntityAssociationsBuilder
 		}
 
 		association.registerView( EntityListView.VIEW_NAME, viewFactory );
+	}
+
+	private void buildAssociationCreateView( MutableEntityAssociation association ) {
+		EntityConfiguration to = association.getAssociatedEntityConfiguration();
+
+		EntityFormViewFactory viewFactory = beanFactory.getBean( EntityFormViewFactory.class );
+		BeanUtils.copyProperties( to.getViewFactory( EntityFormView.CREATE_VIEW_NAME ), viewFactory );
+		viewFactory.setMessagePrefixes( "entityViews.association." + association.getName() + ".createView",
+		                                "entityViews.createView",
+		                                "entityViews" );
+
+		association.registerView( EntityFormView.CREATE_VIEW_NAME, viewFactory );
 	}
 }

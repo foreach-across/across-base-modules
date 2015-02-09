@@ -46,6 +46,10 @@ import java.io.Serializable;
 @RequestMapping(AssociatedEntityController.PATH)
 public class AssociatedEntityController extends EntityControllerSupport
 {
+	public static final String PATH_ENTITY_CONFIG = "entityConfig";
+	public static final String PATH_ENTITY_ID = "entityId";
+	public static final String PATH_ASSOCIATED_ENTITY_CONFIG = "associatedConfig";
+
 	public static final String PATH = "/entities/{entityConfig}/{entityId}/associations/{associatedConfig}";
 
 	@Autowired
@@ -59,8 +63,8 @@ public class AssociatedEntityController extends EntityControllerSupport
 	 */
 	@SuppressWarnings("unchecked")
 	@ModelAttribute(EntityView.ATTRIBUTE_ENTITY)
-	public Object entity( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
-	                      @PathVariable("entityId") Serializable entityId,
+	public Object entity( @PathVariable(PATH_ENTITY_CONFIG) EntityConfiguration<?> entityConfiguration,
+	                      @PathVariable(PATH_ENTITY_ID) Serializable entityId,
 	                      Model model
 	) {
 		EntityModel entityModel = entityConfiguration.getEntityModel();
@@ -76,9 +80,9 @@ public class AssociatedEntityController extends EntityControllerSupport
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView showAssociatedEntities( @PathVariable("entityConfig") EntityConfiguration entityConfiguration,
+	public ModelAndView showAssociatedEntities( @PathVariable(PATH_ENTITY_CONFIG) EntityConfiguration entityConfiguration,
 	                                            @ModelAttribute(EntityView.ATTRIBUTE_ENTITY) Object entity,
-	                                            @PathVariable("associatedConfig") EntityConfiguration associatedConfig,
+	                                            @PathVariable(PATH_ASSOCIATED_ENTITY_CONFIG) EntityConfiguration associatedConfig,
 	                                            AdminMenu adminMenu,
 	                                            Model model,
 	                                            Pageable pageable,

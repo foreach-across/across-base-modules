@@ -1,13 +1,10 @@
 package com.foreach.across.modules.entity.config.modules;
 
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
 import com.foreach.across.modules.entity.config.PostProcessor;
-import com.foreach.across.modules.entity.controllers.AssociatedEntityController;
-import com.foreach.across.modules.entity.controllers.EntityController;
-import com.foreach.across.modules.entity.controllers.EntityCreateController;
-import com.foreach.across.modules.entity.controllers.EntityUpdateController;
+import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
+import com.foreach.across.modules.entity.controllers.*;
 import com.foreach.across.modules.entity.handlers.MenuEventsHandler;
 import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
@@ -44,6 +41,11 @@ public class AdminWebConfiguration implements EntityConfigurer
 	@Bean
 	public AssociatedEntityController associatedEntityController() {
 		return new AssociatedEntityController();
+	}
+
+	@Bean
+	public AssociatedEntityCreateController associatedEntityCreateController() {
+		return new AssociatedEntityCreateController();
 	}
 
 	@Override
