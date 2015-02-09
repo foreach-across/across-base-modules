@@ -410,7 +410,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 .show-for-print{display:inherit!important}}
 </style>
 </head>
-<body class="book">
+<body class="article">
 <div id="header">
 <h1>Across Standard Modules</h1>
 <div class="details">
@@ -708,7 +708,9 @@ Supports <code>maxLength</code> property to specify the maximum length of text t
 <h4 id="_selectformelement">SelectFormElement</h4>
 <div class="paragraph">
 <p>This implementation is used for several element types and can be used to render any collection of selected values.
-The <code>options</code> property determines the list of possible values in the form of <code>SelectOption</code> instances.</p>
+The <code>options</code> property determines the list of possible values in the form of <code>SelectOption</code> instances.  The associated
+<code>SelectFormElementBuilder</code> takes a <code>SelectOptionGenerator</code> implementation that is used to generate the list of possible
+options when building the element.</p>
 </div>
 <div class="paragraph">
 <p><code>SelectFormElement</code> provides a setter method for <code>elementType</code> because the base implementation can easily be used
@@ -753,6 +755,11 @@ from <code>SelectFormElement</code> instances.</p>
     &lt;/div&gt;
 &lt;/div&gt;</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>configuration:
+defining a custom view
+registering custom properties</p>
 </div>
 </div>
 </div>

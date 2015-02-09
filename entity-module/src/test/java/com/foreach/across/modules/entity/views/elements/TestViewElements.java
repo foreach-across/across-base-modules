@@ -203,6 +203,11 @@ public class TestViewElements
 		}
 
 		@Override
+		public boolean isField() {
+			return false;
+		}
+
+		@Override
 		public String getCustomTemplate() {
 			return null;
 		}
