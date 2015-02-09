@@ -27,8 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ResolvableType;
@@ -36,6 +35,7 @@ import org.springframework.core.ResolvableType;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,7 +70,7 @@ public abstract class FormElementBuilderFactoryAssemblerTestSupport<T extends Fo
 
 		if ( properties.isEmpty() ) {
 			BeanMetaDataManager manager = new BeanMetaDataManager(
-					new ConstraintHelper(), new ExecutableHelper( new TypeResolutionHelper() )
+					new ConstraintHelper(), Collections.<MetaDataProvider>emptyList()
 			);
 
 			BeanMetaData<?> metaData = manager.getBeanMetaData( getTestClass() );

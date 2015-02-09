@@ -6,12 +6,13 @@ import com.foreach.across.modules.entity.registry.properties.MutableEntityProper
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.springframework.stereotype.Component;
 
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author niels
@@ -20,9 +21,11 @@ import javax.validation.metadata.PropertyDescriptor;
 @Component
 public class EntityPropertyRegistryValidationConstraintHandler
 {
+	private final List<MetaDataProvider> metaDataProvider = Collections.emptyList();
+
 	private final BeanMetaDataManager metaDataManager = new BeanMetaDataManager(
-			new ConstraintHelper(), new ExecutableHelper( new TypeResolutionHelper() )
-	);
+			new ConstraintHelper(),
+			metaDataProvider );
 
 	public void handle( Class<?> entityType, MutableEntityPropertyRegistry registry ) {
 		BeanMetaData<?> metaData = metaDataManager.getBeanMetaData( entityType );

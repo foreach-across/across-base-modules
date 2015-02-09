@@ -4,13 +4,13 @@ import com.foreach.across.modules.entity.testmodules.springdata.Client;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.junit.Test;
 
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +21,7 @@ public class TestValidatorDetection
 	@Test
 	public void validatorDescriptionDetector() {
 		BeanMetaDataManager manager = new BeanMetaDataManager(
-				new ConstraintHelper(), new ExecutableHelper( new TypeResolutionHelper() )
+				new ConstraintHelper(), Collections.<MetaDataProvider>emptyList()
 		);
 
 		BeanMetaData<Client> metaData = manager.getBeanMetaData( Client.class );
@@ -46,8 +46,7 @@ public class TestValidatorDetection
 	@SuppressWarnings("unchecked")
 	public void convertValidatorsToMapForJson() {
 		BeanMetaDataManager manager = new BeanMetaDataManager(
-				new ConstraintHelper(), new ExecutableHelper( new TypeResolutionHelper() )
-		);
+				new ConstraintHelper(), Collections.<MetaDataProvider>emptyList()		);
 
 		BeanMetaData<Client> metaData = manager.getBeanMetaData( Client.class );
 		BeanDescriptor beanDescriptor = metaData.getBeanDescriptor();

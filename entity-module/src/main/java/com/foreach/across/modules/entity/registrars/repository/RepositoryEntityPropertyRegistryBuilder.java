@@ -9,8 +9,7 @@ import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +20,7 @@ import org.springframework.data.repository.core.support.RepositoryFactoryInforma
 
 import javax.persistence.Embedded;
 import javax.validation.metadata.BeanDescriptor;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Creates a {@link com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry} for a
@@ -39,7 +35,7 @@ public class RepositoryEntityPropertyRegistryBuilder
 	private static final Logger LOG = LoggerFactory.getLogger( RepositoryEntityPropertyRegistryBuilder.class );
 
 	private final BeanMetaDataManager metaDataManager = new BeanMetaDataManager(
-			new ConstraintHelper(), new ExecutableHelper( new TypeResolutionHelper() )
+			new ConstraintHelper(), Collections.<MetaDataProvider>emptyList()
 	);
 
 	@Autowired

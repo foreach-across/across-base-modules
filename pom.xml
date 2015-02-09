@@ -199,7 +199,8 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-validator</artifactId>
-				<version>5.1.1.Final</version>
+				<!-- Version 5.x.x has issues on Jboss with javax.validation.api 1.1.0 -->
+				<version>4.3.2.Final</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.jboss.logging</groupId>
