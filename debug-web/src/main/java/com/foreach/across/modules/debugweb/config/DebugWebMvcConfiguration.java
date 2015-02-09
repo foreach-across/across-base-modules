@@ -21,8 +21,10 @@ import com.foreach.across.modules.debugweb.DebugWebModule;
 import com.foreach.across.modules.debugweb.mvc.DebugMenu;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuBuilder;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
+import com.foreach.across.modules.web.context.PrefixingPathRegistry;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import com.foreach.across.modules.web.mvc.PrefixingRequestMappingHandlerMapping;
+import com.foreach.across.modules.web.mvc.WebAppPathResolverExposingInterceptor;
 import com.foreach.across.modules.web.resource.*;
 import com.foreach.across.modules.web.template.LayoutTemplateProcessorAdapterBean;
 import com.foreach.across.modules.web.template.WebTemplateInterceptor;
@@ -32,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.annotation.AnnotationClassFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -56,6 +57,9 @@ public class DebugWebMvcConfiguration extends WebMvcConfigurerAdapter
 	@Autowired
 	private DebugWebModule debugWebModule;
 
+	@Autowired
+	private PrefixingPathRegistry prefixingPathRegistry;
+
 	@PostConstruct
 	public void initialize() {
 		menuFactory.addMenuBuilder( debugMenuBuilder(), DebugMenu.class );
@@ -66,10 +70,13 @@ public class DebugWebMvcConfiguration extends WebMvcConfigurerAdapter
 		return new DebugMenuBuilder();
 	}
 
-	@Bean
+	@Bean(name = DebugWeb.NAME)
 	@Exposed
 	public DebugWeb debugWeb() {
-		return new DebugWeb( debugWebModule.getRootPath() );
+		DebugWeb debugWeb = new DebugWeb( debugWebModule.getRootPath() );
+		prefixingPathRegistry.add( DebugWeb.NAME, debugWeb );
+
+		return debugWeb;
 	}
 
 	@Bean
@@ -142,8 +149,11 @@ public class DebugWebMvcConfiguration extends WebMvcConfigurerAdapter
 				new PrefixingRequestMappingHandlerMapping( debugWebModule.getRootPath(),
 				                                           new AnnotationClassFilter( DebugWebController.class,
 				                                                                      true ) );
-		mappingHandlerMapping.setInterceptors(
-				new Object[] { debugWebResourceRegistryInterceptor(), debugWebTemplateInterceptor() } );
+		mappingHandlerMapping.addInterceptor(
+				new WebAppPathResolverExposingInterceptor( debugWeb() ),
+				debugWebResourceRegistryInterceptor(),
+				debugWebTemplateInterceptor()
+		);
 
 		return mappingHandlerMapping;
 	}

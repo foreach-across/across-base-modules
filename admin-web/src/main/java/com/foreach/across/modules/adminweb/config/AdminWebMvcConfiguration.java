@@ -32,8 +32,10 @@ import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenuBuilder;
 import com.foreach.across.modules.adminweb.resource.AdminBootstrapWebResourcePackage;
 import com.foreach.across.modules.adminweb.resource.JQueryWebResourcePackage;
+import com.foreach.across.modules.web.context.PrefixingPathRegistry;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import com.foreach.across.modules.web.mvc.PrefixingRequestMappingHandlerMapping;
+import com.foreach.across.modules.web.mvc.WebAppPathResolverExposingInterceptor;
 import com.foreach.across.modules.web.resource.*;
 import com.foreach.across.modules.web.template.LayoutTemplateProcessorAdapterBean;
 import com.foreach.across.modules.web.template.WebTemplateInterceptor;
@@ -78,6 +80,9 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 	@Autowired
 	private MenuFactory menuFactory;
 
+	@Autowired
+	private PrefixingPathRegistry prefixingPathRegistry;
+
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void initialize() {
@@ -109,10 +114,13 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 		return new EntityAdminMenuBuilder();
 	}
 
-	@Bean
+	@Bean(name = AdminWeb.NAME)
 	@Exposed
 	public AdminWeb adminWeb() {
-		return new AdminWeb( adminWebModule.getRootPath() );
+		AdminWeb adminWeb = new AdminWeb( adminWebModule.getRootPath() );
+		prefixingPathRegistry.add( AdminWeb.NAME, adminWeb );
+
+		return adminWeb;
 	}
 
 	@Bean
@@ -155,11 +163,9 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 	public WebResourcePackageManager adminWebResourcePackageManager() {
 		WebResourcePackageManager webResourcePackageManager = new WebResourcePackageManager();
 		webResourcePackageManager.register( JQueryWebResourcePackage.NAME,
-		                                    new JQueryWebResourcePackage(
-				                                    !developmentMode.isActive() ) );
+		                                    new JQueryWebResourcePackage( !developmentMode.isActive() ) );
 		webResourcePackageManager.register( AdminBootstrapWebResourcePackage.NAME,
-		                                    new AdminBootstrapWebResourcePackage(
-				                                    !developmentMode.isActive() ) );
+		                                    new AdminBootstrapWebResourcePackage( !developmentMode.isActive() ) );
 
 		return webResourcePackageManager;
 	}
@@ -200,7 +206,11 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 			}
 		}
 
-		mappingHandlerMapping.addInterceptor( adminWebResourceRegistryInterceptor(), adminWebTemplateInterceptor() );
+		mappingHandlerMapping.addInterceptor(
+				new WebAppPathResolverExposingInterceptor( adminWeb() ),
+				adminWebResourceRegistryInterceptor(),
+				adminWebTemplateInterceptor()
+		);
 
 		return mappingHandlerMapping;
 	}

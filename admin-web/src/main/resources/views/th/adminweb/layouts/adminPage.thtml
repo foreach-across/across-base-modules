@@ -39,7 +39,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" th:if="${@adminWeb.title}" th:href="@{${@adminWeb.path('/')}}" th:text="${@adminWeb.title}">
+				<a class="navbar-brand" th:if="${@adminWeb.title}" th:href="@{${#webapp.path('/')}}" th:text="${@adminWeb.title}">
 					application name
 				</a>
 			</div>
@@ -47,7 +47,7 @@
 				<ul th:replace="th/bootstrap/menu :: navbar(${adminMenu})"></ul>
 
 				<ul class="nav navbar-nav navbar-right">
-					<li><a th:href="@{${@adminWeb.path('/logout')}}">Logout</a></li>
+					<li><a th:href="@{${#webapp.path('/logout')}}">Logout</a></li>
 				</ul>
 			</div>
 		</div>
