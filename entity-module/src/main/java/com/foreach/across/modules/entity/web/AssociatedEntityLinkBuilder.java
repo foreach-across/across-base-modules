@@ -43,11 +43,11 @@ public class AssociatedEntityLinkBuilder
 		return fromLinkBuilder.view( parent ) + StringUtils.replaceOnce( toLinkBuilder.overview(), "entities",
 		                                                                 "associations" );
 	}
-/*
-	public String create() {
-		return format( createPath );
+	public String create( Object parent ) {
+		return fromLinkBuilder.view( parent ) + StringUtils.replaceOnce( toLinkBuilder.create(), "entities", "associations" );
 	}
 
+/*
 	public String update( Object entity ) {
 		return format( updatePath, entity );
 	}
