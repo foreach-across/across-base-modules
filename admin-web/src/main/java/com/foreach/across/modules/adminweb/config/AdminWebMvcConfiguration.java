@@ -16,11 +16,10 @@
 package com.foreach.across.modules.adminweb.config;
 
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.AcrossCondition;
-import com.foreach.across.core.annotations.Exposed;
-import com.foreach.across.core.annotations.Module;
+import com.foreach.across.core.annotations.*;
 import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.development.AcrossDevelopmentMode;
+import com.foreach.across.core.events.AcrossContextBootstrappedEvent;
 import com.foreach.across.modules.adminweb.AdminWeb;
 import com.foreach.across.modules.adminweb.AdminWebModule;
 import com.foreach.across.modules.adminweb.AdminWebModuleSettings;
@@ -32,8 +31,10 @@ import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenuBuilder;
 import com.foreach.across.modules.adminweb.resource.AdminBootstrapWebResourcePackage;
 import com.foreach.across.modules.adminweb.resource.JQueryWebResourcePackage;
+import com.foreach.across.modules.web.config.support.PrefixingHandlerMappingConfigurer;
 import com.foreach.across.modules.web.context.PrefixingPathRegistry;
 import com.foreach.across.modules.web.menu.MenuFactory;
+import com.foreach.across.modules.web.mvc.InterceptorRegistry;
 import com.foreach.across.modules.web.mvc.PrefixingRequestMappingHandlerMapping;
 import com.foreach.across.modules.web.mvc.WebAppPathResolverExposingInterceptor;
 import com.foreach.across.modules.web.resource.*;
@@ -49,14 +50,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor;
 import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
 import java.util.Locale;
 
 @Configuration
-public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
+@AcrossEventHandler
+public class AdminWebMvcConfiguration implements PrefixingHandlerMappingConfigurer
 {
 	private static final Logger LOG = LoggerFactory.getLogger( AdminWebModule.class );
 
@@ -82,6 +84,9 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 
 	@Autowired
 	private PrefixingPathRegistry prefixingPathRegistry;
+
+	@RefreshableCollection(includeModuleInternals = true)
+	private Collection<PrefixingHandlerMappingConfigurer> prefixingHandlerMappingConfigurers;
 
 	@SuppressWarnings("unchecked")
 	@PostConstruct
@@ -187,36 +192,55 @@ public class AdminWebMvcConfiguration extends WebMvcConfigurerAdapter
 	}
 
 	@Bean
+	public AuthenticationController authenticationController() {
+		return new AuthenticationController();
+	}
+
+	@Bean
 	@Exposed
 	public PrefixingRequestMappingHandlerMapping adminRequestMappingHandlerMapping() {
-		PrefixingRequestMappingHandlerMapping mappingHandlerMapping =
-				new PrefixingRequestMappingHandlerMapping( adminWebModule.getRootPath(),
-				                                           new AnnotationClassFilter( AdminWebController.class,
-				                                                                      true ) );
+		PrefixingRequestMappingHandlerMapping mappingHandlerMapping = new PrefixingRequestMappingHandlerMapping(
+				adminWebModule.getRootPath(), new AnnotationClassFilter( AdminWebController.class, true )
+		);
+		mappingHandlerMapping.setOrder( contextInfo.getModuleIndex( adminWebModule ) );
 
-		//mappingHandlerMapping.addInterceptor( new LocaleChangeInterceptor() );
+		return mappingHandlerMapping;
+	}
 
+	@Event
+	protected void updateInterceptors( AcrossContextBootstrappedEvent contextBootstrappedEvent ) {
+		InterceptorRegistry interceptorRegistry = new InterceptorRegistry();
+
+		for ( PrefixingHandlerMappingConfigurer configurer : prefixingHandlerMappingConfigurers ) {
+			if ( configurer.supports( AdminWebModule.NAME ) ) {
+				configurer.addInterceptors( interceptorRegistry );
+			}
+		}
+
+		adminRequestMappingHandlerMapping().setInterceptors( interceptorRegistry.getInterceptors().toArray() );
+		adminRequestMappingHandlerMapping().reload();
+	}
+
+	@Override
+	public boolean supports( String mapperName ) {
+		return AdminWebModule.NAME.equals( mapperName );
+	}
+
+	@Override
+	public void addInterceptors( InterceptorRegistry interceptorRegistry ) {
 		// todo: unify web registration approach and move this to a different configuration
 		if ( contextInfo.hasModule( "AcrossHibernateModule" ) ) {
 			ApplicationContext moduleCtx = contextInfo.getModuleInfo( "AcrossHibernateModule" ).getApplicationContext();
 
 			if ( moduleCtx.containsLocalBean( "openSessionInViewInterceptor" ) ) {
-				mappingHandlerMapping.addInterceptor( moduleCtx.getBean( "openSessionInViewInterceptor",
-				                                                         OpenSessionInViewInterceptor.class ) );
+				interceptorRegistry.addWebRequestInterceptor(
+						moduleCtx.getBean( "openSessionInViewInterceptor", OpenSessionInViewInterceptor.class )
+				);
 			}
 		}
 
-		mappingHandlerMapping.addInterceptor(
-				new WebAppPathResolverExposingInterceptor( adminWeb() ),
-				adminWebResourceRegistryInterceptor(),
-				adminWebTemplateInterceptor()
-		);
-
-		return mappingHandlerMapping;
-	}
-
-	@Bean
-	public AuthenticationController authenticationController() {
-		return new AuthenticationController();
+		interceptorRegistry.addInterceptor( new WebAppPathResolverExposingInterceptor( adminWeb() ) );
+		interceptorRegistry.addInterceptor( adminWebResourceRegistryInterceptor() );
+		interceptorRegistry.addInterceptor( adminWebTemplateInterceptor() );
 	}
 }
