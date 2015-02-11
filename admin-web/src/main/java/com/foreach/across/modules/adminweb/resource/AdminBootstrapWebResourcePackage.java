@@ -35,7 +35,7 @@ public class AdminBootstrapWebResourcePackage extends SimpleWebResourcePackage
 	public AdminBootstrapWebResourcePackage( boolean minified, String version ) {
 		if ( minified ) {
 			setWebResources( Arrays.asList( new WebResource( WebResource.CSS, NAME,
-			                                                 "/css/adminweb/styles-light-theme.css",
+			                                                 "/css/adminweb/fe_bootstrap-1.0.css",
 			                                                 WebResource.VIEWS ),
 //			                                new WebResource( WebResource.CSS, NAME + "-theme",
 //			                                                 "//netdna.bootstrapcdn.com/bootstrap/" + version + "/css/bootstrap-theme.min.css",
@@ -54,7 +54,7 @@ public class AdminBootstrapWebResourcePackage extends SimpleWebResourcePackage
 		}
 		else {
 			setWebResources( Arrays.asList( new WebResource( WebResource.CSS, NAME,
-			                                                 "/css/adminweb/styles-light-theme.css",
+			                                                 "/css/adminweb/fe_bootstrap-1.0.css",
 			                                                 WebResource.VIEWS ),
 //			                                new WebResource( WebResource.CSS, NAME + "-theme",
 //			                                                 "//netdna.bootstrapcdn.com/bootstrap/" + version + "/css/bootstrap-theme.css",
