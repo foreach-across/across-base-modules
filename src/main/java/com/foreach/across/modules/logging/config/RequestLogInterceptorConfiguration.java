@@ -18,13 +18,13 @@ package com.foreach.across.modules.logging.config;
 import com.foreach.across.modules.web.config.support.PrefixingHandlerMappingConfigurer;
 import com.foreach.across.modules.web.mvc.InterceptorRegistry;
 import com.foreach.common.web.logging.RequestLogInterceptor;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Andy Somers
  */
-@Component
-public class RequestLogInterceptorHandlerMappingConfigurer implements PrefixingHandlerMappingConfigurer
+@Configuration
+public class RequestLogInterceptorConfiguration implements PrefixingHandlerMappingConfigurer
 {
 	@Override
 	public boolean supports( String mapperName ) {
@@ -33,6 +33,6 @@ public class RequestLogInterceptorHandlerMappingConfigurer implements PrefixingH
 
 	@Override
 	public void addInterceptors( InterceptorRegistry interceptorRegistry ) {
-		interceptorRegistry.addInterceptor( new RequestLogInterceptor() );
+		interceptorRegistry.addFirst( new RequestLogInterceptor() );
 	}
 }
