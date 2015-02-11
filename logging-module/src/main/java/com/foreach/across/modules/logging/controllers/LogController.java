@@ -21,10 +21,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
-import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.Event;
-import com.foreach.across.core.annotations.Refreshable;
-import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.table.Table;
@@ -38,16 +35,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @DebugWebController
-@Refreshable
-@AcrossDepends(required = "DebugWebModule")
 public class LogController
 {
 	@Event
 	public void buildMenu( DebugMenuEvent event ) {
-		event.builder().item( "/loggers", "Logger overview" );
+		event.builder().group( "/logging", "Logging" ).and().item( "/logging/loggers", "Logger overview" );
 	}
 
-	@RequestMapping(value = "/loggers", method = RequestMethod.GET)
+	@RequestMapping(value = "/logging/loggers", method = RequestMethod.GET)
 	public String showLoggers( Model model ) {
 		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		List<Logger> loggers = loggerContext.getLoggerList();
@@ -78,7 +73,7 @@ public class LogController
 		model.addAttribute( "loggers", loggerMap );
 		model.addAttribute( "appenders", Table.fromMap( "Appenders", appenderMap ) );
 
-		return DebugWeb.VIEW_LOGGERS;
+		return "th/logging/listLoggers";
 	}
 
 	@RequestMapping(value = "/loggers", method = RequestMethod.POST)

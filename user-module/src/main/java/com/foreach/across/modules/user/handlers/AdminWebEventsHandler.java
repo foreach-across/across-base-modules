@@ -19,10 +19,10 @@ import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.modules.adminweb.events.AdminWebUrlRegistry;
 import com.foreach.across.modules.adminweb.menu.AdminMenuEvent;
+import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
 import com.foreach.across.modules.user.controllers.GroupController;
 import com.foreach.across.modules.user.controllers.RoleController;
 import com.foreach.across.modules.user.controllers.UserController;
-import com.foreach.across.modules.user.security.CurrentUserProxy;
 import com.foreach.across.modules.web.menu.PathBasedMenuBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AdminWebEventsHandler
 {
 	@Autowired
-	private CurrentUserProxy currentUser;
+	private CurrentSecurityPrincipalProxy currentPrincipal;
 
 	@Event
 	public void secureUrls( AdminWebUrlRegistry urls ) {
@@ -44,18 +44,18 @@ public class AdminWebEventsHandler
 		PathBasedMenuBuilder builder = adminMenuEvent.builder();
 		builder.group( "/users", "User management" );
 
-		if ( currentUser.hasPermission( "manage users" ) ) {
+		if ( currentPrincipal.hasAuthority( "manage users" ) ) {
 			builder.item( "/users/users", "Users", UserController.PATH ).order( 1 ).and()
 			       .item( "/users/users/create", "Create a new user", UserController.PATH + "/create" );
 		}
 
-		if ( currentUser.hasPermission( "manage user roles" ) ) {
+		if ( currentPrincipal.hasAuthority( "manage user roles" ) ) {
 			builder
 					.item( "/users/roles", "Roles", RoleController.PATH ).order( 3 ).and()
 					.item( "/users/roles/create", "Create a new role", RoleController.PATH + "/create" );
 		}
 
-		if ( currentUser.hasPermission( "manage groups" ) ) {
+		if ( currentPrincipal.hasAuthority( "manage groups" ) ) {
 			builder
 					.item( "/users/groups", "Groups", GroupController.PATH ).order( 2 ).and()
 					.item( "/users/groups/create", "Create a new group", GroupController.PATH + "/create" );

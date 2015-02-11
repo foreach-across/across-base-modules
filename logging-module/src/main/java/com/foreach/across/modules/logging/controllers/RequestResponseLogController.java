@@ -15,9 +15,7 @@
  */
 package com.foreach.across.modules.logging.controllers;
 
-import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.Event;
-import com.foreach.across.core.annotations.Refreshable;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
@@ -34,22 +32,20 @@ import java.util.List;
 import java.util.UUID;
 
 @DebugWebController
-@Refreshable
-@AcrossDepends(required = "DebugWebModule")
 public class RequestResponseLogController
 {
 	@Autowired
 	private RequestResponseLogRegistry logRegistry;
 	@Autowired
 	private RequestResponseLoggingFilter logFilter;
-	@Autowired(required = false)
+	@Autowired
 	private DebugWeb debugWeb;
 
 	@Event
 	public void buildMenu( DebugMenuEvent event ) {
-		event.builder().group( "/logging/requestResponse", "Request - response logs" ).and()
+		event.builder().group( "/logging/requestResponse", "Request - response" ).and()
 		     .item( "/logging/requestResponse/list", "Overview" ).and()
-			 .item( "/logging/requestResponse/settings", "Settings" );/*.and()
+		     .item( "/logging/requestResponse/settings", "Settings" );/*.and()
 		     .item( "/logging/requestResponse/detail", "detail" ).disable()*/
 	}
 
@@ -59,27 +55,29 @@ public class RequestResponseLogController
 		model.addAttribute( "paused", logFilter.isPaused() );
 		model.addAttribute( "logEntries", logRegistry.getEntries() );
 
-		return DebugWeb.VIEW_LOGGING_REQUEST_RESPONSE_LIST;
+		return "th/logging/requestResponse/list";
 	}
 
 	@RequestMapping("/logging/requestResponse/detail")
 	public String detail( @RequestParam("id") UUID id, Model model ) {
 		model.addAttribute( "entry", logRegistry.getEntry( id ) );
 
-		return DebugWeb.VIEW_LOGGING_REQUEST_RESPONSE_DETAIL;
+		return "th/logging/requestResponse/detail";
 	}
 
-	@RequestMapping(value = "/logging/requestResponse/settings" )
-	public String settings( Model model, @RequestParam( value = "excludedPathPatterns", required = false) String excludedPathPatterns,
-			@RequestParam( value = "includedPathPatterns", required = false ) String includedPathPatterns) {
+	@RequestMapping(value = "/logging/requestResponse/settings")
+	public String settings( Model model,
+	                        @RequestParam(value = "excludedPathPatterns", required = false) String excludedPathPatterns,
+	                        @RequestParam(value = "includedPathPatterns",
+	                                      required = false) String includedPathPatterns ) {
 		model.addAttribute( "logFilter", logFilter );
-		if( excludedPathPatterns != null ) {
+		if ( excludedPathPatterns != null ) {
 			logFilter.setExcludedPathPatterns( fromTextArea( excludedPathPatterns ) );
 		}
-		if( includedPathPatterns != null ) {
+		if ( includedPathPatterns != null ) {
 			logFilter.setIncludedPathPatterns( fromTextArea( includedPathPatterns ) );
 		}
-		return DebugWeb.VIEW_LOGGING_REQUEST_RESPONSE_SETTINGS;
+		return "th/logging/requestResponse/settings";
 	}
 
 	@RequestMapping("/logging/requestResponse/pause")
@@ -97,9 +95,9 @@ public class RequestResponseLogController
 	private List<String> fromTextArea( String items ) {
 		List<String> splitItems = Arrays.asList( items.split( "," ) );
 		List<String> cleanedItems = new ArrayList<>();
-		if( splitItems.size() > 0 ) {
-			for( String item : splitItems ) {
-				if( item != null && item.length() > 0 ) {
+		if ( splitItems.size() > 0 ) {
+			for ( String item : splitItems ) {
+				if ( item != null && item.length() > 0 ) {
 					cleanedItems.add( item.trim() );
 				}
 			}

@@ -35,7 +35,6 @@ public final class DebugWeb extends PrefixingPathContext
 	public static final String VIEW_BROWSER_HANDLERS = "th/debugweb/browser/handlers";
 	public static final String VIEW_BROWSER_EVENTS = "th/debugweb/browser/events";
 
-	public static final String VIEW_LOGGERS = "th/debugweb/listLoggers";
 	public static final String VIEW_SPRING_BEANS = "th/debugweb/listBeans";
 	public static final String VIEW_SPRING_INTERCEPTORS = "th/debugweb/listInterceptors";
 	public static final String VIEW_PROPERTIES = "th/debugweb/listProperties";
@@ -45,10 +44,6 @@ public final class DebugWeb extends PrefixingPathContext
 
 	public static final String VIEW_SERVLET_FILTERS = "th/debugweb/servlet/filters";
 	public static final String VIEW_SERVLET_SERVLETS = "th/debugweb/servlet/servlets";
-
-	public static final String VIEW_LOGGING_REQUEST_RESPONSE_DETAIL = "th/debugweb/logging/requestResponse/detail";
-	public static final String VIEW_LOGGING_REQUEST_RESPONSE_LIST = "th/debugweb/logging/requestResponse/list";
-	public static final String VIEW_LOGGING_REQUEST_RESPONSE_SETTINGS = "th/debugweb/logging/requestResponse/settings";
 
 	public DebugWeb( String prefix ) {
 		super( prefix );

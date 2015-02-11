@@ -17,14 +17,8 @@ package com.foreach.across.modules.adminweb;
 
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
-import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
-import com.foreach.across.modules.adminweb.config.AdminWebMvcConfiguration;
-import com.foreach.across.modules.adminweb.config.AdminWebSecurityConfiguration;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.modules.web.AcrossWebModule;
-
-import java.util.Set;
 
 @AcrossDepends(
 		required = { AcrossWebModule.NAME, SpringSecurityModule.NAME },
@@ -68,11 +62,5 @@ public class AdminWebModule extends AcrossModule
 	@Override
 	public String getDescription() {
 		return "Provides a basic administrative web interface with user authentication and authorization.";
-	}
-
-	@Override
-	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-		contextConfigurers.add( new AnnotatedClassConfigurer( AdminWebMvcConfiguration.class,
-		                                                      AdminWebSecurityConfiguration.class ) );
 	}
 }

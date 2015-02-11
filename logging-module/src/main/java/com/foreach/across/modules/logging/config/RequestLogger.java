@@ -15,20 +15,15 @@
  */
 package com.foreach.across.modules.logging.config;
 
-import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.modules.logging.controllers.LogController;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 /**
  * @author Andy Somers
  */
-@Configuration
-@AcrossDepends(required = "DebugWebModule")
-public class LoggingModuleConfiguration
+public enum RequestLogger
 {
-	@Bean
-	public LogController logController() {
-		return new LogController();
-	}
+	// Do not log any requests
+	NONE,
+	// Log requests through the RequestLogFilter
+	FILTER,
+	// Log requests through the RequestLogInterceptor
+	INTERCEPTOR
 }

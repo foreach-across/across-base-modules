@@ -17,6 +17,7 @@ package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.AcrossException;
 import com.foreach.across.core.annotations.AcrossCondition;
+import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.controllers.RequestResponseLogController;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
@@ -58,6 +59,7 @@ public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServlet
 	}
 
 	@Bean
+	@AcrossDepends(required = "DebugWebModule")
 	public RequestResponseLogController requestResponseLogController() {
 		return new RequestResponseLogController();
 	}
