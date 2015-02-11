@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.elements;
+package com.foreach.across.modules.entity.views.elements.form.date;
+
+import com.foreach.across.modules.entity.views.elements.CommonViewElements;
+import com.foreach.across.modules.entity.views.elements.form.FormElementSupport;
 
 /**
- * @author Arne Vandamme
+ * @author Andy Somers
  */
-public interface CommonViewElements
+public class DateFormElement extends FormElementSupport
 {
-	String TEXTBOX = "textbox";
-	String HIDDEN = "hidden";
-	String SELECT = "select";
-	String MULTI_CHECKBOX = "multi-checkbox";
-	String CHECKBOX = "checkbox";
-	String DATE = "date";
-	String FIELDSET = "fieldset";
-	String TEXT = "text";
+	public static final String TYPE = CommonViewElements.DATE;
 
-	String BUTTON = "button";
-	String SUBMIT_BUTTON = "submit";
-	String LINK_BUTTON = "button-link";
+	public DateFormElement() {
+		super( TYPE );
+	}
 }

@@ -36,6 +36,15 @@ public abstract class EntityControllerSupport
 		registry.addWithKey( WebResource.CSS, EntityModule.NAME, "/css/entity/entity-module.css", WebResource.VIEWS );
 		registry.addWithKey( WebResource.JAVASCRIPT_PAGE_END, EntityModule.NAME,
 		                     "/js/entity/entity-module.js", WebResource.VIEWS );
+		registry.addWithKey( WebResource.JAVASCRIPT, "jquery",
+		                     "//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js",
+		                     WebResource.EXTERNAL );
+		registry.addWithKey( WebResource.CSS, "jqueryui-css",
+		                     "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css",
+		                     WebResource.EXTERNAL );
+		registry.addWithKey( WebResource.JAVASCRIPT, "jqueryui",
+		                     "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js",
+		                     WebResource.EXTERNAL );
 	}
 
 	@InitBinder(EntityView.ATTRIBUTE_ENTITY)

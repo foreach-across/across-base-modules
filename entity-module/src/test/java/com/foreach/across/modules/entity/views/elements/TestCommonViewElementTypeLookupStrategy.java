@@ -33,6 +33,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -86,6 +87,12 @@ public class TestCommonViewElementTypeLookupStrategy
 		assertEquals( CommonViewElements.TEXT, lookup( AtomicInteger.class, ViewElementMode.FOR_READING ) );
 		assertEquals( CommonViewElements.TEXT, lookup( Long.class, ViewElementMode.FOR_READING ) );
 		assertEquals( CommonViewElements.TEXT, lookup( BigDecimal.class, ViewElementMode.FOR_READING ) );
+	}
+
+	@Test
+	public void dateTypeForDates() throws Exception {
+		assertEquals( CommonViewElements.DATE, lookup( Date.class, ViewElementMode.FOR_WRITING ) );
+		assertEquals( CommonViewElements.TEXT, lookup( Date.class, ViewElementMode.FOR_READING ) );
 	}
 
 	@Test

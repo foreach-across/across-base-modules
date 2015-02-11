@@ -17,6 +17,7 @@ import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import com.foreach.across.modules.entity.views.elements.CommonViewElementTypeLookupStrategy;
 import com.foreach.across.modules.entity.views.elements.fieldset.FieldsetElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.checkbox.CheckboxFormElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.elements.form.date.DateFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.hidden.HiddenFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.select.SelectFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.textbox.TextboxFormElementBuilderFactoryAssembler;
@@ -108,6 +109,11 @@ public class EntityModuleConfiguration
 	@Bean
 	public HiddenFormElementBuilderFactoryAssembler hiddenFormElementBuilderFactoryAsssembler() {
 		return new HiddenFormElementBuilderFactoryAssembler();
+	}
+
+	@Bean
+	public DateFormElementBuilderFactoryAssembler dateFormElementBuilderFactoryAsssembler() {
+		return new DateFormElementBuilderFactoryAssembler();
 	}
 
 	@Bean

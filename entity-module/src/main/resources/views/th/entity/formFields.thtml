@@ -48,6 +48,22 @@
 				          th:text="${element.print(entity)}"
 				          th:attr="maxlength=${element.maxLength}"/>
 			</div>
+			<!--/* date */-->
+			<div th:if="${element.elementType eq 'date'}">
+				<label th:for="${#ids.next(element.name)}">
+					<span th:text="${element.label}">label text</span>
+					<sup th:if="${element.required}"><strong>*</strong></sup>
+				</label>
+				<input th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}"
+				       class="form-control" th:value="${element.print(entity)}"
+						/>
+				<script th:inline="javascript">
+					/*<![CDATA[*/
+					var elementId = '#' + /*[[${#ids.prev(element.name)}]]*/ 'elementId';
+					$(elementId).datepicker(/*[[${element.attributes}]]*/);
+					/*]]>*/
+				</script>
+			</div>
 			<!--/* select */-->
 			<div th:if="${element.elementType eq 'select' and not element.options.empty}">
 				<label th:for="${#ids.next(element.name)}">

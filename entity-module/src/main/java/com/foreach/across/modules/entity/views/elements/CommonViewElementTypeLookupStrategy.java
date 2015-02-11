@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ClassUtils;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -88,6 +89,10 @@ public class CommonViewElementTypeLookupStrategy implements ViewElementTypeLooku
 				if ( ClassUtils.isAssignable( Boolean.class, propertyType )
 						|| ClassUtils.isAssignable( AtomicBoolean.class, propertyType ) ) {
 					return CommonViewElements.CHECKBOX;
+				}
+
+				if ( ClassUtils.isAssignable( Date.class, propertyType ) ) {
+					return CommonViewElements.DATE;
 				}
 
 				return CommonViewElements.TEXTBOX;
