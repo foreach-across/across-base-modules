@@ -30,6 +30,7 @@ import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.table.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,10 +45,10 @@ public class LogController
 {
 	@Event
 	public void buildMenu( DebugMenuEvent event ) {
-		event.builder().item( "/loggers", "Logger overview" );
+		event.builder().group( "/logging", "Logging" ).and().item( "/logging/loggers", "Logger overview" );
 	}
 
-	@RequestMapping(value = "/loggers", method = RequestMethod.GET)
+	@RequestMapping(value = "/logging/loggers", method = RequestMethod.GET)
 	public String showLoggers( Model model ) {
 		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		List<Logger> loggers = loggerContext.getLoggerList();
