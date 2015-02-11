@@ -17,6 +17,7 @@ package com.foreach.across.modules.logging;
 
 import com.foreach.across.core.AcrossModuleSettings;
 import com.foreach.across.core.AcrossModuleSettingsRegistry;
+import com.foreach.across.modules.logging.config.RequestLogger;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
 
 /**
@@ -29,6 +30,8 @@ public class LoggingModuleSettings extends AcrossModuleSettings
 	public static final String REQUEST_RESPONSE_LOG_PAUSED = "logging.requestResponse.paused";
 	public static final String REQUEST_RESPONSE_LOG_CONFIGURATION = "logging.requestResponse.configuration";
 
+	public static final String REQUEST_LOGGER = "logging.request.logger";
+
 	@Override
 	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
 		registry.register( REQUEST_RESPONSE_LOG_ENABLED, Boolean.class, false,
@@ -38,9 +41,15 @@ public class LoggingModuleSettings extends AcrossModuleSettings
 		                   "Configuration settings for request/response details log." );
 		registry.register( REQUEST_RESPONSE_LOG_PAUSED, Boolean.class, false,
 		                   "If enabled, should this logger be paused or not." );
+		registry.register( REQUEST_LOGGER, RequestLogger.class, RequestLogger.INTERCEPTOR,
+		                   "Configures how the requests will be logged" );
 	}
 
 	public boolean isRequestResponseLogEnabled() {
 		return getProperty( REQUEST_RESPONSE_LOG_ENABLED, Boolean.class );
+	}
+
+	public RequestLogger getRequestLogger() {
+		return getProperty( REQUEST_LOGGER, RequestLogger.class );
 	}
 }

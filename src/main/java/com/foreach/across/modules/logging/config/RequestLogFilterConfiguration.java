@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.logging.config;
 
+import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.modules.logging.filters.RequestLogFilter;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ import javax.servlet.ServletException;
  * Configures the RequestLogFilter to be first in the filter chain
  */
 @Configuration
+@AcrossCondition("settings.requestLogger == T(com.foreach.across.modules.logging.config.RequestLogger).FILTER")
 public class RequestLogFilterConfiguration extends AcrossWebDynamicServletConfigurer
 {
 	@Override
