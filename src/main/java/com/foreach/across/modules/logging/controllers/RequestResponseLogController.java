@@ -43,7 +43,7 @@ public class RequestResponseLogController
 
 	@Event
 	public void buildMenu( DebugMenuEvent event ) {
-		event.builder().group( "/logging/requestResponse", "Request - response logs" ).and()
+		event.builder().group( "/logging/requestResponse", "Request - response" ).and()
 		     .item( "/logging/requestResponse/list", "Overview" ).and()
 		     .item( "/logging/requestResponse/settings", "Settings" );/*.and()
 		     .item( "/logging/requestResponse/detail", "detail" ).disable()*/
