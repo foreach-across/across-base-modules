@@ -55,14 +55,14 @@ public class RequestResponseLogController
 		model.addAttribute( "paused", logFilter.isPaused() );
 		model.addAttribute( "logEntries", logRegistry.getEntries() );
 
-		return DebugWeb.VIEW_LOGGING_REQUEST_RESPONSE_LIST;
+		return "th/logging/requestResponse/list";
 	}
 
 	@RequestMapping("/logging/requestResponse/detail")
 	public String detail( @RequestParam("id") UUID id, Model model ) {
 		model.addAttribute( "entry", logRegistry.getEntry( id ) );
 
-		return DebugWeb.VIEW_LOGGING_REQUEST_RESPONSE_DETAIL;
+		return "th/logging/requestResponse/detail";
 	}
 
 	@RequestMapping(value = "/logging/requestResponse/settings")
@@ -77,7 +77,7 @@ public class RequestResponseLogController
 		if ( includedPathPatterns != null ) {
 			logFilter.setIncludedPathPatterns( fromTextArea( includedPathPatterns ) );
 		}
-		return DebugWeb.VIEW_LOGGING_REQUEST_RESPONSE_SETTINGS;
+		return "th/logging/requestResponse/settings";
 	}
 
 	@RequestMapping("/logging/requestResponse/pause")

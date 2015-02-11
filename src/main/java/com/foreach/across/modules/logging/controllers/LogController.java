@@ -22,7 +22,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
 import com.foreach.across.core.annotations.Event;
-import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.table.Table;
@@ -74,7 +73,7 @@ public class LogController
 		model.addAttribute( "loggers", loggerMap );
 		model.addAttribute( "appenders", Table.fromMap( "Appenders", appenderMap ) );
 
-		return DebugWeb.VIEW_LOGGERS;
+		return "th/logging/listLoggers";
 	}
 
 	@RequestMapping(value = "/loggers", method = RequestMethod.POST)
