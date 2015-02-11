@@ -1,0 +1,2 @@
+
+use DebugWebConfigurerAdapter to add interceptors only to debug web
