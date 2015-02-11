@@ -73,15 +73,15 @@ public class DebugWebInterceptorsConfiguration extends DebugWebConfigurerAdapter
 	public WebTemplateRegistry debugWebTemplateRegistry() {
 		WebTemplateRegistry webTemplateRegistry = new WebTemplateRegistry();
 
-		webTemplateRegistry.register( DebugWeb.LAYOUT_TEMPLATE, debugWebLayoutTemplateProcessor() );
-		webTemplateRegistry.setDefaultTemplateName( DebugWeb.LAYOUT_TEMPLATE );
+		webTemplateRegistry.register( debugWebLayoutTemplateProcessor() );
+		webTemplateRegistry.setDefaultTemplateName( "debugWeb" );
 
 		return webTemplateRegistry;
 	}
 
 	@Bean
 	public LayoutTemplateProcessorAdapterBean debugWebLayoutTemplateProcessor() {
-		return new LayoutTemplateProcessorAdapterBean( DebugWeb.LAYOUT_TEMPLATE )
+		return new LayoutTemplateProcessorAdapterBean( "debugWeb", DebugWeb.LAYOUT_TEMPLATE )
 		{
 			@Override
 			protected void registerWebResources( WebResourceRegistry registry ) {
