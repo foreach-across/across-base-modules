@@ -92,6 +92,40 @@ public class ITLoggingModuleBuilding
 		}
 	}
 
+	@Test
+	public void moduleWithoutDebugWebWorks() throws Exception {
+		try (AcrossTestContext ctx = new AcrossTestWebContext( new LoggingModuleWithoutDebugWebConfig() )) {
+			LoggingModuleSettings settings = ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
+			                                                                             LoggingModuleSettings.class );
+
+			assertFalse( settings.isRequestResponseLogEnabled() );
+			try {
+				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
+				                                            LogController.class );
+				fail( "There should not be a bean of type " + LogController.class.getName() );
+			}
+			catch ( NoSuchBeanDefinitionException e ) {
+				// expected
+			}
+
+			try {
+				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
+				                                            RequestResponseLoggingConfiguration.class );
+				fail( "There should not be a bean of type " + RequestResponseLoggingConfiguration.class.getName() );
+			}
+			catch ( NoSuchBeanDefinitionException e ) {
+				// expected
+			}
+			try {
+				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE, RequestResponseLogController.class );
+				fail( "There should not be a bean of type " + RequestResponseLogController.class.getName() );
+			}
+			catch ( NoSuchBeanDefinitionException e ) {
+				// expected
+			}
+		}
+	}
+
 	protected static class ComplexLoggingModuleConfig implements AcrossContextConfigurer
 	{
 
@@ -115,6 +149,14 @@ public class ITLoggingModuleBuilding
 		public void configure( AcrossContext context ) {
 			context.addModule( new LoggingModule() );
 			context.addModule( new DebugWebModule() );
+		}
+	}
+
+	protected static class LoggingModuleWithoutDebugWebConfig implements AcrossContextConfigurer
+	{
+		@Override
+		public void configure( AcrossContext context ) {
+			context.addModule( new LoggingModule() );
 		}
 	}
 }

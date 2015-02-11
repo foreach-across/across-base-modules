@@ -15,11 +15,10 @@
  */
 package com.foreach.across.modules.logging.controllers;
 
-import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.Event;
-import com.foreach.across.core.annotations.Refreshable;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
+import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogRegistry;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLoggingFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,15 +31,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-@Refreshable
-@AcrossDepends(required = "DebugWebModule")
+@DebugWebController
 public class RequestResponseLogController
 {
 	@Autowired
 	private RequestResponseLogRegistry logRegistry;
 	@Autowired
 	private RequestResponseLoggingFilter logFilter;
-	@Autowired(required = false)
+	@Autowired
 	private DebugWeb debugWeb;
 
 	@Event

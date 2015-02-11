@@ -15,14 +15,20 @@
  */
 package com.foreach.across.modules.logging.config;
 
-import org.springframework.context.annotation.ComponentScan;
+import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.modules.logging.controllers.LogController;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Andy Somers
  */
 @Configuration
-@ComponentScan("com.foreach.across.modules.logging.controllers")
+@AcrossDepends(required = "DebugWebModule")
 public class LoggingModuleConfiguration
 {
+	@Bean
+	public LogController logController() {
+		return new LogController();
+	}
 }
