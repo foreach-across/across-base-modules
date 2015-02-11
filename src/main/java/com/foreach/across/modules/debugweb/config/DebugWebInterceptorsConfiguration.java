@@ -22,6 +22,7 @@ import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.DebugWebModule;
 import com.foreach.across.modules.debugweb.config.support.DebugWebConfigurerAdapter;
 import com.foreach.across.modules.debugweb.mvc.DebugMenu;
+import com.foreach.across.modules.web.context.PrefixingPathRegistry;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import com.foreach.across.modules.web.mvc.InterceptorRegistry;
 import com.foreach.across.modules.web.mvc.WebAppPathResolverExposingInterceptor;
@@ -50,6 +51,9 @@ public class DebugWebInterceptorsConfiguration extends DebugWebConfigurerAdapter
 	@Module(AcrossModule.CURRENT_MODULE)
 	private DebugWebModule debugWebModule;
 
+	@Autowired
+	private PrefixingPathRegistry prefixingPathRegistry;
+
 	@Override
 	public void addInterceptors( InterceptorRegistry interceptorRegistry ) {
 		interceptorRegistry.addInterceptor( new WebAppPathResolverExposingInterceptor( debugWeb() ) );
@@ -57,10 +61,13 @@ public class DebugWebInterceptorsConfiguration extends DebugWebConfigurerAdapter
 		interceptorRegistry.addInterceptor( debugWebTemplateInterceptor() );
 	}
 
-	@Bean
+	@Bean(name = DebugWeb.NAME)
 	@Exposed
 	public DebugWeb debugWeb() {
-		return new DebugWeb( debugWebModule.getRootPath() );
+		DebugWeb debugWeb = new DebugWeb( debugWebModule.getRootPath() );
+		prefixingPathRegistry.add( DebugWeb.NAME, debugWeb );
+
+		return debugWeb;
 	}
 
 	@Bean
@@ -74,14 +81,14 @@ public class DebugWebInterceptorsConfiguration extends DebugWebConfigurerAdapter
 		WebTemplateRegistry webTemplateRegistry = new WebTemplateRegistry();
 
 		webTemplateRegistry.register( debugWebLayoutTemplateProcessor() );
-		webTemplateRegistry.setDefaultTemplateName( "debugWeb" );
+		webTemplateRegistry.setDefaultTemplateName( DebugWeb.NAME );
 
 		return webTemplateRegistry;
 	}
 
 	@Bean
 	public LayoutTemplateProcessorAdapterBean debugWebLayoutTemplateProcessor() {
-		return new LayoutTemplateProcessorAdapterBean( "debugWeb", DebugWeb.LAYOUT_TEMPLATE )
+		return new LayoutTemplateProcessorAdapterBean( DebugWeb.NAME, DebugWeb.LAYOUT_TEMPLATE )
 		{
 			@Override
 			protected void registerWebResources( WebResourceRegistry registry ) {
