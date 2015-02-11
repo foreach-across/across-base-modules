@@ -18,14 +18,14 @@ package com.foreach.across.modules.hibernate.config;
 import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
+import com.foreach.across.modules.web.config.support.PrefixingHandlerMappingConfigurerAdapter;
+import com.foreach.across.modules.web.mvc.InterceptorRegistry;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
  * Configures the OpenSessionInViewInterceptor if necessary.
@@ -35,13 +35,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @AcrossDepends(required = "AcrossWebModule")
 @AcrossCondition("${" + AcrossHibernateModuleSettings.OPEN_SESSION_IN_VIEW_INTERCEPTOR + "}")
 @Configuration
-public class OpenSessionInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
+public class OpenSessionInViewInterceptorConfiguration extends PrefixingHandlerMappingConfigurerAdapter implements Ordered
 {
 	@Autowired
 	private SessionFactory sessionFactory;
 
 	@Autowired
 	private AcrossHibernateModuleSettings settings;
+
+	@Override
+	public boolean supports( String mapperName ) {
+		// Add open session in view to all registered handler mappings by default
+		return true;
+	}
 
 	@Override
 	public int getOrder() {
