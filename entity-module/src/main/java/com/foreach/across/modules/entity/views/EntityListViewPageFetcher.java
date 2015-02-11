@@ -15,14 +15,13 @@
  */
 package com.foreach.across.modules.entity.views;
 
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 /**
  * @author Arne Vandamme
  */
-public interface EntityListViewPageFetcher
+public interface EntityListViewPageFetcher<V extends ViewCreationContext>
 {
-	Page fetchPage( EntityConfiguration entityConfiguration, Pageable pageable, EntityView model );
+	Page fetchPage( V viewCreationContext, Pageable pageable, EntityView model );
 }

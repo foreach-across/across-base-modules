@@ -16,7 +16,6 @@
 package com.foreach.across.modules.entity.views;
 
 import com.foreach.across.modules.entity.EntityAttributes;
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.ViewElement;
@@ -37,7 +36,7 @@ import java.util.Collection;
  *
  * @author Arne Vandamme
  */
-public class EntityListViewFactory extends ConfigurablePropertiesEntityViewFactorySupport<EntityListView>
+public class EntityListViewFactory<V extends ViewCreationContext> extends ConfigurablePropertiesEntityViewFactorySupport<V, EntityListView>
 {
 	private int pageSize = 50;
 	private boolean showResultNumber = true;
@@ -107,9 +106,9 @@ public class EntityListViewFactory extends ConfigurablePropertiesEntityViewFacto
 	}
 
 	@Override
-	protected void extendViewModel( EntityConfiguration entityConfiguration, EntityListView view ) {
+	protected void extendViewModel( V viewCreationContext, EntityListView view ) {
 		Pageable pageable = buildPageable( view );
-		Page page = getPageFetcher().fetchPage( entityConfiguration, pageable, view );
+		Page page = getPageFetcher().fetchPage( viewCreationContext, pageable, view );
 
 		view.setPageable( pageable );
 		view.setPage( page );

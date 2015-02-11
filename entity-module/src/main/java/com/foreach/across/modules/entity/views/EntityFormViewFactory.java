@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.entity.views;
 
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.views.elements.CommonViewElements;
 import com.foreach.across.modules.entity.views.elements.ViewElementMode;
@@ -24,12 +23,12 @@ import com.foreach.across.modules.entity.views.elements.button.ButtonViewElement
 /**
  * @author Arne Vandamme
  */
-public class EntityFormViewFactory extends ConfigurablePropertiesEntityViewFactorySupport<EntityFormView>
+public class EntityFormViewFactory<V extends ViewCreationContext> extends ConfigurablePropertiesEntityViewFactorySupport<V, EntityFormView>
 {
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void extendViewModel( EntityConfiguration entityConfiguration, EntityFormView view ) {
-		EntityModel entityModel = entityConfiguration.getEntityModel();
+	protected void extendViewModel( V viewCreationContext, EntityFormView view ) {
+		EntityModel entityModel = viewCreationContext.getEntityConfiguration().getEntityModel();
 
 		Object entity = retrieveOrCreateEntity( entityModel, view );
 		view.setEntity( entity );

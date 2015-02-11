@@ -34,8 +34,8 @@ import java.util.List;
  *
  * @author Arne Vandamme
  */
-public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends EntityView>
-		extends SimpleEntityViewFactorySupport<T>
+public abstract class ConfigurablePropertiesEntityViewFactorySupport<V extends ViewCreationContext, T extends EntityView>
+		extends SimpleEntityViewFactorySupport<V, T>
 {
 	private EntityPropertyRegistries entityPropertyRegistries;
 
@@ -76,12 +76,13 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 	}
 
 	@Override
-	protected void buildViewModel( EntityConfiguration entityConfiguration,
+	protected void buildViewModel( V viewCreationContext,
+			EntityConfiguration entityConfiguration,
 	                               EntityMessageCodeResolver messageCodeResolver,
 	                               T view ) {
 		view.setEntityProperties( getEntityProperties( entityConfiguration, messageCodeResolver ) );
 
-		extendViewModel( entityConfiguration, view );
+		extendViewModel( viewCreationContext, view );
 	}
 
 	private ViewElements getEntityProperties( EntityConfiguration entityConfiguration,
@@ -127,5 +128,5 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<T extends E
 
 	protected abstract ViewElementMode getMode();
 
-	protected abstract void extendViewModel( EntityConfiguration entityConfiguration, T view );
+	protected abstract void extendViewModel( V viewCreationContext, T view );
 }

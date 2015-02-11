@@ -20,6 +20,7 @@ import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.views.*;
+import com.foreach.across.modules.entity.web.WebViewCreationContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,10 +109,10 @@ public class RepositoryEntityAssociationsBuilder
 		if ( repository instanceof JpaSpecificationExecutor ) {
 			final JpaSpecificationExecutor jpa = (JpaSpecificationExecutor) repository;
 
-			viewFactory.setPageFetcher( new EntityListViewPageFetcher()
+			viewFactory.setPageFetcher( new EntityListViewPageFetcher<WebViewCreationContext>()
 			{
 				@Override
-				public Page fetchPage( EntityConfiguration entityConfiguration,
+				public Page fetchPage( WebViewCreationContext viewCreationContext,
 				                       Pageable pageable,
 				                       final EntityView model ) {
 					Specification s = new Specification<Object>()

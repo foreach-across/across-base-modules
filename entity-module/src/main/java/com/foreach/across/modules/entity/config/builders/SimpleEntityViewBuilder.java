@@ -22,6 +22,7 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegis
 import com.foreach.across.modules.entity.registry.properties.MergingEntityPropertyRegistry;
 import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
 import com.foreach.across.modules.entity.views.EntityView;
+import com.foreach.across.modules.entity.views.ViewCreationContext;
 import com.foreach.across.modules.entity.views.elements.ViewElementMode;
 import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
@@ -113,7 +114,7 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 			}
 
 			@Override
-			protected void extendViewModel( EntityConfiguration entityConfiguration, EntityView view ) {
+			protected void extendViewModel( ViewCreationContext viewCreationContext, EntityView view ) {
 			}
 
 			@Override

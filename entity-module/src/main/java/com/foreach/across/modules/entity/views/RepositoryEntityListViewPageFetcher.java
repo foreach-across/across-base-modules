@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.entity.views;
 
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +28,7 @@ import java.util.List;
 /**
  * @author Arne Vandamme
  */
-public class RepositoryEntityListViewPageFetcher implements EntityListViewPageFetcher
+public class RepositoryEntityListViewPageFetcher implements EntityListViewPageFetcher<ViewCreationContext>
 {
 	private CrudRepository repository;
 
@@ -39,7 +38,7 @@ public class RepositoryEntityListViewPageFetcher implements EntityListViewPageFe
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Page fetchPage( EntityConfiguration entityConfiguration, Pageable pageable, EntityView model ) {
+	public Page fetchPage( ViewCreationContext viewCreationContext, Pageable pageable, EntityView model ) {
 		if ( repository instanceof PagingAndSortingRepository ) {
 			return ( (PagingAndSortingRepository) repository ).findAll( pageable );
 		}

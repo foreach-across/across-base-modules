@@ -34,10 +34,10 @@ import java.util.Collections;
  *
  * @author Arne Vandamme
  */
-public abstract class SimpleEntityViewFactorySupport<T extends EntityView> implements EntityViewFactory
+public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationContext, T extends EntityView> implements EntityViewFactory<V>
 {
-	private Collection<ViewPreProcessor<ViewCreationContext, T>> preProcessors = Collections.emptyList();
-	private Collection<ViewPostProcessor<ViewCreationContext, T>> postProcessors = Collections.emptyList();
+	private Collection<ViewPreProcessor<V, T>> preProcessors = Collections.emptyList();
+	private Collection<ViewPostProcessor<V, T>> postProcessors = Collections.emptyList();
 	private String template;
 	private MessageSource messageSource;
 	private EntityMessageCodeResolver messageCodeResolver;
@@ -102,12 +102,12 @@ public abstract class SimpleEntityViewFactorySupport<T extends EntityView> imple
 	 *
 	 * @param preProcessors A Collection of ViewPreProcessors
 	 */
-	public void setPreProcessors( Collection<ViewPreProcessor<ViewCreationContext, T>> preProcessors ) {
+	public void setPreProcessors( Collection<ViewPreProcessor<V, T>> preProcessors ) {
 		Assert.notNull( preProcessors );
 		this.preProcessors = preProcessors;
 	}
 
-	public Collection<ViewPreProcessor<ViewCreationContext, T>> getPreProcessors() {
+	public Collection<ViewPreProcessor<V, T>> getPreProcessors() {
 		return preProcessors;
 	}
 
@@ -116,17 +116,17 @@ public abstract class SimpleEntityViewFactorySupport<T extends EntityView> imple
 	 *
 	 * @param postProcessors A Collection of ViewPostProcessors
 	 */
-	public void setPostProcessors( Collection<ViewPostProcessor<ViewCreationContext, T>> postProcessors ) {
+	public void setPostProcessors( Collection<ViewPostProcessor<V, T>> postProcessors ) {
 		Assert.notNull( postProcessors );
 		this.postProcessors = postProcessors;
 	}
 
-	public Collection<ViewPostProcessor<ViewCreationContext, T>> getPostProcessors() {
+	public Collection<ViewPostProcessor<V, T>> getPostProcessors() {
 		return postProcessors;
 	}
 
 	@Override
-	public EntityView create( String viewName, ViewCreationContext creationContext, Model model ) {
+	public EntityView create( String viewName, V creationContext, Model model ) {
 		EntityConfiguration entityConfiguration = creationContext.getEntityConfiguration();
 		Assert.notNull( entityConfiguration );
 
@@ -144,21 +144,21 @@ public abstract class SimpleEntityViewFactorySupport<T extends EntityView> imple
 
 		handlePreProcessors( creationContext, view );
 
-		buildViewModel( entityConfiguration, codeResolver, view );
+		buildViewModel( creationContext, entityConfiguration, codeResolver, view );
 
 		handlePostProcessors( creationContext, view );
 
 		return view;
 	}
 
-	private void handlePreProcessors( ViewCreationContext creationContext, T view ) {
-		for ( ViewPreProcessor<ViewCreationContext, T> preProcessor : preProcessors ) {
+	private void handlePreProcessors( V creationContext, T view ) {
+		for ( ViewPreProcessor<V, T> preProcessor : preProcessors ) {
 			preProcessor.preProcess( creationContext, view );
 		}
 	}
 
-	private void handlePostProcessors( ViewCreationContext creationContext, T view ) {
-		for ( ViewPostProcessor<ViewCreationContext, T> postProcessor : postProcessors ) {
+	private void handlePostProcessors( V creationContext, T view ) {
+		for ( ViewPostProcessor<V, T> postProcessor : postProcessors ) {
 			postProcessor.postProcess( creationContext, view );
 		}
 	}
@@ -185,6 +185,8 @@ public abstract class SimpleEntityViewFactorySupport<T extends EntityView> imple
 
 	protected abstract T createEntityView();
 
-	protected abstract void buildViewModel( EntityConfiguration entityConfiguration,
-	                                        EntityMessageCodeResolver codeResolver, T view );
+	protected abstract void buildViewModel( V viewCreationContext,
+	                                        EntityConfiguration entityConfiguration,
+	                                        EntityMessageCodeResolver codeResolver,
+	                                        T view );
 }
