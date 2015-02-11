@@ -23,8 +23,9 @@ import com.foreach.across.modules.adminweb.AdminWeb;
 import com.foreach.across.modules.adminweb.AdminWebModule;
 import com.foreach.across.modules.adminweb.config.support.AdminWebConfigurerAdapter;
 import com.foreach.across.modules.adminweb.menu.AdminMenu;
-import com.foreach.across.modules.adminweb.resource.BootstrapWebResourcePackage;
+import com.foreach.across.modules.adminweb.resource.AdminBootstrapWebResourcePackage;
 import com.foreach.across.modules.adminweb.resource.JQueryWebResourcePackage;
+import com.foreach.across.modules.web.context.PrefixingPathRegistry;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import com.foreach.across.modules.web.mvc.InterceptorRegistry;
 import com.foreach.across.modules.web.mvc.WebAppPathResolverExposingInterceptor;
@@ -56,6 +57,9 @@ public class AdminWebInterceptorsConfiguration extends AdminWebConfigurerAdapter
 	@Module(AcrossModule.CURRENT_MODULE)
 	private AdminWebModule adminWebModule;
 
+	@Autowired
+	private PrefixingPathRegistry prefixingPathRegistry;
+
 	@Override
 	public void addInterceptors( InterceptorRegistry interceptorRegistry ) {
 		interceptorRegistry.addInterceptor( new WebAppPathResolverExposingInterceptor( adminWeb() ) );
@@ -63,10 +67,13 @@ public class AdminWebInterceptorsConfiguration extends AdminWebConfigurerAdapter
 		interceptorRegistry.addInterceptor( adminWebTemplateInterceptor() );
 	}
 
-	@Bean
+	@Bean(name = AdminWeb.NAME)
 	@Exposed
 	public AdminWeb adminWeb() {
-		return new AdminWeb( adminWebModule.getRootPath(), "Administrative web interface" );
+		AdminWeb adminWeb = new AdminWeb( adminWebModule.getRootPath() );
+		prefixingPathRegistry.add( AdminWeb.NAME, adminWeb );
+
+		return adminWeb;
 	}
 
 	@Bean
@@ -96,7 +103,7 @@ public class AdminWebInterceptorsConfiguration extends AdminWebConfigurerAdapter
 		WebTemplateRegistry webTemplateRegistry = new WebTemplateRegistry();
 
 		webTemplateRegistry.register( adminLayoutTemplateProcessor() );
-		webTemplateRegistry.setDefaultTemplateName( "adminWeb" );
+		webTemplateRegistry.setDefaultTemplateName( AdminWeb.NAME );
 
 		return webTemplateRegistry;
 	}
@@ -107,8 +114,8 @@ public class AdminWebInterceptorsConfiguration extends AdminWebConfigurerAdapter
 		WebResourcePackageManager webResourcePackageManager = new WebResourcePackageManager();
 		webResourcePackageManager.register( JQueryWebResourcePackage.NAME,
 		                                    new JQueryWebResourcePackage( !developmentMode.isActive() ) );
-		webResourcePackageManager.register( BootstrapWebResourcePackage.NAME,
-		                                    new BootstrapWebResourcePackage( !developmentMode.isActive() ) );
+		webResourcePackageManager.register( AdminBootstrapWebResourcePackage.NAME,
+		                                    new AdminBootstrapWebResourcePackage( !developmentMode.isActive() ) );
 
 		return webResourcePackageManager;
 	}
@@ -116,11 +123,11 @@ public class AdminWebInterceptorsConfiguration extends AdminWebConfigurerAdapter
 	// todo: verify thymeleaf support is enabled
 	@Bean
 	public LayoutTemplateProcessorAdapterBean adminLayoutTemplateProcessor() {
-		return new LayoutTemplateProcessorAdapterBean( "adminWeb", AdminWeb.LAYOUT_TEMPLATE )
+		return new LayoutTemplateProcessorAdapterBean( AdminWeb.NAME, AdminWeb.LAYOUT_TEMPLATE )
 		{
 			@Override
 			protected void registerWebResources( WebResourceRegistry registry ) {
-				registry.addPackage( BootstrapWebResourcePackage.NAME );
+				registry.addPackage( AdminBootstrapWebResourcePackage.NAME );
 				registry.addWithKey( WebResource.CSS, AdminWeb.MODULE, AdminWeb.LAYOUT_TEMPLATE_CSS,
 				                     WebResource.VIEWS );
 			}

@@ -56,7 +56,7 @@ public class ITDebugWebModule
 	private WebResourceRegistryInterceptor debugWebResourceRegistryInterceptor;
 
 	@Autowired
-	@Qualifier("debugHandlerMapping")
+	@Qualifier("debugWebHandlerMapping")
 	private PrefixingRequestMappingHandlerMapping debugHandlerMapping;
 
 	@Autowired

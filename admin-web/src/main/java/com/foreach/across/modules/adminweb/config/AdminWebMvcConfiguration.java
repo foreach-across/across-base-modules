@@ -16,9 +16,11 @@
 package com.foreach.across.modules.adminweb.config;
 
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.modules.adminweb.AdminWebModule;
+import com.foreach.across.modules.adminweb.AdminWebModuleSettings;
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.adminweb.controllers.AuthenticationController;
 import com.foreach.across.modules.adminweb.menu.AdminMenu;
@@ -33,8 +35,11 @@ import org.springframework.aop.support.annotation.AnnotationClassFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
 import javax.annotation.PostConstruct;
+import java.util.Locale;
 
 @Configuration
 public class AdminWebMvcConfiguration extends PrefixingHandlerMappingConfiguration
@@ -45,6 +50,9 @@ public class AdminWebMvcConfiguration extends PrefixingHandlerMappingConfigurati
 
 	@Autowired
 	private MenuFactory menuFactory;
+
+	@Autowired
+	private AdminWebModuleSettings settings;
 
 	@SuppressWarnings("unchecked")
 	@PostConstruct
@@ -61,6 +69,20 @@ public class AdminWebMvcConfiguration extends PrefixingHandlerMappingConfigurati
 	@Override
 	protected ClassFilter getHandlerMatcher() {
 		return new AnnotationClassFilter( AdminWebController.class, true );
+	}
+
+	@AcrossCondition("#{not getBeanFactory().containsBean('" + DispatcherServlet.LOCALE_RESOLVER_BEAN_NAME + "')}")
+	@Bean(name = DispatcherServlet.LOCALE_RESOLVER_BEAN_NAME)
+	@Exposed
+	public CookieLocaleResolver localeResolver() {
+		CookieLocaleResolver cookieLocaleResolver = new CookieLocaleResolver();
+		Locale defaultLocale = settings.getDefaultLocale();
+
+		if ( defaultLocale != null ) {
+			cookieLocaleResolver.setDefaultLocale( defaultLocale );
+		}
+
+		return new CookieLocaleResolver();
 	}
 
 	@Bean(name = "adminWebHandlerMapping")
