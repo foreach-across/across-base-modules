@@ -30,7 +30,7 @@
 <body>
 <div sec:authorize="isAuthenticated()">
 	<!-- Main menu navigation -->
-	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<nav class="navbar navbar-fixed-top" role="navigation">
 		<div class="container-fluid">
 			<div class="navbar-header admin-navbar-title">
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-top-navbar" aria-expanded="true" aria-controls="navbar">

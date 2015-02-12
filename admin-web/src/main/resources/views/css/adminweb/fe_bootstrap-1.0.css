@@ -40,14 +40,6 @@
  * We need to supply a full code font-stack in order to combat this:
  * jsfiddle.net/csswizardry/uD6UW
  */
-/*------------------------------------*\
-    FONTS.SCSS
-\*------------------------------------*/
-@font-face {
-  font-family: 'Glyphicons Halflings';
-  src: url('../fonts/glyphicons-halflings-regular.eot');
-  src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular') format('svg'); }
-
 /*
   $condition can be any of these sizes:
   - very-small
@@ -77,6 +69,14 @@
 
   - a breakpoint or a HTML class (IE, modernizr class)
 */
+/*------------------------------------*\
+    FONTS.SCSS
+\*------------------------------------*/
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url("fonts/glyphicons-halflings-regular.eot");
+  src: url("fonts/glyphicons-halflings-regular.eot?#iefix") format('embedded-opentype'), url("fonts/glyphicons-halflings-regular.woff") format('woff'), url("fonts/glyphicons-halflings-regular.ttf") format('truetype'), url("fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular") format('svg'); }
+
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 html {
   font-family: sans-serif;
@@ -265,11 +265,6 @@ td, th {
       background-color: #fff !important; }
   .table-bordered th, .table-bordered td {
     border: 1px solid #ddd !important; } }
-
-@font-face {
-  font-family: 'Glyphicons Halflings';
-  src: url('../fonts/glyphicons-halflings-regular.eot');
-  src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg'); }
 
 .glyphicon {
   position: relative;
@@ -4730,17 +4725,38 @@ button.close {
 * {
   -webkit-font-smoothing: antialiased; }
 
-.navbar-header .logo {
-  position: absolute;
-  max-width: 40px;
-  top: 4px;
-  left: 10px; }
-.navbar-header .navbar-brand {
-  padding-left: 52px;
-  font-weight: 700;
-  font-size: 0.95em;
-  text-transform: uppercase;
-  color: #eeeeee; }
+.navbar-header {
+  background: url("images/across-logo-white.svg") no-repeat 1em center;
+  padding-left: 20px; }
+  .navbar-header .logo {
+    position: absolute;
+    max-width: 40px;
+    top: 4px;
+    left: 10px; }
+  .navbar-header .navbar-brand {
+    padding-left: 52px;
+    font-weight: 700;
+    font-size: 0.95em;
+    text-transform: uppercase;
+    color: #eeeeee; }
+
+.navbar-fixed-top {
+  background: #002c41; }
+  .navbar-fixed-top .nav > li > a, .navbar-fixed-top .nav > li > a {
+    color: #eeeeee;
+    -webkit-transition: background 500ms ease;
+    -moz-transition: background 500ms ease;
+    -o-transition: background 500ms ease;
+    transition: background 500ms ease; }
+    .navbar-fixed-top .nav > li > a:hover, .navbar-fixed-top .nav > li > a:active, .navbar-fixed-top .nav > li > a:focus, .navbar-fixed-top .nav > li > a:hover, .navbar-fixed-top .nav > li > a:active, .navbar-fixed-top .nav > li > a:focus {
+      color: #ffffff;
+      background: #003d5a;
+      -webkit-transition: background 500ms;
+      -moz-transition: background 500ms;
+      -o-transition: background 500ms;
+      transition: background 500ms; }
+    .navbar-fixed-top .nav > li > a[aria-expanded="true"], .navbar-fixed-top .nav > li > a[aria-expanded="true"] {
+      background: #003d5a; }
 
 .nav-title {
   color: #999999;
@@ -5032,7 +5048,7 @@ h2.page-header, h3.page-header {
   height: 48px;
   border-radius: 3px;
   border: 1px solid #f4f4f4;
-  background: url("../images/spinner.gif") no-repeat center center white; }
+  background: url("images/spinner.gif") no-repeat center center white; }
   .spinner.active {
     display: inline-block; }
 
@@ -5241,7 +5257,7 @@ body {
 mark, .mark {
   background: #FFCE01; }
 
-[data-toggle="collapse"]:before {
+.sidebar [data-toggle="collapse"]:before {
   color: #C4C4C4;
   font-size: 0.75em;
   content: '▼';
@@ -5249,7 +5265,7 @@ mark, .mark {
   width: 0.75em;
   height: 1em;
   float: right; }
-[data-toggle="collapse"][aria-expanded="true"]:before {
+.sidebar [data-toggle="collapse"][aria-expanded="true"]:before {
   content: '▲'; }
 
 #ui-datepicker-div, .ui-datepicker {
