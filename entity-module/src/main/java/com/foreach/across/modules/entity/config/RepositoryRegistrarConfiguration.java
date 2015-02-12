@@ -1,8 +1,8 @@
 package com.foreach.across.modules.entity.config;
 
 import com.foreach.across.modules.entity.registrars.repository.*;
-import com.foreach.across.modules.entity.registrars.repository.handlers.ManyToManyAssociationJpaSpecificationExecutorListViewBuilder;
-import com.foreach.across.modules.entity.registrars.repository.handlers.ManyToOneAssociationJpaSpecificationExecutorListViewBuilder;
+import com.foreach.across.modules.entity.registrars.repository.handlers.ManyToManyAssociationViewBuilder;
+import com.foreach.across.modules.entity.registrars.repository.handlers.ManyToOneAssociationViewBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,12 +40,12 @@ public class RepositoryRegistrarConfiguration
 	}
 
 	@Bean
-	protected ManyToOneAssociationJpaSpecificationExecutorListViewBuilder manyToOneAssociationJpaSpecificationExecutorListViewBuilder() {
-		return new ManyToOneAssociationJpaSpecificationExecutorListViewBuilder();
+	protected ManyToOneAssociationViewBuilder manyToOneAssociationViewBuilder() {
+		return new ManyToOneAssociationViewBuilder();
 	}
 
 	@Bean
-	protected ManyToManyAssociationJpaSpecificationExecutorListViewBuilder manyToManyAssociationJpaSpecificationExecutorListViewBuilder() {
-		return new ManyToManyAssociationJpaSpecificationExecutorListViewBuilder();
+	protected ManyToManyAssociationViewBuilder manyToManyAssociationViewBuilder() {
+		return new ManyToManyAssociationViewBuilder();
 	}
 }

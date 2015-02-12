@@ -112,6 +112,15 @@ public class TestRepositoryEntityRegistrar
 	}
 
 	@Test
+	public void representativeShouldHaveAnAssociationToItsCompanies() throws Exception {
+		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Representative.class );
+		EntityAssociation association = configuration.association( Company.class );
+
+		assertNotNull( association );
+		assertTrue( association.hasView( EntityListView.VIEW_NAME ) );
+	}
+
+	@Test
 	public void verifyPropertyRegistry() {
 		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
 		EntityPropertyRegistry registry = configuration.getPropertyRegistry();

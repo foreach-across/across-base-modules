@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.registrars.repository.handlers;
 
+import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.repository.Repository;
@@ -22,9 +23,11 @@ import org.springframework.data.repository.Repository;
 /**
  * @author Andy Somers
  */
-public interface AssociationListViewBuilder
+public interface AssociationViewBuilder
 {
-	boolean supports( Class<?> clazz, Repository repository );
+	boolean supports( Class<?> clazz );
 
-	void handle( EntityListViewFactory viewFactory, Repository repository, PersistentProperty property );
+	void buildListView( MutableEntityAssociation association, PersistentProperty property );
+
+	void buildCreateView( MutableEntityAssociation association );
 }
