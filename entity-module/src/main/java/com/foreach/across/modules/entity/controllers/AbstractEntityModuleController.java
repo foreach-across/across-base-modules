@@ -16,29 +16,20 @@
 package com.foreach.across.modules.entity.controllers;
 
 import com.foreach.across.modules.entity.EntityModule;
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.web.resource.WebResource;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
-import org.springframework.validation.Validator;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * @author Arne Vandamme
  */
-public abstract class EntityControllerSupport
+public abstract class AbstractEntityModuleController implements EntityControllerAttributes
 {
 	@ModelAttribute
 	public void init( WebResourceRegistry registry ) {
 		registry.addWithKey( WebResource.CSS, EntityModule.NAME, "/css/entity/entity-module.css", WebResource.VIEWS );
 		registry.addWithKey( WebResource.JAVASCRIPT_PAGE_END, EntityModule.NAME,
 		                     "/js/entity/entity-module.js", WebResource.VIEWS );
-		registry.addWithKey( WebResource.JAVASCRIPT, "jquery",
-		                     "//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js",
-		                     WebResource.EXTERNAL );
 		registry.addWithKey( WebResource.CSS, "jqueryui-css",
 		                     "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css",
 		                     WebResource.EXTERNAL );
@@ -46,17 +37,4 @@ public abstract class EntityControllerSupport
 		                     "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js",
 		                     WebResource.EXTERNAL );
 	}
-
-	@InitBinder(EntityView.ATTRIBUTE_ENTITY)
-	protected void initBinder( @PathVariable("entityConfig") EntityConfiguration<?> entityConfiguration,
-	                           WebDataBinder binder ) {
-		binder.setMessageCodesResolver( entityConfiguration.getEntityMessageCodeResolver() );
-
-		Validator validator = entityConfiguration.getAttribute( Validator.class );
-
-		if ( validator != null ) {
-			binder.setValidator( validator );
-		}
-	}
-
 }

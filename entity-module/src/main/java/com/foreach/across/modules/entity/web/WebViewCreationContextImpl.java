@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.web;
 
+import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
 import com.foreach.across.modules.web.resource.WebResourceUtils;
@@ -27,6 +28,7 @@ public class WebViewCreationContextImpl implements WebViewCreationContext
 {
 	private NativeWebRequest request;
 	private EntityConfiguration entityConfiguration;
+	private EntityAssociation entityAssociation;
 
 	public NativeWebRequest getRequest() {
 		return request;
@@ -42,6 +44,24 @@ public class WebViewCreationContextImpl implements WebViewCreationContext
 
 	public void setEntityConfiguration( EntityConfiguration entityConfiguration ) {
 		this.entityConfiguration = entityConfiguration;
+	}
+
+	@Override
+	public EntityAssociation getEntityAssociation() {
+		return entityAssociation;
+	}
+
+	@Override
+	public void setEntityAssociation( EntityAssociation entityAssociation ) {
+		this.entityAssociation = entityAssociation;
+		if ( entityConfiguration == null ) {
+			entityConfiguration = entityAssociation.getAssociatedEntityConfiguration();
+		}
+	}
+
+	@Override
+	public boolean isForAssociation() {
+		return getEntityAssociation() != null;
 	}
 
 	@Override

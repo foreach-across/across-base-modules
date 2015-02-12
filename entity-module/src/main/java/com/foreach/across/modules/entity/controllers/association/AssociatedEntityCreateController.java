@@ -1,9 +1,25 @@
-package com.foreach.across.modules.entity.controllers;
+/*
+ * Copyright 2014 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.foreach.across.modules.entity.controllers.association;
 
 import com.foreach.across.modules.adminweb.AdminWeb;
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.adminweb.menu.AdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
+import com.foreach.across.modules.entity.controllers.AbstractEntityModuleController;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.views.EntityFormView;
@@ -35,9 +51,8 @@ import java.io.Serializable;
  * @since 9/02/2015
  */
 @AdminWebController
-public class AssociatedEntityCreateController extends EntityControllerSupport
+public class AssociatedEntityCreateController extends AbstractEntityModuleController
 {
-
 	private static final String PATH = AssociatedEntityController.PATH + "/create";
 
 	@Autowired
@@ -51,12 +66,13 @@ public class AssociatedEntityCreateController extends EntityControllerSupport
 
 	@SuppressWarnings("unchecked")
 	@ModelAttribute(EntityView.ATTRIBUTE_ENTITY)
-	public Object entity( @PathVariable(
-			AssociatedEntityController.PATH_ASSOCIATED_ENTITY_CONFIG) EntityConfiguration<?> associatedEntityConfiguration,
-	                      @PathVariable(
-			                      AssociatedEntityController.PATH_ENTITY_CONFIG) EntityConfiguration<?> entityConfiguration,
-	                      @PathVariable(AssociatedEntityController.PATH_ENTITY_ID) Serializable entityId,
-	                      Model model
+	public Object entity(
+			@PathVariable(
+					AssociatedEntityController.PATH_ASSOCIATED_ENTITY_CONFIG) EntityConfiguration<?> associatedEntityConfiguration,
+			@PathVariable(
+					AssociatedEntityController.PATH_ENTITY_CONFIG) EntityConfiguration<?> entityConfiguration,
+			@PathVariable(AssociatedEntityController.PATH_ENTITY_ID) Serializable entityId,
+			Model model
 	) {
 		Object entity = conversionService.convert( entityId, entityConfiguration.getEntityType() );
 
@@ -72,18 +88,21 @@ public class AssociatedEntityCreateController extends EntityControllerSupport
 	}
 
 	@RequestMapping(value = PATH, method = RequestMethod.GET)
-	public ModelAndView showCreateAssociatedEntityForm( @PathVariable(
-			AssociatedEntityController.PATH_ENTITY_CONFIG) EntityConfiguration entityConfiguration,
-	                                                    @ModelAttribute(EntityView.ATTRIBUTE_ENTITY) Object entity,
-	                                                    @PathVariable(
-			                                                    AssociatedEntityController.PATH_ASSOCIATED_ENTITY_CONFIG) EntityConfiguration associatedConfig,
-	                                                    @ModelAttribute(
-			                                                    EntityFormView.ATTRIBUTE_PARENT_ENTITY) Object parentEntity,
-	                                                    AdminMenu adminMenu,
-	                                                    Model model,
-	                                                    WebViewCreationContext creationContext ) {
+	public ModelAndView showCreateAssociatedEntityForm(
+			@PathVariable(
+					AssociatedEntityController.PATH_ENTITY_CONFIG) EntityConfiguration entityConfiguration,
+			@ModelAttribute(EntityView.ATTRIBUTE_ENTITY) Object entity,
+			@PathVariable(
+					AssociatedEntityController.PATH_ASSOCIATED_ENTITY_CONFIG) EntityConfiguration associatedConfig,
+			@ModelAttribute(
+					EntityFormView.ATTRIBUTE_PARENT_ENTITY) Object parentEntity,
+			AdminMenu adminMenu,
+			Model model,
+			WebViewCreationContext creationContext
+	) {
 
-		creationContext.setEntityConfiguration( associatedConfig );
+		creationContext.setEntityAssociation( entityConfiguration.association( associatedConfig.getEntityType() ) );
+
 		adminMenu.breadcrumbLeaf( entityConfiguration.getLabel( entity ) );
 		EntityViewFactory viewFactory = entityConfiguration.association( associatedConfig.getEntityType() )
 		                                                   .getViewFactory( EntityFormView.CREATE_VIEW_NAME );
@@ -97,17 +116,17 @@ public class AssociatedEntityCreateController extends EntityControllerSupport
 	}
 
 	@RequestMapping(value = PATH, method = RequestMethod.POST)
-	public ModelAndView saveEntity( @PathVariable(
-			AssociatedEntityController.PATH_ENTITY_CONFIG) EntityConfiguration entityConfiguration,
-	                                @ModelAttribute(EntityView.ATTRIBUTE_ENTITY) @Valid Object entity,
-	                                @ModelAttribute(EntityFormView.ATTRIBUTE_PARENT_ENTITY) Object parentEntity,
-	                                @PathVariable(
-			                                AssociatedEntityController.PATH_ASSOCIATED_ENTITY_CONFIG) EntityConfiguration associatedConfig,
-	                                BindingResult bindingResult,
-	                                AdminMenu adminMenu,
-	                                Model model,
-	                                RedirectAttributes redirectAttributes,
-	                                WebViewCreationContext creationContext ) {
+	public ModelAndView saveEntity(
+			@PathVariable(AssociatedEntityController.PATH_ENTITY_CONFIG) EntityConfiguration entityConfiguration,
+			@ModelAttribute(EntityView.ATTRIBUTE_ENTITY) @Valid Object entity,
+			@ModelAttribute(EntityFormView.ATTRIBUTE_PARENT_ENTITY) Object parentEntity,
+			@PathVariable(
+					AssociatedEntityController.PATH_ASSOCIATED_ENTITY_CONFIG) EntityConfiguration associatedConfig,
+			BindingResult bindingResult,
+			AdminMenu adminMenu,
+			Model model,
+			RedirectAttributes redirectAttributes,
+			WebViewCreationContext creationContext ) {
 		EntityModel entityModel = associatedConfig.getEntityModel();
 		if ( !bindingResult.hasErrors() ) {
 			entityModel.save( entity );

@@ -18,6 +18,7 @@ package com.foreach.across.modules.entity.config.modules;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.entity.EntityModuleSettings;
 import com.foreach.across.modules.entity.annotations.EntityValidator;
+import com.foreach.across.modules.entity.controllers.ViewRequestValidator;
 import com.foreach.across.modules.entity.views.ViewCreationContext;
 import com.foreach.across.modules.entity.views.thymeleaf.EntityModuleDialect;
 import com.foreach.across.modules.entity.web.WebViewCreationContextImpl;
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Sort;
@@ -55,6 +57,7 @@ public class AcrossWebConfiguration extends WebMvcConfigurerAdapter
 	private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring4.SpringTemplateEngine";
 
 	private static final Logger LOG = LoggerFactory.getLogger( AcrossWebConfiguration.class );
+
 	@EntityValidator
 	@SuppressWarnings("unused")
 	private Validator entityValidator;
@@ -129,6 +132,11 @@ public class AcrossWebConfiguration extends WebMvcConfigurerAdapter
 		}
 
 		return null;
+	}
+
+	@Bean
+	protected Validator viewRequestValidator() {
+		return new ViewRequestValidator();
 	}
 
 	private boolean shouldRegisterThymeleafDialect() {

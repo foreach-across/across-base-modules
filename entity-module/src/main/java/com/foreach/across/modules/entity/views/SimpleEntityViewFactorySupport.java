@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.views;
 
+import com.foreach.across.modules.entity.controllers.EntityViewCommand;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
@@ -126,6 +127,16 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 	}
 
 	@Override
+	public void prepareModelAndCommand( String viewName, V creationContext, EntityViewCommand command, Model model ) {
+
+	}
+
+	@Override
+	public void prepareDataBinder( String viewName, V creationContext, EntityViewCommand viewRequest ) {
+
+	}
+
+	@Override
 	public EntityView create( String viewName, V creationContext, Model model ) {
 		EntityConfiguration entityConfiguration = creationContext.getEntityConfiguration();
 		Assert.notNull( entityConfiguration );
@@ -133,14 +144,11 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 		T view = createEntityView();
 		view.setViewName( template );
 		view.setEntityConfiguration( entityConfiguration );
-		view.setEntityLinkBuilder(
-				entityLinkBuilder != null
-						? entityLinkBuilder : entityConfiguration.getAttribute( EntityLinkBuilder.class )
-		);
 		view.addModel( model );
 
 		EntityMessageCodeResolver codeResolver = createMessageCodeResolver( entityConfiguration );
 		view.setEntityMessages( createEntityMessages( codeResolver ) );
+		view.setEntityLinkBuilder( determineLinkBuilder( creationContext, view ) );
 
 		handlePreProcessors( creationContext, view );
 
@@ -149,6 +157,39 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 		handlePostProcessors( creationContext, view );
 
 		return view;
+	}
+
+	protected EntityLinkBuilder determineLinkBuilder( V creationContext, T view ) {
+		EntityLinkBuilder linkBuilder = null;
+
+		if ( entityLinkBuilder != null ) {
+			linkBuilder = entityLinkBuilder;
+		}
+		else {
+			// If association, see if there is a link builder configured on the association
+			if ( creationContext.isForAssociation() ) {
+				linkBuilder = creationContext.getEntityAssociation().getAttribute( EntityLinkBuilder.class );
+			}
+
+			// Use the link builder available on the entity configuration (usually there is one)
+			if ( linkBuilder == null ) {
+				linkBuilder = creationContext.getEntityConfiguration().getAttribute( EntityLinkBuilder.class );
+			}
+		}
+
+		if ( linkBuilder != null && creationContext.isForAssociation() ) {
+			// todo: only scope if so configured
+			// Scope the link builder to the parent
+			EntityConfiguration source = creationContext.getEntityAssociation().getSourceEntityConfiguration();
+			EntityLinkBuilder sourceLinkBuilder = source.getAttribute( EntityLinkBuilder.class );
+			Object sourceEntity = view.getModel().get( EntityFormView.ATTRIBUTE_PARENT_ENTITY );
+
+			if ( sourceEntity != null ) {
+				return linkBuilder.asAssociationFor( sourceLinkBuilder, sourceEntity );
+			}
+		}
+
+		return linkBuilder;
 	}
 
 	private void handlePreProcessors( V creationContext, T view ) {

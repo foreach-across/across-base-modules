@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.views;
 
+import com.foreach.across.modules.entity.controllers.EntityViewCommand;
 import org.springframework.ui.Model;
 
 /**
@@ -22,5 +23,9 @@ import org.springframework.ui.Model;
  */
 public interface EntityViewFactory<T extends ViewCreationContext>
 {
+	void prepareModelAndCommand( String viewName, T creationContext, EntityViewCommand command, Model model );
+
+	void prepareDataBinder( String viewName, T creationContext, EntityViewCommand viewRequest );
+
 	EntityView create( String viewName, T creationContext, Model model );
 }

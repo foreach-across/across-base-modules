@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.registry;
-
-import com.foreach.across.modules.entity.registry.support.ReadableAttributes;
-import com.foreach.across.modules.entity.views.EntityViewFactory;
+package com.foreach.across.modules.entity.controllers;
 
 /**
- * Filtered view on an association between two {@link com.foreach.across.modules.entity.registry.EntityConfiguration}s.
+ * Common attributes for the standard entity controllers.
  *
  * @author Arne Vandamme
  */
-public interface EntityAssociation<ET> extends ReadableAttributes
+public interface EntityControllerAttributes
 {
-	String getName();
+	String ROOT_PATH = "/entities";
 
-	Class<ET> getEntityType();
+	String VAR_ENTITY = "entityConfig";
+	String VAR_ENTITY_ID = "entityId";
+	String VAR_ASSOCIATION = "associationName";
+	String VAR_ASSOCIATION_ID = "associatedEntityId";
 
-	EntityConfiguration getSourceEntityConfiguration();
+	String PATH_ENTITY = "/{entityConfig}";
+	String PATH_ENTITY_ID = "/{entityId}";
 
-	EntityConfiguration<ET> getAssociatedEntityConfiguration();
-
-	boolean hasView( String name );
-
-	<Y extends EntityViewFactory> Y getViewFactory( String viewName );
+	String ATTRIBUTE_SOURCE_ENTITY = "parentEntity";
+	String CREATION_CONTEXT = "viewCreationContext";
+	String VIEW_COMMAND = "cmd";
+	String VIEW_FACTORY = "viewFactory";
+	String VIEW_REQUEST = "viewRequest";
 }

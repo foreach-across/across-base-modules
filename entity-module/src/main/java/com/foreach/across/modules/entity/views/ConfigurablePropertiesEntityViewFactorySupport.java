@@ -19,10 +19,7 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.elements.ViewElement;
-import com.foreach.across.modules.entity.views.elements.ViewElementBuilderContext;
-import com.foreach.across.modules.entity.views.elements.ViewElementMode;
-import com.foreach.across.modules.entity.views.elements.ViewElements;
+import com.foreach.across.modules.entity.views.elements.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Comparator;
@@ -77,7 +74,7 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<V extends V
 
 	@Override
 	protected void buildViewModel( V viewCreationContext,
-			EntityConfiguration entityConfiguration,
+	                               EntityConfiguration entityConfiguration,
 	                               EntityMessageCodeResolver messageCodeResolver,
 	                               T view ) {
 		view.setEntityProperties( getEntityProperties( entityConfiguration, messageCodeResolver ) );
@@ -123,7 +120,23 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<V extends V
 
 	protected ViewElement createPropertyView( ViewElementBuilderContext builderContext,
 	                                          EntityPropertyDescriptor descriptor ) {
-		return builderContext.getViewElement( descriptor );
+		ViewElement element = builderContext.getViewElement( descriptor );
+		applyNamePrefix( element, "entity." );
+
+		return element;
+	}
+
+	private void applyNamePrefix( ViewElement element, String prefix ) {
+		if ( element instanceof ViewElementSupport && element.isField() ) {
+			( (ViewElementSupport) element ).setName( prefix + element.getName() );
+
+		}
+
+		if ( element instanceof ViewElements ) {
+			for ( ViewElement child : ((ViewElements) element) ) {
+				applyNamePrefix( child, prefix );
+			}
+		}
 	}
 
 	protected abstract ViewElementMode getMode();

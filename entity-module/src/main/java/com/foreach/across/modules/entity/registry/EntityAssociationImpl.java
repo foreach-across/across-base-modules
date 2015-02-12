@@ -45,6 +45,11 @@ public class EntityAssociationImpl<T>
 	}
 
 	@Override
+	public EntityConfiguration getSourceEntityConfiguration() {
+		return entityConfiguration;
+	}
+
+	@Override
 	public EntityConfiguration<T> getAssociatedEntityConfiguration() {
 		return associatedEntityConfiguration;
 	}

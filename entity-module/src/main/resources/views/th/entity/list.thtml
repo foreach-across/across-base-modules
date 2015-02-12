@@ -36,7 +36,7 @@
 	<div class="tab-content" th:remove="${hasMenu} ? none: tag">
 		<div class="text-right">
 			<a class="btn btn-primary"
-			   th:href="@{${@adminWeb.path(entityLinks.create())}}"
+			   th:href="@{${#webapp.path(entityLinks.create())}}"
 			   th:text="|${messages.createAction()}|">create a new entity</a>
 		</div>
 
@@ -80,7 +80,7 @@
 					<span th:utext="${prop.print(entity)}">value</span>
 				</td>
 				<td>
-					<a th:href="@{${@adminWeb.path(entityLinks.update(entity))}}" th:title="${messages.updateAction(entity)}">
+					<a th:href="@{${#webapp.path(entityLinks.update(entity))}}" th:title="${messages.updateAction(entity)}">
 						<span class="glyphicon glyphicon-edit"></span>
 					</a>
 				</td>
@@ -101,7 +101,7 @@
 			<tr th:each="entity,entityStats:${page.content}">
 				<td th:text="${entityStats.count}"></td>
 				<td th:text="${entityConfiguration.getLabel(entity)}"></td>
-				<td><a th:href="@{${entityLinks.update(entity)}}">edit</a></td>
+				<td><a th:href="@{${#webapp.path(entityLinks.update(entity))}}">edit</a></td>
 			</tr>
 			</tbody>
 		</table>

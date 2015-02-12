@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.controllers;
+package com.foreach.across.modules.entity.controllers.association;
 
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.adminweb.menu.AdminMenu;
 import com.foreach.across.modules.adminweb.menu.EntityAdminMenu;
+import com.foreach.across.modules.entity.controllers.AbstractEntityModuleController;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.registry.EntityModel;
-import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
@@ -28,7 +27,6 @@ import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.web.WebViewCreationContext;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -37,14 +35,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.Serializable;
-
 /**
  * @author Arne Vandamme
  */
 @AdminWebController
 @RequestMapping(AssociatedEntityController.PATH)
-public class AssociatedEntityController extends EntityControllerSupport
+public class AssociatedEntityController extends AbstractEntityModuleController /* extends EntityControllerSupport*/
 {
 	public static final String PATH_ENTITY_CONFIG = "entityConfig";
 	public static final String PATH_ENTITY_ID = "entityId";
@@ -53,45 +49,40 @@ public class AssociatedEntityController extends EntityControllerSupport
 	public static final String PATH = "/entities/{entityConfig}/{entityId}/associations/{associatedConfig}";
 
 	@Autowired
-	private ConversionService conversionService;
-
-	@Autowired
 	private MenuFactory menuFactory;
 
-	/**
-	 * Load the parent entity.
-	 */
-	@SuppressWarnings("unchecked")
-	@ModelAttribute(EntityView.ATTRIBUTE_ENTITY)
-	public Object entity( @PathVariable(PATH_ENTITY_CONFIG) EntityConfiguration<?> entityConfiguration,
-	                      @PathVariable(PATH_ENTITY_ID) Serializable entityId,
-	                      Model model
-	) {
-		EntityModel entityModel = entityConfiguration.getEntityModel();
-		Object entity = conversionService.convert( entityId, entityConfiguration.getEntityType() );
+	/*
+	@ModelAttribute(ATTRIBUTE_SOURCE_ENTITY)
+	@Override
+	protected Object buildSourceEntityModel(
+			@PathVariable(VAR_ENTITY) EntityConfiguration<?> entityConfiguration,
+			@PathVariable(PATH_ENTITY_ID) Serializable entityId,
+			Model model ) {
+		Object source = super.buildSourceEntityModel( entityConfiguration, entityId, model );
+		model.addAttribute( ATTRIBUTE_SOURCE_ENTITY, source );
 
-		model.addAttribute( EntityFormView.ATTRIBUTE_ORIGINAL_ENTITY, entity );
-
-		return entityModel.createDto( entity );
+		return source;
 	}
-
+*/
 	/**
 	 * List associated entities.
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView showAssociatedEntities( @PathVariable(PATH_ENTITY_CONFIG) EntityConfiguration entityConfiguration,
-	                                            @ModelAttribute(EntityView.ATTRIBUTE_ENTITY) Object entity,
-	                                            @PathVariable(PATH_ASSOCIATED_ENTITY_CONFIG) EntityConfiguration associatedConfig,
-	                                            AdminMenu adminMenu,
-	                                            Model model,
-	                                            Pageable pageable,
-	                                            WebViewCreationContext creationContext ) {
-		creationContext.setEntityConfiguration( associatedConfig );
+	public ModelAndView showAssociatedEntities(
+			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
+			@ModelAttribute(ATTRIBUTE_SOURCE_ENTITY) Object sourceEntity,
+			@PathVariable(VAR_ASSOCIATION) EntityConfiguration associatedConfig,
+			AdminMenu adminMenu,
+			Model model,
+			Pageable pageable,
+			WebViewCreationContext creationContext ) {
+		creationContext.setEntityAssociation( entityConfiguration.association( associatedConfig.getEntityType() ) );
 
+		//model.addAttribute( EntityFormView.ATTRIBUTE_PARENT_ENTITY, entity );
 		model.addAttribute( EntityListView.ATTRIBUTE_PAGEABLE, pageable );
 
-		adminMenu.breadcrumbLeaf( entityConfiguration.getLabel( entity ) );
+		adminMenu.breadcrumbLeaf( entityConfiguration.getLabel( sourceEntity ) );
 
 		EntityViewFactory viewFactory = entityConfiguration.association( associatedConfig.getEntityType() )
 		                                                   .getViewFactory( EntityListView.VIEW_NAME );
@@ -99,10 +90,10 @@ public class AssociatedEntityController extends EntityControllerSupport
 		EntityView entityView = viewFactory.create( EntityListView.VIEW_NAME, creationContext, model );
 		entityView.setPageTitle(
 				new EntityMessages( entityConfiguration.getEntityMessageCodeResolver() )
-						.updatePageTitle( entityConfiguration.getLabel( entity ) )
+						.updatePageTitle( entityConfiguration.getLabel( sourceEntity ) )
 		);
 		entityView.setEntityMenu(
-				menuFactory.buildMenu( new EntityAdminMenu( entityConfiguration.getEntityType(), entity ) )
+				menuFactory.buildMenu( new EntityAdminMenu( entityConfiguration.getEntityType(), sourceEntity ) )
 		);
 
 		return entityView;

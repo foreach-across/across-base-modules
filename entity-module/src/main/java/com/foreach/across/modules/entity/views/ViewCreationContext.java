@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.views;
 
+import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 
 /**
@@ -28,4 +29,10 @@ public interface ViewCreationContext
 	EntityConfiguration getEntityConfiguration();
 
 	void setEntityConfiguration( EntityConfiguration entityConfiguration );
+
+	EntityAssociation getEntityAssociation();
+
+	void setEntityAssociation( EntityAssociation entityAssociation );
+
+	boolean isForAssociation();
 }
