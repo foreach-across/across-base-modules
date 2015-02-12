@@ -15,34 +15,29 @@
  */
 package com.foreach.across.modules.entity.registrars.repository;
 
+import com.foreach.across.modules.entity.registrars.repository.handlers.AssociationListViewBuilder;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
-import com.foreach.across.modules.entity.views.*;
-import com.foreach.across.modules.entity.web.WebViewCreationContext;
+import com.foreach.across.modules.entity.views.EntityFormView;
+import com.foreach.across.modules.entity.views.EntityFormViewFactory;
+import com.foreach.across.modules.entity.views.EntityListView;
+import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.mapping.JpaPersistentProperty;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.SimpleAssociationHandler;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import java.util.Collection;
 
 /**
  * Builds the list of associations and their views.
@@ -53,6 +48,9 @@ public class RepositoryEntityAssociationsBuilder
 {
 	@Autowired
 	private BeanFactory beanFactory;
+
+	@Autowired
+	private Collection<AssociationListViewBuilder> associationListViewBuilders;
 
 	public <T> void buildAssociations( final MutableEntityRegistry entityRegistry,
 	                                   final MutableEntityConfiguration entityConfiguration ) {
@@ -76,7 +74,7 @@ public class RepositoryEntityAssociationsBuilder
 									= entityRegistry.getMutableEntityConfiguration( property.getActualType() );
 
 							if ( other != null ) {
-								createAssociationFromTo( other, entityConfiguration, property );
+								createAssociationFromTo( ManyToOne.class, other, entityConfiguration, property );
 							}
 						}
 
@@ -85,7 +83,7 @@ public class RepositoryEntityAssociationsBuilder
 									= entityRegistry.getMutableEntityConfiguration( property.getActualType() );
 
 							if ( other != null ) {
-								createAssociationFromTo( entityConfiguration, other, property );
+								createAssociationFromTo( ManyToMany.class, entityConfiguration, other, property );
 							}
 						}
 					}
@@ -94,17 +92,20 @@ public class RepositoryEntityAssociationsBuilder
 		}
 	}
 
-	private void createAssociationFromTo( MutableEntityConfiguration from,
+	private void createAssociationFromTo( Class<?> relationShipClass,
+	                                      MutableEntityConfiguration from,
 	                                      MutableEntityConfiguration to,
 	                                      PersistentProperty property ) {
 		MutableEntityAssociation association = from.createAssociation( to );
 		association.addAttribute( PersistentProperty.class, property );
 
-		buildAssociationListView( association, property );
+		buildAssociationListView( relationShipClass, association, property );
 		buildAssociationCreateView( association );
 	}
 
-	private void buildAssociationListView( MutableEntityAssociation association, final PersistentProperty property ) {
+	private void buildAssociationListView( Class<?> relationShipClass,
+	                                       MutableEntityAssociation association,
+	                                       final PersistentProperty property ) {
 		EntityConfiguration to = association.getAssociatedEntityConfiguration();
 
 		EntityListViewFactory viewFactory = beanFactory.getBean( EntityListViewFactory.class );
@@ -116,33 +117,34 @@ public class RepositoryEntityAssociationsBuilder
 
 		Repository repository = to.getAttribute( Repository.class );
 
-		if ( repository instanceof JpaSpecificationExecutor ) {
-			final JpaSpecificationExecutor jpa = (JpaSpecificationExecutor) repository;
-
-			viewFactory.setPageFetcher( new EntityListViewPageFetcher<WebViewCreationContext>()
-			{
-				@Override
-				public Page fetchPage( WebViewCreationContext viewCreationContext,
-				                       Pageable pageable,
-				                       final EntityView model ) {
-					Specification s = new Specification<Object>()
-					{
-						@Override
-						public Predicate toPredicate( Root<Object> root, CriteriaQuery<?> query, CriteriaBuilder cb ) {
-							return cb.equal( root.get( property.getName() ), model.getEntity() );
-						}
-					};
-
-					return jpa.findAll( s, pageable );
-				}
-			} );
-		}
-		else if ( repository instanceof QueryDslPredicateExecutor ) {
-			System.err.println( "Repository not matching for: " + to.getName() );
-		}
-		else {
-			System.err.println( "Repository not matching for: " + to.getName() );
-		}
+		handleListViewBuilders( relationShipClass, viewFactory, repository, property );
+//		if ( repository instanceof JpaSpecificationExecutor ) {
+//			final JpaSpecificationExecutor jpa = (JpaSpecificationExecutor) repository;
+//
+//			viewFactory.setPageFetcher( new EntityListViewPageFetcher<WebViewCreationContext>()
+//			{
+//				@Override
+//				public Page fetchPage( WebViewCreationContext viewCreationContext,
+//				                       Pageable pageable,
+//				                       final EntityView model ) {
+//					Specification s = new Specification<Object>()
+//					{
+//						@Override
+//						public Predicate toPredicate( Root<Object> root, CriteriaQuery<?> query, CriteriaBuilder cb ) {
+//							return cb.equal( root.get( property.getName() ), model.getEntity() );
+//						}
+//					};
+//
+//					return jpa.findAll( s, pageable );
+//				}
+//			} );
+//		}
+//		else if ( repository instanceof QueryDslPredicateExecutor ) {
+//			System.err.println( "Repository not matching for: " + to.getName() );
+//		}
+//		else {
+//			System.err.println( "Repository not matching for: " + to.getName() );
+//		}
 
 		association.registerView( EntityListView.VIEW_NAME, viewFactory );
 	}
@@ -157,5 +159,16 @@ public class RepositoryEntityAssociationsBuilder
 		                                "entityViews" );
 
 		association.registerView( EntityFormView.CREATE_VIEW_NAME, viewFactory );
+	}
+
+	private void handleListViewBuilders( Class<?> relationshipClass,
+	                                     EntityListViewFactory viewFactory,
+	                                     Repository repository,
+	                                     PersistentProperty persistentProperty ) {
+		for ( AssociationListViewBuilder builder : associationListViewBuilders ) {
+			if ( builder.supports( relationshipClass, repository ) ) {
+				builder.handle( viewFactory, repository, persistentProperty );
+			}
+		}
 	}
 }
