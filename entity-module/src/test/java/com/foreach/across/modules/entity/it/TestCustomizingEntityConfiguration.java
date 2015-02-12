@@ -69,7 +69,7 @@ public class TestCustomizingEntityConfiguration
 
 	@Test
 	public void clientShouldBeRegistered() {
-		assertEquals( 2, entityRegistry.getEntities().size() );
+		assertEquals( 3, entityRegistry.getEntities().size() );
 		assertTrue( entityRegistry.contains( Client.class ) );
 
 		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Client.class );
