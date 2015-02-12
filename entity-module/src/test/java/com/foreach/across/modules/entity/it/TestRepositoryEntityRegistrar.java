@@ -27,10 +27,7 @@ import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
-import com.foreach.across.modules.entity.testmodules.springdata.Client;
-import com.foreach.across.modules.entity.testmodules.springdata.ClientRepository;
-import com.foreach.across.modules.entity.testmodules.springdata.Company;
-import com.foreach.across.modules.entity.testmodules.springdata.SpringDataJpaModule;
+import com.foreach.across.modules.entity.testmodules.springdata.*;
 import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;
@@ -51,7 +48,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.Validator;
 
 import javax.validation.metadata.PropertyDescriptor;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -77,7 +73,7 @@ public class TestRepositoryEntityRegistrar
 
 	@Test
 	public void clientShouldBeRegisteredWithRepositoryInformation() {
-		assertEquals( 2, entityRegistry.getEntities().size() );
+		assertEquals( 3, entityRegistry.getEntities().size() );
 		assertTrue( entityRegistry.contains( Client.class ) );
 
 		EntityConfiguration<?> configuration = entityRegistry.getEntityConfiguration( Client.class );
@@ -103,7 +99,16 @@ public class TestRepositoryEntityRegistrar
 		EntityAssociation association = configuration.association( Client.class );
 
 		assertNotNull( association );
-		assertTrue( association.hasView( EntityListView.VIEW_NAME ));
+		assertTrue( association.hasView( EntityListView.VIEW_NAME ) );
+	}
+
+	@Test
+	public void companyShouldHaveAnAssociationToItsRepresentatives() throws Exception {
+		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Company.class );
+		EntityAssociation association = configuration.association( Representative.class );
+
+		assertNotNull( association );
+		assertTrue( association.hasView( EntityListView.VIEW_NAME ) );
 	}
 
 	@Test

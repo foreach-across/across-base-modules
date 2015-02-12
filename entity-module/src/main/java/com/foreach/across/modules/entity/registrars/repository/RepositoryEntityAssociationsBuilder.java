@@ -37,6 +37,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -76,6 +77,15 @@ public class RepositoryEntityAssociationsBuilder
 
 							if ( other != null ) {
 								createAssociationFromTo( other, entityConfiguration, property );
+							}
+						}
+
+						if ( jpaProperty.isAnnotationPresent( ManyToMany.class ) ) {
+							MutableEntityConfiguration other
+									= entityRegistry.getMutableEntityConfiguration( property.getActualType() );
+
+							if ( other != null ) {
+								createAssociationFromTo( entityConfiguration, other, property );
 							}
 						}
 					}

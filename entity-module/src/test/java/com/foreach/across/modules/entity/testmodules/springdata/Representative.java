@@ -15,29 +15,22 @@
  */
 package com.foreach.across.modules.entity.testmodules.springdata;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Persistable;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * @author Arne Vandamme
+ * @author Andy Somers
  */
 @Entity
-public class Company implements Persistable<String>
+public class Representative implements Persistable<String>
 {
 	@Id
 	private String id;
 
-	@Column
-	private CompanyStatus status;
-
-	@ManyToMany
-	private Set<Representative> representatives = new HashSet<>();
+	private String name;
 
 	@Override
 	public String getId() {
@@ -46,22 +39,18 @@ public class Company implements Persistable<String>
 
 	@Override
 	public boolean isNew() {
-		return true;
+		return StringUtils.isBlank( id );
 	}
 
-	public CompanyStatus getStatus() {
-		return status;
+	public void setId( String id ) {
+		this.id = id;
 	}
 
-	public void setStatus( CompanyStatus status ) {
-		this.status = status;
+	public String getName() {
+		return name;
 	}
 
-	public Set<Representative> getRepresentatives() {
-		return representatives;
-	}
-
-	public void setRepresentatives( Set<Representative> representatives ) {
-		this.representatives = representatives;
+	public void setName( String name ) {
+		this.name = name;
 	}
 }
