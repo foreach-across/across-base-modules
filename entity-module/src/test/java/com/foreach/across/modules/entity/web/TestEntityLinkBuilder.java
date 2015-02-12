@@ -15,7 +15,7 @@
  */
 package com.foreach.across.modules.entity.web;
 
-import com.foreach.across.modules.entity.controllers.entity.EntityListController;
+import com.foreach.across.modules.entity.controllers.EntityControllerAttributes;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.web.context.PrefixingPathContext;
@@ -39,7 +39,7 @@ public class TestEntityLinkBuilder
 
 		when( entityConfiguration.getEntityModel() ).thenReturn( model );
 
-		EntityLinkBuilder url = new EntityLinkBuilder( EntityListController.PATH, entityConfiguration );
+		EntityLinkBuilder url = new EntityLinkBuilder( EntityControllerAttributes.ROOT_PATH, entityConfiguration );
 
 		assertEquals( "/entities/basicPrincipal", url.overview() );
 		assertEquals( "/entities/basicPrincipal/create", url.create() );
@@ -63,7 +63,7 @@ public class TestEntityLinkBuilder
 
 		when( entityConfiguration.getEntityModel() ).thenReturn( model );
 
-		EntityLinkBuilder url = new EntityLinkBuilder( EntityListController.PATH, entityConfiguration );
+		EntityLinkBuilder url = new EntityLinkBuilder( EntityControllerAttributes.ROOT_PATH, entityConfiguration );
 
 		assertEquals( "/entities/basicPrincipal", url.overview() );
 		assertEquals( "/entities/basicPrincipal/create", url.create() );
@@ -90,8 +90,8 @@ public class TestEntityLinkBuilder
 		when( associationModel.getId( anyObject() ) ).thenReturn( 123 );
 		when( association.getEntityModel() ).thenReturn( associationModel );
 
-		EntityLinkBuilder parent = new EntityLinkBuilder( EntityListController.PATH, parentConfig );
-		EntityLinkBuilder url = new EntityLinkBuilder( EntityListController.PATH, association );
+		EntityLinkBuilder parent = new EntityLinkBuilder( EntityControllerAttributes.ROOT_PATH, parentConfig );
+		EntityLinkBuilder url = new EntityLinkBuilder( EntityControllerAttributes.ROOT_PATH, association );
 		url.setAssociationsPath( "{0}/{1}/others/{2}" );
 
 		EntityLinkBuilder scoped = url.asAssociationFor( parent, "someEntity" );
@@ -108,6 +108,7 @@ public class TestEntityLinkBuilder
 		assertEquals( "/entities/basicPrincipal/10001/associations/user/123", scoped.view( "someEntity" ) );
 		assertEquals( "/entities/basicPrincipal/10001/associations/user/123/update", scoped.update( "someEntity" ) );
 		assertEquals( "/entities/basicPrincipal/10001/associations/user/123/delete", scoped.delete( "someEntity" ) );
-		assertEquals( "/entities/basicPrincipal/10001/associations/user/others/123", scoped.associations( "someEntity" ) );
+		assertEquals( "/entities/basicPrincipal/10001/associations/user/others/123",
+		              scoped.associations( "someEntity" ) );
 	}
 }
