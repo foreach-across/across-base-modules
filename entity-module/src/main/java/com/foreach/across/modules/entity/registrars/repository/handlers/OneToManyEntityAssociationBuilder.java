@@ -17,11 +17,17 @@ package com.foreach.across.modules.entity.registrars.repository.handlers;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
+import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
+import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.entity.web.WebViewCreationContext;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,7 +37,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -41,17 +47,45 @@ import javax.persistence.criteria.Root;
  * @author Andy Somers
  */
 @Component
-public class ManyToManyAssociationViewBuilder implements AssociationViewBuilder
+public class OneToManyEntityAssociationBuilder implements EntityAssociationBuilder
 {
+	private static final Logger LOG = LoggerFactory.getLogger( OneToManyEntityAssociationBuilder.class );
+
 	@Autowired
 	private BeanFactory beanFactory;
 
 	@Override
-	public boolean supports( Class<?> clazz ) {
-		return clazz == ManyToMany.class;
+	public boolean supports( PersistentProperty<?> sourceProperty ) {
+		return sourceProperty.isAnnotationPresent( OneToMany.class );
 	}
 
 	@Override
+	public void buildAssociation( MutableEntityRegistry entityRegistry,
+	                              MutableEntityConfiguration entityConfiguration,
+	                              PersistentProperty property ) {
+		MutableEntityConfiguration other
+				= entityRegistry.getMutableEntityConfiguration( property.getActualType() );
+
+		if ( other != null ) {
+			String mappedBy = (String) AnnotationUtils.getValue( property.findAnnotation( OneToMany.class ),
+			                                                     "mappedBy" );
+
+			if ( StringUtils.isBlank( mappedBy ) ) {
+				LOG.warn( "Unable to process unidirectional @OneToMany relationship." );
+			}
+			else {
+				MutableEntityAssociation association = entityConfiguration.createAssociation( other );
+				association.addAttribute( PersistentProperty.class, property );
+				association.setSourceProperty( entityConfiguration.getPropertyRegistry().getProperty( property.getName() ) );
+				association.setTargetProperty( other.getPropertyRegistry().getProperty( mappedBy ) );
+
+				buildCreateView( association );
+				buildListView( association, property );
+			}
+		}
+
+	}
+
 	public void buildListView( MutableEntityAssociation association,
 	                           final PersistentProperty property ) {
 		EntityConfiguration to = association.getAssociatedEntityConfiguration();
@@ -62,6 +96,9 @@ public class ManyToManyAssociationViewBuilder implements AssociationViewBuilder
 		viewFactory.setMessagePrefixes( "entityViews.association." + association.getName() + ".listView",
 		                                "entityViews.listView",
 		                                "entityViews" );
+
+		System.err.println( "OneToMany:" + association.getSourceEntityConfiguration().getName() + "." +
+				                    association.getName() + " (" + property.getName() + ")" );
 
 		Repository repository = to.getAttribute( Repository.class );
 		if ( repository instanceof JpaSpecificationExecutor ) {
@@ -90,11 +127,9 @@ public class ManyToManyAssociationViewBuilder implements AssociationViewBuilder
 		else {
 			System.err.println( "Repository not matching for: " + to.getName() );
 		}
-
 		association.registerView( EntityListView.VIEW_NAME, viewFactory );
 	}
 
-	@Override
 	public void buildCreateView( MutableEntityAssociation association ) {
 		EntityConfiguration to = association.getAssociatedEntityConfiguration();
 

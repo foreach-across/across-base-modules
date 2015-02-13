@@ -20,21 +20,22 @@ package com.foreach.across.modules.entity.controllers;
  *
  * @author Arne Vandamme
  */
-public interface EntityControllerAttributes
-{
-	String ROOT_PATH = "/entities";
+public interface EntityControllerAttributes {
+    String ROOT_PATH = "/entities";
 
-	String VAR_ENTITY = "entityConfig";
-	String VAR_ENTITY_ID = "entityId";
-	String VAR_ASSOCIATION = "associationName";
-	String VAR_ASSOCIATION_ID = "associatedEntityId";
+    String VAR_ENTITY = "entityConfig";
+    String VAR_ENTITY_ID = "entityId";
+    String VAR_ASSOCIATION = "associatedConfig";
+    String VAR_ASSOCIATION_ID = "associatedEntityId";
 
-	String PATH_ENTITY = "/{entityConfig}";
-	String PATH_ENTITY_ID = "/{entityId}";
+    String PATH_ENTITY = "/{entityConfig}";
+    String PATH_ENTITY_ID = "/{entityId}";
+    String PATH_ASSOCIATION = "/associations/{associatedConfig}";
+    String PATH_ASSOCIATION_ID = "/{associatedEntityId}";
 
-	String ATTRIBUTE_SOURCE_ENTITY = "parentEntity";
-	String CREATION_CONTEXT = "viewCreationContext";
-	String VIEW_COMMAND = "cmd";
-	String VIEW_FACTORY = "viewFactory";
-	String VIEW_REQUEST = "viewRequest";
+    String ATTRIBUTE_SOURCE_ENTITY = "parentEntity";
+    String CREATION_CONTEXT = "viewCreationContext";
+    String VIEW_COMMAND = "cmd";
+    String VIEW_FACTORY = "viewFactory";
+    String VIEW_REQUEST = "viewRequest";
 }

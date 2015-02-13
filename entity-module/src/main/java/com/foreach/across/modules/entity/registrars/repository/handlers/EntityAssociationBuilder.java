@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.registry;
+package com.foreach.across.modules.entity.registrars.repository.handlers;
 
-import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
-import com.foreach.across.modules.entity.registry.support.WritableAttributes;
-import com.foreach.across.modules.entity.views.EntityViewFactory;
+import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
+import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
+import org.springframework.data.mapping.PersistentProperty;
 
 /**
- * @author Arne Vandamme
+ * @author Andy Somers
  */
-public interface MutableEntityAssociation<T> extends EntityAssociation<T>, WritableAttributes
+public interface EntityAssociationBuilder
 {
-	void setSourceProperty( EntityPropertyDescriptor descriptor );
+	boolean supports( PersistentProperty<?> sourceProperty );
 
-	void setTargetProperty( EntityPropertyDescriptor descriptor );
-
-	void registerView( String viewName, EntityViewFactory viewFactory );
+	void buildAssociation( MutableEntityRegistry entityRegistry,
+	                       MutableEntityConfiguration entityConfiguration,
+	                       PersistentProperty property );
 }

@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.registry;
 
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.support.ReadableAttributes;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 
@@ -31,7 +32,11 @@ public interface EntityAssociation<ET> extends ReadableAttributes
 
 	EntityConfiguration getSourceEntityConfiguration();
 
+	EntityPropertyDescriptor getSourceProperty();
+
 	EntityConfiguration<ET> getAssociatedEntityConfiguration();
+
+	EntityPropertyDescriptor getTargetProperty();
 
 	boolean hasView( String name );
 

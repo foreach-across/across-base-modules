@@ -16,6 +16,7 @@
 package com.foreach.across.modules.entity.views;
 
 import com.foreach.across.modules.entity.controllers.EntityViewCommand;
+import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
 /**
@@ -23,7 +24,10 @@ import org.springframework.ui.Model;
  */
 public interface EntityViewFactory<T extends ViewCreationContext>
 {
-	void prepareModelAndCommand( String viewName, T creationContext, EntityViewCommand command, Model model );
+	void prepareModelAndCommand( String viewName,
+	                             T creationContext,
+	                             EntityViewCommand command,
+	                             ExtendedModelMap model );
 
 	void prepareDataBinder( String viewName, T creationContext, EntityViewCommand viewRequest );
 

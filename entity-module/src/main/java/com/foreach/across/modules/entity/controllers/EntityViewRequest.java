@@ -19,6 +19,7 @@ import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.entity.web.WebViewCreationContext;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 
@@ -63,13 +64,12 @@ public class EntityViewRequest extends EntityViewCommand
 		return view;
 	}
 
-
 	public void initDataBinder( WebDataBinder dataBinder ) {
 		viewFactory.prepareDataBinder( viewName, creationContext, this );
 	}
 
 	@SuppressWarnings("unchecked")
-	public void prepareModelAndCommand( Model model ) {
+	public void prepareModelAndCommand( ExtendedModelMap model ) {
 		viewFactory.prepareModelAndCommand( viewName, creationContext, this, model );
 	}
 

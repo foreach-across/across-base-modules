@@ -56,7 +56,6 @@ public class EntityFormViewFactory<V extends ViewCreationContext> extends Config
 		cancel.setElementType( CommonViewElements.LINK_BUTTON );
 		cancel.setLink( view.getEntityLinkBuilder().overview() );
 
-		//@{${@adminWeb.path(entityLinks.overview())}}
 		cancel.setLabel( "Cancel" );
 
 		view.getEntityProperties().add( button );

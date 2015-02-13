@@ -21,6 +21,7 @@ import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.annotations.EntityValidator;
 import com.foreach.across.modules.entity.registrars.EntityRegistrar;
 import com.foreach.across.modules.entity.registry.*;
+import com.foreach.across.modules.entity.registry.builders.EntityPropertyRegistryMappingMetaDataBuilder;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
+import org.springframework.data.mapping.PersistentEntity;
+import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 import org.springframework.util.ClassUtils;
@@ -65,6 +68,9 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 	@Autowired
 	private MessageSource messageSource;
 
+	@Autowired
+	private EntityPropertyRegistryMappingMetaDataBuilder mappingMetaDataBuilder;
+
 	@EntityValidator
 	private Validator entityValidator;
 
@@ -74,6 +80,8 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 	                              AcrossModuleInfo moduleInfo,
 	                              AcrossContextBeanRegistry beanRegistry ) {
 		ApplicationContext applicationContext = moduleInfo.getApplicationContext();
+
+		mappingMetaDataBuilder.addMappingContexts( applicationContext.getBeansOfType( MappingContext.class ).values()  );
 
 		Map<String, RepositoryFactoryInformation> repositoryFactoryInformationMap
 				= applicationContext.getBeansOfType( RepositoryFactoryInformation.class );
@@ -129,6 +137,8 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 			entityConfiguration.addAttribute( AcrossModuleInfo.class, moduleInfo );
 			entityConfiguration.addAttribute( RepositoryFactoryInformation.class, repositoryFactoryInformation );
 			entityConfiguration.addAttribute( Repository.class, repository );
+			entityConfiguration.addAttribute( PersistentEntity.class,
+			                                  repositoryFactoryInformation.getPersistentEntity() );
 
 			findDefaultValidatorInModuleContext( entityConfiguration, moduleInfo.getApplicationContext() );
 

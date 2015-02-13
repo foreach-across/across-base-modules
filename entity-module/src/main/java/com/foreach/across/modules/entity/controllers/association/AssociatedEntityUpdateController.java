@@ -46,10 +46,10 @@ import java.io.Serializable;
  * @since 9/02/2015
  */
 @AdminWebController
-@RequestMapping(AssociatedEntityCreateController.PATH)
-public class AssociatedEntityCreateController extends AssociatedEntityControllerSupport
+@RequestMapping(AssociatedEntityUpdateController.PATH)
+public class AssociatedEntityUpdateController extends AssociatedEntityControllerSupport
 {
-	public static final String PATH = AssociatedEntityListController.PATH + "/create";
+	public static final String PATH = AssociatedEntityListController.PATH + PATH_ASSOCIATION_ID + "/update";
 
 	@Autowired
 	private AdminWeb adminWeb;
@@ -66,11 +66,13 @@ public class AssociatedEntityCreateController extends AssociatedEntityController
 	public Object buildViewRequest(
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@PathVariable(VAR_ENTITY_ID) Serializable entityId,
-			@PathVariable(VAR_ASSOCIATION) EntityConfiguration associatedConfiguration,
+			@PathVariable(VAR_ASSOCIATION) EntityConfiguration associatedEntityConfiguration,
+			@PathVariable(VAR_ASSOCIATION_ID) Serializable associatedEntityId,
 			NativeWebRequest request,
 			ExtendedModelMap model ) {
 		return super.buildViewRequest(
-				entityConfiguration, entityId, associatedConfiguration, true, true, null, request, model
+				entityConfiguration, entityId, associatedEntityConfiguration, true, true, associatedEntityId, request,
+				model
 		);
 	}
 
@@ -90,21 +92,22 @@ public class AssociatedEntityCreateController extends AssociatedEntityController
 			associatedModel.save( viewRequest.getEntity() );
 
 			EntityLinkBuilder linkBuilder = (EntityLinkBuilder) model.get( EntityView.ATTRIBUTE_ENTITY_LINKS );
+
 			ModelAndView mav = new ModelAndView();
 			mav.setViewName( adminWeb.redirect( linkBuilder.update( viewRequest.getEntity() ) ) );
 
-			redirectAttributes.addFlashAttribute( "successMessage", "feedback.entityCreated" );
+			redirectAttributes.addFlashAttribute( "successMessage", "feedback.entityUpdated" );
 
 			return mav;
 		}
 		else {
-			return showCreateEntityForm( entityConfiguration, sourceEntity, viewRequest, model );
+			return showUpdateEntityForm( entityConfiguration, sourceEntity, viewRequest, model );
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView showCreateEntityForm(
+	public ModelAndView showUpdateEntityForm(
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@ModelAttribute(ATTRIBUTE_SOURCE_ENTITY) Object sourceEntity,
 			@ModelAttribute(VIEW_REQUEST) EntityViewRequest viewRequest,

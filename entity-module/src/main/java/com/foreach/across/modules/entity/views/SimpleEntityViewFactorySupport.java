@@ -23,7 +23,9 @@ import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import org.springframework.context.MessageSource;
+import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
@@ -127,8 +129,8 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 	}
 
 	@Override
-	public void prepareModelAndCommand( String viewName, V creationContext, EntityViewCommand command, Model model ) {
-
+	public void prepareModelAndCommand( String viewName, V creationContext, EntityViewCommand command, ExtendedModelMap model ) {
+		registerLinkBuilder( creationContext, model );
 	}
 
 	@Override
@@ -148,7 +150,13 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 
 		EntityMessageCodeResolver codeResolver = createMessageCodeResolver( entityConfiguration );
 		view.setEntityMessages( createEntityMessages( codeResolver ) );
-		view.setEntityLinkBuilder( determineLinkBuilder( creationContext, view ) );
+
+		// todo add this once switched to regular ModelMap everywhere
+		/*
+		if ( view.getEntityLinkBuilder() == null ) {
+			registerLinkBuilder( creationContext, view );
+		}
+		*/
 
 		handlePreProcessors( creationContext, view );
 
@@ -159,7 +167,11 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 		return view;
 	}
 
-	protected EntityLinkBuilder determineLinkBuilder( V creationContext, T view ) {
+	/**
+	 * This registers the {@link com.foreach.across.modules.entity.web.EntityLinkBuilder} in the model so it can
+	 * be used for redirect actions without rendering the actual view.
+	 */
+	protected void registerLinkBuilder( V creationContext, ModelMap model ) {
 		EntityLinkBuilder linkBuilder = null;
 
 		if ( entityLinkBuilder != null ) {
@@ -182,14 +194,14 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 			// Scope the link builder to the parent
 			EntityConfiguration source = creationContext.getEntityAssociation().getSourceEntityConfiguration();
 			EntityLinkBuilder sourceLinkBuilder = source.getAttribute( EntityLinkBuilder.class );
-			Object sourceEntity = view.getModel().get( EntityFormView.ATTRIBUTE_PARENT_ENTITY );
+			Object sourceEntity = model.get( EntityFormView.ATTRIBUTE_PARENT_ENTITY );
 
 			if ( sourceEntity != null ) {
-				return linkBuilder.asAssociationFor( sourceLinkBuilder, sourceEntity );
+				linkBuilder = linkBuilder.asAssociationFor( sourceLinkBuilder, sourceEntity );
 			}
 		}
 
-		return linkBuilder;
+		model.addAttribute( EntityView.ATTRIBUTE_ENTITY_LINKS, linkBuilder );
 	}
 
 	private void handlePreProcessors( V creationContext, T view ) {

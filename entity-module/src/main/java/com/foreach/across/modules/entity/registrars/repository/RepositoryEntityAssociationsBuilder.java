@@ -15,20 +15,16 @@
  */
 package com.foreach.across.modules.entity.registrars.repository;
 
-import com.foreach.across.modules.entity.registrars.repository.handlers.AssociationViewBuilder;
-import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
+import com.foreach.across.modules.entity.registrars.repository.handlers.EntityAssociationBuilder;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.mapping.JpaPersistentProperty;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.SimpleAssociationHandler;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import java.util.Collection;
 
 /**
@@ -39,7 +35,7 @@ import java.util.Collection;
 public class RepositoryEntityAssociationsBuilder
 {
 	@Autowired
-	private Collection<AssociationViewBuilder> associationViewBuilders;
+	private Collection<EntityAssociationBuilder> entityAssociationBuilders;
 
 	public <T> void buildAssociations( final MutableEntityRegistry entityRegistry,
 	                                   final MutableEntityConfiguration entityConfiguration ) {
@@ -47,53 +43,28 @@ public class RepositoryEntityAssociationsBuilder
 				= entityConfiguration.getAttribute( RepositoryFactoryInformation.class );
 
 		if ( repositoryFactoryInformation != null ) {
-			PersistentEntity persistentEntity = repositoryFactoryInformation.getPersistentEntity();
+			final PersistentEntity persistentEntity = repositoryFactoryInformation.getPersistentEntity();
 
-			persistentEntity.doWithAssociations( new SimpleAssociationHandler()
-			{
-				@Override
-				public void doWithAssociation( Association<? extends PersistentProperty<?>> association ) {
-					PersistentProperty property = association.getInverse();
+			persistentEntity.doWithAssociations(
+					new SimpleAssociationHandler()
+					{
+						@Override
+						public void doWithAssociation( Association<? extends PersistentProperty<?>> association ) {
+							PersistentProperty property = association.getInverse();
 
-					if ( property instanceof JpaPersistentProperty ) {
-						JpaPersistentProperty jpaProperty = (JpaPersistentProperty) property;
-
-						if ( jpaProperty.isAnnotationPresent( ManyToOne.class ) ) {
-							MutableEntityConfiguration other
-									= entityRegistry.getMutableEntityConfiguration( property.getActualType() );
-
-							if ( other != null ) {
-								createAssociationFromTo( ManyToOne.class, other, entityConfiguration, property );
-							}
-						}
-
-						if ( jpaProperty.isAnnotationPresent( ManyToMany.class ) ) {
-							MutableEntityConfiguration other
-									= entityRegistry.getMutableEntityConfiguration( property.getActualType() );
-
-							if ( other != null ) {
-								createAssociationFromTo( ManyToMany.class, entityConfiguration, other, property );
-								createAssociationFromTo( ManyToMany.class, other, entityConfiguration, property );
+							for ( EntityAssociationBuilder builder : entityAssociationBuilders ) {
+								if ( builder.supports( property ) ) {
+									builder.buildAssociation(
+											entityRegistry,
+											entityConfiguration,
+											property
+									);
+								}
 							}
 						}
 					}
-				}
-			} );
+			);
 		}
 	}
 
-	private void createAssociationFromTo( Class<?> relationShipClass,
-	                                      MutableEntityConfiguration from,
-	                                      MutableEntityConfiguration to,
-	                                      PersistentProperty property ) {
-		MutableEntityAssociation association = from.createAssociation( to );
-		association.addAttribute( PersistentProperty.class, property );
-
-		for ( AssociationViewBuilder builder : associationViewBuilders ) {
-			if ( builder.supports( relationShipClass ) ) {
-				builder.buildCreateView( association );
-				builder.buildListView( association, property );
-			}
-		}
-	}
 }

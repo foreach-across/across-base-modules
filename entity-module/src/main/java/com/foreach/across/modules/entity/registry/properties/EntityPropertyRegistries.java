@@ -15,22 +15,23 @@
  */
 package com.foreach.across.modules.entity.registry.properties;
 
-import com.foreach.across.modules.entity.registry.handlers.EntityPropertyRegistryValidationConstraintHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.foreach.across.core.annotations.RefreshableCollection;
+import com.foreach.across.modules.entity.registry.builders.EntityPropertyRegistryBuilder;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages the {@link EntityPropertyRegistry} instances for
- * a set of entity types.
+ * Manages the {@link EntityPropertyRegistry} instances for a set of entity types.
+ * Dispatches to {@link EntityPropertyRegistryBuilder} instances for attribute generation.
  *
  * @author Arne Vandamme
  */
 public class EntityPropertyRegistries
 {
-	@Autowired
-	private EntityPropertyRegistryValidationConstraintHandler validationConstraintHandler;
+	@RefreshableCollection(includeModuleInternals = true, incremental = true)
+	private Collection<EntityPropertyRegistryBuilder> registryBuilders;
 
 	private final Map<Class<?>, EntityPropertyRegistry> registries = new HashMap<>();
 
@@ -42,11 +43,15 @@ public class EntityPropertyRegistries
 		EntityPropertyRegistry registry = registries.get( entityType );
 
 		if ( registry == null && createIfNotFound ) {
-			registry = new DefaultEntityPropertyRegistry( entityType, this );
+			DefaultEntityPropertyRegistry newRegistry = new DefaultEntityPropertyRegistry( entityType, this );
 
-			validationConstraintHandler.handle( entityType, (MutableEntityPropertyRegistry) registry );
+			for ( EntityPropertyRegistryBuilder builder : registryBuilders ) {
+				builder.buildRegistry( entityType, newRegistry );
+			}
 
-			registries.put( entityType, registry );
+			registries.put( entityType, newRegistry );
+
+			registry = newRegistry;
 		}
 
 		return registry;

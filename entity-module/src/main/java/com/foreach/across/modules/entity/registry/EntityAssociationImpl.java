@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.registry;
 
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.support.AttributeSupport;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 
@@ -27,6 +28,8 @@ public class EntityAssociationImpl<T>
 {
 	private final MutableEntityConfiguration entityConfiguration;
 	private final MutableEntityConfiguration<T> associatedEntityConfiguration;
+
+	private EntityPropertyDescriptor sourceProperty, targetProperty;
 
 	public EntityAssociationImpl( MutableEntityConfiguration entityConfiguration,
 	                              MutableEntityConfiguration<T> associatedEntityConfiguration ) {
@@ -52,6 +55,26 @@ public class EntityAssociationImpl<T>
 	@Override
 	public EntityConfiguration<T> getAssociatedEntityConfiguration() {
 		return associatedEntityConfiguration;
+	}
+
+	@Override
+	public EntityPropertyDescriptor getSourceProperty() {
+		return sourceProperty;
+	}
+
+	@Override
+	public void setSourceProperty( EntityPropertyDescriptor sourceProperty ) {
+		this.sourceProperty = sourceProperty;
+	}
+
+	@Override
+	public EntityPropertyDescriptor getTargetProperty() {
+		return targetProperty;
+	}
+
+	@Override
+	public void setTargetProperty( EntityPropertyDescriptor targetProperty ) {
+		this.targetProperty = targetProperty;
 	}
 
 	@Override

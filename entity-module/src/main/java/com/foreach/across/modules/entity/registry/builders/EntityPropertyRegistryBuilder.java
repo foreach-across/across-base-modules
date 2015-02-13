@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.registrars.repository.handlers;
+package com.foreach.across.modules.entity.registry.builders;
 
-import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
-import com.foreach.across.modules.entity.views.EntityListViewFactory;
-import org.springframework.data.mapping.PersistentProperty;
-import org.springframework.data.repository.Repository;
+import com.foreach.across.modules.entity.registry.properties.MutableEntityPropertyRegistry;
 
 /**
- * @author Andy Somers
+ * @author Arne Vandamme
  */
-public interface AssociationViewBuilder
+public interface EntityPropertyRegistryBuilder
 {
-	boolean supports( Class<?> clazz );
-
-	void buildListView( MutableEntityAssociation association, PersistentProperty property );
-
-	void buildCreateView( MutableEntityAssociation association );
+	void buildRegistry( Class<?> entityType, MutableEntityPropertyRegistry registry );
 }

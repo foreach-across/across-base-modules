@@ -17,6 +17,8 @@ package com.foreach.across.modules.entity.registrars.repository.handlers;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
+import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
+import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.entity.web.WebViewCreationContext;
 import org.springframework.beans.BeanUtils;
@@ -38,20 +40,35 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 /**
- * @author Andy Somers
+ * Builds the association in the opposite direction.
+ *
+ * @author Andy Somers, Arne Vandamme
  */
 @Component
-public class ManyToOneAssociationViewBuilder implements AssociationViewBuilder
+public class ManyToOneEntityAssociationBuilder implements EntityAssociationBuilder
 {
 	@Autowired
 	private BeanFactory beanFactory;
 
 	@Override
-	public boolean supports( Class<?> clazz ) {
-		return clazz == ManyToOne.class;
+	public boolean supports( PersistentProperty<?> sourceProperty ) {
+		return sourceProperty.isAnnotationPresent( ManyToOne.class );
 	}
 
 	@Override
+	public void buildAssociation( MutableEntityRegistry entityRegistry,
+	                              MutableEntityConfiguration entityConfiguration,
+	                              PersistentProperty property ) {
+		MutableEntityConfiguration other = entityRegistry.getMutableEntityConfiguration( property.getActualType() );
+
+		MutableEntityAssociation association = other.createAssociation( entityConfiguration );
+		association.addAttribute( PersistentProperty.class, property );
+		association.setTargetProperty( entityConfiguration.getPropertyRegistry().getProperty( property.getName() ) );
+
+		buildCreateView( association );
+		buildListView( association, property );
+	}
+
 	public void buildListView( MutableEntityAssociation association,
 	                           final PersistentProperty property ) {
 		EntityConfiguration to = association.getAssociatedEntityConfiguration();
@@ -93,7 +110,6 @@ public class ManyToOneAssociationViewBuilder implements AssociationViewBuilder
 		association.registerView( EntityListView.VIEW_NAME, viewFactory );
 	}
 
-	@Override
 	public void buildCreateView( MutableEntityAssociation association ) {
 		EntityConfiguration to = association.getAssociatedEntityConfiguration();
 
