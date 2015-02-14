@@ -1,5 +1,6 @@
 package com.foreach.across.modules.entity.generators.label;
 
+import com.foreach.across.modules.entity.registry.builders.EntityPropertyRegistryBuilder;
 import com.foreach.across.modules.entity.registry.properties.*;
 import com.foreach.across.modules.entity.views.support.SpelValueFetcher;
 import com.foreach.common.test.MockedLoader;
@@ -13,9 +14,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader = MockedLoader.class, classes = {TestProperties.Configuration.class})
+@ContextConfiguration(loader = MockedLoader.class, classes = { TestProperties.Configuration.class })
 public class TestProperties
 {
 	@Autowired
@@ -283,6 +285,11 @@ public class TestProperties
 		@Bean
 		public EntityPropertyRegistries entityPropertyRegistries() {
 			return new EntityPropertyRegistries();
+		}
+
+		@Bean
+		public EntityPropertyRegistryBuilder dummyBuilder() {
+			return mock( EntityPropertyRegistryBuilder.class );
 		}
 	}
 }
