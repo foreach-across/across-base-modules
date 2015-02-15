@@ -24,17 +24,17 @@ import com.foreach.across.modules.entity.views.EntityViewFactory;
  *
  * @author Arne Vandamme
  */
-public interface EntityAssociation<ET> extends ReadableAttributes
+public interface EntityAssociation extends ReadableAttributes
 {
 	String getName();
 
-	Class<ET> getEntityType();
+	Class<?> getEntityType();
 
 	EntityConfiguration getSourceEntityConfiguration();
 
 	EntityPropertyDescriptor getSourceProperty();
 
-	EntityConfiguration<ET> getAssociatedEntityConfiguration();
+	EntityConfiguration getTargetEntityConfiguration();
 
 	EntityPropertyDescriptor getTargetProperty();
 

@@ -24,7 +24,7 @@ public class EntityConfigurationImpl<T> extends AttributeSupport implements Muta
 	private final String name;
 	private final Class<T> entityType;
 	private final Map<String, EntityViewFactory> registeredViews = new HashMap<>();
-	private final Map<Class, EntityAssociation> entityAssociations = new HashMap<>();
+	private final Map<String, EntityAssociation> entityAssociations = new HashMap<>();
 
 	private EntityMessageCodeResolver entityMessageCodeResolver;
 
@@ -134,32 +134,21 @@ public class EntityConfigurationImpl<T> extends AttributeSupport implements Muta
 	}
 
 	@Override
-	public <V> MutableEntityAssociation<V> association( EntityConfiguration<V> associatedEntityConfiguration ) {
-		return association( associatedEntityConfiguration.getEntityType() );
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <V> MutableEntityAssociation<V> association( Class<V> entityType ) {
-		return (MutableEntityAssociation<V>) entityAssociations.get( entityType );
-	}
-
-	@Override
 	public Collection<EntityAssociation> getAssociations() {
 		return entityAssociations.values();
 	}
 
 	@Override
-	public <V> MutableEntityAssociation<V> createAssociation(
-			MutableEntityConfiguration<V> associatedEntityConfiguration
-	) {
-		Class<V> associatedType = associatedEntityConfiguration.getEntityType();
-
-		if ( !entityAssociations.containsKey( associatedType ) ) {
-			entityAssociations.put( associatedType, new EntityAssociationImpl<>( this,
-			                                                                     associatedEntityConfiguration ) );
+	public MutableEntityAssociation createAssociation( String name ) {
+		if ( !entityAssociations.containsKey( name ) ) {
+			entityAssociations.put( name, new EntityAssociationImpl( name, this ) );
 		}
 
-		return association( associatedType );
+		return association( name );
+	}
+
+	@Override
+	public MutableEntityAssociation association( String name ) {
+		return (MutableEntityAssociation) entityAssociations.get( name );
 	}
 }

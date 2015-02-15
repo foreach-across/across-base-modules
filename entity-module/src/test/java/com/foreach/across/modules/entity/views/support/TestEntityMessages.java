@@ -15,7 +15,7 @@
  */
 package com.foreach.across.modules.entity.views.support;
 
-import com.foreach.across.modules.entity.it.TestRepositoryEntityRegistrar;
+import com.foreach.across.modules.entity.registrars.repository.TestRepositoryEntityRegistrar;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;

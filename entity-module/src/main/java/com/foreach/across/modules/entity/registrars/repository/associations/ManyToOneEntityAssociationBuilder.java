@@ -13,56 +13,59 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.registrars.repository.handlers;
+package com.foreach.across.modules.entity.registrars.repository.associations;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
-import com.foreach.across.modules.entity.views.EntityFormView;
-import com.foreach.across.modules.entity.views.EntityFormViewFactory;
-import com.foreach.across.modules.entity.views.EntityListView;
-import com.foreach.across.modules.entity.views.EntityListViewFactory;
+import com.foreach.across.modules.entity.views.*;
+import com.foreach.across.modules.entity.web.WebViewCreationContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.mapping.PersistentProperty;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 /**
- * @author Andy Somers
+ * Builds the association in the opposite direction.
+ *
+ * @author Andy Somers, Arne Vandamme
  */
 @Component
-public class ManyToManyEntityAssociationBuilder implements EntityAssociationBuilder
+public class ManyToOneEntityAssociationBuilder implements EntityAssociationBuilder
 {
 	@Autowired
 	private BeanFactory beanFactory;
 
 	@Override
 	public boolean supports( PersistentProperty<?> sourceProperty ) {
-		return sourceProperty.isAnnotationPresent( ManyToMany.class );
+		return sourceProperty.isAnnotationPresent( ManyToOne.class );
 	}
 
 	@Override
 	public void buildAssociation( MutableEntityRegistry entityRegistry,
-	                              MutableEntityConfiguration entityConfiguration,
+	                              MutableEntityConfiguration to,
 	                              PersistentProperty property ) {
-		MutableEntityConfiguration other
-				= entityRegistry.getMutableEntityConfiguration( property.getActualType() );
+		MutableEntityConfiguration from = entityRegistry.getMutableEntityConfiguration( property.getActualType() );
 
-		if ( other != null ) {
-			createAssociationFromTo( entityConfiguration, other, property );
-			createAssociationFromTo( other, entityConfiguration, property );
-		}
-	}
+		String associationName = to.getName() + "." + property.getName();
 
-	private void createAssociationFromTo( MutableEntityConfiguration from,
-	                                      MutableEntityConfiguration to,
-	                                      PersistentProperty property ) {
-		MutableEntityAssociation association = from.createAssociation( to );
-		association.addAttribute( PersistentProperty.class, property );
+		MutableEntityAssociation association = from.createAssociation( associationName );
+		association.setTargetEntityConfiguration( to );
+		association.setTargetProperty( to.getPropertyRegistry().getProperty( property.getName() ) );
 
 		buildCreateView( association );
 		buildListView( association, property );
@@ -70,7 +73,7 @@ public class ManyToManyEntityAssociationBuilder implements EntityAssociationBuil
 
 	public void buildListView( MutableEntityAssociation association,
 	                           final PersistentProperty property ) {
-		EntityConfiguration to = association.getAssociatedEntityConfiguration();
+		EntityConfiguration to = association.getTargetEntityConfiguration();
 
 		EntityListViewFactory viewFactory = beanFactory.getBean( EntityListViewFactory.class );
 		BeanUtils.copyProperties( to.getViewFactory( EntityListView.VIEW_NAME ), viewFactory );
@@ -79,42 +82,38 @@ public class ManyToManyEntityAssociationBuilder implements EntityAssociationBuil
 		                                "entityViews.listView",
 		                                "entityViews" );
 
-//		Repository repository = to.getAttribute( Repository.class );
-//		if ( repository instanceof JpaSpecificationExecutor ) {
-//			final JpaSpecificationExecutor jpa = (JpaSpecificationExecutor) repository;
-//			viewFactory.setPageFetcher( new EntityListViewPageFetcher<WebViewCreationContext>()
-//			{
-//				@Override
-//				public Page fetchPage( WebViewCreationContext viewCreationContext,
-//				                       Pageable pageable,
-//				                       final EntityView model ) {
-//					/*BeanWrapper beanWrapper = new BeanWrapperImpl( model.getEntity());
-//					beanWrapper.getPropertyValue(  )*/
-//
-//					Specification s = new Specification<Object>()
-//					{
-//						@Override
-//						public Predicate toPredicate( Root<Object> root, CriteriaQuery<?> query, CriteriaBuilder cb ) {
-//							return cb.equal( root.get( property.getName() ), model.getEntity() );
-//						}
-//					};
-//
-//					return jpa.findAll( s, pageable );
-//				}
-//			} );
-//		}
-//		else if ( repository instanceof QueryDslPredicateExecutor ) {
-//			System.err.println( "Repository not matching for: " + to.getName() );
-//		}
-//		else {
-//			System.err.println( "Repository not matching for: " + to.getName() );
-//		}
+		Repository repository = to.getAttribute( Repository.class );
+		if ( repository instanceof JpaSpecificationExecutor ) {
+			final JpaSpecificationExecutor jpa = (JpaSpecificationExecutor) repository;
+			viewFactory.setPageFetcher( new EntityListViewPageFetcher<WebViewCreationContext>()
+			{
+				@Override
+				public Page fetchPage( WebViewCreationContext viewCreationContext,
+				                       Pageable pageable,
+				                       final EntityView model ) {
+					Specification s = new Specification<Object>()
+					{
+						@Override
+						public Predicate toPredicate( Root<Object> root, CriteriaQuery<?> query, CriteriaBuilder cb ) {
+							return cb.equal( root.get( property.getName() ), model.getEntity() );
+						}
+					};
 
+					return jpa.findAll( s, pageable );
+				}
+			} );
+		}
+		else if ( repository instanceof QueryDslPredicateExecutor ) {
+			System.err.println( "Repository not matching for: " + to.getName() );
+		}
+		else {
+			System.err.println( "Repository not matching for: " + to.getName() );
+		}
 		association.registerView( EntityListView.VIEW_NAME, viewFactory );
 	}
 
 	public void buildCreateView( MutableEntityAssociation association ) {
-		EntityConfiguration to = association.getAssociatedEntityConfiguration();
+		EntityConfiguration to = association.getTargetEntityConfiguration();
 
 		EntityFormViewFactory viewFactory = beanFactory.getBean( EntityFormViewFactory.class );
 		BeanUtils.copyProperties( to.getViewFactory( EntityFormView.CREATE_VIEW_NAME ), viewFactory );

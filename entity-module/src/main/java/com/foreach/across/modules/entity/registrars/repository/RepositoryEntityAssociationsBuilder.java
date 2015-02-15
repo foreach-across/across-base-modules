@@ -15,7 +15,7 @@
  */
 package com.foreach.across.modules.entity.registrars.repository;
 
-import com.foreach.across.modules.entity.registrars.repository.handlers.EntityAssociationBuilder;
+import com.foreach.across.modules.entity.registrars.repository.associations.EntityAssociationBuilder;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.it;
+package com.foreach.across.modules.entity.registrars.repository;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
@@ -31,6 +31,7 @@ import com.foreach.across.modules.entity.testmodules.springdata.*;
 import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,27 +95,19 @@ public class TestRepositoryEntityRegistrar
 	}
 
 	@Test
-	public void companyShouldHaveAnAssociationToItsClients() {
-		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Company.class );
-		EntityAssociation association = configuration.association( Client.class );
-
-		assertNotNull( association );
-		assertTrue( association.hasView( EntityListView.VIEW_NAME ) );
-	}
-
-	@Test
 	public void companyShouldHaveAnAssociationToItsRepresentatives() throws Exception {
 		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Company.class );
-		EntityAssociation association = configuration.association( Representative.class );
+		EntityAssociation association = configuration.association( "representatives" );
 
 		assertNotNull( association );
 		assertTrue( association.hasView( EntityListView.VIEW_NAME ) );
 	}
 
+	@Ignore
 	@Test
 	public void representativeShouldHaveAnAssociationToItsCompanies() throws Exception {
 		EntityConfiguration configuration = entityRegistry.getEntityConfiguration( Representative.class );
-		EntityAssociation association = configuration.association( Company.class );
+		EntityAssociation association = configuration.association( "company.representatives" );
 
 		assertNotNull( association );
 		assertTrue( association.hasView( EntityListView.VIEW_NAME ) );

@@ -66,11 +66,11 @@ public class AssociatedEntityCreateController extends AssociatedEntityController
 	public Object buildViewRequest(
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@PathVariable(VAR_ENTITY_ID) Serializable entityId,
-			@PathVariable(VAR_ASSOCIATION) EntityConfiguration associatedConfiguration,
+			@PathVariable(VAR_ASSOCIATION) String associationName,
 			NativeWebRequest request,
 			ExtendedModelMap model ) {
 		return super.buildViewRequest(
-				entityConfiguration, entityId, associatedConfiguration, true, true, null, request, model
+				entityConfiguration, entityId, associationName, true, true, null, request, model
 		);
 	}
 

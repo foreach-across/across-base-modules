@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.it;
 
+import com.foreach.across.modules.entity.registrars.repository.TestRepositoryEntityRegistrar;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;

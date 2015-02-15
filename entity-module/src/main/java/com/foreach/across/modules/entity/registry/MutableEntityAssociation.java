@@ -22,8 +22,10 @@ import com.foreach.across.modules.entity.views.EntityViewFactory;
 /**
  * @author Arne Vandamme
  */
-public interface MutableEntityAssociation<T> extends EntityAssociation<T>, WritableAttributes
+public interface MutableEntityAssociation extends EntityAssociation, WritableAttributes
 {
+	void setTargetEntityConfiguration( EntityConfiguration entityConfiguration );
+
 	void setSourceProperty( EntityPropertyDescriptor descriptor );
 
 	void setTargetProperty( EntityPropertyDescriptor descriptor );

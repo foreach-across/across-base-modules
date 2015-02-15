@@ -22,39 +22,46 @@ import com.foreach.across.modules.entity.views.EntityViewFactory;
 /**
  * @author Arne Vandamme
  */
-public class EntityAssociationImpl<T>
+public class EntityAssociationImpl
 		extends AttributeSupport
-		implements MutableEntityAssociation<T>
+		implements MutableEntityAssociation
 {
-	private final MutableEntityConfiguration entityConfiguration;
-	private final MutableEntityConfiguration<T> associatedEntityConfiguration;
+	private final String name;
+	private final MutableEntityConfiguration sourceEntityConfiguration;
+
+	private EntityConfiguration targetEntityConfiguration;
 
 	private EntityPropertyDescriptor sourceProperty, targetProperty;
 
-	public EntityAssociationImpl( MutableEntityConfiguration entityConfiguration,
-	                              MutableEntityConfiguration<T> associatedEntityConfiguration ) {
-		this.entityConfiguration = entityConfiguration;
-		this.associatedEntityConfiguration = associatedEntityConfiguration;
+	public EntityAssociationImpl( String name,
+	                              MutableEntityConfiguration sourceEntityConfiguration ) {
+		this.name = name;
+		this.sourceEntityConfiguration = sourceEntityConfiguration;
 	}
 
 	@Override
 	public String getName() {
-		return associatedEntityConfiguration.getName();
+		return name;
 	}
 
 	@Override
-	public Class<T> getEntityType() {
-		return associatedEntityConfiguration.getEntityType();
+	public Class<?> getEntityType() {
+		return targetEntityConfiguration.getEntityType();
 	}
 
 	@Override
 	public EntityConfiguration getSourceEntityConfiguration() {
-		return entityConfiguration;
+		return sourceEntityConfiguration;
 	}
 
 	@Override
-	public EntityConfiguration<T> getAssociatedEntityConfiguration() {
-		return associatedEntityConfiguration;
+	public void setTargetEntityConfiguration( EntityConfiguration targetEntityConfiguration ) {
+		this.targetEntityConfiguration = targetEntityConfiguration;
+	}
+
+	@Override
+	public EntityConfiguration getTargetEntityConfiguration() {
+		return targetEntityConfiguration;
 	}
 
 	@Override
@@ -79,18 +86,18 @@ public class EntityAssociationImpl<T>
 
 	@Override
 	public boolean hasView( String name ) {
-		return entityConfiguration.hasView( buildAssociatedViewName( name ) );
+		return sourceEntityConfiguration.hasView( buildAssociatedViewName( name ) );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <Y extends EntityViewFactory> Y getViewFactory( String viewName ) {
-		return (Y) entityConfiguration.getViewFactory( buildAssociatedViewName( viewName ) );
+		return (Y) sourceEntityConfiguration.getViewFactory( buildAssociatedViewName( viewName ) );
 	}
 
 	@Override
 	public void registerView( String viewName, EntityViewFactory viewFactory ) {
-		entityConfiguration.registerView( buildAssociatedViewName( viewName ), viewFactory );
+		sourceEntityConfiguration.registerView( buildAssociatedViewName( viewName ), viewFactory );
 	}
 
 	private String buildAssociatedViewName( String viewName ) {

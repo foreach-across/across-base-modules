@@ -25,10 +25,7 @@ public interface MutableEntityConfiguration<T> extends EntityConfiguration<T>, W
 	void setEntityMessageCodeResolver( EntityMessageCodeResolver entityMessageCodeResolver );
 
 	@Override
-	<V> MutableEntityAssociation<V> association( Class<V> entityType );
+	MutableEntityAssociation association( String name );
 
-	@Override
-	<V> MutableEntityAssociation<V> association( EntityConfiguration<V> associatedEntityConfiguration );
-
-	<V> MutableEntityAssociation<V> createAssociation( MutableEntityConfiguration<V> associatedEntityConfiguration );
+	MutableEntityAssociation createAssociation( String name );
 }

@@ -58,7 +58,7 @@ public abstract class AssociatedEntityControllerSupport extends AbstractEntityMo
 	protected Object buildViewRequest(
 			EntityConfiguration entityConfiguration,
 			Serializable entityId,
-			EntityConfiguration associatedEntityConfiguration,
+			String associationName,
 			boolean includeEntity,
 			boolean includeDto,
 			Serializable associatedEntityId,
@@ -75,7 +75,7 @@ public abstract class AssociatedEntityControllerSupport extends AbstractEntityMo
 
 		String viewName = StringUtils.defaultString( requestedViewName, getDefaultViewName() );
 
-		EntityAssociation association = entityConfiguration.association( associatedEntityConfiguration );
+		EntityAssociation association = entityConfiguration.association( associationName );
 		EntityViewFactory viewFactory = association.getViewFactory( viewName );
 		model.addAttribute( VIEW_FACTORY, viewFactory );
 
@@ -97,11 +97,11 @@ public abstract class AssociatedEntityControllerSupport extends AbstractEntityMo
 		if ( includeEntity ) {
 			if ( associatedEntityId != null ) {
 				if ( includeDto ) {
-					viewRequest.setEntity( buildUpdateDto( associatedEntityConfiguration, associatedEntityId, model ) );
+					viewRequest.setEntity( buildUpdateDto( association.getTargetEntityConfiguration(), associatedEntityId, model ) );
 				}
 				else {
 					viewRequest.setEntity(
-							buildOriginalEntityModel( associatedEntityConfiguration, associatedEntityId, model ) );
+							buildOriginalEntityModel( association.getTargetEntityConfiguration(), associatedEntityId, model ) );
 				}
 			}
 			else if ( includeDto ) {
@@ -169,7 +169,7 @@ public abstract class AssociatedEntityControllerSupport extends AbstractEntityMo
 	}
 
 	protected Object buildNewEntityDto( Object sourceEntity, EntityAssociation association, ModelMap model ) {
-		EntityModel entityModel = association.getAssociatedEntityConfiguration().getEntityModel();
+		EntityModel entityModel = association.getTargetEntityConfiguration().getEntityModel();
 
 		// todo: remove direct dependency on spring data - use a regular entitypropertydescriptor ?
 		BeanWrapper associatedBeanWrapper = new BeanWrapperImpl( entityModel.createNew() );

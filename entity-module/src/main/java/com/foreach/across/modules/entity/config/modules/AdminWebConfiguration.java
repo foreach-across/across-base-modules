@@ -81,7 +81,8 @@ public class AdminWebConfiguration implements EntityConfigurer
 			@Override
 			public MutableEntityConfiguration process( MutableEntityConfiguration<?> configuration ) {
 				configuration.addAttribute( EntityLinkBuilder.class,
-				                            new EntityLinkBuilder( EntityControllerAttributes.ROOT_PATH, configuration ) );
+				                            new EntityLinkBuilder( EntityControllerAttributes.ROOT_PATH,
+				                                                   configuration ) );
 				return configuration;
 			}
 		} );
@@ -93,13 +94,13 @@ public class AdminWebConfiguration implements EntityConfigurer
 			public MutableEntityConfiguration process( MutableEntityConfiguration<?> configuration ) {
 				EntityLinkBuilder parentLinkBuilder = configuration.getAttribute( EntityLinkBuilder.class );
 				for ( EntityAssociation association : configuration.getAssociations() ) {
-					EntityLinkBuilder originalLinkBuilder = association.getAssociatedEntityConfiguration()
+					EntityLinkBuilder originalLinkBuilder = association.getTargetEntityConfiguration()
 					                                                   .getAttribute( EntityLinkBuilder.class );
 
 					AssociatedEntityLinkBuilder associationLinkBuilder
 							= new AssociatedEntityLinkBuilder( parentLinkBuilder, originalLinkBuilder );
 
-					MutableEntityAssociation mutable = configuration.association( association.getEntityType() );
+					MutableEntityAssociation mutable = configuration.association( association.getName() );
 					mutable.addAttribute( AssociatedEntityLinkBuilder.class, associationLinkBuilder );
 				}
 

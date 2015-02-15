@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.registrars.repository.handlers;
+package com.foreach.across.modules.entity.registrars.repository.associations;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
@@ -74,9 +74,10 @@ public class OneToManyEntityAssociationBuilder implements EntityAssociationBuild
 				LOG.warn( "Unable to process unidirectional @OneToMany relationship." );
 			}
 			else {
-				MutableEntityAssociation association = entityConfiguration.createAssociation( other );
+				MutableEntityAssociation association = entityConfiguration.createAssociation( property.getName() );
 				association.addAttribute( PersistentProperty.class, property );
 				association.setSourceProperty( entityConfiguration.getPropertyRegistry().getProperty( property.getName() ) );
+				association.setTargetEntityConfiguration( other );
 				association.setTargetProperty( other.getPropertyRegistry().getProperty( mappedBy ) );
 
 				buildCreateView( association );
@@ -88,7 +89,7 @@ public class OneToManyEntityAssociationBuilder implements EntityAssociationBuild
 
 	public void buildListView( MutableEntityAssociation association,
 	                           final PersistentProperty property ) {
-		EntityConfiguration to = association.getAssociatedEntityConfiguration();
+		EntityConfiguration to = association.getTargetEntityConfiguration();
 
 		EntityListViewFactory viewFactory = beanFactory.getBean( EntityListViewFactory.class );
 		BeanUtils.copyProperties( to.getViewFactory( EntityListView.VIEW_NAME ), viewFactory );
@@ -131,7 +132,7 @@ public class OneToManyEntityAssociationBuilder implements EntityAssociationBuild
 	}
 
 	public void buildCreateView( MutableEntityAssociation association ) {
-		EntityConfiguration to = association.getAssociatedEntityConfiguration();
+		EntityConfiguration to = association.getTargetEntityConfiguration();
 
 		EntityFormViewFactory viewFactory = beanFactory.getBean( EntityFormViewFactory.class );
 		BeanUtils.copyProperties( to.getViewFactory( EntityFormView.CREATE_VIEW_NAME ), viewFactory );

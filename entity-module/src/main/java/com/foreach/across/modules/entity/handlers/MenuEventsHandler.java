@@ -64,7 +64,7 @@ public class MenuEventsHandler
 
 			// Get associations
 			for ( EntityAssociation association : entityConfiguration.getAssociations() ) {
-				EntityConfiguration associated = association.getAssociatedEntityConfiguration();
+				EntityConfiguration associated = association.getTargetEntityConfiguration();
 				AssociatedEntityLinkBuilder associatedLinkBuilder = association.getAttribute(
 						AssociatedEntityLinkBuilder.class );
 				EntityMessageCodeResolver messageCodeResolver = associated.getEntityMessageCodeResolver();

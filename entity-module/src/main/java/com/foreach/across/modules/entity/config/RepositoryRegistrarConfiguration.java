@@ -16,9 +16,9 @@
 package com.foreach.across.modules.entity.config;
 
 import com.foreach.across.modules.entity.registrars.repository.*;
-import com.foreach.across.modules.entity.registrars.repository.handlers.ManyToManyEntityAssociationBuilder;
-import com.foreach.across.modules.entity.registrars.repository.handlers.ManyToOneEntityAssociationBuilder;
-import com.foreach.across.modules.entity.registrars.repository.handlers.OneToManyEntityAssociationBuilder;
+import com.foreach.across.modules.entity.registrars.repository.associations.ManyToManyEntityAssociationBuilder;
+import com.foreach.across.modules.entity.registrars.repository.associations.ManyToOneEntityAssociationBuilder;
+import com.foreach.across.modules.entity.registrars.repository.associations.OneToManyEntityAssociationBuilder;
 import com.foreach.across.modules.entity.registry.builders.EntityPropertyRegistryMappingMetaDataBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

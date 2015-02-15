@@ -55,7 +55,7 @@ public class WebViewCreationContextImpl implements WebViewCreationContext
 	public void setEntityAssociation( EntityAssociation entityAssociation ) {
 		this.entityAssociation = entityAssociation;
 		if ( entityConfiguration == null ) {
-			entityConfiguration = entityAssociation.getAssociatedEntityConfiguration();
+			entityConfiguration = entityAssociation.getTargetEntityConfiguration();
 		}
 	}
 

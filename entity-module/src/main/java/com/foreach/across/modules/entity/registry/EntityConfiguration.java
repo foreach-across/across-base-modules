@@ -28,9 +28,7 @@ public interface EntityConfiguration<T> extends ReadableAttributes
 
 	Collection<EntityAssociation> getAssociations();
 
-	<V> EntityAssociation<V> association( Class<V> entityType );
-
-	<V> EntityAssociation<V> association( EntityConfiguration<V> associatedEntityConfiguration );
+	EntityAssociation association( String name );
 
 	boolean isNew( T entity );
 
