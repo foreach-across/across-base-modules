@@ -82,7 +82,6 @@
 							<goal>jar</goal>
 						</goals>
 					</execution>
-					<!--
 					<execution>
 						<inherited>false</inherited>
 						<id>aggregate</id>
@@ -136,7 +135,6 @@
 							<goal>single</goal>
 						</goals>
 					</execution>
-					-->
 				</executions>
 			</plugin>
 			<plugin>
