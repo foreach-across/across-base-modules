@@ -30,7 +30,8 @@ import com.foreach.across.modules.entity.handlers.MenuEventsHandler;
 import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
-import com.foreach.across.modules.entity.web.AssociatedEntityLinkBuilder;
+import com.foreach.across.modules.entity.web.EntityAssociationLinkBuilder;
+import com.foreach.across.modules.entity.web.EntityConfigurationLinkBuilder;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -81,27 +82,12 @@ public class AdminWebConfiguration implements EntityConfigurer
 			@Override
 			public MutableEntityConfiguration process( MutableEntityConfiguration<?> configuration ) {
 				configuration.addAttribute( EntityLinkBuilder.class,
-				                            new EntityLinkBuilder( EntityControllerAttributes.ROOT_PATH,
-				                                                   configuration ) );
-				return configuration;
-			}
-		} );
+				                            new EntityConfigurationLinkBuilder( EntityControllerAttributes.ROOT_PATH,
+				                                                                configuration ) );
 
-		// Create associations
-		configuration.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
-		{
-			@Override
-			public MutableEntityConfiguration process( MutableEntityConfiguration<?> configuration ) {
-				EntityLinkBuilder parentLinkBuilder = configuration.getAttribute( EntityLinkBuilder.class );
 				for ( EntityAssociation association : configuration.getAssociations() ) {
-					EntityLinkBuilder originalLinkBuilder = association.getTargetEntityConfiguration()
-					                                                   .getAttribute( EntityLinkBuilder.class );
-
-					AssociatedEntityLinkBuilder associationLinkBuilder
-							= new AssociatedEntityLinkBuilder( parentLinkBuilder, originalLinkBuilder );
-
 					MutableEntityAssociation mutable = configuration.association( association.getName() );
-					mutable.addAttribute( AssociatedEntityLinkBuilder.class, associationLinkBuilder );
+					mutable.addAttribute( EntityLinkBuilder.class, new EntityAssociationLinkBuilder( association ) );
 				}
 
 				return configuration;

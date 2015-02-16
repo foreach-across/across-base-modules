@@ -20,7 +20,7 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.testmodules.springdata.Client;
+import com.foreach.across.modules.entity.testmodules.springdata.business.Client;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

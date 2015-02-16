@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.foreach.across.modules.entity.registrars.repository;
 
 import com.foreach.across.modules.entity.EntityAttributes;
@@ -19,6 +34,7 @@ import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 
 import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
 import javax.validation.metadata.BeanDescriptor;
 import java.util.*;
 
@@ -122,7 +138,8 @@ public class RepositoryEntityPropertyRegistryBuilder
 	                                         PersistentEntity<?, ?> persistentEntity ) {
 		for ( EntityPropertyDescriptor descriptor : registry.getRegisteredDescriptors() ) {
 			PersistentProperty persistentProperty = persistentEntity.getPersistentProperty( descriptor.getName() );
-			if ( persistentProperty != null && persistentProperty.isAnnotationPresent( Embedded.class ) ) {
+			if ( persistentProperty != null && ( persistentProperty.isAnnotationPresent( Embedded.class )
+					|| persistentProperty.isAnnotationPresent( EmbeddedId.class ) ) ) {
 				MutableEntityPropertyDescriptor mutable = registry.getMutableProperty( descriptor.getName() );
 				if ( mutable != null ) {
 					mutable.addAttribute( EntityAttributes.PROPERTY_PERSISTENCE_METADATA,
@@ -137,7 +154,8 @@ public class RepositoryEntityPropertyRegistryBuilder
 		LOG.trace( "Finding embedded properties for entity {}", persistentEntity.getType() );
 		for ( EntityPropertyDescriptor descriptor : registry.getRegisteredDescriptors() ) {
 			PersistentProperty persistentProperty = persistentEntity.getPersistentProperty( descriptor.getName() );
-			if ( persistentProperty != null && persistentProperty.isAnnotationPresent( Embedded.class ) ) {
+			if ( persistentProperty != null && ( persistentProperty.isAnnotationPresent( Embedded.class )
+					|| persistentProperty.isAnnotationPresent( EmbeddedId.class ) ) ) {
 				LOG.trace( "Setting persisted property {} as embedded", persistentProperty.getName() );
 				MutableEntityPropertyDescriptor mutable = registry.getMutableProperty( descriptor.getName() );
 				if ( mutable != null ) {

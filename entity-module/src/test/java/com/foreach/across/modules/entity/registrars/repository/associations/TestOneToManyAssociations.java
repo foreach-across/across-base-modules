@@ -20,7 +20,7 @@ import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.testmodules.springdata.business.Client;
-import com.foreach.across.modules.entity.testmodules.springdata.business.Company;
+import com.foreach.across.modules.entity.testmodules.springdata.business.ClientGroup;
 import com.foreach.across.modules.entity.views.EntityListView;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,33 +39,32 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 @ContextConfiguration(classes = TestRepositoryEntityRegistrar.Config.class)
-public class TestManyToOneAssociations
+public class TestOneToManyAssociations
 {
 	@Autowired
 	private EntityRegistry entityRegistry;
 
 	@Test
-	public void companyShouldHaveAnAssociationToItsClients() {
-		EntityConfiguration company = entityRegistry.getEntityConfiguration( Company.class );
+	public void clientHasAssociationToClientGroups() {
+		EntityConfiguration clientGroup = entityRegistry.getEntityConfiguration( ClientGroup.class );
 		EntityConfiguration client = entityRegistry.getEntityConfiguration( Client.class );
 
-		EntityAssociation association = company.association( "client.company" );
+		EntityAssociation association = client.association( "client.groups" );
 
 		assertNotNull( association );
 		assertEquals(
-				"Association name should be target entity name joined with target property name",
-				"client.company", association.getName()
+				"Association name should be source entity name joined with target property name",
+				"client.groups", association.getName()
 		);
 
-		assertSame( company, association.getSourceEntityConfiguration() );
-		assertSame( client, association.getTargetEntityConfiguration() );
+		assertSame( client, association.getSourceEntityConfiguration() );
+		assertSame( clientGroup, association.getTargetEntityConfiguration() );
 
-		assertNull(
-				"Regular ManyToOne should not have a source property as the association starts at the other end",
-				association.getSourceProperty()
-		);
-		assertNotNull( association.getTargetProperty() );
-		assertSame( client.getPropertyRegistry().getProperty( "company" ), association.getTargetProperty() );
+		assertNotNull( "OneToMany should have both source and target property set", association.getSourceProperty() );
+		assertNotNull( "OneToMany should have both source and target property set", association.getTargetProperty() );
+
+		assertSame( client.getPropertyRegistry().getProperty( "groups" ), association.getSourceProperty() );
+		assertEquals( "id.client", association.getTargetProperty().getName() );
 
 		assertTrue( association.hasView( EntityListView.VIEW_NAME ) );
 	}

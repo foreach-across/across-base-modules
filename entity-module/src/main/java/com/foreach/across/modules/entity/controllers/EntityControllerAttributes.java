@@ -28,9 +28,9 @@ public interface EntityControllerAttributes {
     String VAR_ASSOCIATION = "associatedConfig";
     String VAR_ASSOCIATION_ID = "associatedEntityId";
 
-    String PATH_ENTITY = "/{entityConfig}";
+    String PATH_ENTITY = "/{entityConfig:.+}";
     String PATH_ENTITY_ID = "/{entityId}";
-    String PATH_ASSOCIATION = "/associations/{associatedConfig}";
+    String PATH_ASSOCIATION = "/associations/{associatedConfig:.+}";
     String PATH_ASSOCIATION_ID = "/{associatedEntityId}";
 
     String ATTRIBUTE_SOURCE_ENTITY = "parentEntity";

@@ -74,7 +74,9 @@ public class OneToManyEntityAssociationBuilder implements EntityAssociationBuild
 				LOG.warn( "Unable to process unidirectional @OneToMany relationship." );
 			}
 			else {
-				MutableEntityAssociation association = entityConfiguration.createAssociation( property.getName() );
+				String associationName = entityConfiguration.getName() + "." + property.getName();
+
+				MutableEntityAssociation association = entityConfiguration.createAssociation( associationName );
 				association.addAttribute( PersistentProperty.class, property );
 				association.setSourceProperty( entityConfiguration.getPropertyRegistry().getProperty( property.getName() ) );
 				association.setTargetEntityConfiguration( other );

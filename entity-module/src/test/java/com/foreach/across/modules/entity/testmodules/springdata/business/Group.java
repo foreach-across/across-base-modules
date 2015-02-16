@@ -13,38 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.testmodules.springdata2;
+package com.foreach.across.modules.entity.testmodules.springdata.business;
 
 import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
 
+/**
+ * @author Arne Vandamme
+ */
 @Entity
-public class Client extends SettableIdBasedEntity<Client>
+public class Group extends SettableIdBasedEntity<Group>
 {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "seq_test_client2_id")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "seq_test_group_id")
 	@GenericGenerator(
-			name = "seq_test_client2_id",
+			name = "seq_test_group_id",
 			strategy = AcrossSequenceGenerator.STRATEGY,
 			parameters = {
-					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "seq_test_client2_id"),
+					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "seq_test_group_id"),
 					@org.hibernate.annotations.Parameter(name = "allocationSize", value = "1")
 			}
 	)
 	private Long id;
 
+	@NotBlank
 	@Column(unique = true)
 	private String name;
-
-	public Client() {
-	}
-
-	public Client( String name ) {
-		this.name = name;
-	}
 
 	public Long getId() {
 		return id;

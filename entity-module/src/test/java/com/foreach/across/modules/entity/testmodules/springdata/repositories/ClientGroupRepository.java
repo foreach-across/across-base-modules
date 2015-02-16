@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.config;
+package com.foreach.across.modules.entity.testmodules.springdata.repositories;
 
-import com.foreach.across.modules.entity.registry.builders.EntityPropertyRegistryValidationMetaDataBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.foreach.across.modules.entity.testmodules.springdata.business.ClientGroup;
+import com.foreach.across.modules.entity.testmodules.springdata.business.ClientGroupId;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-/**
- * @author niels
- * @since 4/02/2015
- */
-@Configuration
-public class EntityPropertyRegistryHandlerConfiguration
+public interface ClientGroupRepository extends JpaRepository<ClientGroup, ClientGroupId>
 {
-
-	@Bean
-	public EntityPropertyRegistryValidationMetaDataBuilder entityPropertyRegistryValidationConstraintHandler() {
-		return new EntityPropertyRegistryValidationMetaDataBuilder();
-	}
 }

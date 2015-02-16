@@ -81,12 +81,13 @@ public class AssociatedEntityUpdateController extends AssociatedEntityController
 	public ModelAndView saveEntity(
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@ModelAttribute(ATTRIBUTE_SOURCE_ENTITY) Object sourceEntity,
-			@PathVariable(VAR_ASSOCIATION) EntityConfiguration associatedEntityConfiguration,
+			@PathVariable(VAR_ASSOCIATION) String associationName,
 			@ModelAttribute(VIEW_REQUEST) @Valid EntityViewRequest viewRequest,
 			BindingResult bindingResult,
 			ExtendedModelMap model,
 			RedirectAttributes redirectAttributes ) {
-		EntityModel associatedModel = associatedEntityConfiguration.getEntityModel();
+		EntityModel associatedModel =
+				entityConfiguration.association( associationName ).getTargetEntityConfiguration().getEntityModel();
 
 		if ( !bindingResult.hasErrors() ) {
 			associatedModel.save( viewRequest.getEntity() );

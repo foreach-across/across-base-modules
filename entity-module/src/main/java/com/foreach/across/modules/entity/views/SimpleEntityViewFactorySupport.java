@@ -168,7 +168,7 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 	}
 
 	/**
-	 * This registers the {@link com.foreach.across.modules.entity.web.EntityLinkBuilder} in the model so it can
+	 * This registers the {@link com.foreach.across.modules.entity.web.EntityConfigurationLinkBuilder} in the model so it can
 	 * be used for redirect actions without rendering the actual view.
 	 */
 	protected void registerLinkBuilder( V creationContext, ModelMap model ) {

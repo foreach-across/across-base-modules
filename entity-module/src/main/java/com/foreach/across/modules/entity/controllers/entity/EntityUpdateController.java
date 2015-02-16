@@ -69,7 +69,7 @@ public class EntityUpdateController extends EntityControllerSupport
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.POST)
 	public ModelAndView saveEntity(
-			@PathVariable("entityConfig") EntityConfiguration entityConfiguration,
+			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@ModelAttribute(VIEW_REQUEST) @Valid EntityViewRequest viewRequest,
 			BindingResult bindingResult,
 			ExtendedModelMap model,
@@ -99,7 +99,7 @@ public class EntityUpdateController extends EntityControllerSupport
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView showUpdateEntityForm(
-			@PathVariable("entityConfig") EntityConfiguration entityConfiguration,
+			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@ModelAttribute(VIEW_REQUEST) EntityViewRequest viewRequest,
 			AdminMenu adminMenu,
 			ExtendedModelMap model

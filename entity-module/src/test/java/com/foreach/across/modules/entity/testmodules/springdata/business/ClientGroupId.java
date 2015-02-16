@@ -13,10 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.testmodules.springdata;
+package com.foreach.across.modules.entity.testmodules.springdata.business;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import javax.persistence.Embeddable;
+import javax.persistence.ManyToOne;
+import java.io.Serializable;
 
-public interface ClientRepository extends JpaRepository<Client, Long>
+/**
+ * @author Arne Vandamme
+ */
+@Embeddable
+public class ClientGroupId implements Serializable
 {
+	@ManyToOne
+	private Client client;
+
+	@ManyToOne
+	private Group group;
+
+	public Client getClient() {
+		return client;
+	}
+
+	public void setClient( Client client ) {
+		this.client = client;
+	}
+
+	public Group getGroup() {
+		return group;
+	}
+
+	public void setGroup( Group group ) {
+		this.group = group;
+	}
 }

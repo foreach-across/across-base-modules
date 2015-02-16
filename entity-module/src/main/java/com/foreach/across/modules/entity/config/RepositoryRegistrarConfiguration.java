@@ -16,10 +16,10 @@
 package com.foreach.across.modules.entity.config;
 
 import com.foreach.across.modules.entity.registrars.repository.*;
-import com.foreach.across.modules.entity.registrars.repository.associations.ManyToManyEntityAssociationBuilder;
 import com.foreach.across.modules.entity.registrars.repository.associations.ManyToOneEntityAssociationBuilder;
 import com.foreach.across.modules.entity.registrars.repository.associations.OneToManyEntityAssociationBuilder;
 import com.foreach.across.modules.entity.registry.builders.EntityPropertyRegistryMappingMetaDataBuilder;
+import com.foreach.across.modules.entity.registry.builders.EntityPropertyRegistryValidationMetaDataBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -61,10 +61,13 @@ public class RepositoryRegistrarConfiguration
 		return new ManyToOneEntityAssociationBuilder();
 	}
 
+	/*
+	// todo: implement many to many nicely
 	@Bean
 	protected ManyToManyEntityAssociationBuilder manyToManyAssociationViewBuilder() {
 		return new ManyToManyEntityAssociationBuilder();
 	}
+	*/
 
 	@Bean
 	protected OneToManyEntityAssociationBuilder oneToManyAssociationViewBuilder() {
@@ -74,5 +77,10 @@ public class RepositoryRegistrarConfiguration
 	@Bean
 	protected EntityPropertyRegistryMappingMetaDataBuilder entityPropertyMappingMetaDataBuilder() {
 		return new EntityPropertyRegistryMappingMetaDataBuilder();
+	}
+
+	@Bean
+	public EntityPropertyRegistryValidationMetaDataBuilder entityPropertyValidationMetaDataBuilder() {
+		return new EntityPropertyRegistryValidationMetaDataBuilder();
 	}
 }

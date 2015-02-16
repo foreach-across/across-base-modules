@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.testmodules.springdata;
+package com.foreach.across.modules.entity.testmodules.springdata.config;
 
+import com.foreach.across.modules.entity.testmodules.springdata.SpringDataJpaModule;
+import com.foreach.across.modules.entity.testmodules.springdata.validators.CompanyValidator;
 import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +25,10 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@EnableJpaRepositories(transactionManagerRef = HibernateJpaConfiguration.TRANSACTION_MANAGER)
+@EnableJpaRepositories(
+		transactionManagerRef = HibernateJpaConfiguration.TRANSACTION_MANAGER,
+        basePackageClasses = SpringDataJpaModule.class
+)
 public class ClientConfig
 {
 	@Bean
@@ -35,7 +40,7 @@ public class ClientConfig
 	}
 
 	@Bean
-	public CompanyValidator customerValidator() {
+	public CompanyValidator companyValidator() {
 		return new CompanyValidator();
 	}
 }

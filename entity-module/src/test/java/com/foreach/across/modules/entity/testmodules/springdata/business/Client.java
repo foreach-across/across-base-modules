@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.testmodules.springdata;
+package com.foreach.across.modules.entity.testmodules.springdata.business;
 
 import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import com.foreach.across.modules.hibernate.id.AcrossSequenceGenerator;
@@ -21,6 +21,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Client extends SettableIdBasedEntity<Client>
@@ -43,6 +44,9 @@ public class Client extends SettableIdBasedEntity<Client>
 
 	@ManyToOne
 	private Company company;
+
+	@OneToMany(mappedBy = "id.client")
+	private Set<ClientGroup> groups;
 
 	public Client() {
 	}
@@ -77,5 +81,13 @@ public class Client extends SettableIdBasedEntity<Client>
 
 	public void setCompany( Company company ) {
 		this.company = company;
+	}
+
+	public Set<ClientGroup> getGroups() {
+		return groups;
+	}
+
+	public void setGroups( Set<ClientGroup> groups ) {
+		this.groups = groups;
 	}
 }

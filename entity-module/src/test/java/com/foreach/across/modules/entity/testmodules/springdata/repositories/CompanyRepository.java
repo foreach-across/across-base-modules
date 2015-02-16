@@ -13,23 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.testmodules.springdata;
+package com.foreach.across.modules.entity.testmodules.springdata.repositories;
+
+import com.foreach.across.modules.entity.testmodules.springdata.business.Company;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author Arne Vandamme
  */
-public enum CompanyStatus
+public interface CompanyRepository extends JpaRepository<Company, String>
 {
-	IN_BUSINESS( "In business" ),
-	BROKE( "Broke" );
-
-	private String name;
-
-	CompanyStatus( String name ) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
 }

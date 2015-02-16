@@ -16,8 +16,8 @@
 package com.foreach.across.modules.entity.views.elements.form.select;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.testmodules.springdata.Client;
-import com.foreach.across.modules.entity.testmodules.springdata.CompanyStatus;
+import com.foreach.across.modules.entity.testmodules.springdata.business.Client;
+import com.foreach.across.modules.entity.testmodules.springdata.business.CompanyStatus;
 import com.foreach.across.modules.entity.views.elements.CommonViewElements;
 import com.foreach.across.modules.entity.views.elements.form.FormElementBuilderFactoryAssemblerSupport;
 import com.foreach.across.modules.entity.views.elements.form.FormElementBuilderFactoryAssemblerTestSupport;
