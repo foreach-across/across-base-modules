@@ -135,7 +135,7 @@ public class AcrossWebConfiguration extends WebMvcConfigurerAdapter
 	}
 
 	@Bean
-	protected Validator viewRequestValidator() {
+	protected ViewRequestValidator viewRequestValidator() {
 		return new ViewRequestValidator();
 	}
 
