@@ -35,13 +35,12 @@ import java.util.List;
 /**
  * @author Arne Vandamme
  */
-public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewFactorySupport, S extends SimpleEntityViewBuilder>
-		extends EntityViewBuilder<T, S>
+public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewFactorySupport, SELF extends SimpleEntityViewBuilder<T, SELF>>
+		extends EntityViewBuilder<T, SELF>
 {
-	public static class EntityViewPropertyRegistryBuilder
-			extends EntityPropertyRegistryBuilderSupport<SimpleEntityViewBuilder>
+	public class EntityViewPropertyRegistryBuilder extends EntityPropertyRegistryBuilderSupport<SELF, EntityViewPropertyRegistryBuilder>
 	{
-		EntityViewPropertyRegistryBuilder( SimpleEntityViewBuilder parent ) {
+		EntityViewPropertyRegistryBuilder( SELF parent ) {
 			super( parent );
 		}
 
@@ -49,23 +48,35 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 			and().viewPropertyFilter = EntityPropertyFilters.includeOrdered( propertyNames );
 			return this;
 		}
+
+		@Override
+		public SELF and() {
+			return super.and();
+		}
+	}
+
+	public static class StandardEntityViewBuilder extends SimpleEntityViewBuilder<ConfigurablePropertiesEntityViewFactorySupport, StandardEntityViewBuilder>
+	{
+
 	}
 
 	private String template;
 	private EntityViewPropertyRegistryBuilder propertyRegistryBuilder;
-	private EntityPropertyFilter viewPropertyFilter;
 	private Collection<ViewPreProcessor> preProcessors = new ArrayList<>();
 	private Collection<ViewPostProcessor> postProcessors = new ArrayList<>();
 
+	protected EntityPropertyFilter viewPropertyFilter;
+
 	@SuppressWarnings("unchecked")
-	public S template( String template ) {
+	public SELF template( String template ) {
 		this.template = template;
-		return (S) this;
+		return (SELF) this;
 	}
 
+	@SuppressWarnings("unchecked")
 	public EntityViewPropertyRegistryBuilder properties() {
 		if ( propertyRegistryBuilder == null ) {
-			propertyRegistryBuilder = new EntityViewPropertyRegistryBuilder( this );
+			propertyRegistryBuilder = new EntityViewPropertyRegistryBuilder( (SELF) this );
 		}
 
 		return propertyRegistryBuilder;
@@ -83,10 +94,10 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 	 * @return current builder
 	 */
 	@SuppressWarnings("unchecked")
-	public S addPreProcessor( ViewPreProcessor preProcessor ) {
+	public SELF addPreProcessor( ViewPreProcessor preProcessor ) {
 		Assert.notNull( preProcessor );
 		this.preProcessors.add( preProcessor );
-		return (S) this;
+		return (SELF) this;
 	}
 
 	/**
@@ -97,10 +108,10 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 	 * @return current builder
 	 */
 	@SuppressWarnings("unchecked")
-	public S addPostProcessor( ViewPostProcessor postProcessor ) {
+	public SELF addPostProcessor( ViewPostProcessor postProcessor ) {
 		Assert.notNull( postProcessor );
 		this.postProcessors.add( postProcessor );
-		return (S) this;
+		return (SELF) this;
 	}
 
 	@SuppressWarnings("unchecked")

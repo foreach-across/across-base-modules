@@ -33,8 +33,8 @@ import java.util.Map;
  */
 public class EntityConfigurationBuilder extends EntityBuilderSupport<EntityConfigurationBuilder>
 {
-	public static class EntityPropertyRegistryBuilder
-			extends EntityPropertyRegistryBuilderSupport<EntityConfigurationBuilder>
+	public class EntityPropertyRegistryBuilder
+			extends EntityPropertyRegistryBuilderSupport<EntityConfigurationBuilder, EntityPropertyRegistryBuilder>
 	{
 		EntityPropertyRegistryBuilder( EntityConfigurationBuilder parent ) {
 			super( parent );
@@ -67,15 +67,15 @@ public class EntityConfigurationBuilder extends EntityBuilderSupport<EntityConfi
 	}
 
 	/**
-	 * Returns a {@link com.foreach.across.modules.entity.config.builders.SimpleEntityViewBuilder} instance for the
-	 * view with the given name.  If there is already another builder for that view that does not extend the
-	 * SimpleEntityViewBuilder, an exception will be thrown.
+	 * Returns a {@link com.foreach.across.modules.entity.config.builders.SimpleEntityViewBuilder.StandardEntityViewBuilder}
+	 * instance for the view with the given name.  If there is already another builder type for that view, an exception
+	 * will be thrown.
 	 *
 	 * @param name Name of the view for which to retrieve a builder.
 	 * @return builder instance
 	 */
-	public SimpleEntityViewBuilder view( String name ) {
-		return view( name, SimpleEntityViewBuilder.class );
+	public SimpleEntityViewBuilder.StandardEntityViewBuilder view( String name ) {
+		return view( name, SimpleEntityViewBuilder.StandardEntityViewBuilder.class );
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class EntityConfigurationBuilder extends EntityBuilderSupport<EntityConfi
 	 * @return builder instance
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized <T extends EntityViewBuilder> T view( String name, Class<T> builderClass ) {
+	public synchronized <T extends EntityViewBuilder<?, T>> T view( String name, Class<T> builderClass ) {
 		T builder = (T) viewBuilders.get( name );
 
 		if ( builder == null ) {

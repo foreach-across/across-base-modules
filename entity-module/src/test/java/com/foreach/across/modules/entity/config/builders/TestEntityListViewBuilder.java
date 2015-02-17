@@ -18,6 +18,8 @@ package com.foreach.across.modules.entity.config.builders;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilters;
+import com.foreach.across.modules.entity.registry.properties.MutableEntityPropertyRegistry;
 import com.foreach.across.modules.entity.testmodules.springdata.business.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.business.Company;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
@@ -44,6 +46,8 @@ public class TestEntityListViewBuilder
 	private EntityConfigurationBuilder builder;
 	private MutableEntityConfiguration client, company;
 
+	private MutableEntityPropertyRegistry clientProperties;
+
 	private EntityListViewBuilder view;
 
 	private EntityListViewFactory viewFactory;
@@ -54,9 +58,12 @@ public class TestEntityListViewBuilder
 
 		entityRegistry = new EntityRegistryImpl();
 
+		clientProperties = mock( MutableEntityPropertyRegistry.class );
+
 		client = mock( MutableEntityConfiguration.class );
 		when( client.getEntityType() ).thenReturn( Client.class );
 		when( client.getName() ).thenReturn( "client" );
+		when( client.getPropertyRegistry() ).thenReturn( clientProperties );
 
 		company = mock( MutableEntityConfiguration.class );
 		when( company.getEntityType() ).thenReturn( Company.class );
@@ -91,5 +98,20 @@ public class TestEntityListViewBuilder
 
 		assertNotNull( viewFactory );
 		assertEquals( "th/someTemplate", viewFactory.getTemplate() );
+	}
+
+	@Test
+	public void returnToListBuilderAfterProperties() {
+		view.template( "th/someTemplate" )
+		    .properties( "one", "two" )
+		    .property( "three" ).and()
+		    .and()
+		    .showResultNumber( false );
+		view.apply( client );
+
+		assertNotNull( viewFactory );
+
+		assertNotNull( viewFactory.getPropertyFilter() );
+		assertEquals( EntityPropertyFilters.includeOrdered( "one", "two" ), viewFactory.getPropertyFilter() );
 	}
 }

@@ -20,9 +20,9 @@ import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 
 /**
-* @author Arne Vandamme
-*/
-public abstract class EntityViewBuilder<T extends EntityViewFactory, S extends EntityViewBuilder>
+ * @author Arne Vandamme
+ */
+public abstract class EntityViewBuilder<T extends EntityViewFactory, SELF extends EntityViewBuilder<T, SELF>>
 {
 	private String name;
 	private EntityConfigurationBuilder parent;
@@ -37,10 +37,10 @@ public abstract class EntityViewBuilder<T extends EntityViewFactory, S extends E
 		this.parent = parent;
 	}
 
-	@SuppressWarnings( "unchecked" )
-	public S factory( T entityViewFactory ) {
+	@SuppressWarnings("unchecked")
+	public SELF factory( T entityViewFactory ) {
 		this.factory = entityViewFactory;
-		return (S) this;
+		return (SELF) this;
 	}
 
 	public EntityConfigurationBuilder and() {

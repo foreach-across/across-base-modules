@@ -33,7 +33,7 @@ public abstract class AbstractEntityModuleController implements EntityController
 		registry.addWithKey( WebResource.CSS, "jqueryui-css",
 		                     "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css",
 		                     WebResource.EXTERNAL );
-		registry.addWithKey( WebResource.JAVASCRIPT, "jqueryui",
+		registry.addWithKey( WebResource.JAVASCRIPT_PAGE_END, "jqueryui",
 		                     "//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js",
 		                     WebResource.EXTERNAL );
 	}
