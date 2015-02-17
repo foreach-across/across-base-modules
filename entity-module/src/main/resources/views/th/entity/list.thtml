@@ -34,59 +34,70 @@
 	</ul>
 
 	<div class="tab-content" th:remove="${hasMenu} ? none: tag">
+
 		<div class="text-right">
 			<a class="btn btn-primary"
 			   th:href="@{${#webapp.path(entityLinks.create())}}"
 			   th:text="|${messages.createAction()}|">create a new entity</a>
 		</div>
 
-		<div>
-			<span th:text="${messages.resultsFound(page)}">Number of items found.</span><br/>
-			<a th:unless="${page.first}" href="#" data-tbl="entity-list"
-			   th:attr="data-tbl-page=${page.number - 1}" th:text="${messages.previousPage(page)}">previous page</a>
-			<span th:if="${page.totalPages gt 1}" th:text="${messages.pagerText(page)}">Showing page 1 of 13</span>
-			<a th:unless="${page.last}" href="#" data-tbl="entity-list"
-			   th:attr="data-tbl-page=${page.number + 1}" th:text="${messages.nextPage(page)}">next</a>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+
+				<span th:text="${messages.resultsFound(page)}">Number of items found.</span><br/>
+				<a th:unless="${page.first}" href="#" data-tbl="entity-list"
+				   th:attr="data-tbl-page=${page.number - 1}" th:text="${messages.previousPage(page)}">previous page</a>
+				<span th:if="${page.totalPages gt 1}" th:text="${messages.pagerText(page)}">Showing page 1 of 13</span>
+				<a th:unless="${page.last}" href="#" data-tbl="entity-list"
+				   th:attr="data-tbl-page=${page.number + 1}" th:text="${messages.nextPage(page)}">next</a>
+			</div>
+
+			<div class="panel-body">
+				<div class="table-responsive">
+
+					<table class="table table-striped table-hover" th:unless="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"
+					       th:attr="data-tbl-entity-type=${entityConfiguration.name},data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
+						<thead>
+						<tr>
+							<th th:if="${showResultNumber}">#</th>
+							<th th:each="prop : ${properties}">
+						<span th:if="${prop.sortable}"
+						      data-tbl="entity-list"
+						      class="sortable"
+						      th:attr="data-tbl-sort-property=${prop.sortableProperty}">
+							<span th:text="${prop.label}">Property name</span>
+							<span class="caret"></span>
+						</span>
+								<span th:unless="${prop.sortable}" th:text="${prop.label}">Name</span>
+							</th>
+							<th></th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr th:each="entity,entityStats:${page.content}" em:attributes="${rowProcessor.attributes(entity)}">
+							<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
+							<td th:each="prop : ${properties}">
+								<!--/*
+
+								<span th:if="${prop.name eq 'createdDate'}" th:remove="tag">
+									<div th:replace="|th/entity/${prop.name}|">DATUM</div>
+								</span>
+								*/-->
+								<span th:utext="${prop.print(entity)}">value</span>
+							</td>
+							<td>
+								<a th:href="@{${#webapp.path(entityLinks.update(entity))}}" th:title="${messages.updateAction(entity)}">
+									<span class="glyphicon glyphicon-edit"></span>
+								</a>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+
+				</div>
+			</div>
 		</div>
 
-		<table class="table table-striped table-hover" th:unless="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"
-		       th:attr="data-tbl-entity-type=${entityConfiguration.name},data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
-			<thead>
-			<tr>
-				<th th:if="${showResultNumber}">#</th>
-				<th th:each="prop : ${properties}">
-			<span th:if="${prop.sortable}"
-			      data-tbl="entity-list"
-			      class="sortable"
-			      th:attr="data-tbl-sort-property=${prop.sortableProperty}">
-				<span th:text="${prop.label}">Property name</span>
-				<span class="caret"></span>
-			</span>
-					<span th:unless="${prop.sortable}" th:text="${prop.label}">Name</span>
-				</th>
-				<th></th>
-			</tr>
-			</thead>
-			<tbody>
-			<tr th:each="entity,entityStats:${page.content}" em:attributes="${rowProcessor.attributes(entity)}">
-				<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
-				<td th:each="prop : ${properties}">
-					<!--/*
-
-					<span th:if="${prop.name eq 'createdDate'}" th:remove="tag">
-						<div th:replace="|th/entity/${prop.name}|">DATUM</div>
-					</span>
-					*/-->
-					<span th:utext="${prop.print(entity)}">value</span>
-				</td>
-				<td>
-					<a th:href="@{${#webapp.path(entityLinks.update(entity))}}" th:title="${messages.updateAction(entity)}">
-						<span class="glyphicon glyphicon-edit"></span>
-					</a>
-				</td>
-			</tr>
-			</tbody>
-		</table>
 
 		<table class="table table-striped table-hover" th:if="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"
 		       th:attr="data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">

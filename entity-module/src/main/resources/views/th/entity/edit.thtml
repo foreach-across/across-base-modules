@@ -42,7 +42,7 @@
 		<div class="tab-pane active">
 			<form method="post" th:action="@{${@adminWeb.path(formAction)}}" th:object="${viewRequest}" role="form">
 				<div class="row">
-					<div class="col-md-4">
+					<div class="col-md-6">
 
 						<div th:replace="th/entity/formFields :: form_fields(${properties})" />
 

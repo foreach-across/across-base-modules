@@ -71,25 +71,32 @@ public class MenuEventsHandler
 		PathBasedMenuBuilder builder = menu.builder();
 
 		EntityConfiguration<Object> entityConfiguration = entityRegistry.getEntityConfiguration( menu.getEntityType() );
+		EntityMessageCodeResolver messageCodeResolver = entityConfiguration.getEntityMessageCodeResolver();
+
 		EntityLinkBuilder linkBuilder = entityConfiguration.getAttribute( EntityLinkBuilder.class );
 
 		if ( menu.isForUpdate() ) {
-			builder.item( linkBuilder.update( menu.getEntity() ), "General" ).order( Ordered.HIGHEST_PRECEDENCE );
+			builder.item( linkBuilder.update( menu.getEntity() ),
+			              messageCodeResolver.getMessageWithFallback( "adminMenu.general", "General" ) )
+			       .order( Ordered.HIGHEST_PRECEDENCE );
 
 			// Get associations
 			for ( EntityAssociation association : entityConfiguration.getAssociations() ) {
 				EntityConfiguration associated = association.getTargetEntityConfiguration();
 				EntityLinkBuilder associatedLinkBuilder = association.getAttribute( EntityLinkBuilder.class )
 				                                                     .asAssociationFor( linkBuilder, menu.getEntity() );
-				EntityMessageCodeResolver messageCodeResolver = associated.getEntityMessageCodeResolver();
-
-				builder.item(
-						association.getName(), messageCodeResolver.getNamePlural(), associatedLinkBuilder.overview()
+				String itemTitle = messageCodeResolver.getMessageWithFallback(
+						"adminMenu." + association.getName(),
+						associated.getEntityMessageCodeResolver().getNamePlural()
 				);
+
+				builder.item( association.getName(), itemTitle, associatedLinkBuilder.overview() );
 			}
 		}
 		else {
-			builder.item( linkBuilder.create(), "General" ).order( Ordered.HIGHEST_PRECEDENCE );
+			builder.item( linkBuilder.create(),
+			              messageCodeResolver.getMessageWithFallback( "adminMenu.general", "General" ) )
+			       .order( Ordered.HIGHEST_PRECEDENCE );
 		}
 	}
 }

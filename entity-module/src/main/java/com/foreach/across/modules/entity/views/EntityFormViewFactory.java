@@ -19,6 +19,7 @@ import com.foreach.across.modules.entity.registry.EntityModel;
 import com.foreach.across.modules.entity.views.elements.CommonViewElements;
 import com.foreach.across.modules.entity.views.elements.ViewElementMode;
 import com.foreach.across.modules.entity.views.elements.button.ButtonViewElement;
+import com.foreach.across.modules.entity.views.support.EntityMessages;
 
 /**
  * @author Arne Vandamme
@@ -46,17 +47,18 @@ public class EntityFormViewFactory<V extends ViewCreationContext> extends Config
 				                    : view.getEntityLinkBuilder().update( original )
 		);
 
+		EntityMessages messages = view.getEntityMessages();
+
 		ButtonViewElement button = new ButtonViewElement();
 		button.setName( "btn-save" );
 		button.setElementType( CommonViewElements.SUBMIT_BUTTON);
-		button.setLabel( "Save" );
+		button.setLabel( messages.messageWithFallback( "actions.save" ) );
 
 		ButtonViewElement cancel = new ButtonViewElement();
 		cancel.setName( "btn-cancel" );
 		cancel.setElementType( CommonViewElements.LINK_BUTTON );
 		cancel.setLink( view.getEntityLinkBuilder().overview() );
-
-		cancel.setLabel( "Cancel" );
+		cancel.setLabel( messages.messageWithFallback( "actions.cancel" ) );
 
 		view.getEntityProperties().add( button );
 		view.getEntityProperties().add( cancel );
