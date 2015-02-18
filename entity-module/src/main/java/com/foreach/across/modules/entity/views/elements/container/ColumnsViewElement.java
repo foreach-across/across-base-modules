@@ -13,25 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.entity.views.elements;
+package com.foreach.across.modules.entity.views.elements.container;
 
 /**
  * @author Arne Vandamme
  */
-public interface CommonViewElements
+public class ColumnsViewElement extends ContainerViewElement
 {
-	String CONTAINER = "container";
-
-	String TEXTBOX = "textbox";
-	String HIDDEN = "hidden";
-	String SELECT = "select";
-	String MULTI_CHECKBOX = "multi-checkbox";
-	String CHECKBOX = "checkbox";
-	String DATE = "date";
-	String FIELDSET = "fieldset";
-	String TEXT = "text";
-
-	String BUTTON = "button";
-	String SUBMIT_BUTTON = "submit";
-	String LINK_BUTTON = "button-link";
+	@Override
+	public String getElementType() {
+		return "columns";
+	}
 }

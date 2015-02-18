@@ -50,12 +50,41 @@ public class ViewElements implements Iterable<ViewElement>
 	}
 
 	/**
+	 * Add the element directly as the first element to this collection.  If anywhere in this collection there
+	 * is already an element with the same name, an exception will be thrown.
+	 *
+	 * @param element element to add
+	 */
+	public void addFirst( ViewElement element ) {
+		Assert.notNull( element );
+
+		if ( contains( element.getName() ) ) {
+			throw new IllegalArgumentException( "Set already contains a ViewElement with name " + element.getName() );
+		}
+
+		elements.addFirst( element );
+	}
+
+	/**
+	 * Adds all elements directly to this collection.  If any of the elements duplicates the name
+	 * of an already present element, an exception will be thrown.
+	 *
+	 * @param elements elements to add
+	 */
+	public void addAll( Iterable<ViewElement> elements ) {
+		for ( ViewElement element : elements ) {
+			add( element );
+		}
+	}
+
+	/**
 	 * Remove the element with that name from wherever it may be in the collection.
 	 *
 	 * @param elementName name of the element to remove
 	 * @return element that was removed - can be null
 	 */
-	public ViewElement remove( String elementName ) {
+	@SuppressWarnings("unchecked")
+	public <V extends ViewElement> V remove( String elementName ) {
 		ViewElements parent = getParent( elementName );
 
 		if ( parent == this ) {
@@ -65,7 +94,7 @@ public class ViewElements implements Iterable<ViewElement>
 				elements.remove( element );
 			}
 
-			return element;
+			return (V) element;
 		}
 		else {
 			return parent.remove( elementName );
@@ -96,16 +125,17 @@ public class ViewElements implements Iterable<ViewElement>
 	/**
 	 * @return instance with that name, or null if not found
 	 */
-	public ViewElement get( String elementName ) {
+	@SuppressWarnings("unchecked")
+	public <V extends ViewElement> V get( String elementName ) {
 		for ( ViewElement element : elements ) {
 			if ( StringUtils.equals( elementName, element.getName() ) ) {
-				return element;
+				return (V) element;
 			}
 			else if ( element instanceof ViewElements ) {
 				ViewElement found = ( (ViewElements) element ).get( elementName );
 
 				if ( found != null ) {
-					return found;
+					return (V) found;
 				}
 			}
 		}
@@ -124,16 +154,17 @@ public class ViewElements implements Iterable<ViewElement>
 	 * @param elementName name of the element
 	 * @return parent group element or null if direct child or element not found
 	 */
-	public ViewElements getParent( String elementName ) {
+	@SuppressWarnings("unchecked")
+	public <V extends ViewElements> V getParent( String elementName ) {
 		for ( ViewElement element : elements ) {
 			if ( StringUtils.equals( elementName, element.getName() ) ) {
-				return this;
+				return (V) this;
 			}
 			else if ( element instanceof ViewElements ) {
 				ViewElements parent = ( (ViewElements) element ).getParent( elementName );
 
 				if ( parent != null ) {
-					return parent;
+					return (V) parent;
 				}
 			}
 		}

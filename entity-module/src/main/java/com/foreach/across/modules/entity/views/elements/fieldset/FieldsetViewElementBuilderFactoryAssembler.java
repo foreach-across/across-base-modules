@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * @author Arne Vandamme
  */
-public class FieldsetElementBuilderFactoryAssembler implements ViewElementBuilderFactoryAssembler
+public class FieldsetViewElementBuilderFactoryAssembler implements ViewElementBuilderFactoryAssembler
 {
 	@Autowired
 	private ConversionService conversionService;
@@ -55,22 +55,22 @@ public class FieldsetElementBuilderFactoryAssembler implements ViewElementBuilde
 	public ViewElementBuilderFactory createBuilderFactory( EntityConfiguration entityConfiguration,
 	                                                       EntityPropertyRegistry propertyRegistry,
 	                                                       EntityPropertyDescriptor descriptor ) {
-		FieldsetElementBuilder template
+		FieldsetViewElementBuilder template
 				= createTemplate( entityConfiguration, propertyRegistry, descriptor );
 
-		CloningViewElementBuilderFactory<FieldsetElementBuilder> builderFactory
-				= new CloningViewElementBuilderFactory<>( FieldsetElementBuilder.class );
+		CloningViewElementBuilderFactory<FieldsetViewElementBuilder> builderFactory
+				= new CloningViewElementBuilderFactory<>( FieldsetViewElementBuilder.class );
 		builderFactory.setBuilderTemplate( template );
 
 		return builderFactory;
 	}
 
-	protected FieldsetElementBuilder createTemplate(
+	protected FieldsetViewElementBuilder createTemplate(
 			EntityConfiguration entityConfiguration,
 			EntityPropertyRegistry registry,
 			EntityPropertyDescriptor descriptor
 	) {
-		FieldsetElementBuilder template = new FieldsetElementBuilder();
+		FieldsetViewElementBuilder template = new FieldsetViewElementBuilder();
 		template.setMessageCodeResolver( entityConfiguration.getEntityMessageCodeResolver() );
 		template.setName( descriptor.getName() );
 		template.setLabel( descriptor.getDisplayName() );

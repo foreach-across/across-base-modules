@@ -43,7 +43,6 @@
 
 		<div class="panel panel-default">
 			<div class="panel-heading">
-
 				<span th:text="${messages.resultsFound(page)}">Number of items found.</span><br/>
 				<a th:unless="${page.first}" href="#" data-tbl="entity-list"
 				   th:attr="data-tbl-page=${page.number - 1}" th:text="${messages.previousPage(page)}">previous page</a>
@@ -98,24 +97,6 @@
 			</div>
 		</div>
 
-
-		<table class="table table-striped table-hover" th:if="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"
-		       th:attr="data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
-			<thead>
-			<tr>
-				<th>#</th>
-				<th>Name</th>
-				<th></th>
-			</tr>
-			</thead>
-			<tbody>
-			<tr th:each="entity,entityStats:${page.content}">
-				<td th:text="${entityStats.count}"></td>
-				<td th:text="${entityConfiguration.getLabel(entity)}"></td>
-				<td><a th:href="@{${#webapp.path(entityLinks.update(entity))}}">edit</a></td>
-			</tr>
-			</tbody>
-		</table>
 	</div>
 </div>
 </body>

@@ -28,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class EntityView extends ModelAndView
 {
+	public static final String ATTRIBUTE_VIEW_NAME = "entityViewName";
 	public static final String ATTRIBUTE_ENTITY = "entity";
 	public static final String ATTRIBUTE_ENTITY_CONFIGURATION = "entityConfiguration";
 	public static final String ATTRIBUTE_ENTITY_LINKS = "entityLinks";
@@ -35,6 +36,14 @@ public class EntityView extends ModelAndView
 	public static final String ATTRIBUTE_PROPERTIES = "properties";
 	public static final String ATTRIBUTE_ENTITY_MENU = "entityMenu";
 	public static final String ATTRIBUTE_PAGE_TITLE = "pageTitle";
+
+	public String getName() {
+		return (String) getModelMap().get( ATTRIBUTE_VIEW_NAME );
+	}
+
+	public void setName( String name ) {
+		getModelMap().put( ATTRIBUTE_VIEW_NAME, name );
+	}
 
 	public void addModel( Model model ) {
 		addAllObjects( model.asMap() );
@@ -73,8 +82,9 @@ public class EntityView extends ModelAndView
 		getModelMap().put( ATTRIBUTE_PROPERTIES, entityProperties );
 	}
 
-	public Object getEntity() {
-		return getModelMap().get( ATTRIBUTE_ENTITY );
+	@SuppressWarnings("unchecked")
+	public <V> V getEntity() {
+		return (V) getModelMap().get( ATTRIBUTE_ENTITY );
 	}
 
 	public void setEntity( Object entity ) {

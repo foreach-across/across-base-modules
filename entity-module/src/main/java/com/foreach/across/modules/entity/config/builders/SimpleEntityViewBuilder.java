@@ -24,6 +24,8 @@ import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewF
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.ViewCreationContext;
 import com.foreach.across.modules.entity.views.elements.ViewElementMode;
+import com.foreach.across.modules.entity.views.processors.ViewDataBinderProcessor;
+import com.foreach.across.modules.entity.views.processors.ViewModelAndCommandProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
 import org.springframework.util.Assert;
@@ -64,6 +66,8 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 	private EntityViewPropertyRegistryBuilder propertyRegistryBuilder;
 	private Collection<ViewPreProcessor> preProcessors = new ArrayList<>();
 	private Collection<ViewPostProcessor> postProcessors = new ArrayList<>();
+	private Collection<ViewDataBinderProcessor> dataBinderProcessors = new ArrayList<>();
+	private Collection<ViewModelAndCommandProcessor> modelAndCommandProcessors = new ArrayList<>();
 
 	protected EntityPropertyFilter viewPropertyFilter;
 
@@ -84,6 +88,44 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 
 	public EntityViewPropertyRegistryBuilder properties( String... propertyNames ) {
 		return properties().filter( propertyNames );
+	}
+
+	/**
+	 * Add a processor object that should be applied to the view factory.  The processor should
+	 * implement at least one of the processor interfaces and will be registered on the view for
+	 * each functional interface type that it implements.
+	 * <p/>
+	 * Processors added through this method will be registered after processors added using the
+	 * specifically typed methods.
+	 *
+	 * @param processor instance - should not be null
+	 * @return current builder
+	 * @see com.foreach.across.modules.entity.views.processors.ViewProcessorAdapter
+	 * @see com.foreach.across.modules.entity.views.processors.WebViewProcessorAdapter
+	 */
+	@SuppressWarnings("unchecked")
+	public SELF addProcessor( Object processor ) {
+		Assert.notNull( processor );
+		Assert.isTrue(
+				processor instanceof ViewPreProcessor
+						|| processor instanceof ViewPostProcessor
+						|| processor instanceof ViewDataBinderProcessor
+						|| processor instanceof ViewModelAndCommandProcessor
+		);
+		if ( processor instanceof ViewPreProcessor ) {
+			preProcessors.add( (ViewPreProcessor) processor );
+		}
+		if ( processor instanceof ViewPostProcessor ) {
+			postProcessors.add( (ViewPostProcessor) processor );
+		}
+		if ( processor instanceof ViewDataBinderProcessor ) {
+			dataBinderProcessors.add( (ViewDataBinderProcessor) processor );
+		}
+		if ( processor instanceof ViewModelAndCommandProcessor ) {
+			modelAndCommandProcessors.add( (ViewModelAndCommandProcessor) processor );
+		}
+
+		return (SELF) this;
 	}
 
 	/**
@@ -111,6 +153,34 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 	public SELF addPostProcessor( ViewPostProcessor postProcessor ) {
 		Assert.notNull( postProcessor );
 		this.postProcessors.add( postProcessor );
+		return (SELF) this;
+	}
+
+	/**
+	 * Add a {@link com.foreach.across.modules.entity.views.processors.ViewModelAndCommandProcessor} that
+	 * should be called when preparing the model and command for the view.
+	 *
+	 * @param modelAndCommandProcessor instance - should not be null
+	 * @return current builder
+	 */
+	@SuppressWarnings("unchecked")
+	public SELF addModelAndCommandProcessor( ViewModelAndCommandProcessor modelAndCommandProcessor ) {
+		Assert.notNull( modelAndCommandProcessor );
+		this.modelAndCommandProcessors.add( modelAndCommandProcessor );
+		return (SELF) this;
+	}
+
+	/**
+	 * Add a {@link com.foreach.across.modules.entity.views.processors.ViewDataBinderProcessor} that
+	 * should be called when preparing the databinder for the view.
+	 *
+	 * @param dataBinderProcessor instance - should not be null
+	 * @return current builder
+	 */
+	@SuppressWarnings("unchecked")
+	public SELF addDataBinderProcessor( ViewDataBinderProcessor dataBinderProcessor ) {
+		Assert.notNull( dataBinderProcessor );
+		this.dataBinderProcessors.add( dataBinderProcessor );
 		return (SELF) this;
 	}
 
@@ -164,6 +234,15 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 
 		if ( !postProcessors.isEmpty() ) {
 			factory.setPostProcessors( merge( factory.getPostProcessors(), postProcessors ) );
+		}
+
+		if ( !dataBinderProcessors.isEmpty() ) {
+			factory.setDataBinderProcessors( merge( factory.getDataBinderProcessors(), dataBinderProcessors ) );
+		}
+
+		if ( !modelAndCommandProcessors.isEmpty() ) {
+			factory.setModelAndCommandProcessors( merge( factory.getModelAndCommandProcessors(),
+			                                             modelAndCommandProcessors ) );
 		}
 	}
 

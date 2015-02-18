@@ -27,7 +27,7 @@ import java.util.Collection;
 /**
  * @author Arne Vandamme
  */
-public class FieldsetElementBuilder implements ViewElementBuilder<FieldsetElement>
+public class FieldsetViewElementBuilder implements ViewElementBuilder<FieldsetViewElement>
 {
 	private String name, label, labelCode, customTemplate;
 
@@ -94,9 +94,9 @@ public class FieldsetElementBuilder implements ViewElementBuilder<FieldsetElemen
 	}
 
 	@Override
-	public FieldsetElement createViewElement( ViewElementBuilderContext builderContext ) {
+	public FieldsetViewElement createViewElement( ViewElementBuilderContext builderContext ) {
 		// Create the fieldset element
-		FieldsetElement fieldset = new FieldsetElement();
+		FieldsetViewElement fieldset = new FieldsetViewElement();
 		BeanUtils.copyProperties( this, fieldset, "label" );
 		fieldset.setLabel( resolve( getLabelCode(), getLabel() ) );
 

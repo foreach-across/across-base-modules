@@ -18,6 +18,8 @@ package com.foreach.across.modules.entity.views;
 import com.foreach.across.modules.entity.controllers.EntityViewCommand;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
+import com.foreach.across.modules.entity.views.processors.ViewDataBinderProcessor;
+import com.foreach.across.modules.entity.views.processors.ViewModelAndCommandProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
@@ -27,6 +29,7 @@ import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
+import org.springframework.validation.DataBinder;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -41,6 +44,9 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 {
 	private Collection<ViewPreProcessor<V, T>> preProcessors = Collections.emptyList();
 	private Collection<ViewPostProcessor<V, T>> postProcessors = Collections.emptyList();
+	private Collection<ViewDataBinderProcessor<V>> dataBinderProcessors = Collections.emptyList();
+	private Collection<ViewModelAndCommandProcessor<V>> modelAndCommandProcessors = Collections.emptyList();
+
 	private String template;
 	private MessageSource messageSource;
 	private EntityMessageCodeResolver messageCodeResolver;
@@ -128,14 +134,42 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 		return postProcessors;
 	}
 
-	@Override
-	public void prepareModelAndCommand( String viewName, V creationContext, EntityViewCommand command, ExtendedModelMap model ) {
-		registerLinkBuilder( creationContext, model );
+	public Collection<ViewDataBinderProcessor<V>> getDataBinderProcessors() {
+		return dataBinderProcessors;
+	}
+
+	public void setDataBinderProcessors( Collection<ViewDataBinderProcessor<V>> dataBinderProcessors ) {
+		this.dataBinderProcessors = dataBinderProcessors;
+	}
+
+	public Collection<ViewModelAndCommandProcessor<V>> getModelAndCommandProcessors() {
+		return modelAndCommandProcessors;
+	}
+
+	public void setModelAndCommandProcessors( Collection<ViewModelAndCommandProcessor<V>> modelAndCommandProcessors ) {
+		this.modelAndCommandProcessors = modelAndCommandProcessors;
 	}
 
 	@Override
-	public void prepareDataBinder( String viewName, V creationContext, EntityViewCommand viewRequest ) {
+	public void prepareModelAndCommand( String viewName,
+	                                    V creationContext,
+	                                    EntityViewCommand command,
+	                                    ExtendedModelMap model ) {
+		registerLinkBuilder( creationContext, model );
 
+		for ( ViewModelAndCommandProcessor<V> modelAndCommandProcessor : modelAndCommandProcessors ) {
+			modelAndCommandProcessor.prepareModelAndCommand( viewName, creationContext, command, model );
+		}
+	}
+
+	@Override
+	public void prepareDataBinder( String viewName,
+	                               V creationContext,
+	                               EntityViewCommand command,
+	                               DataBinder dataBinder ) {
+		for ( ViewDataBinderProcessor<V> dataBinderProcessor : dataBinderProcessors ) {
+			dataBinderProcessor.prepareDataBinder( viewName, creationContext, command, dataBinder );
+		}
 	}
 
 	@Override
@@ -144,6 +178,7 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 		Assert.notNull( entityConfiguration );
 
 		T view = createEntityView();
+		view.setName( viewName );
 		view.setViewName( template );
 		view.setEntityConfiguration( entityConfiguration );
 		view.addModel( model );

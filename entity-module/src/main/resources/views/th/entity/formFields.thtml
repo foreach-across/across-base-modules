@@ -1,3 +1,22 @@
+<!--
+  Copyright 2014 the original author or authors
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
 <th:block th:fragment="form_fields(properties)">
 	<th:block th:each="element : ${properties}">
 		<th:block th:if="${element.customTemplate != null}">
@@ -7,6 +26,22 @@
 			<div th:remove="${element.field} ? 'none': 'tag'"
 			     class="form-group"
 			     th:classappend="${element.field and #fields.hasErrors(element.name)}? has-error">
+				<!--/* container */-->
+				<div th:if="${element.elementType eq 'container'}" th:remove="tag">
+					<div th:replace="th/entity/formFields :: form_fields(${element})">
+						group members
+					</div>
+				</div>
+				<!--/* columns */-->
+				<div class="row"
+						th:if="${element.elementType eq 'columns' and #elements.hasChildren(element)}"
+						th:with="colSize=${12 / element.size()}">
+					<div th:each="column : ${element}" th:class="|col-md-${colSize}|">
+						<div th:replace="th/entity/formFields :: form_fields(${column})">
+								column body
+						</div>
+					</div>
+				</div>
 				<!--/* submit button */-->
 				<th:block th:if="${element.elementType eq 'submit'}">
 					<input type="submit" class="btn btn-primary" th:name="${element.name}" th:value="${element.label}" />
@@ -114,3 +149,5 @@
 		</th:block>
 	</th:block>
 </th:block>
+</body>
+</html>

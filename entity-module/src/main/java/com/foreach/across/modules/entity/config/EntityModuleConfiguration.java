@@ -30,7 +30,7 @@ import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.views.EntityFormViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import com.foreach.across.modules.entity.views.elements.CommonViewElementTypeLookupStrategy;
-import com.foreach.across.modules.entity.views.elements.fieldset.FieldsetElementBuilderFactoryAssembler;
+import com.foreach.across.modules.entity.views.elements.fieldset.FieldsetViewElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.checkbox.CheckboxFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.date.DateFormElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.hidden.HiddenFormElementBuilderFactoryAssembler;
@@ -142,8 +142,8 @@ public class EntityModuleConfiguration
 	}
 
 	@Bean
-	public FieldsetElementBuilderFactoryAssembler fieldsetElementBuilderFactoryAssembler() {
-		return new FieldsetElementBuilderFactoryAssembler();
+	public FieldsetViewElementBuilderFactoryAssembler fieldsetElementBuilderFactoryAssembler() {
+		return new FieldsetViewElementBuilderFactoryAssembler();
 	}
 
 	@Bean

@@ -15,22 +15,55 @@
  */
 package com.foreach.across.modules.entity.views.processors;
 
+import com.foreach.across.modules.entity.controllers.EntityViewCommand;
 import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.ViewCreationContext;
+import com.foreach.across.modules.entity.views.elements.ViewElements;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.DataBinder;
 
 /**
- * @author Andy Somers
+ * Convenient helper combining the different view processors and providing most common extension points.
+ *
+ * @author Andy Somers, Arne Vandamme
  */
 public class ViewProcessorAdapter<T extends ViewCreationContext, U extends EntityView>
-		implements ViewPreProcessor<T, U>, ViewPostProcessor<T, U>
+		implements ViewPreProcessor<T, U>, ViewPostProcessor<T, U>, ViewDataBinderProcessor<T>, ViewModelAndCommandProcessor<T>
 {
 	@Override
-	public void preProcess( T creationContext, U view ) {
-
+	public void prepareModelAndCommand( String viewName,
+	                                    T creationContext,
+	                                    EntityViewCommand command,
+	                                    ModelMap model ) {
 	}
 
 	@Override
-	public void postProcess( T creationContext, U view ) {
+	public void prepareDataBinder( String viewName,
+	                               T creationContext,
+	                               EntityViewCommand command,
+	                               DataBinder dataBinder ) {
+	}
+
+	@Override
+	public final void preProcess( T creationContext, U view ) {
+		applyCustomPreProcessing( creationContext, view );
+	}
+
+	protected void applyCustomPreProcessing( T creationContext, U view ) {
+	}
+
+	@Override
+	public final void postProcess( T creationContext, U view ) {
+		applyCustomPostProcessing( creationContext, view );
+
+		modifyViewElements( view.getEntityProperties() );
+	}
+
+	protected void applyCustomPostProcessing( T creationContext, U view ) {
+
+	}
+
+	protected void modifyViewElements( ViewElements elements ) {
 
 	}
 }

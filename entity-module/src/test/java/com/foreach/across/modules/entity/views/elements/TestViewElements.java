@@ -15,7 +15,7 @@
  */
 package com.foreach.across.modules.entity.views.elements;
 
-import com.foreach.across.modules.entity.views.elements.fieldset.FieldsetElement;
+import com.foreach.across.modules.entity.views.elements.fieldset.FieldsetViewElement;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,12 +35,12 @@ public class TestViewElements
 	private final SimpleElement three = new SimpleElement( "three" );
 	private final SimpleElement four = new SimpleElement( "four" );
 
-	private FieldsetElement groupWithThree;
+	private FieldsetViewElement groupWithThree;
 
 	@Before
 	public void before() {
 		list = new ViewElements();
-		groupWithThree = new FieldsetElement();
+		groupWithThree = new FieldsetViewElement();
 		groupWithThree.setName( "groupWithThree" );
 
 		groupWithThree.add( three );
@@ -156,7 +156,7 @@ public class TestViewElements
 
 	@Test
 	public void sortPropertiesInGroups() {
-		FieldsetElement group = new FieldsetElement();
+		FieldsetViewElement group = new FieldsetViewElement();
 		group.setName( "group" );
 		group.add( four );
 		group.add( three );

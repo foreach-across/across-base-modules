@@ -65,7 +65,7 @@ public class EntityViewRequest extends EntityViewCommand
 	}
 
 	public void initDataBinder( WebDataBinder dataBinder ) {
-		viewFactory.prepareDataBinder( viewName, creationContext, this );
+		viewFactory.prepareDataBinder( viewName, creationContext, this, dataBinder );
 	}
 
 	@SuppressWarnings("unchecked")

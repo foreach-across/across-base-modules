@@ -115,7 +115,11 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<V extends V
 			}
 		}
 
-		return propertyViews;
+		return customizeViewElements( propertyViews );
+	}
+
+	protected ViewElements customizeViewElements( ViewElements elements ) {
+		return elements;
 	}
 
 	protected ViewElement createPropertyView( ViewElementBuilderContext builderContext,
