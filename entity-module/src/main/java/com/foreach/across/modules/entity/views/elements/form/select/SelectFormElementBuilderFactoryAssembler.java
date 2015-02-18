@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.views.elements.form.select;
 
+import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
@@ -38,7 +39,7 @@ public class SelectFormElementBuilderFactoryAssembler
 	private EntityRegistry entityRegistry;
 
 	public SelectFormElementBuilderFactoryAssembler() {
-		super( SelectFormElementBuilder.class, CommonViewElements.SELECT, CommonViewElements.MULTI_CHECKBOX );
+		super( SelectFormElementBuilder.class, CommonViewElements.SELECT, CommonViewElements.MULTI_CHECKBOX , CommonViewElements.RADIO);
 	}
 
 	@Override
@@ -72,9 +73,14 @@ public class SelectFormElementBuilderFactoryAssembler
 			}
 		}
 
+
 		if ( isCollection ) {
 			template.setElementType( CommonViewElements.MULTI_CHECKBOX );
 		}
+		else if ( CommonViewElements.RADIO.equals( descriptor.getAttribute( EntityAttributes.ELEMENT_TYPE_WRITABLE ) ) ) {
+			template.setElementType( CommonViewElements.RADIO );
+		}
+
 	}
 
 	private boolean isCollection( EntityPropertyDescriptor descriptor ) {
