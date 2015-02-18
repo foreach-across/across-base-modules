@@ -35,6 +35,8 @@
 
 	<div class="tab-content" th:remove="${hasMenu} ? none: tag">
 
+		<div th:replace="th/entity/formFields :: form_fields(${properties})" />
+
 		<div class="text-right">
 			<a class="btn btn-primary"
 			   th:href="@{${#webapp.path(entityLinks.create())}}"
@@ -59,7 +61,7 @@
 						<thead>
 						<tr>
 							<th th:if="${showResultNumber}">#</th>
-							<th th:each="prop : ${properties}">
+							<th th:each="prop : ${properties.get('table')}">
 						<span th:if="${prop.sortable}"
 						      data-tbl="entity-list"
 						      class="sortable"
@@ -75,13 +77,7 @@
 						<tbody>
 						<tr th:each="entity,entityStats:${page.content}" em:attributes="${rowProcessor.attributes(entity)}">
 							<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
-							<td th:each="prop : ${properties}">
-								<!--/*
-
-								<span th:if="${prop.name eq 'createdDate'}" th:remove="tag">
-									<div th:replace="|th/entity/${prop.name}|">DATUM</div>
-								</span>
-								*/-->
+							<td th:each="prop : ${properties.get('table')}">
 								<span th:utext="${prop.print(entity)}">value</span>
 							</td>
 							<td>

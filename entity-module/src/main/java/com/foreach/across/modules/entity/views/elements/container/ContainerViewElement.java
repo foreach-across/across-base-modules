@@ -32,6 +32,13 @@ public class ContainerViewElement extends ViewElements implements ViewElement
 
 	private String name, customTemplate;
 
+	public ContainerViewElement() {
+	}
+
+	public ContainerViewElement( String name ) {
+		this.name = name;
+	}
+
 	@Override
 	public String getElementType() {
 		return TYPE;

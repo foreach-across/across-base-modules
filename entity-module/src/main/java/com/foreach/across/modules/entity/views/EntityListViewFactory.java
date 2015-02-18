@@ -18,9 +18,9 @@ package com.foreach.across.modules.entity.views;
 import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
-import com.foreach.across.modules.entity.views.elements.ViewElement;
-import com.foreach.across.modules.entity.views.elements.ViewElementBuilderContext;
-import com.foreach.across.modules.entity.views.elements.ViewElementMode;
+import com.foreach.across.modules.entity.views.elements.*;
+import com.foreach.across.modules.entity.views.elements.button.ButtonViewElement;
+import com.foreach.across.modules.entity.views.elements.container.ContainerViewElement;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.views.support.ListViewEntityMessages;
 import org.springframework.data.domain.Page;
@@ -113,6 +113,20 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 		view.setPageable( pageable );
 		view.setPage( page );
 		view.setShowResultNumber( isShowResultNumber() );
+
+		ContainerViewElement buttons = new ContainerViewElement( "buttons" );
+
+		EntityMessages messages = view.getEntityMessages();
+
+		ButtonViewElement create = new ButtonViewElement();
+		create.setName( "btn-create" );
+		create.setElementType( CommonViewElements.LINK_BUTTON );
+		create.setLink( view.getEntityLinkBuilder().create() );
+		create.setLabel( messages.createAction() );
+		buttons.add( create );
+
+		view.getEntityProperties().addFirst( buttons );
+
 	}
 
 	private Pageable buildPageable( EntityListView view ) {
@@ -139,6 +153,19 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 		sortablePropertyView.setSortableProperty( determineSortableProperty( descriptor ) );
 
 		return sortablePropertyView;
+	}
+
+	@Override
+	protected ViewElements customizeViewElements( ViewElements elements ) {
+		ContainerViewElement root = new ContainerViewElement( "root" );
+
+		// Props are in fact the table members
+		ContainerViewElement table = new ContainerViewElement( "table" );
+		table.addAll( elements );
+
+		root.add( table );
+
+		return root;
 	}
 
 	private String determineSortableProperty( EntityPropertyDescriptor descriptor ) {
