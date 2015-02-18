@@ -18,11 +18,14 @@ package com.foreach.across.modules.entity.views.elements.fieldset;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.ViewElementBuilder;
 import com.foreach.across.modules.entity.views.elements.ViewElementBuilderContext;
+import com.foreach.across.modules.entity.views.elements.form.dependencies.Qualifiers;
 import com.foreach.across.modules.entity.views.support.ValuePrinter;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Arne Vandamme
@@ -35,6 +38,8 @@ public class FieldsetViewElementBuilder implements ViewElementBuilder<FieldsetVi
 	private ValuePrinter valuePrinter;
 
 	private Collection<String> properties = new ArrayList<>();
+
+	private Map<String, Qualifiers> dependencies = new HashMap<>();
 
 	public String getName() {
 		return name;
@@ -91,6 +96,14 @@ public class FieldsetViewElementBuilder implements ViewElementBuilder<FieldsetVi
 
 	public void setProperties( Collection<String> properties ) {
 		this.properties = properties;
+	}
+
+	public Map<String, Qualifiers> getDependencies() {
+		return dependencies;
+	}
+
+	public void setDependencies( Map<String, Qualifiers> dependencies ) {
+		this.dependencies = dependencies;
 	}
 
 	@Override

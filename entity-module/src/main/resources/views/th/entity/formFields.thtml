@@ -54,7 +54,7 @@
 				</th:block>
 				<!--/* fieldset */-->
 				<div th:if="${element.elementType eq 'fieldset'}">
-					<fieldset>
+					<fieldset em:dependencies="${element.dependencies}">
 						<legend th:text="${element.label}">Fieldset label</legend>
 						<div th:replace="th/entity/formFields ::form_fields(${element})">
 							group members

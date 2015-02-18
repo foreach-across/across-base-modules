@@ -34,6 +34,7 @@ import org.springframework.core.convert.ConversionService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Arne Vandamme
@@ -65,6 +66,7 @@ public class FieldsetViewElementBuilderFactoryAssembler implements ViewElementBu
 		return builderFactory;
 	}
 
+	@SuppressWarnings( "unchecked" )
 	protected FieldsetViewElementBuilder createTemplate(
 			EntityConfiguration entityConfiguration,
 			EntityPropertyRegistry registry,
@@ -97,6 +99,9 @@ public class FieldsetViewElementBuilderFactoryAssembler implements ViewElementBu
 
 			properties.addAll( memberNamesInOrder );
 		}
+
+		Map dependencies = descriptor.getAttribute("dependencies", Map.class);
+		template.setDependencies(dependencies);
 
 		template.setProperties( properties );
 

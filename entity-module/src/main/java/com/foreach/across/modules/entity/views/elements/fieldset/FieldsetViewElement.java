@@ -18,8 +18,12 @@ package com.foreach.across.modules.entity.views.elements.fieldset;
 import com.foreach.across.modules.entity.views.elements.CommonViewElements;
 import com.foreach.across.modules.entity.views.elements.ViewElement;
 import com.foreach.across.modules.entity.views.elements.ViewElements;
+import com.foreach.across.modules.entity.views.elements.form.dependencies.Qualifiers;
 import com.foreach.across.modules.entity.views.support.ValuePrinter;
 import org.springframework.util.Assert;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents a described group of other {@link com.foreach.across.modules.entity.views.elements.ViewElement}
@@ -33,6 +37,7 @@ public class FieldsetViewElement extends ViewElements implements ViewElement
 	private ValuePrinter valuePrinter;
 
 	private boolean field;
+	private Map<String, Qualifiers> dependencies = new HashMap<>();
 
 	@Override
 	public String getElementType() {
@@ -82,6 +87,14 @@ public class FieldsetViewElement extends ViewElements implements ViewElement
 
 	public void setField( boolean field ) {
 		this.field = field;
+	}
+
+	public Map<String, Qualifiers> getDependencies() {
+		return dependencies;
+	}
+
+	public void setDependencies( Map<String, Qualifiers> dependencies ) {
+		this.dependencies = dependencies;
 	}
 
 	@Override
