@@ -27,14 +27,13 @@ import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ExtendedModelMap;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
@@ -62,17 +61,17 @@ public class EntityUpdateController extends EntityControllerSupport
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@PathVariable(VAR_ENTITY_ID) Serializable entityId,
 			NativeWebRequest request,
-			ExtendedModelMap model ) {
+			ModelMap model ) {
 		return super.buildViewRequest( entityConfiguration, true, true, entityId, request, model );
 	}
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.POST)
-	public ModelAndView saveEntity(
+	public String saveEntity(
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@ModelAttribute(VIEW_REQUEST) @Valid EntityViewRequest viewRequest,
 			BindingResult bindingResult,
-			ExtendedModelMap model,
+			ModelMap model,
 			AdminMenu adminMenu,
 			RedirectAttributes redirectAttributes
 	) {
@@ -81,15 +80,10 @@ public class EntityUpdateController extends EntityControllerSupport
 		if ( !bindingResult.hasErrors() ) {
 			entityModel.save( viewRequest.getEntity() );
 
-			ModelAndView mav = new ModelAndView();
-			mav.setViewName(
-					adminWeb.redirect( entityConfiguration.getAttribute( EntityLinkBuilder.class )
-					                                      .update( viewRequest.getEntity() ) )
-			);
-
 			redirectAttributes.addFlashAttribute( "successMessage", "feedback.entityUpdated" );
 
-			return mav;
+			return adminWeb.redirect( entityConfiguration.getAttribute( EntityLinkBuilder.class )
+			                                             .update( viewRequest.getEntity() ) );
 		}
 		else {
 			return showUpdateEntityForm( entityConfiguration, viewRequest, adminMenu, model );
@@ -98,11 +92,11 @@ public class EntityUpdateController extends EntityControllerSupport
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView showUpdateEntityForm(
+	public String showUpdateEntityForm(
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@ModelAttribute(VIEW_REQUEST) EntityViewRequest viewRequest,
 			AdminMenu adminMenu,
-			ExtendedModelMap model
+			ModelMap model
 	) {
 		Object original = model.get( EntityFormView.ATTRIBUTE_ORIGINAL_ENTITY );
 		adminMenu.breadcrumbLeaf( entityConfiguration.getLabel( original ) );
@@ -119,7 +113,7 @@ public class EntityUpdateController extends EntityControllerSupport
 			);
 		}
 
-		return view;
+		return view.getTemplate();
 	}
 
 }

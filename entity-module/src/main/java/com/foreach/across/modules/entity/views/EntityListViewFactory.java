@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.ui.ModelMap;
 
 import java.util.Collection;
 
@@ -101,8 +102,8 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 	}
 
 	@Override
-	protected EntityListView createEntityView() {
-		return new EntityListView();
+	protected EntityListView createEntityView( ModelMap model ) {
+		return new EntityListView( model );
 	}
 
 	@Override

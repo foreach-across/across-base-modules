@@ -15,6 +15,8 @@
  */
 package com.foreach.across.modules.entity.views;
 
+import org.springframework.ui.ModelMap;
+
 /**
  * @author Arne Vandamme
  */
@@ -31,27 +33,31 @@ public class EntityFormView extends EntityView
 	// Will contain the entity that is the parent of the association, if applicable
 	public static final String ATTRIBUTE_PARENT_ENTITY = "parentEntity";
 
+	public EntityFormView( ModelMap model ) {
+		super( model );
+	}
+
 	public Object getOriginalEntity() {
-		return getModelMap().get( ATTRIBUTE_ORIGINAL_ENTITY );
+		return getAttribute( ATTRIBUTE_ORIGINAL_ENTITY );
 	}
 
 	public void setOriginalEntity( Object entity ) {
-		getModelMap().put( ATTRIBUTE_ORIGINAL_ENTITY, entity );
+		addAttribute( ATTRIBUTE_ORIGINAL_ENTITY, entity );
 	}
 
 	public String getFormAction() {
-		return (String) getModelMap().get( ATTRIBUTE_FORM_ACTION );
+		return getAttribute( ATTRIBUTE_FORM_ACTION );
 	}
 
 	public void setFormAction( String action ) {
-		getModelMap().put( ATTRIBUTE_FORM_ACTION, action );
+		addAttribute( ATTRIBUTE_FORM_ACTION, action );
 	}
 
 	public Object getParentEntity() {
-		return getModelMap().get( ATTRIBUTE_PARENT_ENTITY );
+		return getAttribute( ATTRIBUTE_PARENT_ENTITY );
 	}
 
 	public void setParentEntity( Object entity ) {
-		getModelMap().put( ATTRIBUTE_PARENT_ENTITY, entity );
+		addAttribute( ATTRIBUTE_PARENT_ENTITY, entity );
 	}
 }

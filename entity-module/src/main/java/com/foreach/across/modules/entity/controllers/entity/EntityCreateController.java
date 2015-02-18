@@ -26,15 +26,13 @@ import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
@@ -65,31 +63,26 @@ public class EntityCreateController extends EntityControllerSupport
 	public Object buildViewRequest(
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			NativeWebRequest request,
-			ExtendedModelMap model ) {
+			ModelMap model ) {
 		return super.buildViewRequest( entityConfiguration, true, true, null, request, model );
 	}
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.POST)
-	public ModelAndView saveEntity( @PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
-	                                @ModelAttribute(VIEW_REQUEST) @Valid EntityViewRequest viewRequest,
-	                                BindingResult bindingResult,
-	                                Model model,
-	                                RedirectAttributes redirectAttributes ) {
+	public String saveEntity( @PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
+	                          @ModelAttribute(VIEW_REQUEST) @Valid EntityViewRequest viewRequest,
+	                          BindingResult bindingResult,
+	                          ModelMap model,
+	                          RedirectAttributes redirectAttributes ) {
 		EntityModel entityModel = entityConfiguration.getEntityModel();
 
 		if ( !bindingResult.hasErrors() ) {
 			entityModel.save( viewRequest.getEntity() );
 
-			ModelAndView mav = new ModelAndView();
-			mav.setViewName(
-					adminWeb.redirect( entityConfiguration.getAttribute( EntityLinkBuilder.class )
-					                                      .update( viewRequest.getEntity() ) )
-			);
-
 			redirectAttributes.addFlashAttribute( "successMessage", "feedback.entityCreated" );
 
-			return mav;
+			return adminWeb.redirect( entityConfiguration.getAttribute( EntityLinkBuilder.class )
+			                                             .update( viewRequest.getEntity() ) );
 		}
 		else {
 			return showCreateEntityForm( viewRequest, entityConfiguration, model );
@@ -97,10 +90,10 @@ public class EntityCreateController extends EntityControllerSupport
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView showCreateEntityForm(
+	public String showCreateEntityForm(
 			@ModelAttribute(VIEW_REQUEST) EntityViewRequest viewRequest,
 			@PathVariable(VAR_ENTITY) EntityConfiguration<?> entityConfiguration,
-			Model model ) {
+			ModelMap model ) {
 		EntityView view = viewRequest.createView( model );
 
 		view.setEntityMenu( menuFactory.buildMenu( new EntityAdminMenu<>( entityConfiguration.getEntityType() ) ) );
@@ -109,6 +102,6 @@ public class EntityCreateController extends EntityControllerSupport
 			view.setPageTitle( view.getEntityMessages().createPageTitle() );
 		}
 
-		return view;
+		return view.getTemplate();
 	}
 }

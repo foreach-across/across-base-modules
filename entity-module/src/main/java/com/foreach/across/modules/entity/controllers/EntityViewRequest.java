@@ -19,8 +19,7 @@ import com.foreach.across.modules.entity.views.EntityView;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.entity.web.WebViewCreationContext;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
 
 /**
@@ -54,22 +53,23 @@ public class EntityViewRequest extends EntityViewCommand
 	}
 
 	@SuppressWarnings("unchecked")
-	public EntityView createView( Model model ) {
+	public EntityView createView( ModelMap model ) {
 		EntityView view = viewFactory.create( viewName, creationContext, model );
 
 		if ( partialFragment != null ) {
-			view.setViewName( StringUtils.join( new Object[] { view.getViewName(), partialFragment }, " :: " ) );
+			view.setTemplate( StringUtils.join( new Object[] { view.getTemplate(), partialFragment }, " :: " ) );
 		}
 
 		return view;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void initDataBinder( WebDataBinder dataBinder ) {
 		viewFactory.prepareDataBinder( viewName, creationContext, this, dataBinder );
 	}
 
 	@SuppressWarnings("unchecked")
-	public void prepareModelAndCommand( ExtendedModelMap model ) {
+	public void prepareModelAndCommand( ModelMap model ) {
 		viewFactory.prepareModelAndCommand( viewName, creationContext, this, model );
 	}
 

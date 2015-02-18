@@ -21,13 +21,11 @@ import com.foreach.across.modules.entity.controllers.EntityViewRequest;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.views.EntityListView;
 import org.springframework.data.domain.Pageable;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Lists all entities of a particular type.
@@ -43,7 +41,7 @@ public class EntityListController extends EntityControllerSupport
 	public Object buildViewRequest(
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			NativeWebRequest request,
-			ExtendedModelMap model ) {
+			ModelMap model ) {
 		return super.buildViewRequest( entityConfiguration, false, false, null, request, model );
 	}
 
@@ -53,14 +51,14 @@ public class EntityListController extends EntityControllerSupport
 	}
 
 	@RequestMapping
-	public ModelAndView listAllEntities(
+	public String listAllEntities(
 			@ModelAttribute(VIEW_REQUEST) EntityViewRequest viewRequest,
-			Model model,
+			ModelMap model,
 			Pageable pageable
 	) {
 		model.addAttribute( EntityListView.ATTRIBUTE_PAGEABLE, pageable );
 
-		return viewRequest.createView( model );
+		return viewRequest.createView( model ).getTemplate();
 	}
 
 }

@@ -31,7 +31,6 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -63,7 +62,7 @@ public abstract class AssociatedEntityControllerSupport extends AbstractEntityMo
 			boolean includeDto,
 			Serializable associatedEntityId,
 			NativeWebRequest request,
-			ExtendedModelMap model
+			ModelMap model
 	) {
 		WebViewCreationContextImpl viewCreationContext = new WebViewCreationContextImpl();
 		viewCreationContext.setRequest( request );
@@ -97,11 +96,13 @@ public abstract class AssociatedEntityControllerSupport extends AbstractEntityMo
 		if ( includeEntity ) {
 			if ( associatedEntityId != null ) {
 				if ( includeDto ) {
-					viewRequest.setEntity( buildUpdateDto( association.getTargetEntityConfiguration(), associatedEntityId, model ) );
+					viewRequest.setEntity( buildUpdateDto( association.getTargetEntityConfiguration(),
+					                                       associatedEntityId, model ) );
 				}
 				else {
 					viewRequest.setEntity(
-							buildOriginalEntityModel( association.getTargetEntityConfiguration(), associatedEntityId, model ) );
+							buildOriginalEntityModel( association.getTargetEntityConfiguration(), associatedEntityId,
+							                          model ) );
 				}
 			}
 			else if ( includeDto ) {

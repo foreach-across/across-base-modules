@@ -28,7 +28,6 @@ import com.foreach.across.modules.web.template.WebTemplateInterceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -60,7 +59,7 @@ public abstract class EntityControllerSupport extends AbstractEntityModuleContro
 			boolean includeDto,
 			Serializable entityId,
 			NativeWebRequest request,
-			ExtendedModelMap model
+			ModelMap model
 	) {
 		WebViewCreationContextImpl viewCreationContext = new WebViewCreationContextImpl();
 		viewCreationContext.setRequest( request );

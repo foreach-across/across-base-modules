@@ -18,13 +18,11 @@ package com.foreach.across.modules.entity.controllers.entity;
 import com.foreach.across.modules.adminweb.annotations.AdminWebController;
 import com.foreach.across.modules.entity.controllers.EntityViewRequest;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.io.Serializable;
 
@@ -44,7 +42,7 @@ public class EntityViewController extends EntityControllerSupport
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@PathVariable(VAR_ENTITY_ID) Serializable entityId,
 			NativeWebRequest request,
-			ExtendedModelMap model ) {
+			ModelMap model ) {
 		return super.buildViewRequest( entityConfiguration, true, false, entityId, request, model );
 	}
 
@@ -55,10 +53,10 @@ public class EntityViewController extends EntityControllerSupport
 	}
 
 	@RequestMapping
-	public ModelAndView renderEntityView(
+	public String renderEntityView(
 			@ModelAttribute(VIEW_REQUEST) EntityViewRequest viewRequest,
-			Model model
+			ModelMap model
 	) {
-		return viewRequest.createView( model );
+		return viewRequest.createView( model ).getTemplate();
 	}
 }

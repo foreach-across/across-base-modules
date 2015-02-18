@@ -27,15 +27,13 @@ import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.web.menu.MenuFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
@@ -68,7 +66,7 @@ public class AssociatedEntityCreateController extends AssociatedEntityController
 			@PathVariable(VAR_ENTITY_ID) Serializable entityId,
 			@PathVariable(VAR_ASSOCIATION) String associationName,
 			NativeWebRequest request,
-			ExtendedModelMap model ) {
+			ModelMap model ) {
 		return super.buildViewRequest(
 				entityConfiguration, entityId, associationName, true, true, null, request, model
 		);
@@ -76,13 +74,13 @@ public class AssociatedEntityCreateController extends AssociatedEntityController
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.POST)
-	public ModelAndView saveEntity(
+	public String saveEntity(
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@ModelAttribute(ATTRIBUTE_SOURCE_ENTITY) Object sourceEntity,
 			@PathVariable(VAR_ASSOCIATION) String associationName,
 			@ModelAttribute(VIEW_REQUEST) @Valid EntityViewRequest viewRequest,
 			BindingResult bindingResult,
-			ExtendedModelMap model,
+			ModelMap model,
 			RedirectAttributes redirectAttributes ) {
 		EntityModel associatedModel =
 				entityConfiguration.association( associationName ).getTargetEntityConfiguration().getEntityModel();
@@ -90,13 +88,11 @@ public class AssociatedEntityCreateController extends AssociatedEntityController
 		if ( !bindingResult.hasErrors() ) {
 			associatedModel.save( viewRequest.getEntity() );
 
-			EntityLinkBuilder linkBuilder = (EntityLinkBuilder) model.get( EntityView.ATTRIBUTE_ENTITY_LINKS );
-			ModelAndView mav = new ModelAndView();
-			mav.setViewName( adminWeb.redirect( linkBuilder.update( viewRequest.getEntity() ) ) );
-
 			redirectAttributes.addFlashAttribute( "successMessage", "feedback.entityCreated" );
 
-			return mav;
+			EntityLinkBuilder linkBuilder = (EntityLinkBuilder) model.get( EntityView.ATTRIBUTE_ENTITY_LINKS );
+
+			return adminWeb.redirect( linkBuilder.update( viewRequest.getEntity() ) );
 		}
 		else {
 			return showCreateEntityForm( entityConfiguration, sourceEntity, viewRequest, model );
@@ -105,11 +101,11 @@ public class AssociatedEntityCreateController extends AssociatedEntityController
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView showCreateEntityForm(
+	public String showCreateEntityForm(
 			@PathVariable(VAR_ENTITY) EntityConfiguration entityConfiguration,
 			@ModelAttribute(ATTRIBUTE_SOURCE_ENTITY) Object sourceEntity,
 			@ModelAttribute(VIEW_REQUEST) EntityViewRequest viewRequest,
-			Model model ) {
+			ModelMap model ) {
 		EntityView view = viewRequest.createView( model );
 		view.setPageTitle(
 				new EntityMessages( entityConfiguration.getEntityMessageCodeResolver() )
@@ -119,6 +115,6 @@ public class AssociatedEntityCreateController extends AssociatedEntityController
 				menuFactory.buildMenu( new EntityAdminMenu( entityConfiguration.getEntityType(), sourceEntity ) )
 		);
 
-		return view;
+		return view.getTemplate();
 	}
 }

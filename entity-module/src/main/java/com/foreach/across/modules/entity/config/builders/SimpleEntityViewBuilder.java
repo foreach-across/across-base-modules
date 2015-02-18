@@ -28,6 +28,7 @@ import com.foreach.across.modules.entity.views.processors.ViewDataBinderProcesso
 import com.foreach.across.modules.entity.views.processors.ViewModelAndCommandProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
+import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -199,8 +200,8 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 			}
 
 			@Override
-			protected EntityView createEntityView() {
-				return new EntityView();
+			protected EntityView createEntityView( ModelMap model ) {
+				return new EntityView( model );
 			}
 		};
 	}

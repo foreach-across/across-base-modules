@@ -21,12 +21,27 @@ import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.web.menu.Menu;
 import org.springframework.ui.Model;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.Assert;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
+ * Uses a backing {@link org.springframework.ui.ModelMap} for storing and fetching the different attributes.
+ * Has a {@link com.foreach.across.modules.entity.views.EntityView#getTemplate()} method that refers to the rendering
+ * template; as such it can be seen as an alternative to {@link org.springframework.web.servlet.ModelAndView} without
+ * putting dependencies on Spring mvc.
+ * <p/>
+ * The backing model can be (partially) prefilled and passed in externally.  Default
+ * {@link com.foreach.across.modules.entity.views.SimpleEntityViewFactorySupport} implementations use the model as
+ * communication channel for data attributes between preparation and creation steps of a
+ * {@link com.foreach.across.modules.entity.views.EntityView}.
+ *
  * @author Arne Vandamme
+ * @see com.foreach.across.modules.entity.views.SimpleEntityViewFactorySupport
  */
-public class EntityView extends ModelAndView
+public class EntityView implements Model
 {
 	public static final String ATTRIBUTE_VIEW_NAME = "entityViewName";
 	public static final String ATTRIBUTE_ENTITY = "entity";
@@ -37,73 +52,131 @@ public class EntityView extends ModelAndView
 	public static final String ATTRIBUTE_ENTITY_MENU = "entityMenu";
 	public static final String ATTRIBUTE_PAGE_TITLE = "pageTitle";
 
+	private final ModelMap model;
+
+	private String template;
+
+	public EntityView( ModelMap model ) {
+		Assert.notNull( model );
+		this.model = model;
+	}
+
 	public String getName() {
-		return (String) getModelMap().get( ATTRIBUTE_VIEW_NAME );
+		return getAttribute( ATTRIBUTE_VIEW_NAME );
 	}
 
 	public void setName( String name ) {
-		getModelMap().put( ATTRIBUTE_VIEW_NAME, name );
+		model.put( ATTRIBUTE_VIEW_NAME, name );
 	}
 
-	public void addModel( Model model ) {
-		addAllObjects( model.asMap() );
+	public String getTemplate() {
+		return template;
+	}
+
+	public void setTemplate( String template ) {
+		this.template = template;
 	}
 
 	public EntityConfiguration getEntityConfiguration() {
-		return (EntityConfiguration) getModelMap().get( ATTRIBUTE_ENTITY_CONFIGURATION );
+		return getAttribute( ATTRIBUTE_ENTITY_CONFIGURATION );
 	}
 
 	public void setEntityConfiguration( EntityConfiguration entityConfiguration ) {
-		getModelMap().addAttribute( ATTRIBUTE_ENTITY_CONFIGURATION, entityConfiguration );
+		model.addAttribute( ATTRIBUTE_ENTITY_CONFIGURATION, entityConfiguration );
 	}
 
 	public EntityLinkBuilder getEntityLinkBuilder() {
-		return (EntityLinkBuilder) getModelMap().get( ATTRIBUTE_ENTITY_LINKS );
+		return getAttribute( ATTRIBUTE_ENTITY_LINKS );
 	}
 
 	public void setEntityLinkBuilder( EntityLinkBuilder entityLinks ) {
-		getModelMap().addAttribute( ATTRIBUTE_ENTITY_LINKS, entityLinks );
+		model.addAttribute( ATTRIBUTE_ENTITY_LINKS, entityLinks );
 	}
 
 	public EntityMessages getEntityMessages() {
-		return (EntityMessages) getModelMap().get( ATTRIBUTE_MESSAGES );
+		return getAttribute( ATTRIBUTE_MESSAGES );
 	}
 
 	public void setEntityMessages( EntityMessages messages ) {
-		getModelMap().addAttribute( ATTRIBUTE_MESSAGES, messages );
+		model.addAttribute( ATTRIBUTE_MESSAGES, messages );
 	}
 
 	@SuppressWarnings("unchecked")
 	public ViewElements getEntityProperties() {
-		return (ViewElements) getModelMap().get( ATTRIBUTE_PROPERTIES );
+		return getAttribute( ATTRIBUTE_PROPERTIES );
 	}
 
 	public void setEntityProperties( ViewElements entityProperties ) {
-		getModelMap().put( ATTRIBUTE_PROPERTIES, entityProperties );
+		model.put( ATTRIBUTE_PROPERTIES, entityProperties );
 	}
 
 	@SuppressWarnings("unchecked")
 	public <V> V getEntity() {
-		return (V) getModelMap().get( ATTRIBUTE_ENTITY );
+		return (V) getAttribute( ATTRIBUTE_ENTITY );
 	}
 
 	public void setEntity( Object entity ) {
-		getModelMap().put( ATTRIBUTE_ENTITY, entity );
+		model.put( ATTRIBUTE_ENTITY, entity );
 	}
 
 	public void setPageTitle( String pageTitle ) {
-		getModelMap().put( ATTRIBUTE_PAGE_TITLE, pageTitle );
+		model.put( ATTRIBUTE_PAGE_TITLE, pageTitle );
 	}
 
 	public String getPageTitle() {
-		return (String) getModelMap().get( ATTRIBUTE_PAGE_TITLE );
+		return getAttribute( ATTRIBUTE_PAGE_TITLE );
 	}
 
 	public void setEntityMenu( Menu menu ) {
-		getModelMap().put( ATTRIBUTE_ENTITY_MENU, menu );
+		model.put( ATTRIBUTE_ENTITY_MENU, menu );
 	}
 
 	public Menu getEntityMenu() {
-		return (Menu) getModelMap().get( ATTRIBUTE_ENTITY_MENU );
+		return getAttribute( ATTRIBUTE_ENTITY_MENU );
+	}
+
+	@SuppressWarnings("unchecked")
+	public <V> V getAttribute( String attributeName ) {
+		return (V) model.get( attributeName );
+	}
+
+	@Override
+	public Model addAttribute( String attributeName, Object attributeValue ) {
+		model.addAttribute( attributeName, attributeValue );
+		return this;
+	}
+
+	@Override
+	public Model addAttribute( Object attributeValue ) {
+		model.addAttribute( attributeValue );
+		return this;
+	}
+
+	@Override
+	public Model addAllAttributes( Collection<?> attributeValues ) {
+		model.addAllAttributes( attributeValues );
+		return this;
+	}
+
+	@Override
+	public Model addAllAttributes( Map<String, ?> attributes ) {
+		model.addAllAttributes( attributes );
+		return this;
+	}
+
+	@Override
+	public Model mergeAttributes( Map<String, ?> attributes ) {
+		model.mergeAttributes( attributes );
+		return this;
+	}
+
+	@Override
+	public boolean containsAttribute( String attributeName ) {
+		return model.containsAttribute( attributeName );
+	}
+
+	@Override
+	public Map<String, Object> asMap() {
+		return model;
 	}
 }

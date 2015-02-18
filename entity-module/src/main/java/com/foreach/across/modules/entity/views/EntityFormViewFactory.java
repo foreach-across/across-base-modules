@@ -22,6 +22,7 @@ import com.foreach.across.modules.entity.views.elements.ViewElements;
 import com.foreach.across.modules.entity.views.elements.button.ButtonViewElement;
 import com.foreach.across.modules.entity.views.elements.container.ContainerViewElement;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
+import org.springframework.ui.ModelMap;
 
 /**
  * @author Arne Vandamme
@@ -56,7 +57,7 @@ public class EntityFormViewFactory<V extends ViewCreationContext> extends Config
 		}
 
 		boolean newEntity = entityModel.isNew( entity );
-		view.addObject( "existing", !newEntity );
+		view.addAttribute( "existing", !newEntity );
 		view.setFormAction( newEntity
 				                    ? view.getEntityLinkBuilder().create()
 				                    : view.getEntityLinkBuilder().update( original )
@@ -99,7 +100,7 @@ public class EntityFormViewFactory<V extends ViewCreationContext> extends Config
 	}
 
 	@Override
-	protected EntityFormView createEntityView() {
-		return new EntityFormView();
+	protected EntityFormView createEntityView( ModelMap model ) {
+		return new EntityFormView( model );
 	}
 }

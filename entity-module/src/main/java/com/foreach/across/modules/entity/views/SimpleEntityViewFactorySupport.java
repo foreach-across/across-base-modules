@@ -25,8 +25,6 @@ import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import org.springframework.context.MessageSource;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 import org.springframework.validation.DataBinder;
@@ -154,7 +152,7 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 	public void prepareModelAndCommand( String viewName,
 	                                    V creationContext,
 	                                    EntityViewCommand command,
-	                                    ExtendedModelMap model ) {
+	                                    ModelMap model ) {
 		registerLinkBuilder( creationContext, model );
 
 		for ( ViewModelAndCommandProcessor<V> modelAndCommandProcessor : modelAndCommandProcessors ) {
@@ -173,15 +171,14 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 	}
 
 	@Override
-	public EntityView create( String viewName, V creationContext, Model model ) {
+	public EntityView create( String viewName, V creationContext, ModelMap model ) {
 		EntityConfiguration entityConfiguration = creationContext.getEntityConfiguration();
 		Assert.notNull( entityConfiguration );
 
-		T view = createEntityView();
+		T view = createEntityView( model );
 		view.setName( viewName );
-		view.setViewName( template );
+		view.setTemplate( template );
 		view.setEntityConfiguration( entityConfiguration );
-		view.addModel( model );
 
 		EntityMessageCodeResolver codeResolver = createMessageCodeResolver( entityConfiguration );
 		view.setEntityMessages( createEntityMessages( codeResolver ) );
@@ -271,7 +268,7 @@ public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationConte
 		return codeResolver;
 	}
 
-	protected abstract T createEntityView();
+	protected abstract T createEntityView( ModelMap model );
 
 	protected abstract void buildViewModel( V viewCreationContext,
 	                                        EntityConfiguration entityConfiguration,
