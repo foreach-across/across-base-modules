@@ -44,6 +44,7 @@ public class DebugWebMvcConfiguration extends PrefixingHandlerMappingConfigurati
 	private DebugWebModule debugWebModule;
 
 	@PostConstruct
+	@SuppressWarnings( "unchecked" )
 	public void initialize() {
 		menuFactory.addMenuBuilder( debugMenuBuilder(), DebugMenu.class );
 	}
