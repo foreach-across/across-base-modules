@@ -141,6 +141,19 @@
 						<span th:text="${element.label}">label</span>
 					</label>
 				</div>
+                <!--/* radio */-->
+                <div th:if="${element.elementType eq 'radio' and not element.options.empty}" class="radio">
+                    <label>
+                        <span th:text="${element.label}">label</span>
+                        <sup th:if="${element.required}"><strong>*</strong></sup>
+                    </label>
+                    <th:block th:each="option : ${element.options}" th:with="selectedValue=${element.value(entity)}">
+                        <div class="radio">
+                            <input type="radio" th:id="${#ids.next(element.name)}" th:name="${element.name}" th:value="${option.value}" th:checked="${option.isSelected(selectedValue)}" />
+                            <label th:for="${#ids.seq(element.name)}" th:text="${option.label}">label</label>
+                        </div>
+                    </th:block>
+                </div>
 
 				<div class="small text-danger" th:if="${element.field and #fields.hasErrors(element.name)}">
 					<span th:each="error : ${#fields.errors(element.name)}" th:text="${error}">Error message.</span>

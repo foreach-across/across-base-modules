@@ -25,6 +25,7 @@ public interface CommonViewElements
 	String TEXTBOX = "textbox";
 	String HIDDEN = "hidden";
 	String SELECT = "select";
+	String RADIO = "radio";
 	String MULTI_CHECKBOX = "multi-checkbox";
 	String CHECKBOX = "checkbox";
 	String DATE = "date";
