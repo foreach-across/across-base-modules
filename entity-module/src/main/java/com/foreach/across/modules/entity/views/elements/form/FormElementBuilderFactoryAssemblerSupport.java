@@ -35,6 +35,7 @@ import javax.validation.metadata.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -72,6 +73,7 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 		return builderFactory;
 	}
 
+    @SuppressWarnings("unchecked")
 	protected T createTemplate(
 			EntityConfiguration entityConfiguration,
 			EntityPropertyRegistry registry,
@@ -87,7 +89,10 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 		// todo: only if *native* property
 		template.setField( true );
 
-		assembleTemplate( entityConfiguration, registry, descriptor, template );
+        Map dependencies = descriptor.getAttribute("dependencies", Map.class);
+        template.setDependencies(dependencies);
+
+        assembleTemplate(entityConfiguration, registry, descriptor, template);
 
 		handleConstraints( descriptor, template );
 

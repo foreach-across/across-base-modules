@@ -17,4 +17,9 @@ $(document).ready(function() {
     $('.js-form-element-datepicker').each(function(){
         $(this).datepicker();
     });
+
+    $('[data-dependson]').each(function(){
+        var dependsonConfig = $(this).data('dependson');
+        $(this).dependsOn(dependsonConfig, {hide: false});
+    });
 });

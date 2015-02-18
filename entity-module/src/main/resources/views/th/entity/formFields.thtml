@@ -79,7 +79,7 @@
 					<input th:unless="${element.multiLine}"
 					       th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}"
 					       class="form-control" th:value="${element.print(entity)}"
-					       th:attr="maxlength=${element.maxLength}"
+					       th:attr="maxlength=${element.maxLength}" em:dependencies="${element.dependencies}"
 							/>
 					<textarea th:if="${element.multiLine}" class="form-control"
 					          th:id="${#ids.seq(element.name)}"
@@ -94,7 +94,8 @@
 						<sup th:if="${element.required}"><strong>*</strong></sup>
 					</label>
 					<input th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}"
-					       class="form-control js-form-element-datepicker" th:value="${element.print(entity)}" />
+					       class="form-control js-form-element-datepicker" th:value="${element.print(entity)}"
+                           em:dependencies="${element.dependencies}"/>
 				</div>
 				<!--/* select */-->
 				<div th:if="${element.elementType eq 'select' and not element.options.empty}">
@@ -103,7 +104,7 @@
 						<sup th:if="${element.required}"><strong>*</strong></sup>
 					</label>
 					<select th:id="${#ids.seq(element.name)}" class="form-control" th:name="${element.name}"
-					        th:with="selectedValue = ${element.value(entity)}">
+					        th:with="selectedValue = ${element.value(entity)}" em:dependencies="${element.dependencies}">
 						<option th:if="${not element.required or selectedValue == null}"></option>
 						<option th:each="option : ${element.options}"
 						        th:value="${option.value}"
@@ -124,7 +125,8 @@
 								       th:id="${#ids.seq(element.name)}"
 								       th:name="${element.name}"
 								       th:value="${option.value}"
-								       th:checked="${selectedValue != null and option.isSelected(selectedValue)}"/>
+								       th:checked="${selectedValue != null and option.isSelected(selectedValue)}"
+                                       em:dependencies="${element.dependencies}"/>
 								<span th:text="${option.label}">label text</span>
 							</label>
 							<input type="hidden" th:name="|_${element.name}|" value="on"/>
@@ -136,7 +138,8 @@
 					<label th:for="${#ids.next(element.name)}">
 						<input type="checkbox" th:id="${#ids.seq(element.name)}"
 						       th:name="${element.name}"
-						       th:checked="${element.isChecked(entity)}"/>
+						       th:checked="${element.isChecked(entity)}"
+                               em:dependencies="${element.dependencies}"/>
 						<input type="hidden" th:name="|_${element.name}|" value="on"/>
 						<span th:text="${element.label}">label</span>
 					</label>

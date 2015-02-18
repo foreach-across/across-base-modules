@@ -10,6 +10,10 @@
 
 	<artifactId>entity-module</artifactId>
 
+    <properties>
+        <jackson.version>2.3.2</jackson.version>
+    </properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>across-standard-modules</groupId>
@@ -38,7 +42,17 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<scope>provided</scope>

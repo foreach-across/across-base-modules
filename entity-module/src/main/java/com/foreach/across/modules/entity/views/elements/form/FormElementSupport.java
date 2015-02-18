@@ -16,6 +16,7 @@
 package com.foreach.across.modules.entity.views.elements.form;
 
 import com.foreach.across.modules.entity.views.elements.ViewElementSupport;
+import com.foreach.across.modules.entity.views.elements.form.dependencies.Qualifiers;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,8 @@ public abstract class FormElementSupport extends ViewElementSupport
 	private boolean required;
 
 	private Map<String, String> attributes = new HashMap<>();
+
+    private Map<String, Qualifiers> dependencies = new HashMap<>();
 
 	protected FormElementSupport( String elementType ) {
 		setElementType( elementType );
@@ -48,4 +51,12 @@ public abstract class FormElementSupport extends ViewElementSupport
 	public void setAttributes( Map<String, String> attributes ) {
 		this.attributes = attributes;
 	}
+
+    public Map<String, Qualifiers> getDependencies() {
+        return dependencies;
+    }
+
+    public void setDependencies(Map<String, Qualifiers> dependencies) {
+        this.dependencies = dependencies;
+    }
 }

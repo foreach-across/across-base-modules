@@ -34,9 +34,9 @@ public class EntityModuleDialect extends AbstractDialect implements IExpressionE
 {
 	public static final String UTILITY_ELEMENTS = "elements";
 
-	public enum AttributeNames
-	{
-		ATTRIBUTES( "attributes" );
+    public enum AttributeNames {
+        ATTRIBUTES("attributes"),
+        DEPENDENCIES("dependencies");
 
 		private String name;
 
@@ -66,6 +66,7 @@ public class EntityModuleDialect extends AbstractDialect implements IExpressionE
 	public Set<IProcessor> getProcessors() {
 		Set<IProcessor> processors = new HashSet<>();
 		processors.add( new MultipleAttributeProcessor() );
+        processors.add(new DependencyProcessor());
 		return processors;
 	}
 }
