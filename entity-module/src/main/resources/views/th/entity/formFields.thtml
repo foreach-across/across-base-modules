@@ -20,9 +20,12 @@
 <th:block th:fragment="form_fields(properties)">
 	<th:block th:each="element : ${properties}">
 		<th:block th:if="${element.customTemplate != null}">
-			<div th:replace="${element.customTemplate}" />
+			<div th:replace="${element.customTemplate}"/>
 		</th:block>
 		<th:block th:if="${element.customTemplate == null}">
+			<th:block th:if="${element.elementType eq 'sortable-property'}" th:utext="${element.print(entity)}">
+				raw html content
+			</th:block>
 			<div th:remove="${element.field} ? 'none': 'tag'"
 			     class="form-group"
 			     th:classappend="${element.field and #fields.hasErrors(element.name)}? has-error">
@@ -34,21 +37,44 @@
 				</div>
 				<!--/* columns */-->
 				<div class="row"
-						th:if="${element.elementType eq 'columns' and #elements.hasChildren(element)}"
-						th:with="colSize=${12 / element.size()}">
+				     th:if="${element.elementType eq 'columns' and #elements.hasChildren(element)}"
+				     th:with="colSize=${12 / element.size()}">
 					<div th:each="column : ${element}" th:class="|col-md-${colSize}|">
 						<div th:replace="th/entity/formFields :: form_fields(${column})">
-								column body
+							column body
 						</div>
 					</div>
 				</div>
+				<!--/* table */-->
+				<div th:if="${element.elementType eq 'table'}" th:with="table=${element}">
+					<table class="table table-striped table-hover" em:attributes="${table.attributes}">
+						<thead th:if="${table.header != null}" em:attributes="${table.header.attributes}">
+						<tr>
+							<th th:if="${table.showResultNumber}">#</th>
+							<th th:each="column : ${table.columns}" em:attributes="${table.header.cellProcessor(column)}">
+								<span th:text="${column.label}">Property name</span>
+							</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr th:each="entity,entityStats : ${table.rows}" em:attributes="${table.rowProcessor(entity)}">
+							<td th:if="${table.showResultNumber}" th:text="${entityStats.count + table.page.number * table.page.size}"></td>
+							<td th:each="column : ${table.columns}" em:attributes="${table.cellProcessor(column, entity)}">
+								<th:block th:replace="th/entity/formFields :: form_fields(${column})">
+									CELL CONTENT
+								</th:block>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
 				<!--/* submit button */-->
 				<th:block th:if="${element.elementType eq 'submit'}">
-					<input type="submit" class="btn btn-primary" th:name="${element.name}" th:value="${element.label}" />
+					<input type="submit" class="btn btn-primary" th:name="${element.name}" th:value="${element.label}"/>
 				</th:block>
 				<!--/* link button */-->
 				<th:block th:if="${element.elementType eq 'button-link'}">
-					<a class="btn btn-link" th:href="@{${@adminWeb.path(element.link)}}" th:text="${element.label}">
+					<a class="btn btn-link" th:href="@{${@adminWeb.path(element.print(entity))}}" th:text="${element.label}">
 						link text
 					</a>
 				</th:block>
@@ -56,7 +82,7 @@
 				<div th:if="${element.elementType eq 'fieldset'}">
 					<fieldset em:dependencies="${element.dependencies}">
 						<legend th:text="${element.label}">Fieldset label</legend>
-						<div th:replace="th/entity/formFields ::form_fields(${element})">
+						<div th:replace="th/entity/formFields :: form_fields(${element})">
 							group members
 						</div>
 					</fieldset>
@@ -95,7 +121,7 @@
 					</label>
 					<input th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}"
 					       class="form-control js-form-element-datepicker" th:value="${element.print(entity)}"
-                           em:dependencies="${element.dependencies}"/>
+					       em:dependencies="${element.dependencies}"/>
 				</div>
 				<!--/* select */-->
 				<div th:if="${element.elementType eq 'select' and not element.options.empty}">
@@ -118,6 +144,7 @@
 						<span th:text="${element.label}">label text</span>
 						<sup th:if="${element.required}"><strong>*</strong></sup>
 					</label>
+
 					<div th:with="selectedValue = ${element.value(entity)}">
 						<div th:each="option : ${element.options}" class="checkbox">
 							<label th:for="${#ids.next(element.name)}">
@@ -126,7 +153,7 @@
 								       th:name="${element.name}"
 								       th:value="${option.value}"
 								       th:checked="${selectedValue != null and option.isSelected(selectedValue)}"
-                                       em:dependencies="${element.dependencies}"/>
+								       em:dependencies="${element.dependencies}"/>
 								<span th:text="${option.label}">label text</span>
 							</label>
 							<input type="hidden" th:name="|_${element.name}|" value="on"/>
@@ -139,24 +166,24 @@
 						<input type="checkbox" th:id="${#ids.seq(element.name)}"
 						       th:name="${element.name}"
 						       th:checked="${element.isChecked(entity)}"
-                               em:dependencies="${element.dependencies}"/>
+						       em:dependencies="${element.dependencies}"/>
 						<input type="hidden" th:name="|_${element.name}|" value="on"/>
 						<span th:text="${element.label}">label</span>
 					</label>
 				</div>
-                <!--/* radio */-->
-                <div th:if="${element.elementType eq 'radio' and not element.options.empty}" class="radio">
-                    <label>
-                        <span th:text="${element.label}">label</span>
-                        <sup th:if="${element.required}"><strong>*</strong></sup>
-                    </label>
-                    <th:block th:each="option : ${element.options}" th:with="selectedValue=${element.value(entity)}">
-                        <div class="radio">
-                            <input type="radio" th:id="${#ids.next(element.name)}" th:name="${element.name}" th:value="${option.value}" th:checked="${option.isSelected(selectedValue)}" />
-                            <label th:for="${#ids.seq(element.name)}" th:text="${option.label}">label</label>
-                        </div>
-                    </th:block>
-                </div>
+				<!--/* radio */-->
+				<div th:if="${element.elementType eq 'radio' and not element.options.empty}" class="radio">
+					<label>
+						<span th:text="${element.label}">label</span>
+						<sup th:if="${element.required}"><strong>*</strong></sup>
+					</label>
+					<th:block th:each="option : ${element.options}" th:with="selectedValue=${element.value(entity)}">
+						<div class="radio">
+							<input type="radio" th:id="${#ids.next(element.name)}" th:name="${element.name}" th:value="${option.value}" th:checked="${option.isSelected(selectedValue)}"/>
+							<label th:for="${#ids.seq(element.name)}" th:text="${option.label}">label</label>
+						</div>
+					</th:block>
+				</div>
 
 				<div class="small text-danger" th:if="${element.field and #fields.hasErrors(element.name)}">
 					<span th:each="error : ${#fields.errors(element.name)}" th:text="${error}">Error message.</span>

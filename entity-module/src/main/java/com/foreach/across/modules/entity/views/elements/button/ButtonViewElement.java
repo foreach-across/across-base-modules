@@ -47,4 +47,9 @@ public class ButtonViewElement extends ViewElementSupport
 	public boolean hasLink() {
 		return link != null;
 	}
+
+	@Override
+	public String print( Object entity ) {
+		return getLink();
+	}
 }

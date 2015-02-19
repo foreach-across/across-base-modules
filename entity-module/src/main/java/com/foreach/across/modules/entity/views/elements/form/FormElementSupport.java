@@ -28,8 +28,6 @@ public abstract class FormElementSupport extends ViewElementSupport
 {
 	private boolean required;
 
-	private Map<String, String> attributes = new HashMap<>();
-
     private Map<String, Qualifiers> dependencies = new HashMap<>();
 
 	protected FormElementSupport( String elementType ) {
@@ -42,14 +40,6 @@ public abstract class FormElementSupport extends ViewElementSupport
 
 	public void setRequired( boolean required ) {
 		this.required = required;
-	}
-
-	public Map<String, String> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes( Map<String, String> attributes ) {
-		this.attributes = attributes;
 	}
 
     public Map<String, Qualifiers> getDependencies() {

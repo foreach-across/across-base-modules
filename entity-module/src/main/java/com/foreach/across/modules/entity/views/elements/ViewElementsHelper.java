@@ -15,6 +15,8 @@
  */
 package com.foreach.across.modules.entity.views.elements;
 
+import java.util.Collections;
+
 /**
  * Utility object to help identifying {@link com.foreach.across.modules.entity.views.elements.ViewElement} types.
  * By default exposed as a Thymeleaf expression object under key <strong>#elements</strong>.
@@ -37,5 +39,12 @@ public class ViewElementsHelper
 	 */
 	public boolean hasChildren( ViewElement element ) {
 		return isCollection( element ) && !( (ViewElements) element ).isEmpty();
+	}
+
+	/**
+	 * @return Single element wrapped as a singleton.
+	 */
+	public Iterable<ViewElement> asCollection( ViewElement element ) {
+		return Collections.singleton( element );
 	}
 }

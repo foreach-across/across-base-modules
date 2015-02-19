@@ -21,6 +21,7 @@ import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.*;
 import com.foreach.across.modules.entity.views.elements.button.ButtonViewElement;
 import com.foreach.across.modules.entity.views.elements.container.ContainerViewElement;
+import com.foreach.across.modules.entity.views.elements.table.TableViewElement;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.views.support.ListViewEntityMessages;
 import org.springframework.data.domain.Page;
@@ -107,13 +108,18 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 	}
 
 	@Override
-	protected void extendViewModel( V viewCreationContext, EntityListView view ) {
+	protected void extendViewModel( V viewCreationContext, final EntityListView view ) {
 		Pageable pageable = buildPageable( view );
 		Page page = getPageFetcher().fetchPage( viewCreationContext, pageable, view );
 
 		view.setPageable( pageable );
 		view.setPage( page );
 		view.setShowResultNumber( isShowResultNumber() );
+
+		TableViewElement table = new TableViewElement();
+		table.setName( "resultsTable" );
+		table.setPage( page );
+		table.setColumns( (Iterable<ViewElement>) view.getEntityProperties().remove( "table" ) );
 
 		ContainerViewElement buttons = new ContainerViewElement( "buttons" );
 
@@ -126,8 +132,20 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 		create.setLabel( messages.createAction() );
 		buttons.add( create );
 
-		view.getEntityProperties().addFirst( buttons );
+		ButtonViewElement edit = new ButtonViewElement() {
+			@Override
+			public String print( Object entity ) {
+				return view.getEntityLinkBuilder().update( entity );
+			}
+		};
+		edit.setName( "btn-edit" );
+		edit.setElementType( CommonViewElements.LINK_BUTTON );
+		edit.setLabel( messages.updateAction() );
 
+		((ViewElements) table.getColumns()).add( edit );
+
+		view.getEntityProperties().addFirst( table );
+		view.getEntityProperties().addFirst( buttons );
 	}
 
 	private Pageable buildPageable( EntityListView view ) {

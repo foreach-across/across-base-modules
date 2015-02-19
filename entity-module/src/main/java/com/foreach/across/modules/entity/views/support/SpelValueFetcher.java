@@ -37,6 +37,6 @@ public class SpelValueFetcher<T> implements ValueFetcher<T>
 
 	@Override
 	public Object getValue( T entity ) {
-		return PARSER.parseExpression( expression ).getValue( entity, Object.class );
+		return entity != null ? PARSER.parseExpression( expression ).getValue( entity, Object.class ) : null;
 	}
 }

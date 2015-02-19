@@ -30,6 +30,10 @@ public class PropertyDescriptorValueFetcher<T> implements ValueFetcher<T>
 
 	@Override
 	public Object getValue( T entity ) {
+		if ( entity == null ) {
+			return null;
+		}
+
 		try {
 			return descriptor.getReadMethod().invoke( entity );
 		}
