@@ -4,6 +4,8 @@ import com.foreach.across.modules.entity.registry.support.ReadableAttributes;
 import com.foreach.across.modules.entity.views.support.ValueFetcher;
 import org.springframework.core.ResolvableType;
 
+import java.lang.reflect.Field;
+
 public interface EntityPropertyDescriptor extends ReadableAttributes
 {
 	/**
@@ -39,4 +41,6 @@ public interface EntityPropertyDescriptor extends ReadableAttributes
 	 * @return New descriptor representing the merged instance.
 	 */
 	EntityPropertyDescriptor merge( EntityPropertyDescriptor other );
+
+	Field getField();
 }

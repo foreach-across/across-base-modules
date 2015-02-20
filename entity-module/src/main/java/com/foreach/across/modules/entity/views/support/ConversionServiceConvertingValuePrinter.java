@@ -16,6 +16,7 @@
 package com.foreach.across.modules.entity.views.support;
 
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 
 /**
  * Uses a separate {@link com.foreach.across.modules.entity.views.support.ValueFetcher} for getting
@@ -28,15 +29,27 @@ public class ConversionServiceConvertingValuePrinter<T> implements ValuePrinter<
 {
 	private final ValueFetcher<T> valueFetcher;
 	private final ConversionService conversionService;
+	private final TypeDescriptor sourceTypeDescriptor;
+	private final static TypeDescriptor targetTypeDescriptor = TypeDescriptor.forObject( "" );
 
 	public ConversionServiceConvertingValuePrinter( ValueFetcher<T> valueFetcher,
 	                                                ConversionService conversionService ) {
+		this( valueFetcher, null, conversionService );
+	}
+
+	public ConversionServiceConvertingValuePrinter( ValueFetcher<T> valueFetcher,
+	                                                TypeDescriptor sourceTypeDescriptor,
+	                                                ConversionService conversionService ) {
 		this.valueFetcher = valueFetcher;
 		this.conversionService = conversionService;
+		this.sourceTypeDescriptor = sourceTypeDescriptor;
 	}
 
 	@Override
 	public String print( T object ) {
+		if ( sourceTypeDescriptor != null ) {
+			return (String) conversionService.convert( getValue( object ), sourceTypeDescriptor, targetTypeDescriptor );
+		}
 		return conversionService.convert( getValue( object ), String.class );
 	}
 

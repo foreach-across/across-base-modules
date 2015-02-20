@@ -1,6 +1,5 @@
 package com.foreach.across.modules.entity.registry.properties;
 
-import com.foreach.across.modules.entity.util.EntityUtils;
 import com.foreach.across.modules.entity.views.support.NestedValueFetcher;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -32,7 +31,7 @@ public class DefaultEntityPropertyRegistry extends EntityPropertyRegistrySupport
 		Map<String, PropertyDescriptor> scannedDescriptors = new HashMap<>();
 
 		for ( PropertyDescriptor descriptor : BeanUtils.getPropertyDescriptors( entityType ) ) {
-			register( SimpleEntityPropertyDescriptor.forPropertyDescriptor( descriptor ) );
+			register( SimpleEntityPropertyDescriptor.forPropertyDescriptor( descriptor, entityType ) );
 			scannedDescriptors.put( descriptor.getName(), descriptor );
 		}
 

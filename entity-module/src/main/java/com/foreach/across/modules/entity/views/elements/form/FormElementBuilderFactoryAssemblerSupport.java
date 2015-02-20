@@ -28,11 +28,13 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -73,7 +75,7 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 		return builderFactory;
 	}
 
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	protected T createTemplate(
 			EntityConfiguration entityConfiguration,
 			EntityPropertyRegistry registry,
@@ -89,10 +91,10 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 		// todo: only if *native* property
 		template.setField( true );
 
-        Map dependencies = descriptor.getAttribute("dependencies", Map.class);
-        template.setDependencies(dependencies);
+		Map dependencies = descriptor.getAttribute( "dependencies", Map.class );
+		template.setDependencies( dependencies );
 
-        assembleTemplate(entityConfiguration, registry, descriptor, template);
+		assembleTemplate( entityConfiguration, registry, descriptor, template );
 
 		handleConstraints( descriptor, template );
 
@@ -133,7 +135,12 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 	protected ValuePrinter createValuePrinter( EntityPropertyDescriptor descriptor ) {
 		// todo: has existing valueprinter, has existing printer (?)
 		ValueFetcher<?> valueFetcher = descriptor.getValueFetcher();
-		return new ConversionServiceConvertingValuePrinter<>( valueFetcher, conversionService );
+		Field field = descriptor.getField();
+		TypeDescriptor sourceTypeDescriptor = null;
+		if ( field != null ) {
+			sourceTypeDescriptor = new TypeDescriptor( field );
+		}
+		return new ConversionServiceConvertingValuePrinter<>( valueFetcher, sourceTypeDescriptor, conversionService );
 	}
 
 	protected T newInstance() {

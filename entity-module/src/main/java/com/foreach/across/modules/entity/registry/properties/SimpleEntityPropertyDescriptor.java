@@ -6,9 +6,11 @@ import com.foreach.across.modules.entity.views.support.PropertyDescriptorValueFe
 import com.foreach.across.modules.entity.views.support.ValueFetcher;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.ResolvableType;
+import org.springframework.util.ReflectionUtils;
 import org.thymeleaf.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class SimpleEntityPropertyDescriptor extends AttributeSupport implements MutableEntityPropertyDescriptor
@@ -19,6 +21,7 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 	private ValueFetcher valueFetcher;
 	private Class<?> propertyType;
 	private ResolvableType propertyResolvableType;
+	private Field field;
 
 	public SimpleEntityPropertyDescriptor() {
 	}
@@ -112,6 +115,15 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 	}
 
 	@Override
+	public Field getField() {
+		return field;
+	}
+
+	public void setField( Field field ) {
+		this.field = field;
+	}
+
+	@Override
 	public EntityPropertyDescriptor merge( EntityPropertyDescriptor other ) {
 		SimpleEntityPropertyDescriptor descriptor = new SimpleEntityPropertyDescriptor();
 		BeanUtils.copyProperties( this, descriptor );
@@ -141,9 +153,8 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 		return descriptor;
 	}
 
-	public static SimpleEntityPropertyDescriptor forPropertyDescriptor( PropertyDescriptor prop ) {
+	public static SimpleEntityPropertyDescriptor forPropertyDescriptor( PropertyDescriptor prop, Class<?> entityType ) {
 		SimpleEntityPropertyDescriptor descriptor = new SimpleEntityPropertyDescriptor();
-
 		descriptor.setName( prop.getName() );
 
 		if ( StringUtils.equals( prop.getName(), prop.getDisplayName() ) ) {
@@ -160,6 +171,8 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 		descriptor.setReadable( readMethod != null );
 		descriptor.setHidden( prop.isHidden() );
 		descriptor.setPropertyType( prop.getPropertyType() );
+		Field field = ReflectionUtils.findField( entityType, prop.getName() );
+		descriptor.setField( field );
 
 		if ( descriptor.isReadable() ) {
 			descriptor.setPropertyResolvableType( ResolvableType.forMethodReturnType( readMethod ) );

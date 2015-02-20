@@ -18,6 +18,9 @@ package com.foreach.across.modules.entity.views.elements;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
+
+import java.lang.reflect.Field;
 
 /**
  * @author Arne Vandamme
@@ -27,6 +30,7 @@ public class ConversionServiceViewElement implements ViewElement
 	private final EntityMessageCodeResolver messageCodeResolver;
 	private final EntityPropertyDescriptor descriptor;
 	private final ConversionService conversionService;
+	private static final TypeDescriptor targetTypeDescriptor = TypeDescriptor.forObject( "" );
 
 	private String customTemplate;
 
@@ -74,6 +78,11 @@ public class ConversionServiceViewElement implements ViewElement
 
 	@Override
 	public String print( Object entity ) {
+		Field field = descriptor.getField();
+		if ( field != null ) {
+			TypeDescriptor sourceTypeDescriptor = new TypeDescriptor( field );
+			return (String) conversionService.convert( value( entity ), sourceTypeDescriptor, targetTypeDescriptor );
+		}
 		return conversionService.convert( value( entity ), String.class );
 	}
 }

@@ -22,6 +22,8 @@ import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.converters.EntityConverter;
 import com.foreach.across.modules.entity.converters.EntityToStringConverter;
 import com.foreach.across.modules.entity.converters.StringToEntityConfigurationConverter;
+import com.foreach.across.modules.entity.formatters.DateFormatter;
+import com.foreach.across.modules.entity.formatters.TemporalFormatterFactory;
 import com.foreach.across.modules.entity.registrars.ModuleEntityRegistration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
@@ -44,8 +46,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.format.datetime.DateFormatterRegistrar;
 import org.springframework.format.support.DefaultFormattingConversionService;
+import org.springframework.format.support.FormattingConversionService;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
@@ -58,11 +61,11 @@ public class EntityModuleConfiguration
 	private static final Logger LOG = LoggerFactory.getLogger( EntityModuleConfiguration.class );
 
 	@Autowired(required = false)
-	private ConfigurableConversionService conversionService;
+	private FormattingConversionService conversionService;
 
 	@PostConstruct
 	public void init() {
-		ConfigurableConversionService converterRegistry =
+		FormattingConversionService converterRegistry =
 				conversionService != null ? conversionService : entityConversionService();
 
 		EntityRegistry entityRegistry = entityRegistry();
@@ -70,6 +73,11 @@ public class EntityModuleConfiguration
 		converterRegistry.addConverter( new StringToEntityConfigurationConverter( entityRegistry ) );
 		converterRegistry.addConverter( new EntityConverter<>( converterRegistry, entityRegistry ) );
 		converterRegistry.addConverter( new EntityToStringConverter( entityRegistry ) );
+
+		DateFormatterRegistrar dateFormatterRegistrar = new DateFormatterRegistrar();
+		dateFormatterRegistrar.setFormatter( new DateFormatter() );
+		dateFormatterRegistrar.registerFormatters( conversionService );
+		conversionService.addFormatterForFieldAnnotation( new TemporalFormatterFactory() );
 	}
 
 	@Bean
@@ -80,7 +88,7 @@ public class EntityModuleConfiguration
 	@Bean
 	@Exposed
 	@AcrossCondition("not hasBeanOfType(T(org.springframework.core.convert.ConversionService))")
-	public ConfigurableConversionService entityConversionService() {
+	public FormattingConversionService entityConversionService() {
 		LOG.warn( "No ConversionService found in Across context - creating and exposing a ConversionService bean" );
 		return new DefaultFormattingConversionService();
 	}
