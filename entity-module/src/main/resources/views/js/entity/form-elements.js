@@ -15,7 +15,9 @@
  */
 $(document).ready(function() {
     $('.js-form-element-datepicker').each(function(){
-        $(this).datepicker();
+        $(this).datepicker({
+            constrainInput: false
+        });
     });
 
     $('[data-dependson]').each(function(){
