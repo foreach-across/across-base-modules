@@ -56,7 +56,11 @@ public class SelectFormElementBuilderFactoryAssembler
 					                            + descriptor.getName() );
 		}
 
-		if ( memberType.isEnum() ) {
+		SelectOptionGenerator selectOptionGenerator = descriptor.getAttribute( SelectOptionGenerator.class );
+		if ( selectOptionGenerator != null ) {
+			template.setOptionGenerator( selectOptionGenerator );
+		}
+		else if ( memberType.isEnum() ) {
 			template.setOptionGenerator( new EnumSelectOptionGenerator( (Class<? extends Enum>) memberType ) );
 		}
 		else {
