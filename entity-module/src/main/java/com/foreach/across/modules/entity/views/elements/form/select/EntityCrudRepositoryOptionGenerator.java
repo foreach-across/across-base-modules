@@ -43,13 +43,14 @@ public class EntityCrudRepositoryOptionGenerator implements SelectOptionGenerato
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Collection<SelectOption> generateOptions( EntityMessageCodeResolver codeResolver ) {
 		// todo: support sorting
-		Iterable entities = repository.findAll();
+		return populateOptionsList( findEntities() );
+	}
 
+	@SuppressWarnings("unchecked")
+	protected Collection<SelectOption> populateOptionsList( Iterable entities ) {
 		List<SelectOption> options = new ArrayList<>();
-
 		for ( Object entity : entities ) {
 			SelectOption option = new SelectOption();
 			option.setLabel( entityConfiguration.getLabel( entity ) );
@@ -58,7 +59,10 @@ public class EntityCrudRepositoryOptionGenerator implements SelectOptionGenerato
 
 			options.add( option );
 		}
-
 		return options;
+	}
+
+	protected Iterable findEntities() {
+		return repository.findAll();
 	}
 }
