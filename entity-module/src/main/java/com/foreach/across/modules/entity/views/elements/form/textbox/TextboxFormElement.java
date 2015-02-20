@@ -11,6 +11,7 @@ public class TextboxFormElement extends FormElementSupport
 	public static final String TYPE = CommonViewElements.TEXTBOX;
 
 	private Integer maxLength;
+	private boolean url= false;
 	private boolean multiLine = true;
 
 	public TextboxFormElement() {
@@ -23,6 +24,14 @@ public class TextboxFormElement extends FormElementSupport
 
 	public void setMaxLength( Integer maxLength ) {
 		this.maxLength = maxLength;
+	}
+
+	public boolean isUrl() {
+		return url;
+	}
+
+	public void setUrl( boolean url ) {
+		this.url = url;
 	}
 
 	public boolean isMultiLine() {

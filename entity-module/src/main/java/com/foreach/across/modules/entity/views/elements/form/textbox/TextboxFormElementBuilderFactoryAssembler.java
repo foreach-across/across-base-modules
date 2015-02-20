@@ -21,6 +21,7 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegis
 import com.foreach.across.modules.entity.views.elements.CommonViewElements;
 import com.foreach.across.modules.entity.views.elements.form.FormElementBuilderFactoryAssemblerSupport;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.Size;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -63,6 +64,9 @@ public class TextboxFormElementBuilderFactoryAssembler
 				template.setMaxLength( max );
 				template.setMultiLine( max > maximumSingleLineLength );
 			}
+		}
+		if ( URL.class.equals( type ) ) {
+			template.setUrl( true );
 		}
 	}
 }

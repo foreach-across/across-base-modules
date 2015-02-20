@@ -23,6 +23,7 @@ import com.foreach.across.modules.entity.views.elements.form.FormElementBuilderS
 public class TextboxFormElementBuilder extends FormElementBuilderSupport<TextboxFormElement>
 {
 	private Integer maxLength;
+	private boolean url = false;
 	private boolean multiLine = true;
 
 	public TextboxFormElementBuilder() {
@@ -37,8 +38,16 @@ public class TextboxFormElementBuilder extends FormElementBuilderSupport<Textbox
 		this.maxLength = maxLength;
 	}
 
+	public boolean isUrl() {
+		return url;
+	}
+
+	public void setUrl( boolean url ) {
+		this.url = url;
+	}
+
 	public boolean isMultiLine() {
-		return multiLine;
+		return multiLine && !url;
 	}
 
 	public void setMultiLine( boolean multiLine ) {
