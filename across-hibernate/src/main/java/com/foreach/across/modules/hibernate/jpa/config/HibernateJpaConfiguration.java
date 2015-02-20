@@ -62,7 +62,6 @@ public class HibernateJpaConfiguration
 		factory.setDataSource( module.getDataSource() );
 		factory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
 		factory.getJpaPropertyMap().putAll( settings.getHibernateProperties() );
-		factory.setJpaDialect( settings.getJpaDialect() );
 
 		Map<String, String> tableAliases = hibernatePackage.getTableAliases();
 
