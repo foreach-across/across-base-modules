@@ -20,7 +20,8 @@ import com.foreach.across.modules.entity.views.EntityFormViewFactory;
 /**
  * @author Arne Vandamme
  */
-public class EntityFormViewBuilder extends SimpleEntityViewBuilder<EntityFormViewFactory, EntityFormViewBuilder>
+public abstract class EntityFormViewBuilder<SELF extends EntityFormViewBuilder>
+		extends SimpleEntityViewBuilder<EntityFormViewFactory, SELF>
 {
 	@Override
 	protected EntityFormViewFactory createFactoryInstance() {

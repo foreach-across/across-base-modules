@@ -15,147 +15,201 @@
  */
 package com.foreach.across.modules.entity.config.builders;
 
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.config.PostProcessor;
 import com.foreach.across.modules.entity.registry.EntityConfigurationImpl;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.DefaultEntityPropertyRegistry;
+import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
 import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
+import com.foreach.across.modules.entity.views.processors.ViewDataBinderProcessor;
+import com.foreach.across.modules.entity.views.processors.ViewModelAndCommandProcessor;
+import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
+import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Arne Vandamme
  */
-public class EntityConfigurationBuilder extends EntityBuilderSupport<EntityConfigurationBuilder>
+public class EntityConfigurationBuilder<T> extends EntityBuilderSupport<EntityConfigurationBuilder, MutableEntityConfiguration<T>>
 {
-	public class EntityPropertyRegistryBuilder
-			extends EntityPropertyRegistryBuilderSupport<EntityConfigurationBuilder, EntityPropertyRegistryBuilder>
+	public class ViewBuilder extends SimpleEntityViewBuilder<ConfigurablePropertiesEntityViewFactorySupport, ViewBuilder>
 	{
-		EntityPropertyRegistryBuilder( EntityConfigurationBuilder parent ) {
-			super( parent );
+		public class Properties extends EntityViewPropertyRegistryBuilder<Properties>
+		{
+			@Override
+			public ViewBuilder and() {
+				return viewBuilder;
+			}
+		}
+
+		private final ViewBuilder viewBuilder;
+
+		public ViewBuilder() {
+			this.viewBuilder = this;
+		}
+
+		@Override
+		public Properties properties( String... propertyNames ) {
+			return properties().filter( propertyNames );
+		}
+
+		@Override
+		public Properties properties() {
+			return (Properties) super.properties();
+		}
+
+		@Override
+		protected Properties createPropertiesBuilder() {
+			return new Properties();
+		}
+
+		@Override
+		public ViewBuilder template( String template ) {
+			return super.template( template );
+		}
+
+		@Override
+		public ViewBuilder addProcessor( Object processor ) {
+			return super.addProcessor( processor );
+		}
+
+		@Override
+		public ViewBuilder addPreProcessor( ViewPreProcessor preProcessor ) {
+			return super.addPreProcessor( preProcessor );
+		}
+
+		@Override
+		public ViewBuilder addPostProcessor( ViewPostProcessor postProcessor ) {
+			return super.addPostProcessor( postProcessor );
+		}
+
+		@Override
+		public ViewBuilder addModelAndCommandProcessor( ViewModelAndCommandProcessor modelAndCommandProcessor ) {
+			return super.addModelAndCommandProcessor( modelAndCommandProcessor );
+		}
+
+		@Override
+		public ViewBuilder addDataBinderProcessor( ViewDataBinderProcessor dataBinderProcessor ) {
+			return super.addDataBinderProcessor( dataBinderProcessor );
+		}
+
+		@Override
+		public ViewBuilder factory( ConfigurablePropertiesEntityViewFactorySupport entityViewFactory ) {
+			return super.factory( entityViewFactory );
+		}
+
+		@Override
+		public EntityConfigurationBuilder and() {
+			return self;
 		}
 	}
 
-	private final Class<?> entityType;
-	private final EntitiesConfigurationBuilder parent;
+	public class ListViewBuilder extends EntityListViewBuilder<ListViewBuilder>
+	{
+		public class Properties extends EntityViewPropertyRegistryBuilder<Properties>
+		{
+			@Override
+			public ListViewBuilder and() {
+				return viewBuilder;
+			}
+		}
 
-	private final Map<String, EntityViewBuilder> viewBuilders = new HashMap<>();
+		private final ListViewBuilder viewBuilder;
 
-	private EntityPropertyRegistryBuilder propertyRegistryBuilder;
+		public ListViewBuilder() {
+			this.viewBuilder = this;
+		}
 
-	EntityConfigurationBuilder( Class<?> entityType, EntitiesConfigurationBuilder parent ) {
-		this.entityType = entityType;
-		this.parent = parent;
+		@Override
+		public Properties properties( String... propertyNames ) {
+			return properties().filter( propertyNames );
+		}
+
+		@Override
+		public Properties properties() {
+			return (Properties) super.properties();
+		}
+
+		@Override
+		protected Properties createPropertiesBuilder() {
+			return new Properties();
+		}
+
+		@Override
+		public EntityConfigurationBuilder and() {
+			return self;
+		}
 	}
 
-	@Override
-	protected Collection<EntityConfiguration> entitiesToConfigure( MutableEntityRegistry entityRegistry ) {
-		return Collections.<EntityConfiguration>singleton( entityRegistry.getEntityConfiguration( entityType ) );
+	public class FormViewBuilder extends EntityFormViewBuilder<FormViewBuilder>
+	{
+		public class Properties extends EntityViewPropertyRegistryBuilder<Properties>
+		{
+			@Override
+			public FormViewBuilder and() {
+				return viewBuilder;
+			}
+		}
+
+		private final FormViewBuilder viewBuilder;
+
+		public FormViewBuilder() {
+			this.viewBuilder = this;
+		}
+
+		@Override
+		public Properties properties( String... propertyNames ) {
+			return properties().filter( propertyNames );
+		}
+
+		@Override
+		public Properties properties() {
+			return (Properties) super.properties();
+		}
+
+		@Override
+		protected Properties createPropertiesBuilder() {
+			return new Properties();
+		}
+
+		@Override
+		public EntityConfigurationBuilder and() {
+			return self;
+		}
+	}
+
+	public class EntityPropertyRegistryBuilder
+			extends EntityPropertyRegistryBuilderSupport<EntityPropertyRegistryBuilder>
+	{
+		@Override
+		public EntityConfigurationBuilder and() {
+			return self;
+		}
+	}
+
+	private final EntityConfigurationBuilder self;
+	private final Class<T> entityType;
+	private final EntitiesConfigurationBuilder parent;
+
+	private EntityPropertyRegistryBuilder propertyRegistryBuilder;
+	private final Map<String, EntityAssociationBuilder> associations = new HashMap<>();
+
+	EntityConfigurationBuilder( Class<T> entityType, EntitiesConfigurationBuilder parent ) {
+		this.entityType = entityType;
+		this.parent = parent;
+		this.self = this;
 	}
 
 	public EntityPropertyRegistryBuilder properties() {
 		if ( propertyRegistryBuilder == null ) {
-			propertyRegistryBuilder = new EntityPropertyRegistryBuilder( this );
+			propertyRegistryBuilder = new EntityPropertyRegistryBuilder();
 		}
 
 		return propertyRegistryBuilder;
-	}
-
-	/**
-	 * Returns a {@link com.foreach.across.modules.entity.config.builders.SimpleEntityViewBuilder.StandardEntityViewBuilder}
-	 * instance for the view with the given name.  If there is already another builder type for that view, an exception
-	 * will be thrown.
-	 *
-	 * @param name Name of the view for which to retrieve a builder.
-	 * @return builder instance
-	 */
-	public SimpleEntityViewBuilder.StandardEntityViewBuilder view( String name ) {
-		return view( name, SimpleEntityViewBuilder.StandardEntityViewBuilder.class );
-	}
-
-	/**
-	 * Returns the default list view builder for the entity being configured.
-	 * A default list view is usually available.
-	 *
-	 * @return builder instance
-	 */
-	public EntityListViewBuilder listView() {
-		return listView( EntityListView.VIEW_NAME );
-	}
-
-	/**
-	 * Returns a list view builder for the view with the given name.
-	 *
-	 * @param name Name of the view for which to retrieve a builder.
-	 * @return builder instance
-	 */
-	public EntityListViewBuilder listView( String name ) {
-		return view( name, EntityListViewBuilder.class );
-	}
-
-	/**
-	 * Returns the default create form view builder for the entity being configured.
-	 * A default create form view is usually available.
-	 *
-	 * @return builder instance
-	 */
-	public EntityFormViewBuilder createFormView() {
-		return formView( EntityFormView.CREATE_VIEW_NAME );
-	}
-
-	/**
-	 * Returns the default update form view builder for the entity being configured.
-	 * A default update form view is usually available.
-	 *
-	 * @return builder instance
-	 */
-	public EntityFormViewBuilder updateFormView() {
-		return formView( EntityFormView.UPDATE_VIEW_NAME );
-	}
-
-	/**
-	 * Returns a form view builder for the view with the given name.
-	 *
-	 * @param name Name of the view for which to retrieve a builder.
-	 * @return builder instance
-	 */
-	public EntityFormViewBuilder formView( String name ) {
-		return view( name, EntityFormViewBuilder.class );
-	}
-
-	/**
-	 * Returns a builder for the view with the specified name.  Any existing builder is assumed to be of the given
-	 * type and a new instance of that type will be created if there is no builder yet.  Note that custom
-	 * builder types *must* have a parameterless constructor.
-	 *
-	 * @param name         Name of the view for which to retrieve a builder.
-	 * @param builderClass Type of the builder.
-	 * @param <T>          Specific builder implementation.
-	 * @return builder instance
-	 */
-	@SuppressWarnings("unchecked")
-	public synchronized <T extends EntityViewBuilder<?, T>> T view( String name, Class<T> builderClass ) {
-		T builder = (T) viewBuilders.get( name );
-
-		if ( builder == null ) {
-			try {
-				builder = builderClass.newInstance();
-			}
-			catch ( InstantiationException | IllegalAccessException e ) {
-				throw new RuntimeException( "Could not create instance of " + builderClass, e );
-			}
-			builder.setName( name );
-			builder.setParent( this );
-
-			viewBuilders.put( name, builder );
-		}
-
-		return builder;
 	}
 
 	/**
@@ -166,9 +220,47 @@ public class EntityConfigurationBuilder extends EntityBuilderSupport<EntityConfi
 	}
 
 	@Override
-	void apply( MutableEntityRegistry entityRegistry ) {
-		super.apply( entityRegistry );
+	public ViewBuilder view( String name ) {
+		return view( name, ViewBuilder.class );
+	}
 
+	@Override
+	public ListViewBuilder listView() {
+		return listView( EntityListView.VIEW_NAME );
+	}
+
+	@Override
+	public ListViewBuilder listView( String name ) {
+		return view( name, ListViewBuilder.class );
+	}
+
+	@Override
+	public FormViewBuilder createFormView() {
+		return formView( EntityFormView.CREATE_VIEW_NAME );
+	}
+
+	@Override
+	public FormViewBuilder updateFormView() {
+		return formView( EntityFormView.UPDATE_VIEW_NAME );
+	}
+
+	@Override
+	public FormViewBuilder formView( String name ) {
+		return view( name, FormViewBuilder.class );
+	}
+
+	public synchronized EntityAssociationBuilder association( String name ) {
+		EntityAssociationBuilder builder = associations.get( name );
+
+		if ( builder == null ) {
+			builder = new EntityAssociationBuilder( name );
+			associations.put( name, builder );
+		}
+
+		return builder;
+	}
+
+	void apply( MutableEntityRegistry entityRegistry ) {
 		MutableEntityConfiguration configuration = entityRegistry.getMutableEntityConfiguration( entityType );
 
 		if ( configuration == null ) {
@@ -181,8 +273,23 @@ public class EntityConfigurationBuilder extends EntityBuilderSupport<EntityConfi
 			propertyRegistryBuilder.apply( configuration.getPropertyRegistry() );
 		}
 
-		for ( EntityViewBuilder viewBuilder : viewBuilders.values() ) {
-			viewBuilder.apply( configuration );
+		applyAttributes( configuration );
+		applyViewBuilders( configuration );
+
+		for ( EntityAssociationBuilder associationBuilder : associations.values() ) {
+			associationBuilder.apply( configuration, entityRegistry );
+		}
+	}
+
+	void postProcess( MutableEntityRegistry entityRegistry ) {
+		MutableEntityConfiguration<T> configuration = entityRegistry.getMutableEntityConfiguration( entityType );
+
+		for ( PostProcessor<MutableEntityConfiguration<T>> postProcessor : postProcessors() ) {
+			postProcessor.process( configuration );
+		}
+
+		for ( EntityAssociationBuilder associationBuilder : associations.values() ) {
+			associationBuilder.postProcess( configuration );
 		}
 	}
 }

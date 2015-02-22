@@ -17,14 +17,13 @@ package com.foreach.across.modules.entity.registry;
 
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.support.ReadableAttributes;
-import com.foreach.across.modules.entity.views.EntityViewFactory;
 
 /**
  * Filtered view on an association between two {@link com.foreach.across.modules.entity.registry.EntityConfiguration}s.
  *
  * @author Arne Vandamme
  */
-public interface EntityAssociation extends ReadableAttributes
+public interface EntityAssociation extends ReadableAttributes, EntityViewRegistry
 {
 	String getName();
 
@@ -37,8 +36,4 @@ public interface EntityAssociation extends ReadableAttributes
 	EntityConfiguration getTargetEntityConfiguration();
 
 	EntityPropertyDescriptor getTargetProperty();
-
-	boolean hasView( String name );
-
-	<Y extends EntityViewFactory> Y getViewFactory( String viewName );
 }

@@ -15,20 +15,19 @@
  */
 package com.foreach.across.modules.entity.config.builders;
 
+import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityViewRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilter;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyFilters;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegistry;
 import com.foreach.across.modules.entity.registry.properties.MergingEntityPropertyRegistry;
 import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
-import com.foreach.across.modules.entity.views.EntityView;
-import com.foreach.across.modules.entity.views.ViewCreationContext;
-import com.foreach.across.modules.entity.views.elements.ViewElementMode;
+import com.foreach.across.modules.entity.views.SimpleEntityViewFactory;
 import com.foreach.across.modules.entity.views.processors.ViewDataBinderProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewModelAndCommandProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
-import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -36,32 +35,30 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * Basic view builder supporting both {@link com.foreach.across.modules.entity.views.SimpleEntityViewFactorySupport}
+ * and {@link com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport}.
+ *
  * @author Arne Vandamme
  */
-public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewFactorySupport, SELF extends SimpleEntityViewBuilder<T, SELF>>
+public abstract class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewFactorySupport, SELF extends SimpleEntityViewBuilder>
 		extends EntityViewBuilder<T, SELF>
 {
-	public class EntityViewPropertyRegistryBuilder extends EntityPropertyRegistryBuilderSupport<SELF, EntityViewPropertyRegistryBuilder>
+	public abstract class EntityViewPropertyRegistryBuilder<MYSELF extends EntityViewPropertyRegistryBuilder>
+			extends EntityPropertyRegistryBuilderSupport<MYSELF>
 	{
-		EntityViewPropertyRegistryBuilder( SELF parent ) {
-			super( parent );
-		}
-
-		public EntityViewPropertyRegistryBuilder filter( String... propertyNames ) {
+		@SuppressWarnings( "unchecked" )
+		public MYSELF filter( String... propertyNames ) {
 			and().viewPropertyFilter = EntityPropertyFilters.includeOrdered( propertyNames );
-			return this;
+			return (MYSELF) this;
 		}
 
 		@Override
 		public SELF and() {
-			return super.and();
+			return viewBuilder;
 		}
 	}
 
-	public static class StandardEntityViewBuilder extends SimpleEntityViewBuilder<ConfigurablePropertiesEntityViewFactorySupport, StandardEntityViewBuilder>
-	{
-
-	}
+	private final SELF viewBuilder;
 
 	private String template;
 	private EntityViewPropertyRegistryBuilder propertyRegistryBuilder;
@@ -72,6 +69,11 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 
 	protected EntityPropertyFilter viewPropertyFilter;
 
+	@SuppressWarnings( "unchecked" )
+	public SimpleEntityViewBuilder() {
+		this.viewBuilder = (SELF) this;
+	}
+
 	@SuppressWarnings("unchecked")
 	public SELF template( String template ) {
 		this.template = template;
@@ -81,7 +83,7 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 	@SuppressWarnings("unchecked")
 	public EntityViewPropertyRegistryBuilder properties() {
 		if ( propertyRegistryBuilder == null ) {
-			propertyRegistryBuilder = new EntityViewPropertyRegistryBuilder( (SELF) this );
+			propertyRegistryBuilder = createPropertiesBuilder();
 		}
 
 		return propertyRegistryBuilder;
@@ -90,6 +92,8 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 	public EntityViewPropertyRegistryBuilder properties( String... propertyNames ) {
 		return properties().filter( propertyNames );
 	}
+
+	protected abstract EntityViewPropertyRegistryBuilder createPropertiesBuilder();
 
 	/**
 	 * Add a processor object that should be applied to the view factory.  The processor should
@@ -185,48 +189,23 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 		return (SELF) this;
 	}
 
+	/**
+	 * @return parent builder
+	 */
+	public abstract Object and();
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected T createFactoryInstance() {
-		return (T) new ConfigurablePropertiesEntityViewFactorySupport()
-		{
-			@Override
-			protected ViewElementMode getMode() {
-				return ViewElementMode.FOR_READING;
-			}
-
-			@Override
-			protected void extendViewModel( ViewCreationContext viewCreationContext, EntityView view ) {
-			}
-
-			@Override
-			protected EntityView createEntityView( ModelMap model ) {
-				return new EntityView( model );
-			}
-		};
+		return (T) new SimpleEntityViewFactory();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected void applyToFactory( EntityConfiguration configuration,
+	protected void applyToFactory( EntityViewRegistry viewRegistry,
 	                               T factory ) {
 		if ( template != null ) {
 			factory.setTemplate( template );
-		}
-
-		EntityPropertyRegistry registry = factory.getPropertyRegistry();
-
-		if ( registry == null ) {
-			registry = new MergingEntityPropertyRegistry( configuration.getPropertyRegistry() );
-			factory.setPropertyRegistry( registry );
-		}
-
-		if ( propertyRegistryBuilder != null ) {
-			propertyRegistryBuilder.apply( registry );
-		}
-
-		if ( viewPropertyFilter != null ) {
-			factory.setPropertyFilter( viewPropertyFilter );
 		}
 
 		if ( !preProcessors.isEmpty() ) {
@@ -242,8 +221,32 @@ public class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewF
 		}
 
 		if ( !modelAndCommandProcessors.isEmpty() ) {
-			factory.setModelAndCommandProcessors( merge( factory.getModelAndCommandProcessors(),
-			                                             modelAndCommandProcessors ) );
+			factory.setModelAndCommandProcessors(
+					merge( factory.getModelAndCommandProcessors(), modelAndCommandProcessors )
+			);
+		}
+
+		EntityPropertyRegistry registry = factory.getPropertyRegistry();
+
+		if ( registry == null ) {
+			if ( viewRegistry instanceof EntityConfiguration ) {
+				registry = new MergingEntityPropertyRegistry(
+						( (EntityConfiguration) viewRegistry ).getPropertyRegistry() );
+			}
+			else if ( viewRegistry instanceof EntityAssociation ) {
+				registry = new MergingEntityPropertyRegistry(
+						( (EntityAssociation) viewRegistry ).getTargetEntityConfiguration().getPropertyRegistry() );
+			}
+
+			factory.setPropertyRegistry( registry );
+		}
+
+		if ( propertyRegistryBuilder != null ) {
+			propertyRegistryBuilder.apply( registry );
+		}
+
+		if ( viewPropertyFilter != null ) {
+			factory.setPropertyFilter( viewPropertyFilter );
 		}
 	}
 

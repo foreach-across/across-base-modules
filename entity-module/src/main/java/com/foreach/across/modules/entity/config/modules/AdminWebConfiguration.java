@@ -86,7 +86,7 @@ public class AdminWebConfiguration implements EntityConfigurer
 		configuration.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
 		{
 			@Override
-			public MutableEntityConfiguration process( MutableEntityConfiguration<?> configuration ) {
+			public void process( MutableEntityConfiguration<?> configuration ) {
 				configuration.addAttribute( EntityLinkBuilder.class,
 				                            new EntityConfigurationLinkBuilder( EntityControllerAttributes.ROOT_PATH,
 				                                                                configuration ) );
@@ -95,8 +95,6 @@ public class AdminWebConfiguration implements EntityConfigurer
 					MutableEntityAssociation mutable = configuration.association( association.getName() );
 					mutable.addAttribute( EntityLinkBuilder.class, new EntityAssociationLinkBuilder( association ) );
 				}
-
-				return configuration;
 			}
 		} );
 	}

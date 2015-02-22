@@ -114,30 +114,27 @@ public class TestEntitiesConfigurationBuilder
 	public void globalPostProcessorsRunBeforeSeparateConfigurations() {
 		final List<String> processors = new ArrayList<>( 5 );
 
-		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
+		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration>()
 		{
 			@Override
-			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
+			public void process( MutableEntityConfiguration configuration ) {
 				processors.add( "one" );
-				return configuration;
 			}
 		} );
 
-		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
+		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration>()
 		{
 			@Override
-			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
+			public void process( MutableEntityConfiguration configuration ) {
 				processors.add( "two" );
-				return configuration;
 			}
 		} );
 
-		builder.entity( Client.class ).addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
+		builder.entity( Client.class ).addPostProcessor( new PostProcessor<MutableEntityConfiguration<Client>>()
 		{
 			@Override
-			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
+			public void process( MutableEntityConfiguration<Client> configuration ) {
 				processors.add( "three" );
-				return configuration;
 			}
 		} );
 
@@ -145,47 +142,47 @@ public class TestEntitiesConfigurationBuilder
 
 		assertEquals( Arrays.asList( "one", "one", "two", "two", "three" ), processors );
 	}
-
-	@Test
-	public void ifPostProcessorReturnsDifferentConfigurationThatOneIsUsed() {
-		final MutableEntityConfiguration newClient = mock( MutableEntityConfiguration.class );
-		when( newClient.getEntityType() ).thenReturn( Client.class );
-		when( newClient.getName() ).thenReturn( "client" );
-
-		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
-		{
-			@Override
-			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
-				if ( configuration.getEntityType().equals( Client.class ) ) {
-					return newClient;
-				}
-				return configuration;
-			}
-		} );
-
-		builder.postProcess( entityRegistry );
-
-		assertSame( company, entityRegistry.getEntityConfiguration( Company.class ) );
-		assertSame( newClient, entityRegistry.getEntityConfiguration( Client.class ) );
-		assertNotSame( client, entityRegistry.getEntityConfiguration( Client.class ) );
-	}
-
-	@Test
-	public void ifPostProcessorReturnsNullTheConfigurationIsRemoved() {
-		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
-		{
-			@Override
-			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
-				if ( configuration.getEntityType().equals( Client.class ) ) {
-					return null;
-				}
-				return configuration;
-			}
-		} );
-
-		builder.postProcess( entityRegistry );
-
-		assertSame( company, entityRegistry.getEntityConfiguration( Company.class ) );
-		assertNull( entityRegistry.getEntityConfiguration( Client.class ) );
-	}
+//
+//	@Test
+//	public void ifPostProcessorReturnsDifferentConfigurationThatOneIsUsed() {
+//		final MutableEntityConfiguration newClient = mock( MutableEntityConfiguration.class );
+//		when( newClient.getEntityType() ).thenReturn( Client.class );
+//		when( newClient.getName() ).thenReturn( "client" );
+//
+//		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration>()
+//		{
+//			@Override
+//			public void process( MutableEntityConfiguration configuration ) {
+//				if ( configuration.getEntityType().equals( Client.class ) ) {
+//					return newClient;
+//				}
+//				return configuration;
+//			}
+//		} );
+//
+//		builder.postProcess( entityRegistry );
+//
+//		assertSame( company, entityRegistry.getEntityConfiguration( Company.class ) );
+//		assertSame( newClient, entityRegistry.getEntityConfiguration( Client.class ) );
+//		assertNotSame( client, entityRegistry.getEntityConfiguration( Client.class ) );
+//	}
+//
+//	@Test
+//	public void ifPostProcessorReturnsNullTheConfigurationIsRemoved() {
+//		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
+//		{
+//			@Override
+//			public void process( MutableEntityConfiguration<?> configuration ) {
+//				if ( configuration.getEntityType().equals( Client.class ) ) {
+//					return null;
+//				}
+//				return configuration;
+//			}
+//		} );
+//
+//		builder.postProcess( entityRegistry );
+//
+//		assertSame( company, entityRegistry.getEntityConfiguration( Company.class ) );
+//		assertNull( entityRegistry.getEntityConfiguration( Client.class ) );
+//	}
 }

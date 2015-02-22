@@ -15,7 +15,7 @@
  */
 package com.foreach.across.modules.entity.config.builders;
 
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.EntityViewRegistry;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewPageFetcher;
 import org.springframework.data.domain.Sort;
@@ -29,7 +29,9 @@ import java.util.Collection;
  *
  * @author Arne Vandamme
  */
-public class EntityListViewBuilder extends SimpleEntityViewBuilder<EntityListViewFactory, EntityListViewBuilder>
+@SuppressWarnings( "unchecked" )
+public abstract class EntityListViewBuilder<SELF extends SimpleEntityViewBuilder>
+		extends SimpleEntityViewBuilder<EntityListViewFactory, SELF>
 {
 	private Boolean showResultNumber;
 	private Integer pageSize;
@@ -48,51 +50,51 @@ public class EntityListViewBuilder extends SimpleEntityViewBuilder<EntityListVie
 	 * @param pageFetcher instance - may not be null
 	 * @return current builder
 	 */
-	public EntityListViewBuilder pageFetcher( EntityListViewPageFetcher pageFetcher ) {
+	public SELF pageFetcher( EntityListViewPageFetcher pageFetcher ) {
 		Assert.notNull( pageFetcher );
 		this.pageFetcher = pageFetcher;
-		return this;
+		return (SELF) this;
 	}
 
 	/**
 	 * @param pageSize number of results per page.
 	 * @return current builder
 	 */
-	public EntityListViewBuilder pageSize( int pageSize ) {
+	public SELF pageSize( int pageSize ) {
 		this.pageSize = pageSize;
-		return this;
+		return (SELF) this;
 	}
 
 	/**
 	 * @param propertyNames of properties that can be sorted on
 	 * @return current builder
 	 */
-	public EntityListViewBuilder sortableOn( String... propertyNames ) {
+	public SELF sortableOn( String... propertyNames ) {
 		this.sortableProperties = Arrays.asList( propertyNames );
-		return this;
+		return (SELF) this;
 	}
 
 	/**
 	 * @param sort default sort instance that should be applied when fetching
 	 * @return current builder
 	 */
-	public EntityListViewBuilder defaultSort( Sort sort ) {
+	public SELF defaultSort( Sort sort ) {
 		this.defaultSort = sort;
-		return this;
+		return (SELF) this;
 	}
 
 	/**
 	 * @param showResultNumber true if result numbers should be shown in the list
 	 * @return current builder
 	 */
-	public EntityListViewBuilder showResultNumber( boolean showResultNumber ) {
+	public SELF showResultNumber( boolean showResultNumber ) {
 		this.showResultNumber = showResultNumber;
-		return this;
+		return (SELF) this;
 	}
 
 	@Override
-	protected void applyToFactory( EntityConfiguration configuration, EntityListViewFactory factory ) {
-		super.applyToFactory( configuration, factory );
+	protected void applyToFactory( EntityViewRegistry viewRegistry, EntityListViewFactory factory ) {
+		super.applyToFactory( viewRegistry, factory );
 
 		if ( pageFetcher != null ) {
 			factory.setPageFetcher( pageFetcher );

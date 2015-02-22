@@ -15,26 +15,20 @@
  */
 package com.foreach.across.modules.entity.config.builders;
 
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
+import com.foreach.across.modules.entity.registry.ConfigurableEntityViewRegistry;
+import com.foreach.across.modules.entity.registry.EntityViewRegistry;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
 
 /**
  * @author Arne Vandamme
  */
-public abstract class EntityViewBuilder<T extends EntityViewFactory, SELF extends EntityViewBuilder<T, SELF>>
+public abstract class EntityViewBuilder<T extends EntityViewFactory, SELF>
 {
 	private String name;
-	private EntityConfigurationBuilder parent;
-
 	private T factory;
 
 	protected void setName( String name ) {
 		this.name = name;
-	}
-
-	protected void setParent( EntityConfigurationBuilder parent ) {
-		this.parent = parent;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -43,23 +37,19 @@ public abstract class EntityViewBuilder<T extends EntityViewFactory, SELF extend
 		return (SELF) this;
 	}
 
-	public EntityConfigurationBuilder and() {
-		return parent;
-	}
-
 	@SuppressWarnings("unchecked")
-	protected void apply( MutableEntityConfiguration configuration ) {
-		T configuredFactory = (T) configuration.getViewFactory( name );
+	protected void apply( ConfigurableEntityViewRegistry viewRegistry ) {
+		T configuredFactory = viewRegistry.getViewFactory( name );
 
 		if ( configuredFactory == null ) {
 			configuredFactory = factory != null ? factory : createFactoryInstance();
-			configuration.registerView( name, configuredFactory );
+			viewRegistry.registerView( name, configuredFactory );
 		}
 
-		applyToFactory( configuration, configuredFactory );
+		applyToFactory( viewRegistry, configuredFactory );
 	}
 
 	protected abstract T createFactoryInstance();
 
-	protected abstract void applyToFactory( EntityConfiguration configuration, T factory );
+	protected abstract void applyToFactory( EntityViewRegistry viewRegistry, T factory );
 }

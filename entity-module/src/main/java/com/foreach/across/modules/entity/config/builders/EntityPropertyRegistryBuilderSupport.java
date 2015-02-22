@@ -29,11 +29,10 @@ import java.util.Map;
 /**
  * @author Arne Vandamme
  */
-public abstract class EntityPropertyRegistryBuilderSupport<PARENT, SELF extends EntityPropertyRegistryBuilderSupport<PARENT, SELF>>
+public abstract class EntityPropertyRegistryBuilderSupport<SELF extends EntityPropertyRegistryBuilderSupport>
 {
-	public class EntityPropertyDescriptorBuilder
+	public class EntityPropertyDescriptorBuilder<T extends EntityPropertyRegistryBuilderSupport>
 	{
-		private final SELF parent;
 		private final String name;
 
 		private String displayName;
@@ -41,8 +40,7 @@ public abstract class EntityPropertyRegistryBuilderSupport<PARENT, SELF extends 
 
 		private final Map<Object, Object> attributes = new HashMap<>();
 
-		EntityPropertyDescriptorBuilder( SELF parent, String name ) {
-			this.parent = parent;
+		EntityPropertyDescriptorBuilder( String name ) {
 			this.name = name;
 		}
 
@@ -106,7 +104,7 @@ public abstract class EntityPropertyRegistryBuilderSupport<PARENT, SELF extends 
 		 * @return parent builder
 		 */
 		public SELF and() {
-			return parent;
+			return propertiesBuilder;
 		}
 
 		void apply( EntityPropertyRegistry entityPropertyRegistry ) {
@@ -147,38 +145,38 @@ public abstract class EntityPropertyRegistryBuilderSupport<PARENT, SELF extends 
 		}
 	}
 
-	private final PARENT parent;
-
+	private final SELF propertiesBuilder;
 	private final Map<String, EntityPropertyDescriptorBuilder> builders = new HashMap<>();
 
-	public EntityPropertyRegistryBuilderSupport( PARENT parent ) {
-		this.parent = parent;
+	@SuppressWarnings( "unchecked" )
+	public EntityPropertyRegistryBuilderSupport() {
+		this.propertiesBuilder = (SELF) this;
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public synchronized EntityPropertyDescriptorBuilder property( String name ) {
+	public synchronized EntityPropertyDescriptorBuilder<SELF> property( String name ) {
 		Assert.notNull( name );
 
 		EntityPropertyDescriptorBuilder builder = builders.get( name );
 
 		if ( builder == null ) {
-			builder = new EntityPropertyDescriptorBuilder( (SELF) this, name );
+			builder = new EntityPropertyDescriptorBuilder( name );
 			builders.put( name, builder );
 		}
 
 		return builder;
 	}
 
-	public EntityPropertyDescriptorBuilder property( String name, String displayName ) {
+	public EntityPropertyDescriptorBuilder<SELF> property( String name, String displayName ) {
 		return property( name ).displayName( displayName );
 	}
 
-	public EntityPropertyDescriptorBuilder property( String name, String displayName, String expression ) {
+	public EntityPropertyDescriptorBuilder<SELF> property( String name, String displayName, String expression ) {
 		Assert.notNull( expression );
 		return property( name ).displayName( displayName ).spelValueFetcher( expression );
 	}
 
-	public EntityPropertyDescriptorBuilder property( String name, String displayName, ValueFetcher valueFetcher ) {
+	public EntityPropertyDescriptorBuilder<SELF> property( String name, String displayName, ValueFetcher valueFetcher ) {
 		Assert.notNull( valueFetcher );
 		return property( name ).displayName( displayName ).valueFetcher( valueFetcher );
 	}
@@ -186,9 +184,7 @@ public abstract class EntityPropertyRegistryBuilderSupport<PARENT, SELF extends 
 	/**
 	 * @return parent builder
 	 */
-	public PARENT and() {
-		return parent;
-	}
+	public abstract Object and();
 
 	protected void apply( EntityPropertyRegistry entityPropertyRegistry ) {
 		for ( EntityPropertyDescriptorBuilder builder : builders.values() ) {

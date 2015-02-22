@@ -48,7 +48,7 @@ public class TestEntityListViewBuilder
 
 	private MutableEntityPropertyRegistry clientProperties;
 
-	private EntityListViewBuilder view;
+	private EntityConfigurationBuilder.ListViewBuilder view;
 
 	private EntityListViewFactory viewFactory;
 

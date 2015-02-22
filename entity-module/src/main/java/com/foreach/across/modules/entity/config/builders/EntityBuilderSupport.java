@@ -16,24 +16,29 @@
 package com.foreach.across.modules.entity.config.builders;
 
 import com.foreach.across.modules.entity.config.PostProcessor;
-import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
-import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
+import com.foreach.across.modules.entity.registry.ConfigurableEntityViewRegistry;
+import com.foreach.across.modules.entity.registry.support.WritableAttributes;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Base class for entity related builder supporting configuration of attributes and builder post processors.
+ * Most methods should be overridden in child builders to provide type specificity.
  *
  * @author Arne Vandamme
  * @see com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder
  * @see com.foreach.across.modules.entity.config.builders.EntityConfigurationBuilder
+ * @see com.foreach.across.modules.entity.config.builders.EntityAssociationBuilder
  */
-public abstract class EntityBuilderSupport<T extends EntityBuilderSupport>
+public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
 {
 	private final Map<Object, Object> attributes = new HashMap<>();
-	private final Collection<PostProcessor<MutableEntityConfiguration<?>>> postProcessors = new LinkedList<>();
+	private final Collection<PostProcessor<U>> postProcessors = new LinkedList<>();
+	private final Map<String, EntityViewBuilder> viewBuilders = new HashMap<>();
 
 	/**
 	 * Add a custom attribute this builder should apply to the entity it processes.
@@ -70,64 +75,107 @@ public abstract class EntityBuilderSupport<T extends EntityBuilderSupport>
 	 *
 	 * @param postProcessor Post processor instance to add.
 	 */
-	public void addPostProcessor( PostProcessor<MutableEntityConfiguration<?>> postProcessor ) {
+	public void addPostProcessor( PostProcessor<U> postProcessor ) {
 		postProcessors.add( postProcessor );
 	}
 
 	/**
-	 * Apply the builder configuration to the EntityRegistry.  This will not invoke the post processors,
-	 * use {@link #postProcess(com.foreach.across.modules.entity.registry.MutableEntityRegistry)} to execute
-	 * the post processors after the configuration has been applied.
+	 * Returns a {@link SimpleEntityViewBuilder} instance for the view with the given name.
+	 * If there is already another builder type for that view, an exception will be thrown.
 	 *
-	 * @param entityRegistry EntityRegistry to which the configuration should be applied.
+	 * @param name Name of the view for which to retrieve a builder.
+	 * @return builder instance
 	 */
-	synchronized void apply( MutableEntityRegistry entityRegistry ) {
-		for ( EntityConfiguration entityConfiguration : entitiesToConfigure( entityRegistry ) ) {
-			MutableEntityConfiguration mutableEntityConfiguration
-					= entityRegistry.getMutableEntityConfiguration( entityConfiguration.getEntityType() );
-
-			applyAttributes( mutableEntityConfiguration );
-		}
-	}
-
-	protected void applyAttributes( MutableEntityConfiguration entityConfiguration ) {
-		for ( Map.Entry<Object, Object> attribute : attributes.entrySet() ) {
-			if ( attribute.getKey() instanceof String ) {
-				entityConfiguration.addAttribute( (String) attribute.getKey(), attribute.getValue() );
-			}
-			else {
-				entityConfiguration.addAttribute( (Class) attribute.getKey(), attribute.getValue() );
-			}
-		}
-	}
+	public abstract SimpleEntityViewBuilder view( String name );
 
 	/**
-	 * Apply the post processors to the registry.  Post processors are applied one after the other.
-	 * <p/>
-	 * If a PostProcessor returns a different instance than the one passed in as parameter, the new instance
-	 * will replace the new one in the registry even if it would defer in entity type.  If the post processor
-	 * returns null, the entity configuration will be removed.
+	 * Returns the default list view builder for the entity being configured.
+	 * A default list view is usually available.
 	 *
-	 * @param entityRegistry EntityRegistry to which the post processors should be applied.
+	 * @return builder instance
 	 */
-	synchronized void postProcess( MutableEntityRegistry entityRegistry ) {
-		for ( PostProcessor<MutableEntityConfiguration<?>> postProcessor : postProcessors ) {
-			for ( EntityConfiguration entityConfiguration : new ArrayList<>( entitiesToConfigure( entityRegistry ) ) ) {
-				MutableEntityConfiguration mutableEntityConfiguration
-						= entityRegistry.getMutableEntityConfiguration( entityConfiguration.getEntityType() );
+	public abstract EntityListViewBuilder listView();
 
-				MutableEntityConfiguration modified = postProcessor.process( mutableEntityConfiguration );
+	/**
+	 * Returns a list view builder for the view with the given name.
+	 *
+	 * @param name Name of the view for which to retrieve a builder.
+	 * @return builder instance
+	 */
+	public abstract EntityListViewBuilder listView( String name );
 
-				if ( modified != entityConfiguration ) {
-					entityRegistry.remove( mutableEntityConfiguration.getEntityType() );
+	/**
+	 * Returns the default create form view builder for the entity being configured.
+	 * A default create form view is usually available.
+	 *
+	 * @return builder instance
+	 */
+	public abstract EntityFormViewBuilder createFormView();
 
-					if ( modified != null ) {
-						entityRegistry.register( modified );
-					}
-				}
+	/**
+	 * Returns the default update form view builder for the entity being configured.
+	 * A default update form view is usually available.
+	 *
+	 * @return builder instance
+	 */
+	public abstract EntityFormViewBuilder updateFormView();
+
+	/**
+	 * Returns a form view builder for the view with the given name.
+	 *
+	 * @param name Name of the view for which to retrieve a builder.
+	 * @return builder instance
+	 */
+	public abstract EntityFormViewBuilder formView( String name );
+
+	/**
+	 * Returns a builder for the view with the specified name.  Any existing builder is assumed to be of the given
+	 * type and a new instance of that type will be created if there is no builder yet.  Note that custom
+	 * builder types *must* have a parameterless constructor.
+	 *
+	 * @param name         Name of the view for which to retrieve a builder.
+	 * @param builderClass Type of the builder.
+	 * @param <V>          Specific builder implementation.
+	 * @return builder instance
+	 */
+	@SuppressWarnings("unchecked")
+	public synchronized <V extends EntityViewBuilder<?, V>> V view( String name, Class<V> builderClass ) {
+		V builder = (V) viewBuilders.get( name );
+
+		if ( builder == null ) {
+			try {
+				builder = builderClass.newInstance();
+			}
+			catch ( InstantiationException | IllegalAccessException e ) {
+				throw new RuntimeException( "Could not create instance of " + builderClass, e );
+			}
+			builder.setName( name );
+			//builder.setParent( this );
+
+			viewBuilders.put( name, builder );
+		}
+
+		return builder;
+	}
+
+	protected void applyViewBuilders( ConfigurableEntityViewRegistry viewRegistry ) {
+		for ( EntityViewBuilder viewBuilder : viewBuilders.values() ) {
+			viewBuilder.apply( viewRegistry );
+		}
+	}
+
+	protected void applyAttributes( WritableAttributes writableAttributes ) {
+		for ( Map.Entry<Object, Object> attribute : attributes.entrySet() ) {
+			if ( attribute.getKey() instanceof String ) {
+				writableAttributes.addAttribute( (String) attribute.getKey(), attribute.getValue() );
+			}
+			else {
+				writableAttributes.addAttribute( (Class) attribute.getKey(), attribute.getValue() );
 			}
 		}
 	}
 
-	protected abstract Collection<EntityConfiguration> entitiesToConfigure( MutableEntityRegistry entityRegistry );
+	protected Collection<PostProcessor<U>> postProcessors(){
+		return postProcessors;
+	}
 }

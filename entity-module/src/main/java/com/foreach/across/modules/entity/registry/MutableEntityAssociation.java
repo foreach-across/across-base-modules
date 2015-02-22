@@ -17,18 +17,15 @@ package com.foreach.across.modules.entity.registry;
 
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.registry.support.WritableAttributes;
-import com.foreach.across.modules.entity.views.EntityViewFactory;
 
 /**
  * @author Arne Vandamme
  */
-public interface MutableEntityAssociation extends EntityAssociation, WritableAttributes
+public interface MutableEntityAssociation extends EntityAssociation, WritableAttributes, ConfigurableEntityViewRegistry
 {
 	void setTargetEntityConfiguration( EntityConfiguration entityConfiguration );
 
 	void setSourceProperty( EntityPropertyDescriptor descriptor );
 
 	void setTargetProperty( EntityPropertyDescriptor descriptor );
-
-	void registerView( String viewName, EntityViewFactory viewFactory );
 }
