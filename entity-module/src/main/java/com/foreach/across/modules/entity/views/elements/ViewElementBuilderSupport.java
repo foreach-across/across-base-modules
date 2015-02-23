@@ -5,6 +5,8 @@ import com.foreach.across.modules.entity.views.elements.form.FormElementBuilderS
 import com.foreach.across.modules.entity.views.support.ValuePrinter;
 import org.springframework.beans.BeanUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class ViewElementBuilderSupport<T extends ViewElementSupport> implements ViewElementBuilder<T>
@@ -16,6 +18,8 @@ public class ViewElementBuilderSupport<T extends ViewElementSupport> implements 
 
 	private EntityMessageCodeResolver messageCodeResolver;
 	private ValuePrinter valuePrinter;
+
+	private Map<String, String> attributes = new HashMap<>(  );
 
 	protected ViewElementBuilderSupport( Class<T> builderClass ) {
 		this.builderClass = builderClass;
@@ -76,6 +80,14 @@ public class ViewElementBuilderSupport<T extends ViewElementSupport> implements 
 
 	public void setField( boolean field ) {
 		this.field = field;
+	}
+
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes( Map<String, String> attributes ) {
+		this.attributes = attributes;
 	}
 
 	protected String resolve( String code, String defaultMessage ) {

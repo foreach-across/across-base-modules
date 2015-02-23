@@ -121,7 +121,7 @@
 					</label>
 					<input th:id="${#ids.seq(element.name)}" type="text" th:name="${element.name}"
 					       class="form-control js-form-element-datepicker" th:value="${element.print(entity)}"
-					       em:dependencies="${element.dependencies}"/>
+					       em:dependencies="${element.dependencies}" em:attributes="${element.attributes}"/>
 				</div>
 				<!--/* select */-->
 				<div th:if="${element.elementType eq 'select' and not element.options.empty}">
