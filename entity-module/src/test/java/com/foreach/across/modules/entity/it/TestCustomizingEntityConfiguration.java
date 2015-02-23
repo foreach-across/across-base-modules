@@ -159,13 +159,13 @@ public class TestCustomizingEntityConfiguration
 
 			configuration.entity( Client.class )
 			             .properties()
-			             .property( "someprop", "Some property", "'fixed'" )
+			             .property( "someprop" ).displayName( "Some property" ).spelValueFetcher( "'fixed'" )
 			             .and().and()
 			             .view( "some-extra-view" )
 			             .template( "th/someTemplate" )
 			             .properties()
-			             .property( "calculated", "Calculated" ).and()
-			             .property( "group-membership", "Group membership", "groups.size()" ).and()
+			             .property( "calculated" ).displayName( "Calculated" ).and()
+			             .property( "group-membership" ).displayName( "Group membership").spelValueFetcher( "groups.size()" ).and()
 			             .and()
 			             .and()
 			             .view( "some-other-view" ).factory( mock( ConfigurablePropertiesEntityViewFactorySupport.class ) );

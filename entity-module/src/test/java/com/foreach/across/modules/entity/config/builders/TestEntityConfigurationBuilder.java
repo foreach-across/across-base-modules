@@ -42,7 +42,7 @@ public class TestEntityConfigurationBuilder
 	private EntitiesConfigurationBuilder entities;
 	private MutableEntityRegistry entityRegistry;
 
-	private EntityConfigurationBuilder builder;
+	private EntityConfigurationBuilder<Client> builder;
 	private MutableEntityConfiguration client, company;
 
 	@Before
@@ -94,23 +94,21 @@ public class TestEntityConfigurationBuilder
 	public void postProcessorsAreAppliedInOrder() {
 		final List<String> processors = new ArrayList<>( 2 );
 
-		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
+		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<Client>>()
 		{
 			@Override
-			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
+			public void process( MutableEntityConfiguration<Client> configuration ) {
 				assertSame( client, configuration );
 				processors.add( "one" );
-				return configuration;
 			}
 		} );
 
-		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
+		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<Client>>()
 		{
 			@Override
-			public MutableEntityConfiguration<?> process( MutableEntityConfiguration<?> configuration ) {
+			public void process( MutableEntityConfiguration<Client> configuration ) {
 				assertSame( client, configuration );
 				processors.add( "two" );
-				return configuration;
 			}
 		} );
 
@@ -121,13 +119,13 @@ public class TestEntityConfigurationBuilder
 
 	@Test
 	public void viewBuildersAreSpecificType() {
-		EntityViewBuilder one = builder.view( "someView" );
+		AbstractEntityViewBuilder one = builder.view( "someView" );
 		assertNotNull( one );
 
-		EntityViewBuilder listOne = builder.listView();
+		AbstractEntityViewBuilder listOne = builder.listView();
 		assertNotNull( listOne );
 
-		EntityViewBuilder listTwo = builder.listView( EntityListView.VIEW_NAME );
+		AbstractEntityViewBuilder listTwo = builder.listView( EntityListView.VIEW_NAME );
 		assertSame( listOne, listTwo );
 
 		listTwo = builder.listView( "someListView" );

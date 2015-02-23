@@ -22,13 +22,18 @@ import com.foreach.across.modules.entity.views.EntityViewFactory;
 /**
  * @author Arne Vandamme
  */
-public abstract class EntityViewBuilder<T extends EntityViewFactory, SELF>
+public abstract class AbstractEntityViewBuilder<T extends EntityViewFactory, SELF>
 {
 	private String name;
 	private T factory;
+	protected Object parent;
 
 	protected void setName( String name ) {
 		this.name = name;
+	}
+
+	protected void setParent( Object parent ) {
+		this.parent = parent;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -30,8 +30,8 @@ import java.util.Collection;
  * @author Arne Vandamme
  */
 @SuppressWarnings( "unchecked" )
-public abstract class EntityListViewBuilder<SELF extends SimpleEntityViewBuilder>
-		extends SimpleEntityViewBuilder<EntityListViewFactory, SELF>
+public abstract class AbstractEntityListViewBuilder<SELF extends AbstractSimpleEntityViewBuilder>
+		extends AbstractSimpleEntityViewBuilder<EntityListViewFactory, SELF>
 {
 	private Boolean showResultNumber;
 	private Integer pageSize;

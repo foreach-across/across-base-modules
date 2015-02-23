@@ -1,126 +1,17 @@
 package com.foreach.across.modules.entity.config.builders;
 
 import com.foreach.across.modules.entity.config.PostProcessor;
+import com.foreach.across.modules.entity.config.builders.association.FormViewBuilder;
+import com.foreach.across.modules.entity.config.builders.association.ListViewBuilder;
+import com.foreach.across.modules.entity.config.builders.association.ViewBuilder;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
-import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
 import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
 
-public class EntityAssociationBuilder extends EntityBuilderSupport<EntityAssociationBuilder, MutableEntityAssociation>
+public class EntityAssociationBuilder extends AbstractAttributesAndViewsBuilder<EntityAssociationBuilder, MutableEntityAssociation>
 {
-	public class ViewBuilder extends SimpleEntityViewBuilder<ConfigurablePropertiesEntityViewFactorySupport, ViewBuilder>
-	{
-		public class Properties extends EntityViewPropertyRegistryBuilder<Properties>
-		{
-			@Override
-			public ViewBuilder and() {
-				return viewBuilder;
-			}
-		}
-
-		private final ViewBuilder viewBuilder;
-
-		public ViewBuilder() {
-			this.viewBuilder = this;
-		}
-
-		@Override
-		public Properties properties( String... propertyNames ) {
-			return properties().filter( propertyNames );
-		}
-
-		@Override
-		public Properties properties() {
-			return (Properties) super.properties();
-		}
-
-		@Override
-		protected Properties createPropertiesBuilder() {
-			return new Properties();
-		}
-
-		@Override
-		public EntityAssociationBuilder and() {
-			return self;
-		}
-	}
-
-	public class ListViewBuilder extends EntityListViewBuilder<ListViewBuilder>
-	{
-		public class Properties extends EntityViewPropertyRegistryBuilder<Properties>
-		{
-			@Override
-			public ListViewBuilder and() {
-				return viewBuilder;
-			}
-		}
-
-		private final ListViewBuilder viewBuilder;
-
-		public ListViewBuilder() {
-			this.viewBuilder = this;
-		}
-
-		@Override
-		public Properties properties( String... propertyNames ) {
-			return properties().filter( propertyNames );
-		}
-
-		@Override
-		public Properties properties() {
-			return (Properties) super.properties();
-		}
-
-		@Override
-		protected Properties createPropertiesBuilder() {
-			return new Properties();
-		}
-
-		@Override
-		public EntityAssociationBuilder and() {
-			return self;
-		}
-	}
-
-	public class FormViewBuilder extends EntityFormViewBuilder<FormViewBuilder>
-	{
-		public class Properties extends EntityViewPropertyRegistryBuilder<Properties>
-		{
-			@Override
-			public FormViewBuilder and() {
-				return viewBuilder;
-			}
-		}
-
-		private final FormViewBuilder viewBuilder;
-
-		public FormViewBuilder() {
-			this.viewBuilder = this;
-		}
-
-		@Override
-		public Properties properties( String... propertyNames ) {
-			return properties().filter( propertyNames );
-		}
-
-		@Override
-		public Properties properties() {
-			return (Properties) super.properties();
-		}
-
-		@Override
-		protected Properties createPropertiesBuilder() {
-			return new Properties();
-		}
-
-		@Override
-		public EntityAssociationBuilder and() {
-			return self;
-		}
-	}
-
 	private final String name;
 	private final EntityAssociationBuilder self;
 

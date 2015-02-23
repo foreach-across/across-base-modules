@@ -16,17 +16,15 @@
 package com.foreach.across.modules.entity.config.builders;
 
 import com.foreach.across.modules.entity.config.PostProcessor;
+import com.foreach.across.modules.entity.config.builders.configuration.FormViewBuilder;
+import com.foreach.across.modules.entity.config.builders.configuration.ListViewBuilder;
+import com.foreach.across.modules.entity.config.builders.configuration.ViewBuilder;
 import com.foreach.across.modules.entity.registry.EntityConfigurationImpl;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.DefaultEntityPropertyRegistry;
-import com.foreach.across.modules.entity.views.ConfigurablePropertiesEntityViewFactorySupport;
 import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
-import com.foreach.across.modules.entity.views.processors.ViewDataBinderProcessor;
-import com.foreach.across.modules.entity.views.processors.ViewModelAndCommandProcessor;
-import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
-import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,179 +32,58 @@ import java.util.Map;
 /**
  * @author Arne Vandamme
  */
-public class EntityConfigurationBuilder<T> extends EntityBuilderSupport<EntityConfigurationBuilder, MutableEntityConfiguration<T>>
+public class EntityConfigurationBuilder<T> extends AbstractAttributesAndViewsBuilder<EntityConfigurationBuilder, MutableEntityConfiguration<T>>
 {
-	public class ViewBuilder extends SimpleEntityViewBuilder<ConfigurablePropertiesEntityViewFactorySupport, ViewBuilder>
+	@SuppressWarnings("unchecked")
+	public class PropertyRegistryBuilder
+			extends AbstractEntityPropertyRegistryBuilder<PropertyRegistryBuilder>
 	{
-		public class Properties extends EntityViewPropertyRegistryBuilder<Properties>
+		public class PropertyDescriptorBuilder extends AbstractEntityPropertyDescriptorBuilder<PropertyDescriptorBuilder>
 		{
 			@Override
-			public ViewBuilder and() {
-				return viewBuilder;
+			public PropertyRegistryBuilder and() {
+				return propertyRegistryBuilder;
 			}
 		}
 
-		private final ViewBuilder viewBuilder;
+		private final PropertyRegistryBuilder propertyRegistryBuilder;
 
-		public ViewBuilder() {
-			this.viewBuilder = this;
+		public PropertyRegistryBuilder() {
+			this.propertyRegistryBuilder = this;
 		}
 
 		@Override
-		public Properties properties( String... propertyNames ) {
-			return properties().filter( propertyNames );
+		public synchronized PropertyDescriptorBuilder property( String name ) {
+			return (PropertyDescriptorBuilder) super.property( name );
 		}
 
 		@Override
-		public Properties properties() {
-			return (Properties) super.properties();
-		}
-
-		@Override
-		protected Properties createPropertiesBuilder() {
-			return new Properties();
-		}
-
-		@Override
-		public ViewBuilder template( String template ) {
-			return super.template( template );
-		}
-
-		@Override
-		public ViewBuilder addProcessor( Object processor ) {
-			return super.addProcessor( processor );
-		}
-
-		@Override
-		public ViewBuilder addPreProcessor( ViewPreProcessor preProcessor ) {
-			return super.addPreProcessor( preProcessor );
-		}
-
-		@Override
-		public ViewBuilder addPostProcessor( ViewPostProcessor postProcessor ) {
-			return super.addPostProcessor( postProcessor );
-		}
-
-		@Override
-		public ViewBuilder addModelAndCommandProcessor( ViewModelAndCommandProcessor modelAndCommandProcessor ) {
-			return super.addModelAndCommandProcessor( modelAndCommandProcessor );
-		}
-
-		@Override
-		public ViewBuilder addDataBinderProcessor( ViewDataBinderProcessor dataBinderProcessor ) {
-			return super.addDataBinderProcessor( dataBinderProcessor );
-		}
-
-		@Override
-		public ViewBuilder factory( ConfigurablePropertiesEntityViewFactorySupport entityViewFactory ) {
-			return super.factory( entityViewFactory );
+		protected PropertyDescriptorBuilder createDescriptorBuilder( String name ) {
+			return new PropertyDescriptorBuilder();
 		}
 
 		@Override
 		public EntityConfigurationBuilder and() {
-			return self;
+			return configurationBuilder;
 		}
 	}
 
-	public class ListViewBuilder extends EntityListViewBuilder<ListViewBuilder>
-	{
-		public class Properties extends EntityViewPropertyRegistryBuilder<Properties>
-		{
-			@Override
-			public ListViewBuilder and() {
-				return viewBuilder;
-			}
-		}
-
-		private final ListViewBuilder viewBuilder;
-
-		public ListViewBuilder() {
-			this.viewBuilder = this;
-		}
-
-		@Override
-		public Properties properties( String... propertyNames ) {
-			return properties().filter( propertyNames );
-		}
-
-		@Override
-		public Properties properties() {
-			return (Properties) super.properties();
-		}
-
-		@Override
-		protected Properties createPropertiesBuilder() {
-			return new Properties();
-		}
-
-		@Override
-		public EntityConfigurationBuilder and() {
-			return self;
-		}
-	}
-
-	public class FormViewBuilder extends EntityFormViewBuilder<FormViewBuilder>
-	{
-		public class Properties extends EntityViewPropertyRegistryBuilder<Properties>
-		{
-			@Override
-			public FormViewBuilder and() {
-				return viewBuilder;
-			}
-		}
-
-		private final FormViewBuilder viewBuilder;
-
-		public FormViewBuilder() {
-			this.viewBuilder = this;
-		}
-
-		@Override
-		public Properties properties( String... propertyNames ) {
-			return properties().filter( propertyNames );
-		}
-
-		@Override
-		public Properties properties() {
-			return (Properties) super.properties();
-		}
-
-		@Override
-		protected Properties createPropertiesBuilder() {
-			return new Properties();
-		}
-
-		@Override
-		public EntityConfigurationBuilder and() {
-			return self;
-		}
-	}
-
-	public class EntityPropertyRegistryBuilder
-			extends EntityPropertyRegistryBuilderSupport<EntityPropertyRegistryBuilder>
-	{
-		@Override
-		public EntityConfigurationBuilder and() {
-			return self;
-		}
-	}
-
-	private final EntityConfigurationBuilder self;
+	private final EntityConfigurationBuilder configurationBuilder;
 	private final Class<T> entityType;
 	private final EntitiesConfigurationBuilder parent;
 
-	private EntityPropertyRegistryBuilder propertyRegistryBuilder;
+	private PropertyRegistryBuilder propertyRegistryBuilder;
 	private final Map<String, EntityAssociationBuilder> associations = new HashMap<>();
 
 	EntityConfigurationBuilder( Class<T> entityType, EntitiesConfigurationBuilder parent ) {
 		this.entityType = entityType;
 		this.parent = parent;
-		this.self = this;
+		this.configurationBuilder = this;
 	}
 
-	public EntityPropertyRegistryBuilder properties() {
+	public PropertyRegistryBuilder properties() {
 		if ( propertyRegistryBuilder == null ) {
-			propertyRegistryBuilder = new EntityPropertyRegistryBuilder();
+			propertyRegistryBuilder = new PropertyRegistryBuilder();
 		}
 
 		return propertyRegistryBuilder;

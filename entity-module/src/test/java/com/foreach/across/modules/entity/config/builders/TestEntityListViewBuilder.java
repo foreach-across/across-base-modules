@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.entity.config.builders;
 
+import com.foreach.across.modules.entity.config.builders.configuration.ListViewBuilder;
 import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
@@ -48,7 +49,7 @@ public class TestEntityListViewBuilder
 
 	private MutableEntityPropertyRegistry clientProperties;
 
-	private EntityConfigurationBuilder.ListViewBuilder view;
+	private ListViewBuilder view;
 
 	private EntityListViewFactory viewFactory;
 

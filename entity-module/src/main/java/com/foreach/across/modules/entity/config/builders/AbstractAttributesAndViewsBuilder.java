@@ -18,6 +18,7 @@ package com.foreach.across.modules.entity.config.builders;
 import com.foreach.across.modules.entity.config.PostProcessor;
 import com.foreach.across.modules.entity.registry.ConfigurableEntityViewRegistry;
 import com.foreach.across.modules.entity.registry.support.WritableAttributes;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
@@ -34,11 +35,11 @@ import java.util.Map;
  * @see com.foreach.across.modules.entity.config.builders.EntityConfigurationBuilder
  * @see com.foreach.across.modules.entity.config.builders.EntityAssociationBuilder
  */
-public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
+public abstract class AbstractAttributesAndViewsBuilder<T extends AbstractAttributesAndViewsBuilder, U>
 {
 	private final Map<Object, Object> attributes = new HashMap<>();
 	private final Collection<PostProcessor<U>> postProcessors = new LinkedList<>();
-	private final Map<String, EntityViewBuilder> viewBuilders = new HashMap<>();
+	private final Map<String, AbstractEntityViewBuilder> viewBuilders = new HashMap<>();
 
 	/**
 	 * Add a custom attribute this builder should apply to the entity it processes.
@@ -80,13 +81,13 @@ public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
 	}
 
 	/**
-	 * Returns a {@link SimpleEntityViewBuilder} instance for the view with the given name.
+	 * Returns a {@link AbstractSimpleEntityViewBuilder} instance for the view with the given name.
 	 * If there is already another builder type for that view, an exception will be thrown.
 	 *
 	 * @param name Name of the view for which to retrieve a builder.
 	 * @return builder instance
 	 */
-	public abstract SimpleEntityViewBuilder view( String name );
+	public abstract AbstractSimpleEntityViewBuilder view( String name );
 
 	/**
 	 * Returns the default list view builder for the entity being configured.
@@ -94,7 +95,7 @@ public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
 	 *
 	 * @return builder instance
 	 */
-	public abstract EntityListViewBuilder listView();
+	public abstract AbstractEntityListViewBuilder listView();
 
 	/**
 	 * Returns a list view builder for the view with the given name.
@@ -102,7 +103,7 @@ public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
 	 * @param name Name of the view for which to retrieve a builder.
 	 * @return builder instance
 	 */
-	public abstract EntityListViewBuilder listView( String name );
+	public abstract AbstractEntityListViewBuilder listView( String name );
 
 	/**
 	 * Returns the default create form view builder for the entity being configured.
@@ -110,7 +111,7 @@ public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
 	 *
 	 * @return builder instance
 	 */
-	public abstract EntityFormViewBuilder createFormView();
+	public abstract AbstractEntityFormViewBuilder createFormView();
 
 	/**
 	 * Returns the default update form view builder for the entity being configured.
@@ -118,7 +119,7 @@ public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
 	 *
 	 * @return builder instance
 	 */
-	public abstract EntityFormViewBuilder updateFormView();
+	public abstract AbstractEntityFormViewBuilder updateFormView();
 
 	/**
 	 * Returns a form view builder for the view with the given name.
@@ -126,7 +127,7 @@ public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
 	 * @param name Name of the view for which to retrieve a builder.
 	 * @return builder instance
 	 */
-	public abstract EntityFormViewBuilder formView( String name );
+	public abstract AbstractEntityFormViewBuilder formView( String name );
 
 	/**
 	 * Returns a builder for the view with the specified name.  Any existing builder is assumed to be of the given
@@ -139,18 +140,13 @@ public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
 	 * @return builder instance
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized <V extends EntityViewBuilder<?, V>> V view( String name, Class<V> builderClass ) {
+	public synchronized <V extends AbstractEntityViewBuilder<?, V>> V view( String name, Class<V> builderClass ) {
 		V builder = (V) viewBuilders.get( name );
 
 		if ( builder == null ) {
-			try {
-				builder = builderClass.newInstance();
-			}
-			catch ( InstantiationException | IllegalAccessException e ) {
-				throw new RuntimeException( "Could not create instance of " + builderClass, e );
-			}
+			builder = BeanUtils.instantiateClass( builderClass );
 			builder.setName( name );
-			//builder.setParent( this );
+			builder.setParent( this );
 
 			viewBuilders.put( name, builder );
 		}
@@ -159,7 +155,7 @@ public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
 	}
 
 	protected void applyViewBuilders( ConfigurableEntityViewRegistry viewRegistry ) {
-		for ( EntityViewBuilder viewBuilder : viewBuilders.values() ) {
+		for ( AbstractEntityViewBuilder viewBuilder : viewBuilders.values() ) {
 			viewBuilder.apply( viewRegistry );
 		}
 	}
@@ -175,7 +171,7 @@ public abstract class EntityBuilderSupport<T extends EntityBuilderSupport, U>
 		}
 	}
 
-	protected Collection<PostProcessor<U>> postProcessors(){
+	protected Collection<PostProcessor<U>> postProcessors() {
 		return postProcessors;
 	}
 }

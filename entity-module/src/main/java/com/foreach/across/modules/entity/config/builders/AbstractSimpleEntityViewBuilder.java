@@ -40,11 +40,11 @@ import java.util.List;
  *
  * @author Arne Vandamme
  */
-public abstract class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewFactorySupport, SELF extends SimpleEntityViewBuilder>
-		extends EntityViewBuilder<T, SELF>
+public abstract class AbstractSimpleEntityViewBuilder<T extends ConfigurablePropertiesEntityViewFactorySupport, SELF extends AbstractSimpleEntityViewBuilder>
+		extends AbstractEntityViewBuilder<T, SELF>
 {
 	public abstract class EntityViewPropertyRegistryBuilder<MYSELF extends EntityViewPropertyRegistryBuilder>
-			extends EntityPropertyRegistryBuilderSupport<MYSELF>
+			extends AbstractEntityPropertyRegistryBuilder<MYSELF>
 	{
 		@SuppressWarnings( "unchecked" )
 		public MYSELF filter( String... propertyNames ) {
@@ -70,7 +70,7 @@ public abstract class SimpleEntityViewBuilder<T extends ConfigurablePropertiesEn
 	protected EntityPropertyFilter viewPropertyFilter;
 
 	@SuppressWarnings( "unchecked" )
-	public SimpleEntityViewBuilder() {
+	public AbstractSimpleEntityViewBuilder() {
 		this.viewBuilder = (SELF) this;
 	}
 

@@ -114,7 +114,7 @@ public class TestEntitiesConfigurationBuilder
 	public void globalPostProcessorsRunBeforeSeparateConfigurations() {
 		final List<String> processors = new ArrayList<>( 5 );
 
-		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration>()
+		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
 		{
 			@Override
 			public void process( MutableEntityConfiguration configuration ) {
@@ -122,7 +122,7 @@ public class TestEntitiesConfigurationBuilder
 			}
 		} );
 
-		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration>()
+		builder.addPostProcessor( new PostProcessor<MutableEntityConfiguration<?>>()
 		{
 			@Override
 			public void process( MutableEntityConfiguration configuration ) {
