@@ -17,7 +17,7 @@ package com.foreach.across.modules.entity.registry.properties;
 
 import com.foreach.across.modules.entity.registry.support.WritableAttributes;
 import com.foreach.across.modules.entity.views.support.ValueFetcher;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.convert.TypeDescriptor;
 
 /**
  * @author Arne Vandamme
@@ -34,7 +34,7 @@ public interface MutableEntityPropertyDescriptor extends EntityPropertyDescripto
 
 	void setPropertyType( Class<?> propertyType );
 
-	void setPropertyResolvableType( ResolvableType resolvableType );
+	void setPropertyTypeDescriptor( TypeDescriptor typeDescriptor );
 
 	void setValueFetcher( ValueFetcher<?> valueFetcher );
 }

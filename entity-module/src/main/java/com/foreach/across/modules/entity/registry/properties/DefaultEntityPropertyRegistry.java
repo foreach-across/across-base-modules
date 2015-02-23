@@ -154,7 +154,7 @@ public class DefaultEntityPropertyRegistry extends EntityPropertyRegistrySupport
 		descriptor.setName( name );
 		descriptor.setDisplayName( child.getDisplayName() );
 		descriptor.setPropertyType( child.getPropertyType() );
-		descriptor.setPropertyResolvableType( child.getPropertyResolvableType() );
+		descriptor.setPropertyTypeDescriptor( child.getPropertyTypeDescriptor() );
 		descriptor.setReadable( child.isReadable() );
 		descriptor.setWritable( child.isWritable() );
 		descriptor.setHidden( child.isHidden() );

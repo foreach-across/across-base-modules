@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ResolvableType;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -132,8 +133,10 @@ public class TestCommonViewElementTypeLookupStrategy
 		when( entityRegistry.getEntityConfiguration( Client.class ) ).thenReturn( clientConfig );
 
 		when( descriptor.getPropertyType() ).thenReturn( (Class) List.class );
-		when( descriptor.getPropertyResolvableType() )
-				.thenReturn( ResolvableType.forClassWithGenerics( List.class, Client.class ) );
+		TypeDescriptor collectionTypeDescriptor = TypeDescriptor.collection( List.class, TypeDescriptor.valueOf( Client.class ) );
+		when(descriptor.getPropertyTypeDescriptor()).thenReturn( collectionTypeDescriptor );
+//		when( descriptor.getPropertyTypeDescriptor().getResolvableType() )
+//				.thenReturn( ResolvableType.forClassWithGenerics( List.class, Client.class ) );
 
 		assertEquals( CommonViewElements.MULTI_CHECKBOX, strategy.findElementType( entityConfiguration, descriptor,
 		                                                                           ViewElementMode.FOR_WRITING ) );

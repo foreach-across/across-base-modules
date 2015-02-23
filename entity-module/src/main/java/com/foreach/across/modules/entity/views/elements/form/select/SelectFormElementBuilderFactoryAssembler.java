@@ -39,7 +39,8 @@ public class SelectFormElementBuilderFactoryAssembler
 	private EntityRegistry entityRegistry;
 
 	public SelectFormElementBuilderFactoryAssembler() {
-		super( SelectFormElementBuilder.class, CommonViewElements.SELECT, CommonViewElements.MULTI_CHECKBOX , CommonViewElements.RADIO);
+		super( SelectFormElementBuilder.class, CommonViewElements.SELECT, CommonViewElements.MULTI_CHECKBOX,
+		       CommonViewElements.RADIO );
 	}
 
 	@Override
@@ -77,11 +78,11 @@ public class SelectFormElementBuilderFactoryAssembler
 			}
 		}
 
-
 		if ( isCollection ) {
 			template.setElementType( CommonViewElements.MULTI_CHECKBOX );
 		}
-		else if ( CommonViewElements.RADIO.equals( descriptor.getAttribute( EntityAttributes.ELEMENT_TYPE_WRITABLE ) ) ) {
+		else if ( CommonViewElements.RADIO.equals( descriptor.getAttribute(
+				EntityAttributes.ELEMENT_TYPE_WRITABLE ) ) ) {
 			template.setElementType( CommonViewElements.RADIO );
 		}
 
@@ -97,7 +98,7 @@ public class SelectFormElementBuilderFactoryAssembler
 			return descriptor.getPropertyType().getComponentType();
 		}
 
-		ResolvableType resolvableType = descriptor.getPropertyResolvableType();
+		ResolvableType resolvableType = descriptor.getPropertyTypeDescriptor().getResolvableType();
 
 		if ( resolvableType != null && resolvableType.hasGenerics() ) {
 			return resolvableType.resolveGeneric( 0 );

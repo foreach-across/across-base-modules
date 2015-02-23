@@ -34,7 +34,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -135,12 +134,8 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 	protected ValuePrinter createValuePrinter( EntityPropertyDescriptor descriptor ) {
 		// todo: has existing valueprinter, has existing printer (?)
 		ValueFetcher<?> valueFetcher = descriptor.getValueFetcher();
-		Field field = descriptor.getField();
-		TypeDescriptor sourceTypeDescriptor = null;
-		if ( field != null ) {
-			sourceTypeDescriptor = new TypeDescriptor( field );
-		}
-		return new ConversionServiceConvertingValuePrinter<>( valueFetcher, sourceTypeDescriptor, conversionService );
+		TypeDescriptor propertyTypeDescriptor = descriptor.getPropertyTypeDescriptor();
+		return new ConversionServiceConvertingValuePrinter<>( valueFetcher, propertyTypeDescriptor, conversionService );
 	}
 
 	protected T newInstance() {

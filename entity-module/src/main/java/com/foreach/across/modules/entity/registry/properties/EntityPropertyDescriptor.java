@@ -2,9 +2,7 @@ package com.foreach.across.modules.entity.registry.properties;
 
 import com.foreach.across.modules.entity.registry.support.ReadableAttributes;
 import com.foreach.across.modules.entity.views.support.ValueFetcher;
-import org.springframework.core.ResolvableType;
-
-import java.lang.reflect.Field;
+import org.springframework.core.convert.TypeDescriptor;
 
 public interface EntityPropertyDescriptor extends ReadableAttributes
 {
@@ -26,7 +24,7 @@ public interface EntityPropertyDescriptor extends ReadableAttributes
 	/**
 	 * @return more detailed information about the property type (supporting generics)
 	 */
-	ResolvableType getPropertyResolvableType();
+	TypeDescriptor getPropertyTypeDescriptor();
 
 	/**
 	 * @return Associated instance that can fetch the property value from an instance.
@@ -41,6 +39,4 @@ public interface EntityPropertyDescriptor extends ReadableAttributes
 	 * @return New descriptor representing the merged instance.
 	 */
 	EntityPropertyDescriptor merge( EntityPropertyDescriptor other );
-
-	Field getField();
 }
