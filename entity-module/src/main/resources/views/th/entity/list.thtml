@@ -63,7 +63,7 @@
 						<thead>
 						<tr>
 							<th th:if="${showResultNumber}">#</th>
-							<th th:each="prop : ${properties.get('resultsTable').columns}"  th:if="${prop.elementType != 'button-link'}">
+							<th th:each="prop : ${properties.get('resultsTable').columns}" th:class="${prop.sortable} ? 'sortable'" th:if="${prop.elementType != 'button-link'}">
 						<span th:if="${prop.sortable}"
 						      data-tbl="entity-list"
 						      class="sortable"
