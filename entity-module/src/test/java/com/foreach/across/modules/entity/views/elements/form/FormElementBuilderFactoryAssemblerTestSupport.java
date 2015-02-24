@@ -30,11 +30,12 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.convert.TypeDescriptor;
 
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,7 +86,8 @@ public abstract class FormElementBuilderFactoryAssemblerTestSupport<T extends Fo
 				when( descriptor.getDisplayName() ).thenReturn( StringUtils.lowerCase( propertyName ) );
 				when( descriptor.getAttribute( PropertyDescriptor.class ) ).thenReturn( validationDescriptor );
 				when( descriptor.getPropertyType() ).thenReturn( (Class) field.getType() );
-				when( descriptor.getPropertyResolvableType() ).thenReturn( ResolvableType.forField( field ) );
+				TypeDescriptor typeDescriptor = new TypeDescriptor( field );
+				when( descriptor.getPropertyTypeDescriptor() ).thenReturn( typeDescriptor );
 
 				properties.put( propertyName, descriptor );
 			}

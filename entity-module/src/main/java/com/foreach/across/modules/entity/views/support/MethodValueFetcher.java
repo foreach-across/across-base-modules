@@ -15,17 +15,17 @@
  */
 package com.foreach.across.modules.entity.views.support;
 
-import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 
 /**
  * @author Arne Vandamme
  */
-public class PropertyDescriptorValueFetcher<T> implements ValueFetcher<T>
+public class MethodValueFetcher<T> implements ValueFetcher<T>
 {
-	private final PropertyDescriptor descriptor;
+	private final Method method;
 
-	public PropertyDescriptorValueFetcher( PropertyDescriptor descriptor ) {
-		this.descriptor = descriptor;
+	public MethodValueFetcher( Method method ) {
+		this.method = method;
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class PropertyDescriptorValueFetcher<T> implements ValueFetcher<T>
 		}
 
 		try {
-			return descriptor.getReadMethod().invoke( entity );
+			return method.invoke( entity );
 		}
 		catch ( Exception e ) {
 			return null;

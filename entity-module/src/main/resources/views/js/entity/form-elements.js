@@ -15,9 +15,12 @@
  */
 $(document).ready(function() {
     $('.js-form-element-datepicker').each(function(){
-        $(this).datepicker({
-            constrainInput: false
-        });
+        var datepickerConfig = $( this ).data( 'datepicker-config' );
+        if ( !datepickerConfig ) {
+            datepickerConfig = {};
+        }
+        datepickerConfig['constrainInput'] = false;
+        $(this).datepicker(datepickerConfig);
     });
 
     $('[data-dependson]').each(function(){

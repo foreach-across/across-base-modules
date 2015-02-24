@@ -2,15 +2,14 @@ package com.foreach.across.modules.entity.registry.properties;
 
 import com.foreach.across.modules.entity.registry.support.AttributeSupport;
 import com.foreach.across.modules.entity.util.EntityUtils;
-import com.foreach.across.modules.entity.views.support.PropertyDescriptorValueFetcher;
+import com.foreach.across.modules.entity.views.support.MethodValueFetcher;
 import com.foreach.across.modules.entity.views.support.ValueFetcher;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.ResolvableType;
-import org.springframework.util.ReflectionUtils;
+import org.springframework.core.convert.Property;
+import org.springframework.core.convert.TypeDescriptor;
 import org.thymeleaf.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class SimpleEntityPropertyDescriptor extends AttributeSupport implements MutableEntityPropertyDescriptor
@@ -20,8 +19,7 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 
 	private ValueFetcher valueFetcher;
 	private Class<?> propertyType;
-	private ResolvableType propertyResolvableType;
-	private Field field;
+	private TypeDescriptor propertyTypeDescriptor;
 
 	public SimpleEntityPropertyDescriptor() {
 	}
@@ -101,26 +99,17 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 		this.propertyType = propertyType;
 	}
 
-	public ResolvableType getPropertyResolvableType() {
-		return propertyResolvableType;
+	public TypeDescriptor getPropertyTypeDescriptor() {
+		return propertyTypeDescriptor;
 	}
 
-	public void setPropertyResolvableType( ResolvableType propertyResolvableType ) {
-		this.propertyResolvableType = propertyResolvableType;
+	public void setPropertyTypeDescriptor( TypeDescriptor propertyTypeDescriptor ) {
+		this.propertyTypeDescriptor = propertyTypeDescriptor;
 	}
 
 	@Override
 	public ValueFetcher getValueFetcher() {
 		return valueFetcher;
-	}
-
-	@Override
-	public Field getField() {
-		return field;
-	}
-
-	public void setField( Field field ) {
-		this.field = field;
 	}
 
 	@Override
@@ -130,13 +119,12 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 
 		descriptor.setWritable( other.isWritable() );
 		descriptor.setReadable( other.isReadable() );
-		descriptor.setHidden( other.isHidden() );
 
 		if ( other.getPropertyType() != null ) {
 			descriptor.setPropertyType( other.getPropertyType() );
 		}
-		if ( other.getPropertyResolvableType() != null ) {
-			descriptor.setPropertyResolvableType( other.getPropertyResolvableType() );
+		if ( other.getPropertyTypeDescriptor() != null ) {
+			descriptor.setPropertyTypeDescriptor( other.getPropertyTypeDescriptor() );
 		}
 		if ( other.getValueFetcher() != null ) {
 			descriptor.setValueFetcher( other.getValueFetcher() );
@@ -153,9 +141,30 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 		return descriptor;
 	}
 
-	public static SimpleEntityPropertyDescriptor forPropertyDescriptor( PropertyDescriptor prop, Class<?> entityType ) {
+	public static SimpleEntityPropertyDescriptor forProperty( Property property ) {
 		SimpleEntityPropertyDescriptor descriptor = new SimpleEntityPropertyDescriptor();
-		descriptor.setName( prop.getName() );
+		descriptor.setName( property.getName() );
+
+		descriptor.setDisplayName( EntityUtils.generateDisplayName( property.getName() ) );
+
+		descriptor.setWritable( property.getWriteMethod() != null );
+		descriptor.setReadable( property.getReadMethod() != null );
+		descriptor.setPropertyType( property.getType() );
+		descriptor.setPropertyTypeDescriptor( new TypeDescriptor( property ) );
+
+		if ( descriptor.isReadable() ) {
+			descriptor.setValueFetcher( new MethodValueFetcher( property.getReadMethod() ) );
+		}
+
+		return descriptor;
+
+	}
+
+	public static SimpleEntityPropertyDescriptor forPropertyDescriptor( PropertyDescriptor prop, Class<?> entityType ) {
+		Method writeMethod = prop.getWriteMethod();
+		Method readMethod = prop.getReadMethod();
+		Property property = new Property( entityType, readMethod, writeMethod, prop.getName() );
+		SimpleEntityPropertyDescriptor descriptor = forProperty( property );
 
 		if ( StringUtils.equals( prop.getName(), prop.getDisplayName() ) ) {
 			descriptor.setDisplayName( EntityUtils.generateDisplayName( prop.getName() ) );
@@ -163,28 +172,6 @@ public class SimpleEntityPropertyDescriptor extends AttributeSupport implements 
 		else {
 			descriptor.setDisplayName( prop.getDisplayName() );
 		}
-
-		Method writeMethod = prop.getWriteMethod();
-		Method readMethod = prop.getReadMethod();
-
-		descriptor.setWritable( writeMethod != null );
-		descriptor.setReadable( readMethod != null );
-		descriptor.setHidden( prop.isHidden() );
-		descriptor.setPropertyType( prop.getPropertyType() );
-		Field field = ReflectionUtils.findField( entityType, prop.getName() );
-		descriptor.setField( field );
-
-		if ( descriptor.isReadable() ) {
-			descriptor.setPropertyResolvableType( ResolvableType.forMethodReturnType( readMethod ) );
-			descriptor.setValueFetcher( new PropertyDescriptorValueFetcher( prop ) );
-		}
-		else if ( descriptor.isWritable() ) {
-			descriptor.setPropertyResolvableType( ResolvableType.forMethodParameter( writeMethod, 0 ) );
-		}
-		else {
-			descriptor.setPropertyResolvableType( ResolvableType.forType( prop.getPropertyType() ) );
-		}
-
 		return descriptor;
 	}
 }
