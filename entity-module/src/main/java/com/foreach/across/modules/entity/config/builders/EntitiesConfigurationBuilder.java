@@ -26,7 +26,7 @@ import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
 import org.springframework.util.Assert;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -37,12 +37,7 @@ import java.util.Map;
  */
 public class EntitiesConfigurationBuilder extends AbstractAttributesAndViewsBuilder<EntitiesConfigurationBuilder, MutableEntityConfiguration<?>>
 {
-	private final EntitiesConfigurationBuilder self;
-	private final Map<Class<?>, EntityConfigurationBuilder> builders = new HashMap<>();
-
-	public EntitiesConfigurationBuilder() {
-		this.self = this;
-	}
+	private final Map<Class<?>, EntityConfigurationBuilder> builders = new LinkedHashMap<>();
 
 	@Override
 	public ViewBuilder view( String name ) {

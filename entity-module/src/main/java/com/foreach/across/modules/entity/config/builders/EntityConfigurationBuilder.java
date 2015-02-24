@@ -25,6 +25,7 @@ import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.DefaultEntityPropertyRegistry;
 import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
+import com.foreach.across.modules.entity.views.support.ValueFetcher;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,31 @@ public class EntityConfigurationBuilder<T> extends AbstractAttributesAndViewsBui
 	{
 		public class PropertyDescriptorBuilder extends AbstractEntityPropertyDescriptorBuilder<PropertyDescriptorBuilder>
 		{
+			@Override
+			public PropertyDescriptorBuilder attribute( String name, Object value ) {
+				return super.attribute( name, value );
+			}
+
+			@Override
+			public <S> PropertyDescriptorBuilder attribute( Class<S> type, S value ) {
+				return super.attribute( type, value );
+			}
+
+			@Override
+			public PropertyDescriptorBuilder displayName( String displayName ) {
+				return super.displayName( displayName );
+			}
+
+			@Override
+			public PropertyDescriptorBuilder spelValueFetcher( String expression ) {
+				return super.spelValueFetcher( expression );
+			}
+
+			@Override
+			public PropertyDescriptorBuilder valueFetcher( ValueFetcher valueFetcher ) {
+				return super.valueFetcher( valueFetcher );
+			}
+
 			@Override
 			public PropertyRegistryBuilder and() {
 				return propertyRegistryBuilder;
