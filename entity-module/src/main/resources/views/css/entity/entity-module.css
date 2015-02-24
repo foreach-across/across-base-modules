@@ -21,5 +21,7 @@
     display: none; }
   .sortable.dropup span.caret, .sortable.dropdown span.caret {
     display: inline-block; }
+.table > thead > tr.odd {
+    background-color: #ffffff; }
 
 /*# sourceMappingURL=entity-module.css.map */

@@ -39,7 +39,7 @@
 		<div th:replace="th/entity/formFields :: form_fields(${properties})" />
 		*/-->
 
-		<div class="text-right">
+		<div class="text-right" th:unless="${#strings.isEmpty(messages.createAction())}">
 			<a class="btn btn-primary"
 			   th:href="@{${#webapp.path(entityLinks.create())}}"
 			   th:text="|${messages.createAction()}|">create a new entity</a>
@@ -58,7 +58,7 @@
 			<div class="panel-body">
 				<div class="table-responsive">
 
-					<table class="table table-striped table-hover" th:unless="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"
+					<table class="table table-hover" th:unless="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"
 					       th:attr="data-tbl-entity-type=${entityConfiguration.name},data-tbl-current-page=${page.number},data-tbl-size=${page.size},data-tbl-sort=${page.sort}">
 						<thead>
 						<tr>
@@ -73,16 +73,16 @@
 						</span>
 								<span th:unless="${prop.sortable}" th:text="${prop.label}">Name</span>
 							</th>
-							<th></th>
+							<th th:unless="${#strings.isEmpty(messages.updateAction(entity))}"></th>
 						</tr>
 						</thead>
 						<tbody>
-						<tr th:each="entity,entityStats:${page.content}" em:attributes="${rowProcessor.attributes(entity)}">
+						<tr th:each="entity,entityStats:${page.content}" th:class="${entityStats.even} ? 'odd'" em:attributes="${rowProcessor.attributes(entity)}">
 							<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
 							<td th:each="prop : ${properties.get('resultsTable').columns}" th:if="${prop.elementType != 'button-link'}">
 								<span th:utext="${prop.print(entity)}">value</span>
 							</td>
-							<td>
+							<td th:unless="${#strings.isEmpty(messages.updateAction(entity))}">
 								<a th:href="@{${#webapp.path(entityLinks.update(entity))}}" th:title="${messages.updateAction(entity)}">
 									<span class="glyphicon glyphicon-edit"></span>
 								</a>
