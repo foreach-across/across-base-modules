@@ -20,7 +20,13 @@ $(document).ready(function() {
             datepickerConfig = {};
         }
         datepickerConfig['constrainInput'] = false;
-        $(this).datepicker(datepickerConfig);
+        var datepickerLocale = $( this ).data( 'datepicker-locale' );
+        var datepickerRegional = $.datepicker.regional[""];
+        if ( datepickerLocale ) {
+            datepickerRegional = $.datepicker.regional[datepickerLocale];
+        }
+        $( this ).datepicker(datepickerConfig);
+        $( this ).datepicker("option", datepickerRegional);
     });
 
     $('[data-dependson]').each(function(){
