@@ -21,6 +21,7 @@ import com.foreach.across.modules.entity.registry.EntityRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ClassUtils;
 import org.springframework.validation.Errors;
+import org.springframework.validation.SmartValidator;
 import org.springframework.validation.Validator;
 
 /**
@@ -29,7 +30,7 @@ import org.springframework.validation.Validator;
 public class ViewRequestValidator implements Validator
 {
 	@EntityValidator
-	private Validator entityValidator;
+	private SmartValidator entityValidator;
 
 	@Autowired
 	private EntityRegistry entityRegistry;
@@ -59,7 +60,7 @@ public class ViewRequestValidator implements Validator
 	private Validator validatorForEntity( Object entity ) {
 		Validator validator = null;
 
-		Class entityType = ClassUtils.getUserClass(entity);
+		Class entityType = ClassUtils.getUserClass( entity );
 		EntityConfiguration entityConfiguration = entityRegistry.getEntityConfiguration( entityType );
 
 		if ( entityConfiguration != null ) {

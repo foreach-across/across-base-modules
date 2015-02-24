@@ -49,7 +49,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.format.datetime.DateFormatterRegistrar;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
-import org.springframework.validation.Validator;
+import org.springframework.validation.SmartValidator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.annotation.PostConstruct;
@@ -96,7 +96,7 @@ public class EntityModuleConfiguration
 	@Bean(name = EntityModule.VALIDATOR)
 	@Exposed
 	@AcrossCondition("not hasBean('" + EntityModule.VALIDATOR + "')")
-	public Validator entityValidator() {
+	public SmartValidator entityValidator() {
 		return new LocalValidatorFactoryBean();
 	}
 

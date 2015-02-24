@@ -34,6 +34,7 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.data.web.SortHandlerMethodArgumentResolver;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.util.ClassUtils;
+import org.springframework.validation.SmartValidator;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -60,7 +61,7 @@ public class AcrossWebConfiguration extends WebMvcConfigurerAdapter
 
 	@EntityValidator
 	@SuppressWarnings("unused")
-	private Validator entityValidator;
+	private SmartValidator entityValidator;
 
 	@Autowired
 	private EntityModuleSettings settings;

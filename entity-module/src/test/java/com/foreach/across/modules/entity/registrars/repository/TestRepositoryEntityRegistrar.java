@@ -50,6 +50,7 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.validation.SmartValidator;
 import org.springframework.validation.Validator;
 
 import javax.validation.metadata.PropertyDescriptor;
@@ -74,7 +75,7 @@ public class TestRepositoryEntityRegistrar
 	private ClientRepository clientRepository;
 
 	@EntityValidator
-	private Validator entityValidator;
+	private SmartValidator entityValidator;
 
 	@Test
 	public void clientShouldBeRegisteredWithRepositoryInformation() {

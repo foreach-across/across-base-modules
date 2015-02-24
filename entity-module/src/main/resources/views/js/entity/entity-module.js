@@ -18,20 +18,20 @@ var TablePager = function ( element )
     var table = $( element );
     var id = $( element ).attr( 'data-tbl' );
     var page = table.attr( 'data-tbl-current-page' );
-    var size = table.attr( 'data-tbl-size' );
-    var sort = [];
+    this.size = table.attr( 'data-tbl-size' );
+    this.sort = [];
 
     var tblSort = table.attr( 'data-tbl-sort' );
 
     var props = tblSort ? tblSort.split( ',' ) : [];
 
-    var sortables = $( "[data-tbl='" + id + "'][data-tbl-sort-property]" );
+    this.sortables = $( "[data-tbl='" + id + "'][data-tbl-sort-property]" );
 
-    sortables.removeClass( 'dropup', 'dropdown' );
+    this.sortables.removeClass( 'dropup', 'dropdown' );
 
     for ( var i = 0; i < props.length; i++ ) {
         var pairs = props[i].split( ':' );
-        sort.push( { property: pairs[0], direction: pairs[1].trim() } );
+        this.sort.push( { property: pairs[0], direction: pairs[1].trim() } );
 
         $( "[data-tbl='" + id + "'][data-tbl-sort-property='" + pairs[0] + "']" ).addClass( pairs[1].trim() == 'ASC' ? 'dropdown' : 'dropup' )
     }
@@ -44,7 +44,7 @@ var TablePager = function ( element )
                                                              return false;
                                                          } );
 
-    sortables.click( function ()
+    this.sortables.click( function ()
                      {
                          pager.sortOnProperty( $( this ).attr( 'data-tbl-sort-property' ) );
                          return false;
@@ -54,17 +54,17 @@ var TablePager = function ( element )
     {
         var sortValue = '';
 
-        for ( var i = 0; i < sort.length; i++ ) {
+        for ( var i = 0; i < this.sort.length; i++ ) {
             if ( sortValue.length > 0 ) {
                 sortValue += '&';
             }
 
-            sortValue += sort[i].property + ',' + sort[i].direction;
+            sortValue += this.sort[i].property + ',' + this.sort[i].direction;
         }
 
         var url = paramReplace( 'sort', window.location.href, sortValue );
         url = paramReplace( 'page', url, pageNumber );
-        url = paramReplace( 'size', url, size );
+        url = paramReplace( 'size', url, this.size );
 
         window.location.href = url;
         //alert('moving ' + table + ' to ' + pageNumber );
@@ -73,9 +73,9 @@ var TablePager = function ( element )
     this.sortOnProperty = function ( propertyName )
     {
         var current;
-        for ( var i = 0; i < sort.length; i++ ) {
-            if ( sort[i].property == propertyName ) {
-                current = sort[i];
+        for ( var i = 0; i < this.sort.length; i++ ) {
+            if ( this.sort[i].property == propertyName ) {
+                current = this.sort[i];
             }
         }
 
@@ -83,9 +83,9 @@ var TablePager = function ( element )
             current.direction = current.direction == 'ASC' ? 'DESC' : 'ASC';
         }
         else {
-            sort = [];
+            this.sort = [];
             current = { property: propertyName, direction: 'ASC' };
-            sort.push( current );
+            this.sort.push( current );
         }
 
         this.moveToPage( page );
@@ -131,6 +131,6 @@ $( document ).ready( function ()
                      {
                          $( '[data-tbl-type="paged"]' ).each( function ()
                                                               {
-                                                                  new TablePager( $( this ) );
+                                                                  document.tablePager = new TablePager( $( this ) );
                                                               } );
                      } );
