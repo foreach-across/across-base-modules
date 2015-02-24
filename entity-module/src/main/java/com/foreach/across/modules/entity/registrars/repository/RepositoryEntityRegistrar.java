@@ -35,6 +35,7 @@ import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 import org.springframework.util.ClassUtils;
+import org.springframework.validation.SmartValidator;
 import org.springframework.validation.Validator;
 
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 	private EntityPropertyRegistryMappingMetaDataBuilder mappingMetaDataBuilder;
 
 	@EntityValidator
-	private Validator entityValidator;
+	private SmartValidator entityValidator;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -81,7 +82,7 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 	                              AcrossContextBeanRegistry beanRegistry ) {
 		ApplicationContext applicationContext = moduleInfo.getApplicationContext();
 
-		mappingMetaDataBuilder.addMappingContexts( applicationContext.getBeansOfType( MappingContext.class ).values()  );
+		mappingMetaDataBuilder.addMappingContexts( applicationContext.getBeansOfType( MappingContext.class ).values() );
 
 		Map<String, RepositoryFactoryInformation> repositoryFactoryInformationMap
 				= applicationContext.getBeansOfType( RepositoryFactoryInformation.class );

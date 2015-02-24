@@ -18,6 +18,7 @@ package com.foreach.across.modules.entity.testmodules.springdata.validators;
 import com.foreach.across.modules.entity.annotations.EntityValidator;
 import com.foreach.across.modules.entity.testmodules.springdata.business.Company;
 import org.springframework.validation.Errors;
+import org.springframework.validation.SmartValidator;
 import org.springframework.validation.Validator;
 
 import static org.junit.Assert.assertNotNull;
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertNotNull;
 public class CompanyValidator implements Validator
 {
 	@EntityValidator
-	private Validator entityValidator;
+	private SmartValidator entityValidator;
 
 	@Override
 	public boolean supports( Class<?> clazz ) {

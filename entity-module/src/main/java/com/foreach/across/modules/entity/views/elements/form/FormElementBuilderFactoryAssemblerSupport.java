@@ -31,6 +31,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -105,10 +106,23 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 
 		if ( validationDescriptor != null && validationDescriptor.hasConstraints() ) {
 			for ( ConstraintDescriptor constraint : validationDescriptor.getConstraintDescriptors() ) {
-				Class<? extends Annotation> type = constraint.getAnnotation().annotationType();
+				Annotation annotation = constraint.getAnnotation();
+				Class<? extends Annotation> type = annotation.annotationType();
 
-				if ( NotBlank.class.equals( type ) || NotNull.class.equals( type ) || NotEmpty.class.equals( type ) ) {
-					template.setRequired( true );
+				if ( NotBlank.class.equals( type ) ) {
+					NotBlank notBlank = (NotBlank) annotation;
+					Class<?>[] groups = notBlank.groups();
+					checkValidationGroups( template, groups );
+				}
+				else if ( NotNull.class.equals( type ) ) {
+					NotNull notBlank = (NotNull) annotation;
+					Class<?>[] groups = notBlank.groups();
+					checkValidationGroups( template, groups );
+				}
+				else if ( NotEmpty.class.equals( type ) ) {
+					NotEmpty notBlank = (NotEmpty) annotation;
+					Class<?>[] groups = notBlank.groups();
+					checkValidationGroups( template, groups );
 				}
 				else {
 					handleConstraint( template, type, constraint );
@@ -146,6 +160,12 @@ public abstract class FormElementBuilderFactoryAssemblerSupport<T extends FormEl
 			throw new RuntimeException(
 					getClass().getSimpleName() + " requires the template to have a parameterless constructor", iae
 			);
+		}
+	}
+
+	private void checkValidationGroups( T template, Class<?>[] groups ) {
+		if ( groups.length == 0 || ( groups.length == 1 && Default.class.isAssignableFrom( groups[0] ) ) ) {
+			template.setRequired( true );
 		}
 	}
 
