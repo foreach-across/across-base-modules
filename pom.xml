@@ -64,12 +64,10 @@
 		<dependency>
 			<groupId>com.foreach.libs</groupId>
 			<artifactId>common-spring</artifactId>
-			<version>${foreach.common.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.foreach.libs</groupId>
 			<artifactId>common-web</artifactId>
-			<version>${foreach.common.version}</version>
 		</dependency>
 	</dependencies>
 </project>
