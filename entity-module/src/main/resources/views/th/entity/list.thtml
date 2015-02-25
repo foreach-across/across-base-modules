@@ -47,12 +47,12 @@
 
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<span th:text="${messages.resultsFound(page)}">Number of items found.</span><br/>
+				<span th:utext="${messages.resultsFound(page)}">Number of items found.</span><br/>
 				<a th:unless="${page.first}" href="#" data-tbl="entity-list"
-				   th:attr="data-tbl-page=${page.number - 1}" th:text="${messages.previousPage(page)}">previous page</a>
-				<span th:if="${page.totalPages gt 1}" th:text="${messages.pagerText(page)}">Showing page 1 of 13</span>
+				   th:attr="data-tbl-page=${page.number - 1}" th:utext="${messages.previousPage(page)}">previous page</a>
+				<span th:if="${page.totalPages gt 1}" th:utext="${messages.pagerText(page)}">Showing page 1 of 13</span>
 				<a th:unless="${page.last}" href="#" data-tbl="entity-list"
-				   th:attr="data-tbl-page=${page.number + 1}" th:text="${messages.nextPage(page)}">next</a>
+				   th:attr="data-tbl-page=${page.number + 1}" th:utext="${messages.nextPage(page)}">next</a>
 			</div>
 
 			<div class="panel-body">
