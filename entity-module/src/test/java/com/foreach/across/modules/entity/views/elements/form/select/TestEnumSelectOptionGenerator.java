@@ -49,6 +49,22 @@ public class TestEnumSelectOptionGenerator
 		List<SelectOption> options = new ArrayList<>( generator.generateOptions( codeResolver ) );
 		assertEquals( 2, options.size() );
 
+		assertOption( options.get( 0 ), "Value one", EnumWithoutName.ValueOne );
+		assertOption( options.get( 1 ), "In business", EnumWithoutName.IN_BUSINESS );
+	}
+
+	@Test
+	public void optionsCanBeSorted() throws Exception {
+		MessageSource messageSource = new ResourceBundleMessageSource();
+		EntityMessageCodeResolver codeResolver = new EntityMessageCodeResolver();
+		codeResolver.setMessageSource( messageSource );
+
+		EnumSelectOptionGenerator generator = new EnumSelectOptionGenerator( EnumWithoutName.class );
+		generator.setShouldBeSorted( true );
+
+		List<SelectOption> options = new ArrayList<>( generator.generateOptions( codeResolver ) );
+		assertEquals( 2, options.size() );
+
 		assertOption( options.get( 0 ), "In business", EnumWithoutName.IN_BUSINESS );
 		assertOption( options.get( 1 ), "Value one", EnumWithoutName.ValueOne );
 	}

@@ -31,9 +31,18 @@ import java.util.List;
 public class EnumSelectOptionGenerator implements SelectOptionGenerator
 {
 	private Class<? extends Enum> enumType;
+	private boolean shouldBeSorted = false;
 
 	public EnumSelectOptionGenerator( Class<? extends Enum> enumType ) {
 		this.enumType = enumType;
+	}
+
+	public boolean isShouldBeSorted() {
+		return shouldBeSorted;
+	}
+
+	public void setShouldBeSorted( boolean shouldBeSorted ) {
+		this.shouldBeSorted = shouldBeSorted;
 	}
 
 	@Override
@@ -54,7 +63,9 @@ public class EnumSelectOptionGenerator implements SelectOptionGenerator
 			options.add( option );
 		}
 
-		Collections.sort( options );
+		if ( shouldBeSorted ) {
+			Collections.sort( options );
+		}
 
 		return options;
 	}
