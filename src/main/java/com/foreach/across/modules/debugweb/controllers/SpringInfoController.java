@@ -45,6 +45,7 @@ public class SpringInfoController
 	private ApplicationContext applicationContext;
 
 	@Event
+	@SuppressWarnings( "unused" )
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder()
 		     .group( "/across/web", "AcrossWebModule" ).and()
@@ -63,7 +64,7 @@ public class SpringInfoController
 			Field field = AbstractHandlerMapping.class.getDeclaredField( "interceptors" );
 			field.setAccessible( true );
 
-			List<Table> tables = new LinkedList<Table>();
+			List<Table> tables = new LinkedList<>();
 			for ( Map.Entry<String, AbstractHandlerMapping> handlerEntry : handlers.entrySet() ) {
 
 				Table table = new Table( handlerEntry.getKey() + " - " + handlerEntry.getValue().getClass().getName() );
@@ -82,18 +83,20 @@ public class SpringInfoController
 			model.addAttribute( "handlerTables", tables );
 		}
 		catch ( Exception e ) {
+			// Do nothing
 		}
 
 		return DebugWeb.VIEW_SPRING_INTERCEPTORS;
 	}
 
 	@RequestMapping("/spring/handlers")
+	@SuppressWarnings( "unchecked" )
 	public String showHandlers( Model model ) {
 		Map<String, AbstractHandlerMethodMapping> handlers = BeanFactoryUtils.beansOfTypeIncludingAncestors(
 				(ListableBeanFactory) applicationContext.getAutowireCapableBeanFactory(),
 				AbstractHandlerMethodMapping.class );
 
-		List<Table> tables = new LinkedList<Table>();
+		List<Table> tables = new LinkedList<>();
 		for ( Map.Entry<String, AbstractHandlerMethodMapping> handlerEntry : handlers.entrySet() ) {
 			Table table = new Table( handlerEntry.getKey() + " - " + handlerEntry.getValue().getClass().getName() );
 
