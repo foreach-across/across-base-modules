@@ -25,7 +25,7 @@
 	<properties>
 		<across.version>1.0.5-SNAPSHOT</across.version>
 		<foreach.common.version>0.11-SNAPSHOT</foreach.common.version>
-		<spring.version>4.0.8.RELEASE</spring.version>
+		<spring.version>4.0.9.RELEASE</spring.version>
 		<querydsl.version>3.5.1</querydsl.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -96,27 +96,27 @@
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
-                <groupId>org.asciidoctor</groupId>
-                <artifactId>asciidoctor-maven-plugin</artifactId>
-                <version>1.5.0</version>
-                <inherited>false</inherited>
-                <configuration>
-                    <sourceDirectory>docs</sourceDirectory>
-                    <sourceDocumentName>index.adoc</sourceDocumentName>
-                    <outputDirectory>${project.build.directory}/site/${project.version}/reference</outputDirectory>
-                    <backend>html</backend>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>output-html</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>process-asciidoc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<version>1.5.0</version>
+				<inherited>false</inherited>
+				<configuration>
+					<sourceDirectory>docs</sourceDirectory>
+					<sourceDocumentName>index.adoc</sourceDocumentName>
+					<outputDirectory>${project.build.directory}/site/${project.version}/reference</outputDirectory>
+					<backend>html</backend>
+				</configuration>
+				<executions>
+					<execution>
+						<id>output-html</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.5.3</version>
@@ -129,8 +129,10 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>make-assembly</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
+						<id>make-assembly</id>
+						<!-- this is used for inheritance merges -->
+						<phase>package</phase>
+						<!-- bind to the packaging phase -->
 						<goals>
 							<goal>single</goal>
 						</goals>
@@ -266,6 +268,23 @@
 				<groupId>com.foreach.libs</groupId>
 				<artifactId>common-spring</artifactId>
 				<version>${foreach.common.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.foreach.libs</groupId>
+				<artifactId>common-web</artifactId>
+				<version>${foreach.common.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.foreach.libs</groupId>
