@@ -20,6 +20,7 @@ import com.foreach.across.modules.entity.views.elements.CommonViewElements;
 import com.foreach.across.modules.entity.views.elements.ViewElementMode;
 import com.foreach.across.modules.entity.views.elements.ViewElements;
 import com.foreach.across.modules.entity.views.elements.button.ButtonViewElement;
+import com.foreach.across.modules.entity.views.elements.container.ColumnsViewElement;
 import com.foreach.across.modules.entity.views.elements.container.ContainerViewElement;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import org.springframework.ui.ModelMap;
@@ -29,17 +30,23 @@ import org.springframework.ui.ModelMap;
  */
 public class EntityFormViewFactory<V extends ViewCreationContext> extends ConfigurablePropertiesEntityViewFactorySupport<V, EntityFormView>
 {
+	public static final String FORM_GRID = "_formGrid";
+	public static final String FORM_LEFT = "_formGrid_left";
+	public static final String FORM_RIGHT = "_formGrid_right";
+
 	@Override
 	protected ViewElements customizeViewElements( ViewElements elements ) {
-		ContainerViewElement container = new ContainerViewElement();
-		container.setName( "_formElements" );
-		container.addAll( elements );
+		ContainerViewElement left = new ContainerViewElement( FORM_LEFT );
+		left.addAll( elements );
 
-		ContainerViewElement rootElements = new ContainerViewElement();
-		rootElements.setName( "_root" );
-		rootElements.add( container );
+		ColumnsViewElement formGrid = new ColumnsViewElement( FORM_GRID );
+		formGrid.add( left );
+		formGrid.add( new ContainerViewElement( FORM_RIGHT ) );
 
-		return rootElements;
+		ContainerViewElement root = new ContainerViewElement( CONTAINER );
+		root.add( formGrid );
+
+		return root;
 	}
 
 	@SuppressWarnings("unchecked")

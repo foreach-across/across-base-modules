@@ -63,21 +63,20 @@
 						<thead>
 						<tr>
 							<th th:if="${showResultNumber}">#</th>
-							<th th:each="prop : ${properties.get('resultsTable').columns}" th:class="${prop.sortable} ? 'sortable'" th:if="${prop.elementType != 'button-link'}">
-						<span th:if="${prop.sortable}"
-						      data-tbl="entity-list"
-						      class="sortable"
-						      th:attr="data-tbl-sort-property=${prop.sortableProperty}">
-							<span th:text="${prop.label}">Property name</span>
-							<span class="caret"></span>
-						</span>
-								<span th:unless="${prop.sortable}" th:text="${prop.label}">Name</span>
+							<th th:each="prop : ${properties.get('resultsTable').columns}"
+							    th:class="${prop.sortable} ? 'sortable'"
+							    th:if="${prop.elementType != 'button-link'}"
+							    th:attr="data-tbl-sort-property=${prop.sortable ? prop.sortableProperty : null},data-tbl='entity-list'"
+
+							    th:text="${prop.label}"
+							    >
+								Name
 							</th>
 							<th th:unless="${#strings.isEmpty(messages.updateAction(entity))}"></th>
 						</tr>
 						</thead>
 						<tbody>
-						<tr th:each="entity,entityStats:${page.content}" th:class="${entityStats.even} ? 'odd'" em:attributes="${rowProcessor.attributes(entity)}">
+						<tr th:each="entity,entityStats:${page.content}" th:class="${entityStats.even} ? 'even' : 'odd'" em:attributes="${rowProcessor.attributes(entity)}">
 							<td th:if="${showResultNumber}" th:text="${entityStats.count + page.number * page.size}"></td>
 							<td th:each="prop : ${properties.get('resultsTable').columns}" th:if="${prop.elementType != 'button-link'}">
 								<span th:utext="${prop.print(entity)}">value</span>

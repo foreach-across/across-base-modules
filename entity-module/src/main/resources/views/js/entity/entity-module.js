@@ -27,13 +27,13 @@ var TablePager = function ( element )
 
     this.sortables = $( "[data-tbl='" + id + "'][data-tbl-sort-property]" );
 
-    this.sortables.removeClass( 'dropup', 'dropdown' );
+    this.sortables.removeClass( 'asc', 'desc' );
 
     for ( var i = 0; i < props.length; i++ ) {
         var pairs = props[i].split( ':' );
         this.sort.push( { property: pairs[0], direction: pairs[1].trim() } );
 
-        $( "[data-tbl='" + id + "'][data-tbl-sort-property='" + pairs[0] + "']" ).addClass( pairs[1].trim() == 'ASC' ? 'dropdown' : 'dropup' )
+        $( "[data-tbl='" + id + "'][data-tbl-sort-property='" + pairs[0] + "']" ).addClass( pairs[1].trim() == 'ASC' ? 'asc' : 'desc' )
     }
 
     var pager = this;

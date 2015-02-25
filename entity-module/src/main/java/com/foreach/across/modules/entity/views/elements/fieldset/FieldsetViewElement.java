@@ -39,6 +39,14 @@ public class FieldsetViewElement extends ViewElements implements ViewElement
 	private boolean field;
 	private Map<String, Qualifiers> dependencies = new HashMap<>();
 
+	public FieldsetViewElement() {
+	}
+
+	public FieldsetViewElement( String name, String label ) {
+		this.name = name;
+		this.label = label;
+	}
+
 	@Override
 	public String getElementType() {
 		return TYPE;

@@ -66,6 +66,60 @@ public class ViewElements implements Iterable<ViewElement>
 	}
 
 	/**
+	 * Will move an element with a given name from its current position (anywhere in the collection) to the last
+	 * position of all children of the new parent.  The parent must be a
+	 * {@link com.foreach.across.modules.entity.views.elements.ViewElements} instance.
+	 * <p/>
+	 * Moving will fail silently if either the element is not found, the parent is not found or the parent
+	 * is not of type {@link com.foreach.across.modules.entity.views.elements.ViewElements}.
+	 *
+	 * @param elementToMove name of the element to move
+	 * @param newParent     name of the new parent element
+	 * @return true if element was moved, false if it could not be moved for any reason
+	 */
+	public boolean moveTo( String elementToMove, String newParent ) {
+		ViewElements parent = getParent( elementToMove );
+
+		if ( parent != null ) {
+			ViewElement other = get( newParent );
+
+			if ( other != null && other instanceof ViewElements ) {
+				( (ViewElements) other ).add( parent.remove( elementToMove ) );
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Will move an element with a given name from its current position (anywhere in the collection) to the first
+	 * position of all children of the new parent.  The parent must be a
+	 * {@link com.foreach.across.modules.entity.views.elements.ViewElements} instance.
+	 * <p/>
+	 * Moving will fail silently if either the element is not found, the parent is not found or the parent
+	 * is not of type {@link com.foreach.across.modules.entity.views.elements.ViewElements}.
+	 *
+	 * @param elementToMove name of the element to move
+	 * @param newParent     name of the new parent element
+	 * @return true if element was moved, false if it could not be moved for any reason
+	 */
+	public boolean moveToFirst( String elementToMove, String newParent ) {
+		ViewElements parent = getParent( elementToMove );
+
+		if ( parent != null ) {
+			ViewElement other = get( newParent );
+
+			if ( other != null && other instanceof ViewElements ) {
+				( (ViewElements) other ).addFirst( parent.remove( elementToMove ) );
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Adds all elements directly to this collection.  If any of the elements duplicates the name
 	 * of an already present element, an exception will be thrown.
 	 *

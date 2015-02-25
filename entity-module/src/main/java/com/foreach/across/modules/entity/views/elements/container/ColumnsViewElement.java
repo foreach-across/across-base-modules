@@ -20,6 +20,13 @@ package com.foreach.across.modules.entity.views.elements.container;
  */
 public class ColumnsViewElement extends ContainerViewElement
 {
+	public ColumnsViewElement() {
+	}
+
+	public ColumnsViewElement( String name ) {
+		super( name );
+	}
+
 	@Override
 	public String getElementType() {
 		return "columns";

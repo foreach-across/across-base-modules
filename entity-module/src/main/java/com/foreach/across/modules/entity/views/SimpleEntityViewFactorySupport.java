@@ -40,6 +40,8 @@ import java.util.Collections;
  */
 public abstract class SimpleEntityViewFactorySupport<V extends ViewCreationContext, T extends EntityView> implements EntityViewFactory<V>
 {
+	public static final String CONTAINER = "_entityView";
+
 	private Collection<ViewPreProcessor<V, T>> preProcessors = Collections.emptyList();
 	private Collection<ViewPostProcessor<V, T>> postProcessors = Collections.emptyList();
 	private Collection<ViewDataBinderProcessor<V>> dataBinderProcessors = Collections.emptyList();
