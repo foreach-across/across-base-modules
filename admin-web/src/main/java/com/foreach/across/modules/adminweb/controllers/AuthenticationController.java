@@ -44,6 +44,11 @@ public class AuthenticationController
 
 	@RequestMapping(value = { "", "/" })
 	public String dashboard() {
+		String path = settings.getDashboardPath();
+
+		if ( !StringUtils.equals( path, "/" ) ) {
+			return adminWeb.redirect( path );
+		}
 		return "th/adminweb/dashboard";
 	}
 

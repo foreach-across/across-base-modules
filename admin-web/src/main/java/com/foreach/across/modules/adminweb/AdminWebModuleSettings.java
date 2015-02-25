@@ -61,8 +61,10 @@ public class AdminWebModuleSettings extends AcrossModuleSettings
 	public static final String LOCALE_OPTIONS = "adminWebModule.locale.options";
 
 	public static final String ADMIN_ACCESS_PERMISSIONS = "adminWebModule.access.permissions";
+	public static final String DASHBOARD_PATH = "adminWebModule.dashboard";
 
 	private String title;
+	private String dashboardPath = null;
 
 	@Override
 	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
@@ -77,8 +79,10 @@ public class AdminWebModuleSettings extends AcrossModuleSettings
 		                   "Default locale that should explicitly be set when accessing the administration interface if no specific locale." );
 		registry.register( LOCALE_OPTIONS, List.class, Collections.emptyList(),
 		                   "List of locales that can be selected on the login page." );
-		registry.register( ADMIN_ACCESS_PERMISSIONS, String[].class, new String[]{ "access administration" },
+		registry.register( ADMIN_ACCESS_PERMISSIONS, String[].class, new String[] { "access administration" },
 		                   "List of permissions that grant access to the administration interface." );
+		registry.register( DASHBOARD_PATH, String.class, null,
+		                   "Relative path (within admin web) for the landing page of admin web." );
 	}
 
 	public String getTitle() {
@@ -109,4 +113,22 @@ public class AdminWebModuleSettings extends AcrossModuleSettings
 		return getProperty( ADMIN_ACCESS_PERMISSIONS, String[].class );
 	}
 
+	/**
+	 * Allows changing the admin web dashboard path at runtime.
+	 *
+	 * @param dashboardPath Path within the admin web context to the dashboard.
+	 */
+	public void setDashboardPath( String dashboardPath ) {
+		this.dashboardPath = dashboardPath;
+	}
+
+	public String getDashboardPath() {
+		if ( dashboardPath == null ) {
+			String path = getProperty( DASHBOARD_PATH );
+
+			return StringUtils.isEmpty( path ) ? "/" : path;
+		}
+
+		return dashboardPath;
+	}
 }
