@@ -82,7 +82,7 @@ public class AdminWebMvcConfiguration extends PrefixingHandlerMappingConfigurati
 			cookieLocaleResolver.setDefaultLocale( defaultLocale );
 		}
 
-		return new CookieLocaleResolver();
+		return cookieLocaleResolver;
 	}
 
 	@Bean(name = "adminWebHandlerMapping")
