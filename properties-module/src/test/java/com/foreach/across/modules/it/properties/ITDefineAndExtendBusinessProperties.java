@@ -413,6 +413,61 @@ public class ITDefineAndExtendBusinessProperties
 		assertEquals( uuid, newDraftProps.getValue( "uuid", UUID.class ) );
 	}
 
+	@Test
+	public void overrideSpecificRevisionUpdates() {
+		Entity entity = new Entity( entityId() );
+		EntityRevision one = new EntityRevision( entity, 1, false, false );
+		EntityRevision two = new EntityRevision( entity, 2, false, false );
+		EntityRevision three = new EntityRevision( entity, 3, false, false );
+
+		EntityRevision draft = new EntityRevision( entity, Revision.DRAFT, true, false );
+
+		RevisionProperties draftProps = revisionPropertyService.getProperties( draft );
+		assertNotNull( draftProps );
+		assertTrue( draftProps.isEmpty() );
+
+		draftProps.put( "integer", 123 );
+		draftProps.put( "string", "text" );
+
+		revisionPropertyService.saveProperties( draftProps, draft );
+		revisionPropertyService.checkin( draft, 1 );
+
+		draftProps = revisionPropertyService.checkout( one );
+		assertEquals( 2, draftProps.size() );
+		assertEquals( Integer.valueOf( 123 ), draftProps.getValue( "integer", Integer.class ) );
+		assertEquals( "text", draftProps.getValue( "string" ) );
+
+		draftProps.remove( "integer" );
+		draftProps.put( "string", "other text" );
+		draftProps.put( "decimal", new BigDecimal( "123.55" ) );
+
+		revisionPropertyService.saveProperties( draftProps, draft );
+		revisionPropertyService.checkin( draft, 2 );
+
+		draftProps = revisionPropertyService.checkout( one );
+		assertEquals( 2, draftProps.size() );
+		assertEquals( Integer.valueOf( 123 ), draftProps.getValue( "integer", Integer.class ) );
+		assertEquals( "text", draftProps.getValue( "string" ) );
+
+		// Just check version one in again
+		revisionPropertyService.checkin( draft, 3 );
+
+		RevisionProperties oneProps = revisionPropertyService.getProperties( one );
+		assertEquals( 2, oneProps.size() );
+		assertEquals( Integer.valueOf( 123 ), oneProps.getValue( "integer", Integer.class ) );
+		assertEquals( "text", oneProps.getValue( "string" ) );
+
+		RevisionProperties twoProps = revisionPropertyService.getProperties( two );
+		assertEquals( 2, twoProps.size() );
+		assertEquals( new BigDecimal( "123.55" ), twoProps.getValue( "decimal", BigDecimal.class ) );
+		assertEquals( "other text", twoProps.getValue( "string" ) );
+
+		RevisionProperties threeProps = revisionPropertyService.getProperties( three );
+		assertEquals( 2, threeProps.size() );
+		assertEquals( Integer.valueOf( 123 ), threeProps.getValue( "integer", Integer.class ) );
+		assertEquals( "text", threeProps.getValue( "string" ) );
+	}
+
 	private long entityId() {
 		return entityId++;
 	}
