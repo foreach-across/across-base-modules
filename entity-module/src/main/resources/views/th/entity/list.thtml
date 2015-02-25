@@ -67,10 +67,7 @@
 							    th:class="${prop.sortable} ? 'sortable'"
 							    th:if="${prop.elementType != 'button-link'}"
 							    th:attr="data-tbl-sort-property=${prop.sortable ? prop.sortableProperty : null},data-tbl='entity-list'"
-
-							    th:text="${prop.label}"
-							    >
-								Name
+							    ><span th:text="${prop.label}">Name</span>
 							</th>
 							<th th:unless="${#strings.isEmpty(messages.updateAction(entity))}"></th>
 						</tr>
