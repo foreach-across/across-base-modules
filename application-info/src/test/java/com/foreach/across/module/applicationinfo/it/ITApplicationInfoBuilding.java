@@ -47,8 +47,10 @@ public class ITApplicationInfoBuilding
 			assertNotNull( applicationInfo.getBootstrapEndDate() );
 
 			assertTrue( applicationInfo.getStartupDate().getTime() >= startOfTest );
-			assertTrue( applicationInfo.getBootstrapStartDate().after( applicationInfo.getStartupDate() ) );
-			assertTrue( applicationInfo.getBootstrapEndDate().after( applicationInfo.getBootstrapStartDate() ) );
+			assertTrue(
+					applicationInfo.getBootstrapStartDate().getTime() >= applicationInfo.getStartupDate().getTime() );
+			assertTrue( applicationInfo.getBootstrapEndDate().getTime() >= applicationInfo.getBootstrapStartDate()
+			                                                                              .getTime() );
 		}
 	}
 
