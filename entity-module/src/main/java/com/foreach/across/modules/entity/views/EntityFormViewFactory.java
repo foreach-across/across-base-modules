@@ -73,7 +73,7 @@ public class EntityFormViewFactory<V extends ViewCreationContext> extends Config
 		EntityMessages messages = view.getEntityMessages();
 
 		ContainerViewElement buttons = new ContainerViewElement();
-		buttons.setName( "butttons" );
+		buttons.setName( "buttons" );
 
 		ButtonViewElement save = new ButtonViewElement();
 		save.setName( "btn-save" );
