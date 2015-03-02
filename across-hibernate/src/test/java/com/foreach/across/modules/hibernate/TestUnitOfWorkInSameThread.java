@@ -153,6 +153,8 @@ public class TestUnitOfWorkInSameThread
 			acrossContext.addModule( hibernate1Module() );
 			acrossContext.addModule( hibernate2Module() );
 
+			acrossContext.bootstrap();
+
 			return acrossContext;
 		}
 
