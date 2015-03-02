@@ -10,10 +10,6 @@
 
 	<artifactId>entity-module</artifactId>
 
-    <properties>
-        <jackson.version>2.3.2</jackson.version>
-    </properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>across-standard-modules</groupId>
@@ -35,7 +31,7 @@
 			<artifactId>javax.el-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish.web</groupId>
+			<groupId>org.glassfish</groupId>
 			<artifactId>javax.el</artifactId>
 		</dependency>
 		<dependency>
@@ -45,12 +41,10 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
 			<groupId>javax.servlet</groupId>
