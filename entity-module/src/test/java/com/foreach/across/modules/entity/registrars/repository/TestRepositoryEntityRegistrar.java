@@ -287,7 +287,7 @@ public class TestRepositoryEntityRegistrar
 			context.addModule( hibernateModule );
 
 			SpringDataJpaModule springDataJpaModule = new SpringDataJpaModule();
-			springDataJpaModule.setExposeFilter( new ClassBeanFilter( ClientRepository.class ) );
+			springDataJpaModule.setExposeFilter( new ClassBeanFilter( Repository.class ) );
 			context.addModule( springDataJpaModule );
 		}
 	}

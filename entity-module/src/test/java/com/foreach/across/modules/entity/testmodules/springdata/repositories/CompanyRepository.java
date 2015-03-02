@@ -17,10 +17,11 @@ package com.foreach.across.modules.entity.testmodules.springdata.repositories;
 
 import com.foreach.across.modules.entity.testmodules.springdata.business.Company;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
  * @author Arne Vandamme
  */
-public interface CompanyRepository extends JpaRepository<Company, String>
+public interface CompanyRepository extends JpaRepository<Company, String>, JpaSpecificationExecutor<Company>
 {
 }

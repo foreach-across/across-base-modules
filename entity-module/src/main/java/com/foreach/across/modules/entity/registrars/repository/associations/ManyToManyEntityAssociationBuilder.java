@@ -19,14 +19,18 @@ import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
-import com.foreach.across.modules.entity.views.EntityFormView;
-import com.foreach.across.modules.entity.views.EntityFormViewFactory;
-import com.foreach.across.modules.entity.views.EntityListView;
-import com.foreach.across.modules.entity.views.EntityListViewFactory;
+import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
+import com.foreach.across.modules.entity.views.*;
+import com.foreach.across.modules.entity.views.fetchers.AssociationJpaSpecificationListViewPageFetcher;
+import com.foreach.across.modules.entity.views.fetchers.AssociationPropertyListViewPageFetcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.mapping.PersistentProperty;
+import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.ManyToMany;
@@ -37,6 +41,8 @@ import javax.persistence.ManyToMany;
 @Component
 public class ManyToManyEntityAssociationBuilder implements EntityAssociationBuilder
 {
+	private static final Logger LOG = LoggerFactory.getLogger( ManyToManyEntityAssociationBuilder.class );
+
 	@Autowired
 	private BeanFactory beanFactory;
 
@@ -53,24 +59,50 @@ public class ManyToManyEntityAssociationBuilder implements EntityAssociationBuil
 				= entityRegistry.getMutableEntityConfiguration( property.getActualType() );
 
 		if ( other != null ) {
-			createAssociationFromTo( entityConfiguration, other, property );
-			createAssociationFromTo( other, entityConfiguration, property );
+			String associationName = entityConfiguration.getName() + "." + property.getName();
+
+			// Create source to target association
+			MutableEntityAssociation association = entityConfiguration.association( associationName );
+
+			if ( association == null ) {
+				association = entityConfiguration.createAssociation( associationName );
+				association.setTargetEntityConfiguration( other );
+				association.setSourceProperty(
+						entityConfiguration.getPropertyRegistry().getProperty( property.getName() )
+				);
+				association.addAttribute( PersistentProperty.class, property );
+
+				buildCreateView( association );
+				buildListView( association );
+			}
+			else {
+				LOG.info( "Skipping automatic registration of association {} on {} as it is already registered.",
+				          associationName, entityConfiguration.getName() );
+			}
+
+			// Create target to source association (reverse)
+			association = other.association( associationName );
+
+			if ( association == null ) {
+				association = other.createAssociation( associationName );
+
+				association.setTargetEntityConfiguration( entityConfiguration );
+				association.setTargetProperty(
+						entityConfiguration.getPropertyRegistry().getProperty( property.getName() )
+				);
+				association.addAttribute( PersistentProperty.class, property );
+
+				buildCreateView( association );
+				buildListView( association );
+			}
+			else {
+				LOG.info( "Skipping automatic registration of association {} on {} as it is already registered.",
+				          associationName, other.getName() );
+			}
 		}
 	}
 
-	private void createAssociationFromTo( MutableEntityConfiguration from,
-	                                      MutableEntityConfiguration to,
-	                                      PersistentProperty property ) {
-		MutableEntityAssociation association = from.createAssociation( property.getName() );
-		association.setTargetEntityConfiguration( to );
-		association.addAttribute( PersistentProperty.class, property );
-
-		buildCreateView( association );
-		buildListView( association, property );
-	}
-
-	public void buildListView( MutableEntityAssociation association,
-	                           final PersistentProperty property ) {
+	public void buildListView( MutableEntityAssociation association ) {
 		EntityConfiguration to = association.getTargetEntityConfiguration();
 
 		EntityListViewFactory viewFactory = beanFactory.getBean( EntityListViewFactory.class );
@@ -80,36 +112,7 @@ public class ManyToManyEntityAssociationBuilder implements EntityAssociationBuil
 		                                "entityViews.listView",
 		                                "entityViews" );
 
-//		Repository repository = to.getAttribute( Repository.class );
-//		if ( repository instanceof JpaSpecificationExecutor ) {
-//			final JpaSpecificationExecutor jpa = (JpaSpecificationExecutor) repository;
-//			viewFactory.setPageFetcher( new EntityListViewPageFetcher<WebViewCreationContext>()
-//			{
-//				@Override
-//				public Page fetchPage( WebViewCreationContext viewCreationContext,
-//				                       Pageable pageable,
-//				                       final EntityView model ) {
-//					/*BeanWrapper beanWrapper = new BeanWrapperImpl( model.getEntity());
-//					beanWrapper.getPropertyValue(  )*/
-//
-//					Specification s = new Specification<Object>()
-//					{
-//						@Override
-//						public Predicate toPredicate( Root<Object> root, CriteriaQuery<?> query, CriteriaBuilder cb ) {
-//							return cb.equal( root.get( property.getName() ), model.getEntity() );
-//						}
-//					};
-//
-//					return jpa.findAll( s, pageable );
-//				}
-//			} );
-//		}
-//		else if ( repository instanceof QueryDslPredicateExecutor ) {
-//			System.err.println( "Repository not matching for: " + to.getName() );
-//		}
-//		else {
-//			System.err.println( "Repository not matching for: " + to.getName() );
-//		}
+		viewFactory.setPageFetcher( buildManyToManyListViewPageFetcher( association ) );
 
 		association.registerView( EntityListView.VIEW_NAME, viewFactory );
 	}
@@ -124,6 +127,26 @@ public class ManyToManyEntityAssociationBuilder implements EntityAssociationBuil
 		                                "entityViews" );
 
 		association.registerView( EntityFormView.CREATE_VIEW_NAME, viewFactory );
+	}
 
+	private EntityListViewPageFetcher buildManyToManyListViewPageFetcher( MutableEntityAssociation association ) {
+		EntityPropertyDescriptor source = association.getSourceProperty();
+
+		if ( source != null ) {
+			return new AssociationPropertyListViewPageFetcher( source.getName() );
+		}
+		else {
+			// Reverse association
+			Repository repository = association.getTargetEntityConfiguration().getAttribute( Repository.class );
+
+			if ( repository != null ) {
+				if ( repository instanceof JpaSpecificationExecutor ) {
+					return new AssociationJpaSpecificationListViewPageFetcher(
+							association.getTargetProperty().getName(), (JpaSpecificationExecutor) repository );
+				}
+			}
+		}
+
+		return null;
 	}
 }

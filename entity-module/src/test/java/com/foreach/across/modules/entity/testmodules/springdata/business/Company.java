@@ -17,10 +17,7 @@ package com.foreach.across.modules.entity.testmodules.springdata.business;
 
 import org.springframework.data.domain.Persistable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,6 +27,9 @@ import java.util.Set;
 @Entity
 public class Company implements Persistable<String>
 {
+	@Transient
+	private boolean isNew;
+
 	@Id
 	private String id;
 
@@ -46,7 +46,19 @@ public class Company implements Persistable<String>
 
 	@Override
 	public boolean isNew() {
-		return true;
+		return isNew;
+	}
+
+	public void setNew( boolean isNew ) {
+		this.isNew = isNew;
+	}
+
+	public Company() {
+	}
+
+	public Company( String id ) {
+		this.id = id;
+		setNew( true );
 	}
 
 	public CompanyStatus getStatus() {
@@ -63,5 +75,28 @@ public class Company implements Persistable<String>
 
 	public void setRepresentatives( Set<Representative> representatives ) {
 		this.representatives = representatives;
+	}
+
+	@Override
+	public boolean equals( Object o ) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		Company company = (Company) o;
+
+		if ( id != null ? !id.equals( company.id ) : company.id != null ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id.hashCode() : 0;
 	}
 }

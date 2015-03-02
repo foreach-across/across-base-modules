@@ -16,6 +16,7 @@
 package com.foreach.across.modules.entity.config;
 
 import com.foreach.across.modules.entity.registrars.repository.*;
+import com.foreach.across.modules.entity.registrars.repository.associations.ManyToManyEntityAssociationBuilder;
 import com.foreach.across.modules.entity.registrars.repository.associations.ManyToOneEntityAssociationBuilder;
 import com.foreach.across.modules.entity.registrars.repository.associations.OneToManyEntityAssociationBuilder;
 import com.foreach.across.modules.entity.registry.builders.EntityPropertyRegistryMappingMetaDataBuilder;
@@ -61,13 +62,11 @@ public class RepositoryRegistrarConfiguration
 		return new ManyToOneEntityAssociationBuilder();
 	}
 
-	/*
 	// todo: implement many to many nicely
 	@Bean
 	protected ManyToManyEntityAssociationBuilder manyToManyAssociationViewBuilder() {
 		return new ManyToManyEntityAssociationBuilder();
 	}
-	*/
 
 	@Bean
 	protected OneToManyEntityAssociationBuilder oneToManyAssociationViewBuilder() {

@@ -15,11 +15,11 @@
  */
 package com.foreach.across.modules.entity.testmodules.springdata.business;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 /**
  * @author Andy Somers
@@ -27,10 +27,22 @@ import javax.persistence.Id;
 @Entity
 public class Representative implements Persistable<String>
 {
+	@Transient
+	private boolean isNew;
+
 	@Id
 	private String id;
 
 	private String name;
+
+	public Representative() {
+	}
+
+	public Representative( String id, String name ) {
+		this.id = id;
+		this.name = name;
+		setNew( true );
+	}
 
 	@Override
 	public String getId() {
@@ -39,7 +51,11 @@ public class Representative implements Persistable<String>
 
 	@Override
 	public boolean isNew() {
-		return StringUtils.isBlank( id );
+		return isNew;
+	}
+
+	public void setNew( boolean isNew ) {
+		this.isNew = isNew;
 	}
 
 	public void setId( String id ) {
@@ -52,5 +68,33 @@ public class Representative implements Persistable<String>
 
 	public void setName( String name ) {
 		this.name = name;
+	}
+
+	@Override
+	public boolean equals( Object o ) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		Representative that = (Representative) o;
+
+		if ( id != null ? !id.equals( that.id ) : that.id != null ) {
+			return false;
+		}
+		if ( name != null ? !name.equals( that.name ) : that.name != null ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = id != null ? id.hashCode() : 0;
+		result = 31 * result + ( name != null ? name.hashCode() : 0 );
+		return result;
 	}
 }
