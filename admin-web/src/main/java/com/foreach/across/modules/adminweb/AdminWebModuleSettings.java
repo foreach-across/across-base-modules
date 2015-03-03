@@ -63,6 +63,8 @@ public class AdminWebModuleSettings extends AcrossModuleSettings
 	public static final String ADMIN_ACCESS_PERMISSIONS = "adminWebModule.access.permissions";
 	public static final String DASHBOARD_PATH = "adminWebModule.dashboard";
 
+	public static final String LOGIN_TEMPLATE = "adminWebModule.login.template";
+
 	private String title;
 	private String dashboardPath = null;
 
@@ -83,6 +85,7 @@ public class AdminWebModuleSettings extends AcrossModuleSettings
 		                   "List of permissions that grant access to the administration interface." );
 		registry.register( DASHBOARD_PATH, String.class, null,
 		                   "Relative path (within admin web) for the landing page of admin web." );
+		registry.register( LOGIN_TEMPLATE, String.class, null, "Custom template for the login page." );
 	}
 
 	public String getTitle() {
@@ -130,5 +133,9 @@ public class AdminWebModuleSettings extends AcrossModuleSettings
 		}
 
 		return dashboardPath;
+	}
+
+	public String getLoginTemplate() {
+		return getProperty( LOGIN_TEMPLATE );
 	}
 }

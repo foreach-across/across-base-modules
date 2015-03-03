@@ -56,6 +56,12 @@ public class AuthenticationController
 	public String login( Model model ) {
 		model.addAttribute( "localeOptions", buildLocaleOptions() );
 
+		String loginTemplate = settings.getLoginTemplate();
+
+		if ( StringUtils.isNoneBlank( loginTemplate ) ) {
+			return loginTemplate;
+		}
+
 		return "th/adminweb/login";
 	}
 
