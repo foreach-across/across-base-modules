@@ -34,13 +34,18 @@ import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.web.EntityAssociationLinkBuilder;
 import com.foreach.across.modules.entity.web.EntityConfigurationLinkBuilder;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.ConversionService;
 
 @AcrossDepends(required = "AdminWebModule")
 @Configuration
 public class AdminWebConfiguration implements EntityConfigurer
 {
+	@Autowired
+	private ConversionService conversionService;
+
 	@Bean
 	public MenuEventsHandler menuEventsHandler() {
 		return new MenuEventsHandler();
@@ -87,13 +92,17 @@ public class AdminWebConfiguration implements EntityConfigurer
 		{
 			@Override
 			public void process( MutableEntityConfiguration<?> configuration ) {
-				configuration.addAttribute( EntityLinkBuilder.class,
-				                            new EntityConfigurationLinkBuilder( EntityControllerAttributes.ROOT_PATH,
-				                                                                configuration ) );
+				configuration.addAttribute(
+						EntityLinkBuilder.class,
+						new EntityConfigurationLinkBuilder(
+								EntityControllerAttributes.ROOT_PATH, configuration, conversionService
+						)
+				);
 
 				for ( EntityAssociation association : configuration.getAssociations() ) {
 					MutableEntityAssociation mutable = configuration.association( association.getName() );
-					mutable.addAttribute( EntityLinkBuilder.class, new EntityAssociationLinkBuilder( association ) );
+					mutable.addAttribute( EntityLinkBuilder.class,
+					                      new EntityAssociationLinkBuilder( association, conversionService ) );
 				}
 			}
 		} );

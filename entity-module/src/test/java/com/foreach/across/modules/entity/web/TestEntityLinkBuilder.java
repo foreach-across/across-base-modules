@@ -20,6 +20,9 @@ import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityModel;
 import org.junit.Test;
+import org.springframework.core.convert.ConversionService;
+
+import java.math.BigDecimal;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyObject;
@@ -35,12 +38,16 @@ public class TestEntityLinkBuilder
 		when( entityConfiguration.getName() ).thenReturn( "basicPrincipal" );
 
 		EntityModel model = mock( EntityModel.class );
-		when( model.getId( anyObject() ) ).thenReturn( 10001 );
+		when( model.getId( anyObject() ) ).thenReturn( new BigDecimal( "100.01" ) );
 
 		when( entityConfiguration.getEntityModel() ).thenReturn( model );
 
-		EntityLinkBuilder url =
-				new EntityConfigurationLinkBuilder( EntityControllerAttributes.ROOT_PATH, entityConfiguration );
+		ConversionService conversionService = mock( ConversionService.class );
+		when( conversionService.convert( new BigDecimal( "100.01" ), String.class ) ).thenReturn( "10001" );
+
+		EntityLinkBuilder url = new EntityConfigurationLinkBuilder(
+				EntityControllerAttributes.ROOT_PATH, entityConfiguration, conversionService
+		);
 
 		assertEquals( "/entities/basicPrincipal", url.overview() );
 		assertEquals( "/entities/basicPrincipal/create", url.create() );
@@ -62,8 +69,12 @@ public class TestEntityLinkBuilder
 
 		when( entityConfiguration.getEntityModel() ).thenReturn( model );
 
+		ConversionService conversionService = mock( ConversionService.class );
+		when( conversionService.convert( "someStringId", String.class ) ).thenReturn( "someStringId" );
+
 		EntityLinkBuilder url =
-				new EntityConfigurationLinkBuilder( EntityControllerAttributes.ROOT_PATH, entityConfiguration );
+				new EntityConfigurationLinkBuilder( EntityControllerAttributes.ROOT_PATH, entityConfiguration,
+				                                    conversionService );
 
 		assertEquals( "/entities/basicPrincipal", url.overview() );
 		assertEquals( "/entities/basicPrincipal/create", url.create() );
@@ -95,10 +106,14 @@ public class TestEntityLinkBuilder
 		when( association.getSourceEntityConfiguration() ).thenReturn( parentConfig );
 		when( association.getTargetEntityConfiguration() ).thenReturn( associatedConfig );
 
+		ConversionService conversionService = mock( ConversionService.class );
+		when( conversionService.convert( 10001, String.class ) ).thenReturn( "10001" );
+		when( conversionService.convert( 123, String.class ) ).thenReturn( "123" );
+
 		EntityLinkBuilder parent =
-				new EntityConfigurationLinkBuilder( EntityControllerAttributes.ROOT_PATH, parentConfig );
-		EntityAssociationLinkBuilder
-				url = new EntityAssociationLinkBuilder( association );
+				new EntityConfigurationLinkBuilder( EntityControllerAttributes.ROOT_PATH, parentConfig,
+				                                    conversionService );
+		EntityAssociationLinkBuilder url = new EntityAssociationLinkBuilder( association, conversionService );
 		url.setAssociationsPath( "{0}/{1}/others/{2}" );
 
 		EntityLinkBuilder scoped = url.asAssociationFor( parent, "someEntity" );

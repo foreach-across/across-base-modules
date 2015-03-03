@@ -16,8 +16,7 @@
 package com.foreach.across.modules.entity.web;
 
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
-import com.foreach.across.modules.entity.registry.EntityModel;
-import org.apache.commons.lang3.ClassUtils;
+import org.springframework.core.convert.ConversionService;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -30,34 +29,21 @@ public class EntityConfigurationLinkBuilder implements EntityLinkBuilder
 {
 	private final String rootPath;
 	private final EntityConfiguration entityConfiguration;
+	private final ConversionService conversionService;
 
 	private String overviewPath = "{0}/{1}";
 	private String createPath = "{0}/{1}/create";
-	private String viewPath = "{0}/{1}/{2,number,#}";
-	private String updatePath = "{0}/{1}/{2,number,#}/update";
-	private String deletePath = "{0}/{1}/{2,number,#}/delete";
-	private String associationsPath = "{0}/{1}/{2,number,#}/associations";
+	private String viewPath = "{0}/{1}/{2}";
+	private String updatePath = "{0}/{1}/{2}/update";
+	private String deletePath = "{0}/{1}/{2}/delete";
+	private String associationsPath = "{0}/{1}/{2}/associations";
 
-	public EntityConfigurationLinkBuilder( String rootPath, EntityConfiguration entityConfiguration ) {
+	public EntityConfigurationLinkBuilder( String rootPath,
+	                                       EntityConfiguration entityConfiguration,
+	                                       ConversionService conversionService ) {
 		this.rootPath = rootPath;
 		this.entityConfiguration = entityConfiguration;
-
-		if ( !isNumberIdType( entityConfiguration ) ) {
-			viewPath = "{0}/{1}/{2}";
-			updatePath = "{0}/{1}/{2}/update";
-			deletePath = "{0}/{1}/{2}/delete";
-			associationsPath = "{0}/{1}/{2}/associations";
-		}
-	}
-
-	private boolean isNumberIdType( EntityConfiguration entityConfiguration ) {
-		EntityModel entityModel = entityConfiguration.getEntityModel();
-
-		if ( entityModel != null ) {
-			return ClassUtils.isAssignable( entityModel.getIdType(), Number.class );
-		}
-
-		return false;
+		this.conversionService = conversionService;
 	}
 
 	protected String getOverviewPath() {
@@ -145,7 +131,9 @@ public class EntityConfigurationLinkBuilder implements EntityLinkBuilder
 	@SuppressWarnings("unchecked")
 	private String format( String pattern, Object entity ) {
 		Serializable id = entityConfiguration.getEntityModel().getId( entity );
-		return MessageFormat.format( pattern, rootPath, getEntityConfigurationPath(), id );
+		String idAsString = conversionService.convert( id, String.class );
+
+		return MessageFormat.format( pattern, rootPath, getEntityConfigurationPath(), idAsString );
 	}
 
 	protected String getEntityConfigurationPath() {

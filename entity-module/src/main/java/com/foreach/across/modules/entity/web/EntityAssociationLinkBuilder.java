@@ -17,6 +17,7 @@ package com.foreach.across.modules.entity.web;
 
 import com.foreach.across.modules.entity.registry.EntityAssociation;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.convert.ConversionService;
 
 /**
  * Generates links for an {@link com.foreach.across.modules.entity.registry.EntityAssociation}.
@@ -29,8 +30,8 @@ public class EntityAssociationLinkBuilder extends EntityConfigurationLinkBuilder
 {
 	private final EntityAssociation association;
 
-	public EntityAssociationLinkBuilder( EntityAssociation association ) {
-		super( StringUtils.EMPTY, association.getTargetEntityConfiguration() );
+	public EntityAssociationLinkBuilder( EntityAssociation association, ConversionService conversionService ) {
+		super( StringUtils.EMPTY, association.getTargetEntityConfiguration(), conversionService );
 
 		this.association = association;
 	}
