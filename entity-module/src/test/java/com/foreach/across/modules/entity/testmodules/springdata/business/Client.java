@@ -55,6 +55,11 @@ public class Client extends SettableIdBasedEntity<Client>
 		this.name = name;
 	}
 
+	public Client( String name, Company company ) {
+		this.name = name;
+		this.company = company;
+	}
+
 	public Long getId() {
 		return id;
 	}

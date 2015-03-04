@@ -19,17 +19,26 @@ import com.foreach.across.modules.entity.registrars.repository.TestRepositoryEnt
 import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.EntityRegistry;
+import com.foreach.across.modules.entity.testmodules.springdata.business.Car;
 import com.foreach.across.modules.entity.testmodules.springdata.business.Client;
 import com.foreach.across.modules.entity.testmodules.springdata.business.Company;
-import com.foreach.across.modules.entity.views.EntityListView;
+import com.foreach.across.modules.entity.testmodules.springdata.repositories.ClientRepository;
+import com.foreach.across.modules.entity.testmodules.springdata.repositories.CompanyRepository;
+import com.foreach.across.modules.entity.views.*;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.ui.ModelMap;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Verifies that a @ManyToOne is registered as a @OneToMany on the source entity.
@@ -41,8 +50,42 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestRepositoryEntityRegistrar.Config.class)
 public class TestManyToOneAssociations
 {
+	private static boolean inserted = false;
+
+	private static Company one, two, three;
+	private static Client john, joe, peter;
+
 	@Autowired
 	private EntityRegistry entityRegistry;
+
+	@Autowired
+	private CompanyRepository companyRepository;
+
+	@Autowired
+	private ClientRepository clientRepository;
+
+	private EntityListViewPageFetcher pageFetcher;
+
+	@Before
+	public void insertTestData() {
+		pageFetcher = null;
+
+		if ( !inserted ) {
+			inserted = true;
+
+			one = new Company( "one" );
+			two = new Company( "two" );
+			three = new Company( "three" );
+
+			companyRepository.save( Arrays.asList( one, two, three ) );
+
+			john = new Client( "john", one );
+			joe = new Client( "joe", two );
+			peter = new Client( "peter", two );
+
+			clientRepository.save( Arrays.asList( john, joe, peter ) );
+		}
+	}
 
 	@Test
 	public void companyShouldHaveAnAssociationToItsClients() {
@@ -68,5 +111,47 @@ public class TestManyToOneAssociations
 		assertSame( client.getPropertyRegistry().getProperty( "company" ), association.getTargetProperty() );
 
 		assertTrue( association.hasView( EntityListView.VIEW_NAME ) );
+	}
+
+	@Test
+	public void companyShouldNotHaveAssociationToItsCarsAsTheRepositoryDoesNotSupportSpecifications() {
+		EntityConfiguration company = entityRegistry.getEntityConfiguration( Company.class );
+		EntityConfiguration car = entityRegistry.getEntityConfiguration( Car.class );
+
+		assertNotNull( car );
+
+		EntityAssociation association = company.association( "car.company" );
+		assertNull( association );
+	}
+
+	@Test
+	public void companyHasClients() {
+		EntityConfiguration company = entityRegistry.getEntityConfiguration( Company.class );
+		EntityAssociation association = company.association( "client.company" );
+
+		assertNotNull( association );
+
+		EntityListViewFactory listViewFactory = association.getViewFactory( EntityListView.VIEW_NAME );
+		assertNotNull( listViewFactory );
+
+		pageFetcher = listViewFactory.getPageFetcher();
+
+		verifyClients( one, john );
+		verifyClients( two, joe, peter );
+		verifyClients( three );
+	}
+
+	@SuppressWarnings("unchecked")
+	private void verifyClients( Company company, Client... clients ) {
+		assertNotNull( pageFetcher );
+
+		ViewCreationContext cc = mock( ViewCreationContext.class );
+		EntityView ev = new EntityListView( new ModelMap() );
+		ev.setParentEntity( company );
+
+		Page page = pageFetcher.fetchPage( cc, null, ev );
+		assertNotNull( page );
+		assertEquals( clients.length, page.getTotalElements() );
+		assertTrue( page.getContent().containsAll( Arrays.asList( clients ) ) );
 	}
 }

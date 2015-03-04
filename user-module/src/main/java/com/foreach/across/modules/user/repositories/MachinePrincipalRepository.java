@@ -15,13 +15,13 @@
  */
 package com.foreach.across.modules.user.repositories;
 
+import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
 import com.foreach.across.modules.user.business.MachinePrincipal;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author Arne Vandamme
  */
-public interface MachinePrincipalRepository extends JpaRepository<MachinePrincipal, Long>
+public interface MachinePrincipalRepository extends IdBasedEntityJpaRepository<MachinePrincipal>
 {
 	MachinePrincipal findByName( String name );
 }

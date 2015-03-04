@@ -38,6 +38,7 @@ public class TestEntityUtils
 		assertEquals( "Permission group", EntityUtils.generateDisplayName( "PermissionGroup" ) );
 		assertEquals( "Some field name", EntityUtils.generateDisplayName( "_someFieldName" ) );
 		assertEquals( "Test for me", EntityUtils.generateDisplayName( "_TEST_FOR_ME" ) );
+		assertEquals( "OAuth2 client", EntityUtils.generateDisplayName( "OAuth2Client" ) );
 	}
 
 	@Test

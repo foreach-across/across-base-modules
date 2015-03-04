@@ -55,7 +55,7 @@
 				   th:attr="data-tbl-page=${page.number + 1}" th:utext="${messages.nextPage(page)}">next</a>
 			</div>
 
-			<div class="panel-body">
+			<div class="panel-body" th:if="${page.hasContent()}">
 				<div class="table-responsive">
 
 					<table class="table table-hover" th:unless="${properties.empty}" data-tbl="entity-list" data-tbl-type="paged"

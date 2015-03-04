@@ -15,22 +15,21 @@
  */
 package com.foreach.across.modules.entity.registrars.repository.associations;
 
+import com.foreach.across.modules.entity.query.EntityQueryPageFetcher;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.views.*;
-import com.foreach.across.modules.entity.views.fetchers.AssociationJpaSpecificationListViewPageFetcher;
+import com.foreach.across.modules.entity.views.fetchers.AssociationListViewPageFetcher;
 import com.foreach.across.modules.entity.views.fetchers.AssociationPropertyListViewPageFetcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.mapping.PersistentProperty;
-import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.ManyToMany;
@@ -84,22 +83,35 @@ public class ManyToManyEntityAssociationBuilder implements EntityAssociationBuil
 			association = other.association( associationName );
 
 			if ( association == null ) {
-				association = other.createAssociation( associationName );
+				if ( canAssociationBeBuilt( other, entityConfiguration ) ) {
+					association = other.createAssociation( associationName );
 
-				association.setTargetEntityConfiguration( entityConfiguration );
-				association.setTargetProperty(
-						entityConfiguration.getPropertyRegistry().getProperty( property.getName() )
-				);
-				association.addAttribute( PersistentProperty.class, property );
+					association.setTargetEntityConfiguration( entityConfiguration );
+					association.setTargetProperty(
+							entityConfiguration.getPropertyRegistry().getProperty( property.getName() )
+					);
+					association.addAttribute( PersistentProperty.class, property );
 
-				buildCreateView( association );
-				buildListView( association );
+					buildCreateView( association );
+					buildListView( association );
+				}
 			}
 			else {
 				LOG.info( "Skipping automatic registration of association {} on {} as it is already registered.",
 				          associationName, other.getName() );
 			}
 		}
+	}
+
+	private boolean canAssociationBeBuilt( MutableEntityConfiguration from, MutableEntityConfiguration to ) {
+		if ( !to.hasAttribute( EntityQueryPageFetcher.class ) ) {
+			LOG.warn(
+					"Unable to build association between {} and {} because {} does not provide an EntityQueryPageFetcher.",
+					from.getName(), to.getName(), to.getName() );
+			return false;
+		}
+
+		return true;
 	}
 
 	public void buildListView( MutableEntityAssociation association ) {
@@ -137,13 +149,11 @@ public class ManyToManyEntityAssociationBuilder implements EntityAssociationBuil
 		}
 		else {
 			// Reverse association
-			Repository repository = association.getTargetEntityConfiguration().getAttribute( Repository.class );
+			EntityQueryPageFetcher queryPageFetcher = association.getTargetEntityConfiguration()
+			                                                     .getAttribute( EntityQueryPageFetcher.class );
 
-			if ( repository != null ) {
-				if ( repository instanceof JpaSpecificationExecutor ) {
-					return new AssociationJpaSpecificationListViewPageFetcher(
-							association.getTargetProperty().getName(), (JpaSpecificationExecutor) repository );
-				}
+			if ( queryPageFetcher != null ) {
+				return new AssociationListViewPageFetcher( association.getTargetProperty(), queryPageFetcher );
 			}
 		}
 

@@ -19,6 +19,9 @@ import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.annotations.EntityValidator;
+import com.foreach.across.modules.entity.query.EntityQueryPageFetcher;
+import com.foreach.across.modules.entity.query.jpa.EntityQueryJpaPageFetcher;
+import com.foreach.across.modules.entity.query.querydsl.EntityQueryQueryDslPageFetcher;
 import com.foreach.across.modules.entity.registrars.EntityRegistrar;
 import com.foreach.across.modules.entity.registry.*;
 import com.foreach.across.modules.entity.registry.builders.EntityPropertyRegistryMappingMetaDataBuilder;
@@ -30,8 +33,10 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.context.MappingContext;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 import org.springframework.util.ClassUtils;
@@ -147,6 +152,8 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 					buildMessageCodeResolver( entityConfiguration, moduleInfo )
 			);
 
+			registerEntityQueryPageFetcher( entityConfiguration );
+
 			propertyRegistryBuilder.buildEntityPropertyRegistry( entityConfiguration );
 			entityModelBuilder.buildEntityModel( entityConfiguration );
 			viewsBuilder.buildViews( entityConfiguration );
@@ -201,6 +208,28 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 		resolver.setFallbackCollections( EntityModule.NAME + ".entities", "" );
 
 		return resolver;
+	}
+
+	/**
+	 * Determine the best {@link com.foreach.across.modules.entity.query.EntityQueryPageFetcher} implementation
+	 * for this entity.
+	 */
+	private void registerEntityQueryPageFetcher( MutableEntityConfiguration entityConfiguration ) {
+		Repository repository = entityConfiguration.getAttribute( Repository.class );
+
+		EntityQueryPageFetcher entityQueryPageFetcher = null;
+
+		if ( repository instanceof JpaSpecificationExecutor ) {
+			entityQueryPageFetcher = new EntityQueryJpaPageFetcher( (JpaSpecificationExecutor) repository );
+		}
+		else if ( repository instanceof QueryDslPredicateExecutor ) {
+			entityQueryPageFetcher = new EntityQueryQueryDslPageFetcher( (QueryDslPredicateExecutor) repository,
+			                                                             entityConfiguration );
+		}
+
+		if ( entityQueryPageFetcher != null ) {
+			entityConfiguration.addAttribute( EntityQueryPageFetcher.class, entityQueryPageFetcher );
+		}
 	}
 
 	private String determineUniqueEntityTypeName( EntityRegistry registry, Class<?> entityType ) {

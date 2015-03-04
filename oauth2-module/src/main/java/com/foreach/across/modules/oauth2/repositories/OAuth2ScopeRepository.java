@@ -15,9 +15,9 @@
  */
 package com.foreach.across.modules.oauth2.repositories;
 
+import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
 import com.foreach.across.modules.oauth2.business.OAuth2Scope;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface OAuth2ScopeRepository extends JpaRepository<OAuth2Scope, Long>
+public interface OAuth2ScopeRepository extends IdBasedEntityJpaRepository<OAuth2Scope>
 {
 }

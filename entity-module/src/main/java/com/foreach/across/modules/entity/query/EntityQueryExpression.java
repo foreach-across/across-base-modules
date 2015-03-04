@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.user.repositories;
-
-import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
-import com.foreach.across.modules.user.business.Group;
+package com.foreach.across.modules.entity.query;
 
 /**
  * @author Arne Vandamme
  */
-public interface GroupRepository extends IdBasedEntityJpaRepository<Group>
+public interface EntityQueryExpression
 {
+	EntityQueryOps getOperand();
 }

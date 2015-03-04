@@ -15,17 +15,17 @@
  */
 package com.foreach.across.modules.user.repositories;
 
+import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalRetrievalStrategy;
 import com.foreach.across.modules.user.business.BasicSecurityPrincipal;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 /**
  * @author Arne Vandamme
  */
 public interface SecurityPrincipalRepository
-		extends JpaRepository<BasicSecurityPrincipal, Long>, SecurityPrincipalRetrievalStrategy
+		extends IdBasedEntityJpaRepository<BasicSecurityPrincipal>, SecurityPrincipalRetrievalStrategy
 {
 	@Query("select p from BasicSecurityPrincipal p where p.principalName = ?1")
 	@Override

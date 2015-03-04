@@ -15,29 +15,25 @@
  */
 package com.foreach.across.modules.entity.registrars.repository.associations;
 
+import com.foreach.across.modules.entity.query.EntityQueryPageFetcher;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityAssociation;
 import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
-import com.foreach.across.modules.entity.views.*;
-import com.foreach.across.modules.entity.web.WebViewCreationContext;
+import com.foreach.across.modules.entity.views.EntityFormView;
+import com.foreach.across.modules.entity.views.EntityFormViewFactory;
+import com.foreach.across.modules.entity.views.EntityListView;
+import com.foreach.across.modules.entity.views.EntityListViewFactory;
+import com.foreach.across.modules.entity.views.fetchers.AssociationListViewPageFetcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.mapping.PersistentProperty;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
-import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.ManyToOne;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 /**
  * Builds the association in the opposite direction.
@@ -47,6 +43,8 @@ import javax.persistence.criteria.Root;
 @Component
 public class ManyToOneEntityAssociationBuilder implements EntityAssociationBuilder
 {
+	private static final Logger LOG = LoggerFactory.getLogger( ManyToOneEntityAssociationBuilder.class );
+
 	@Autowired
 	private BeanFactory beanFactory;
 
@@ -60,8 +58,7 @@ public class ManyToOneEntityAssociationBuilder implements EntityAssociationBuild
 	                              MutableEntityConfiguration to,
 	                              PersistentProperty property ) {
 		MutableEntityConfiguration from = entityRegistry.getMutableEntityConfiguration( property.getActualType() );
-		if( from != null ) {
-
+		if ( from != null && canAssociationBeBuilt( from, to ) ) {
 			String associationName = to.getName() + "." + property.getName();
 
 			MutableEntityAssociation association = from.createAssociation( associationName );
@@ -73,8 +70,18 @@ public class ManyToOneEntityAssociationBuilder implements EntityAssociationBuild
 		}
 	}
 
-	public void buildListView( MutableEntityAssociation association,
-	                           final PersistentProperty property ) {
+	private boolean canAssociationBeBuilt( MutableEntityConfiguration from, MutableEntityConfiguration to ) {
+		if ( !to.hasAttribute( EntityQueryPageFetcher.class ) ) {
+			LOG.warn(
+					"Unable to build association between {} and {} because {} does not provide an EntityQueryPageFetcher.",
+					from.getName(), to.getName(), to.getName() );
+			return false;
+		}
+
+		return true;
+	}
+
+	public void buildListView( MutableEntityAssociation association, final PersistentProperty property ) {
 		EntityConfiguration to = association.getTargetEntityConfiguration();
 
 		EntityListViewFactory viewFactory = beanFactory.getBean( EntityListViewFactory.class );
@@ -84,33 +91,18 @@ public class ManyToOneEntityAssociationBuilder implements EntityAssociationBuild
 		                                "entityViews.listView",
 		                                "entityViews" );
 
-		Repository repository = to.getAttribute( Repository.class );
-		if ( repository instanceof JpaSpecificationExecutor ) {
-			final JpaSpecificationExecutor jpa = (JpaSpecificationExecutor) repository;
-			viewFactory.setPageFetcher( new EntityListViewPageFetcher<WebViewCreationContext>()
-			{
-				@Override
-				public Page fetchPage( WebViewCreationContext viewCreationContext,
-				                       Pageable pageable,
-				                       final EntityView model ) {
-					Specification s = new Specification<Object>()
-					{
-						@Override
-						public Predicate toPredicate( Root<Object> root, CriteriaQuery<?> query, CriteriaBuilder cb ) {
-							return cb.equal( root.get( property.getName() ), model.getEntity() );
-						}
-					};
+		EntityQueryPageFetcher queryPageFetcher = to.getAttribute( EntityQueryPageFetcher.class );
 
-					return jpa.findAll( s, pageable );
-				}
-			} );
-		}
-		else if ( repository instanceof QueryDslPredicateExecutor ) {
-			System.err.println( "Repository not matching for: " + to.getName() );
+		if ( queryPageFetcher != null ) {
+			viewFactory.setPageFetcher(
+					new AssociationListViewPageFetcher( association.getTargetProperty(), queryPageFetcher )
+			);
 		}
 		else {
-			System.err.println( "Repository not matching for: " + to.getName() );
+			LOG.warn( "Unable to create ManyToOne association {} as there is no EntityQueryPageFetcher available",
+			          association.getName() );
 		}
+
 		association.registerView( EntityListView.VIEW_NAME, viewFactory );
 	}
 

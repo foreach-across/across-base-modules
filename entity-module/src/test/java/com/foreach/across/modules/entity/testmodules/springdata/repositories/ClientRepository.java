@@ -16,8 +16,8 @@
 package com.foreach.across.modules.entity.testmodules.springdata.repositories;
 
 import com.foreach.across.modules.entity.testmodules.springdata.business.Client;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
 
-public interface ClientRepository extends JpaRepository<Client, Long>
+public interface ClientRepository extends IdBasedEntityJpaRepository<Client>
 {
 }

@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.user.repositories;
+package com.foreach.across.modules.hibernate.jpa.repositories;
 
-import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
-import com.foreach.across.modules.user.business.Group;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+import java.io.Serializable;
 
 /**
+ * Shortcut interface combining the default {@link org.springframework.data.jpa.repository.JpaRepository} with a
+ * {@link org.springframework.data.jpa.repository.JpaSpecificationExecutor}.
+ *
  * @author Arne Vandamme
  */
-public interface GroupRepository extends IdBasedEntityJpaRepository<Group>
+public interface CommonJpaRepository<T, U extends Serializable> extends JpaRepository<T, U>, JpaSpecificationExecutor<T>
 {
 }

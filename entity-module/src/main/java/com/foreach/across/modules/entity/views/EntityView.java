@@ -52,6 +52,9 @@ public class EntityView implements Model
 	public static final String ATTRIBUTE_ENTITY_MENU = "entityMenu";
 	public static final String ATTRIBUTE_PAGE_TITLE = "pageTitle";
 
+	// Will contain the entity that is the parent of the association, if applicable
+	public static final String ATTRIBUTE_PARENT_ENTITY = "parentEntity";
+
 	private final ModelMap model;
 
 	private String template;
@@ -117,6 +120,18 @@ public class EntityView implements Model
 
 	public void setEntity( Object entity ) {
 		model.put( ATTRIBUTE_ENTITY, entity );
+	}
+
+	/**
+	 * @return The parent entity in case of an associated entity view.  The parent is usually the context for which
+	 * the current entity is being viewed.
+	 */
+	public Object getParentEntity() {
+		return getAttribute( ATTRIBUTE_PARENT_ENTITY );
+	}
+
+	public void setParentEntity( Object entity ) {
+		addAttribute( ATTRIBUTE_PARENT_ENTITY, entity );
 	}
 
 	public void setPageTitle( String pageTitle ) {

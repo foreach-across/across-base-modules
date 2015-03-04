@@ -15,10 +15,10 @@
  */
 package com.foreach.across.modules.user.repositories;
 
+import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
 import com.foreach.across.modules.user.business.Role;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RoleRepository extends JpaRepository<Role, Long>
+public interface RoleRepository extends IdBasedEntityJpaRepository<Role>
 {
 	Role findByAuthority( String authority );
 }

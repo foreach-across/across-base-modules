@@ -22,7 +22,6 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class AssociationPropertyListViewPageFetcher implements EntityListViewPag
 	@SuppressWarnings("unchecked")
 	@Override
 	public Page fetchPage( ViewCreationContext viewCreationContext, Pageable pageable, EntityView model ) {
-		BeanWrapper beanWrapper = new BeanWrapperImpl( model.getEntity() );
+		BeanWrapper beanWrapper = new BeanWrapperImpl( model.getParentEntity() );
 		Object itemsValue = beanWrapper.getPropertyValue( propertyName );
 
 		List items = Collections.emptyList();
@@ -62,6 +61,6 @@ public class AssociationPropertyListViewPageFetcher implements EntityListViewPag
 			}
 		}
 
-		return new PageImpl( items, new PageRequest( 0, items.size() ), items.size() );
+		return new PageImpl( items, pageable, items.size() );
 	}
 }

@@ -15,14 +15,14 @@
  */
 package com.foreach.across.modules.user.repositories;
 
+import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
 import com.foreach.across.modules.user.business.Group;
 import com.foreach.across.modules.user.business.User;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 import java.util.Collection;
 
-public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User>
+public interface UserRepository extends IdBasedEntityJpaRepository<User>, QueryDslPredicateExecutor<User>
 {
 	User findByUsername( String userName );
 

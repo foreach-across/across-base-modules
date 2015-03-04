@@ -137,7 +137,7 @@ public class TestManyToManyAssociations
 
 		ViewCreationContext cc = mock( ViewCreationContext.class );
 		EntityView ev = new EntityListView( new ModelMap() );
-		ev.setEntity( representative );
+		ev.setParentEntity( representative );
 
 		Page page = pageFetcher.fetchPage( cc, null, ev );
 		assertNotNull( page );
@@ -151,7 +151,7 @@ public class TestManyToManyAssociations
 
 		ViewCreationContext cc = mock( ViewCreationContext.class );
 		EntityView ev = new EntityListView( new ModelMap() );
-		ev.setEntity( company );
+		ev.setParentEntity( company );
 
 		Page page = pageFetcher.fetchPage( cc, null, ev );
 		assertNotNull( page );

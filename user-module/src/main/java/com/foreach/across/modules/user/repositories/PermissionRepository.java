@@ -15,10 +15,10 @@
  */
 package com.foreach.across.modules.user.repositories;
 
+import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
 import com.foreach.across.modules.user.business.Permission;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PermissionRepository extends JpaRepository<Permission, Long>
+public interface PermissionRepository extends IdBasedEntityJpaRepository<Permission>
 {
 	Permission findByName( String name );
 }

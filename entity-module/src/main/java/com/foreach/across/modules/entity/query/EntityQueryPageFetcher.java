@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.user.repositories;
+package com.foreach.across.modules.entity.query;
 
-import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
-import com.foreach.across.modules.user.business.Group;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
+ * Interface supporting fetching data for a generic {@link com.foreach.across.modules.entity.query.EntityQuery}
+ * instance, used as abstraction for JPA, QueryDsl repositories.
+ *
  * @author Arne Vandamme
  */
-public interface GroupRepository extends IdBasedEntityJpaRepository<Group>
+public interface EntityQueryPageFetcher
 {
+	Page fetchPage( EntityQuery query, Pageable pageable );
 }

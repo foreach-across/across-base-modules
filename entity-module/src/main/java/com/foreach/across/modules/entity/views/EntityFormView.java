@@ -30,9 +30,6 @@ public class EntityFormView extends EntityView
 	public static final String ATTRIBUTE_ORIGINAL_ENTITY = "originalEntity";
 	public static final String ATTRIBUTE_FORM_ACTION = "formAction";
 
-	// Will contain the entity that is the parent of the association, if applicable
-	public static final String ATTRIBUTE_PARENT_ENTITY = "parentEntity";
-
 	public EntityFormView( ModelMap model ) {
 		super( model );
 	}
@@ -51,13 +48,5 @@ public class EntityFormView extends EntityView
 
 	public void setFormAction( String action ) {
 		addAttribute( ATTRIBUTE_FORM_ACTION, action );
-	}
-
-	public Object getParentEntity() {
-		return getAttribute( ATTRIBUTE_PARENT_ENTITY );
-	}
-
-	public void setParentEntity( Object entity ) {
-		addAttribute( ATTRIBUTE_PARENT_ENTITY, entity );
 	}
 }

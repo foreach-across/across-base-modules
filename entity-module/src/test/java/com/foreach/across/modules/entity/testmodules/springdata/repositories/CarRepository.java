@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.user.repositories;
+package com.foreach.across.modules.entity.testmodules.springdata.repositories;
 
-import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
-import com.foreach.across.modules.user.business.Group;
+import com.foreach.across.modules.entity.testmodules.springdata.business.Car;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * @author Arne Vandamme
+ * @author Andy Somers
  */
-public interface GroupRepository extends IdBasedEntityJpaRepository<Group>
+public interface CarRepository extends JpaRepository<Car, String>
 {
 }
