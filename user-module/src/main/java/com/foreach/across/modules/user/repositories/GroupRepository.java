@@ -17,10 +17,11 @@ package com.foreach.across.modules.user.repositories;
 
 import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
 import com.foreach.across.modules.user.business.Group;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 /**
  * @author Arne Vandamme
  */
-public interface GroupRepository extends IdBasedEntityJpaRepository<Group>
+public interface GroupRepository extends IdBasedEntityJpaRepository<Group>, QueryDslPredicateExecutor<Group>
 {
 }

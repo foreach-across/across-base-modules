@@ -18,6 +18,7 @@ package com.foreach.across.modules.entity.query.jpa;
 import com.foreach.across.modules.entity.query.EntityQuery;
 import com.foreach.across.modules.entity.query.EntityQueryPageFetcher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -32,9 +33,13 @@ public class EntityQueryJpaPageFetcher implements EntityQueryPageFetcher
 		this.jpaSpecificationExecutor = jpaSpecificationExecutor;
 	}
 
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	@Override
 	public Page fetchPage( EntityQuery query, Pageable pageable ) {
+		if ( pageable == null ) {
+			return new PageImpl( jpaSpecificationExecutor.findAll( EntityQueryJpaUtils.toSpecification( query ) ) );
+		}
+
 		return jpaSpecificationExecutor.findAll( EntityQueryJpaUtils.toSpecification( query ), pageable );
 	}
 }

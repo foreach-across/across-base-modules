@@ -16,8 +16,12 @@
 package com.foreach.across.modules.entity.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,5 +67,28 @@ public class EntityUtils
 			finished.add( generateDisplayName( name ).toLowerCase() );
 		}
 		return StringUtils.join( finished, " " );
+	}
+
+	/**
+	 * Create a {@link org.springframework.data.domain.Page} from any {@link java.lang.Iterable}.
+	 *
+	 * @param collection contains the items in the page
+	 * @return Page instance
+	 */
+	public static Page<?> createPage( Iterable<?> collection ) {
+		if ( collection instanceof List ) {
+			return new PageImpl<>( (List<?>) collection );
+		}
+
+		if ( collection instanceof Collection ) {
+			return new PageImpl<>( new ArrayList<>( (Collection) collection ) );
+		}
+
+		List<Object> list = new ArrayList<>();
+		for ( Object item : collection ) {
+			list.add( item );
+		}
+
+		return new PageImpl<>( list );
 	}
 }

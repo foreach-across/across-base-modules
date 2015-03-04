@@ -219,12 +219,14 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 
 		EntityQueryPageFetcher entityQueryPageFetcher = null;
 
-		if ( repository instanceof JpaSpecificationExecutor ) {
-			entityQueryPageFetcher = new EntityQueryJpaPageFetcher( (JpaSpecificationExecutor) repository );
-		}
-		else if ( repository instanceof QueryDslPredicateExecutor ) {
+		// Because of some bugs related to JPA - Hibernate integration, favour the use of QueryDsl if possible,
+		// see particular issue: https://hibernate.atlassian.net/browse/HHH-5948
+		if ( repository instanceof QueryDslPredicateExecutor ) {
 			entityQueryPageFetcher = new EntityQueryQueryDslPageFetcher( (QueryDslPredicateExecutor) repository,
 			                                                             entityConfiguration );
+		}
+		else if ( repository instanceof JpaSpecificationExecutor ) {
+			entityQueryPageFetcher = new EntityQueryJpaPageFetcher( (JpaSpecificationExecutor) repository );
 		}
 
 		if ( entityQueryPageFetcher != null ) {

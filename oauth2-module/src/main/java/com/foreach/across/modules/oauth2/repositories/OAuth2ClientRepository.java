@@ -17,8 +17,10 @@ package com.foreach.across.modules.oauth2.repositories;
 
 import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
 import com.foreach.across.modules.oauth2.business.OAuth2Client;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
-public interface OAuth2ClientRepository extends IdBasedEntityJpaRepository<OAuth2Client>
+public interface OAuth2ClientRepository
+		extends IdBasedEntityJpaRepository<OAuth2Client>, QueryDslPredicateExecutor<OAuth2Client>
 {
 	OAuth2Client findByClientId( String clientId );
 }

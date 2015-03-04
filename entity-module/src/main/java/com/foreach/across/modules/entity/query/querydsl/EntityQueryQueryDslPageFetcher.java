@@ -18,6 +18,8 @@ package com.foreach.across.modules.entity.query.querydsl;
 import com.foreach.across.modules.entity.query.EntityQuery;
 import com.foreach.across.modules.entity.query.EntityQueryPageFetcher;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.util.EntityUtils;
+import com.mysema.query.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
@@ -38,7 +40,13 @@ public class EntityQueryQueryDslPageFetcher implements EntityQueryPageFetcher
 
 	@Override
 	public Page fetchPage( EntityQuery query, Pageable pageable ) {
-		return queryDslPredicateExecutor.findAll( EntityQueryQueryDslUtils.toPredicate( query, entityConfiguration ),
-		                                          pageable );
+		Predicate predicate = EntityQueryQueryDslUtils.toPredicate( query, entityConfiguration );
+
+		if ( pageable == null ) {
+			return EntityUtils.createPage( queryDslPredicateExecutor.findAll( predicate ) );
+		}
+
+		return queryDslPredicateExecutor.findAll( predicate, pageable );
 	}
+
 }

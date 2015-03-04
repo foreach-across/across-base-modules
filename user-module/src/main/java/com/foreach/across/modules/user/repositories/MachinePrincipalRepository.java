@@ -17,11 +17,13 @@ package com.foreach.across.modules.user.repositories;
 
 import com.foreach.across.modules.hibernate.jpa.repositories.IdBasedEntityJpaRepository;
 import com.foreach.across.modules.user.business.MachinePrincipal;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 /**
  * @author Arne Vandamme
  */
-public interface MachinePrincipalRepository extends IdBasedEntityJpaRepository<MachinePrincipal>
+public interface MachinePrincipalRepository
+		extends IdBasedEntityJpaRepository<MachinePrincipal>, QueryDslPredicateExecutor<MachinePrincipal>
 {
 	MachinePrincipal findByName( String name );
 }
