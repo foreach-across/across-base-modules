@@ -110,6 +110,9 @@
 						<goals>
 							<goal>process-asciidoc</goal>
 						</goals>
+						<configuration>
+							<doctype>book</doctype>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
