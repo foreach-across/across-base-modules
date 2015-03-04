@@ -41,6 +41,7 @@ public final class DebugWeb extends PrefixingPathContext
 	public static final String VIEW_APPLICATION_PROPERTIES = "th/debugweb/listApplicationProperties";
 	public static final String VIEW_THREADS = "th/debugweb/listThreads";
 	public static final String VIEW_MODULES = "th/debugweb/listAcrossModules";
+	public static final String VIEW_DATASOURCES = "th/debugweb/listDataSources";
 
 	public static final String VIEW_SERVLET_FILTERS = "th/debugweb/servlet/filters";
 	public static final String VIEW_SERVLET_SERVLETS = "th/debugweb/servlet/servlets";
