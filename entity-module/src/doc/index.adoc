@@ -1,7 +1,7 @@
-== EntityModule
+= EntityModule
 :toc:
 
-=== General information
+== General information
 
 === Artifact
 [source,xml,indent=0]

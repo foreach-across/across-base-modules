@@ -1,6 +1,0 @@
-= Across Standard Modules
-Arne Vandamme
-:across-version: 1.1.0
-:toc:
-
-include::entity-module/src/doc/index.adoc[]

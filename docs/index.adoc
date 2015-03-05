@@ -1,6 +1,10 @@
 = Across Standard Modules
 Arne Vandamme
-:across-version: 1.1.0
 :toc:
+:sectanchors:
+:across-version: 1.1.0-SNAPSHOT
+
+:numbered!:
 
 include::../entity-module/src/doc/index.adoc[]
+include::../user-module/src/doc/index.adoc[]
