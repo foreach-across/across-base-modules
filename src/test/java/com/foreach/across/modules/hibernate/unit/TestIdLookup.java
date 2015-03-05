@@ -59,7 +59,7 @@ public class TestIdLookup extends AbstractBaseIdLookup
 		}
 	}
 
-	private static class TestHibernateIdLookupUserType extends HibernateIdLookup<IntegerValues>
+	private static class TestHibernateIdLookupUserType extends HibernateIdLookup<IntegerValues, Integer>
 	{
 
 		public TestHibernateIdLookupUserType() {

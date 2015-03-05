@@ -15,9 +15,10 @@
  */
 package com.foreach.across.modules.hibernate.types;
 
+import com.foreach.across.modules.hibernate.util.HibernateTypeLookup;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.type.IntegerType;
+import org.hibernate.type.AbstractSingleColumnStandardBasicType;
 import org.hibernate.usertype.UserType;
 
 import java.io.Serializable;
@@ -25,19 +26,26 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
-public abstract class HibernateIdLookup<T extends IdLookup> implements UserType
+/**
+ * Defines a generic strategy to transform enum values and their representation in the database.
+ * Tries to match a hibernate {@link org.hibernate.type.Type} to the Id class as specified on the actual IdLookup implementation.
+ *
+ * @param <K>
+ * @param <T>
+ */
+public abstract class HibernateIdLookup<T extends IdLookup<K>, K> implements UserType
 {
-	private final IntegerType TYPE = IntegerType.INSTANCE;
+	private final AbstractSingleColumnStandardBasicType<K> type;
 	private final Class<T> clazz;
 
 	public HibernateIdLookup( Class<T> clazz ) {
+		this.type = HibernateTypeLookup.getForIdLookupType( clazz );
 		this.clazz = clazz;
 	}
 
 	@Override
 	public int[] sqlTypes() {
-		return new int[] { TYPE.sqlType() };
+		return new int[] { type.sqlType() };
 	}
 
 	@Override
@@ -56,13 +64,14 @@ public abstract class HibernateIdLookup<T extends IdLookup> implements UserType
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Object nullSafeGet( ResultSet rs,
 	                           String[] names,
 	                           SessionImplementor session,
 	                           Object owner ) throws HibernateException, SQLException {
-		Integer identifier = (Integer) TYPE.get( rs, names[0], session );
+		K identifier = (K) type.get( rs, names[0], session );
 
-		if( identifier == null ) {
+		if ( identifier == null ) {
 			return null;
 		}
 		T[] enumValues = clazz.getEnumConstants();
@@ -81,10 +90,11 @@ public abstract class HibernateIdLookup<T extends IdLookup> implements UserType
 	                         int index,
 	                         SessionImplementor session ) throws HibernateException, SQLException {
 		try {
-			if( value != null ) {
-				TYPE.set( st, ((IdLookup<Integer>) value).getId(), index, session );
-			} else {
-				st.setNull( index, TYPE.sqlType() );
+			if ( value != null ) {
+				type.set( st, ( (IdLookup<K>) value ).getId(), index, session );
+			}
+			else {
+				st.setNull( index, type.sqlType() );
 			}
 		}
 		catch ( Exception e ) {
