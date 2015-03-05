@@ -39,14 +39,56 @@
 
 == About the EntityModule
 
+=== EntityConfiguration and EntityAssociation
+
 === Integration with Spring Data repositories
+
+== Configuring entity types
+
+=== Using builders
+Entities are usually automatically added to the `EntityRegistry` through the use of one or more `EntityRegistrar` beans.
+The registrars will apply a default configuration, usually consisting of all properties, associations and views.
+
+Customizing the `EntityRegistry` is done by implementing one or more `EntityConfigurer` beans in your modules.  These
+receive an `EntitiesConfigurationBuilder` that effectively allows you to customize all registered `EntityConfiguration` instances.
+Multiple `EntityConfigurer` beans can modify the same `EntityConfiguration`, the order in which they are applied will determine
+the last value if they modify the same properties.
+
+Investigate the javadoc of the `EntitiesConfigurationBuilder` and child builders to discover all possible configuration options.
+
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@AcrossDepends(required = "EntityModule")
+@Configuration
+public class UserEntitiesConfiguration implements EntityConfigurer
+{
+	@Override
+	public void configure( EntitiesConfigurationBuilder configuration ) {
+		// By default permissions cannot be managed through the user interface
+		configuration.entity( Permission.class ).hide();
+	}
+}
+----
 
 === Creating an EntityConfiguration manually
 
-=== Integration with other modules
+=== Automatic registration of entity types
+
+== Integration with other modules
 
 [[integration:adminwebmodule]]
 ==== AdminWebModule
+
+If the `AdminWebModule` is present entity management controllers will be created for all registered entity configurations.
+If you want to avoid the automatic registration of entity management controllers for a particular entity type, you should
+set the `EntityConfiguration` as `hidden`.  This will effectively disable the default entity controllers for that type,
+and hide the existence of the entity type from the administration interface.
+
+You can also hide one or more associations.  By default an association will not be shown if one of the participating
+entities is hidden.  If you specify the `hidden` property of an `EntityAssociation` explicitly, that value will take
+precendence of the entity configurations.  This way it is possible to generate management pages for associated
+entities, but not for the main entity type.
 
 == Entity views
 

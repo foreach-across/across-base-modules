@@ -118,6 +118,30 @@ public class TestEntityConfigurationBuilder
 	}
 
 	@Test
+	public void hidden() {
+		builder.hidden( true );
+		builder.apply( entityRegistry );
+
+		verify( client ).setHidden( true );
+	}
+
+	@Test
+	public void show() {
+		builder.show();
+		builder.apply( entityRegistry );
+
+		verify( client ).setHidden( false );
+	}
+
+	@Test
+	public void hide() {
+		builder.hide();
+		builder.apply( entityRegistry );
+
+		verify( client ).setHidden( true );
+	}
+
+	@Test
 	public void viewBuildersAreSpecificType() {
 		AbstractEntityViewBuilder one = builder.view( "someView" );
 		assertNotNull( one );
@@ -132,17 +156,12 @@ public class TestEntityConfigurationBuilder
 		assertNotNull( listTwo );
 		assertNotSame( listOne, listTwo );
 
-/*		listOne = builder.view( "someListView" );
-		assertSame( listTwo, listOne );
-*/
 		one = builder.createFormView();
 		assertNotNull( one );
 		assertSame( one, builder.formView( EntityFormView.CREATE_VIEW_NAME ) );
-		//assertSame( one, builder.view( EntityFormView.CREATE_VIEW_NAME ) );
 
 		one = builder.updateFormView();
 		assertNotNull( one );
 		assertSame( one, builder.formView( EntityFormView.UPDATE_VIEW_NAME ) );
-		//assertSame( one, builder.view( EntityFormView.UPDATE_VIEW_NAME ) );
 	}
 }

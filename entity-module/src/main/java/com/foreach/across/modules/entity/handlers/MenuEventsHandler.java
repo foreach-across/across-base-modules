@@ -42,26 +42,28 @@ public class MenuEventsHandler
 		builder.item( "/entities", "Entity management" );
 
 		for ( EntityConfiguration entityConfiguration : entityRegistry.getEntities() ) {
-			EntityMessageCodeResolver messageCodeResolver = entityConfiguration.getEntityMessageCodeResolver();
-			EntityMessages messages = new EntityMessages( messageCodeResolver );
-			EntityLinkBuilder linkBuilder = entityConfiguration.getAttribute( EntityLinkBuilder.class );
-			AcrossModuleInfo moduleInfo = entityConfiguration.getAttribute( AcrossModuleInfo.class );
+			if ( !entityConfiguration.isHidden() ) {
+				EntityMessageCodeResolver messageCodeResolver = entityConfiguration.getEntityMessageCodeResolver();
+				EntityMessages messages = new EntityMessages( messageCodeResolver );
+				EntityLinkBuilder linkBuilder = entityConfiguration.getAttribute( EntityLinkBuilder.class );
+				AcrossModuleInfo moduleInfo = entityConfiguration.getAttribute( AcrossModuleInfo.class );
 
-			String group = "/entities";
+				String group = "/entities";
 
-			if ( moduleInfo != null ) {
-				group = "/entities/" + moduleInfo.getName();
-				builder.group( group, moduleInfo.getName() ).disable();
+				if ( moduleInfo != null ) {
+					group = "/entities/" + moduleInfo.getName();
+					builder.group( group, moduleInfo.getName() ).disable();
+				}
+
+				builder.item( group + "/" + entityConfiguration.getName(),
+				              messageCodeResolver.getNameSingular(),
+				              linkBuilder.overview() )
+				       .and()
+				       .item( group + "/" + entityConfiguration.getName() + "/create",
+				              messages.createAction(),
+				              linkBuilder.create()
+				       );
 			}
-
-			builder.item( group + "/" + entityConfiguration.getName(),
-			              messageCodeResolver.getNameSingular(),
-			              linkBuilder.overview() )
-			       .and()
-			       .item( group + "/" + entityConfiguration.getName() + "/create",
-			              messages.createAction(),
-			              linkBuilder.create()
-			       );
 		}
 	}
 

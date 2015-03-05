@@ -43,6 +43,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.Validator;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -151,6 +152,8 @@ public class RepositoryEntityRegistrar implements EntityRegistrar
 			entityConfiguration.setEntityMessageCodeResolver(
 					buildMessageCodeResolver( entityConfiguration, moduleInfo )
 			);
+
+			entityConfiguration.setHidden( Modifier.isAbstract( entityType.getModifiers() ) );
 
 			registerEntityQueryPageFetcher( entityConfiguration );
 

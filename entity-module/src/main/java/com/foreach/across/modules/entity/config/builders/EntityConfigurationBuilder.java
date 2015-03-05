@@ -101,6 +101,8 @@ public class EntityConfigurationBuilder<T> extends AbstractAttributesAndViewsBui
 	private PropertyRegistryBuilder propertyRegistryBuilder;
 	private final Map<String, EntityAssociationBuilder> associations = new HashMap<>();
 
+	private Boolean hidden;
+
 	EntityConfigurationBuilder( Class<T> entityType, EntitiesConfigurationBuilder parent ) {
 		this.entityType = entityType;
 		this.parent = parent;
@@ -113,6 +115,36 @@ public class EntityConfigurationBuilder<T> extends AbstractAttributesAndViewsBui
 		}
 
 		return propertyRegistryBuilder;
+	}
+
+	/**
+	 * Ensures the configuration <strong>will not</strong> be labeled as hidden for UI implementations.
+	 *
+	 * @return current builder
+	 */
+	public EntityConfigurationBuilder<T> show() {
+		return hidden( false );
+	}
+
+	/**
+	 * Ensures the configuration <strong>will be</strong> labeled as hidden for UI implementations.
+	 *
+	 * @return current builder
+	 */
+	public EntityConfigurationBuilder<T> hide() {
+		return hidden( true );
+	}
+
+	/**
+	 * Should the {@link com.foreach.across.modules.entity.registry.EntityConfiguration} be hidden from UI
+	 * implementations. This property can be considered a hint for automatically generated user interfaces.
+	 *
+	 * @param hidden True if the configuration should be hidden from UI.
+	 * @return current builder
+	 */
+	public EntityConfigurationBuilder<T> hidden( boolean hidden ) {
+		this.hidden = hidden;
+		return this;
 	}
 
 	/**
@@ -174,6 +206,10 @@ public class EntityConfigurationBuilder<T> extends AbstractAttributesAndViewsBui
 
 		if ( propertyRegistryBuilder != null ) {
 			propertyRegistryBuilder.apply( configuration.getPropertyRegistry() );
+		}
+
+		if ( hidden != null ) {
+			configuration.setHidden( hidden );
 		}
 
 		applyAttributes( configuration );

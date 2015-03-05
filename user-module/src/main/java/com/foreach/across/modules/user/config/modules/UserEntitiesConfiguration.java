@@ -19,6 +19,7 @@ import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
 import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.views.EntityListView;
+import com.foreach.across.modules.user.business.Permission;
 import com.foreach.across.modules.user.business.User;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,6 +29,9 @@ public class UserEntitiesConfiguration implements EntityConfigurer
 {
 	@Override
 	public void configure( EntitiesConfigurationBuilder configuration ) {
+		// By default permissions cannot be managed through the user interface
+		configuration.entity( Permission.class ).hide();
+
 		configuration.entity( User.class )
 					 /*.properties()
 						.order( "id", "email", "displayName" )
