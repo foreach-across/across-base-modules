@@ -26,7 +26,7 @@ import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.Set;
 
-public abstract class HibernateBitFlag<T extends BitFlag> extends HibernateIdLookup<T> implements UserType
+public abstract class HibernateBitFlag<T extends BitFlag> extends HibernateIdLookup<T, Integer> implements UserType
 {
 	private final IntegerType TYPE = IntegerType.INSTANCE;
 
