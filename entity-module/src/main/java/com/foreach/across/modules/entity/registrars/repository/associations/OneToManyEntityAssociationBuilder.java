@@ -98,7 +98,7 @@ public class OneToManyEntityAssociationBuilder implements EntityAssociationBuild
 
 		if ( queryPageFetcher != null ) {
 			viewFactory.setPageFetcher(
-					new AssociationListViewPageFetcher( association.getSourceProperty(), queryPageFetcher )
+					new AssociationListViewPageFetcher( association.getTargetProperty(), queryPageFetcher )
 			);
 		}
 		else {

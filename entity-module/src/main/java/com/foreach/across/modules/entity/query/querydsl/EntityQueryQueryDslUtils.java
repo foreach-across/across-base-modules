@@ -38,6 +38,13 @@ public abstract class EntityQueryQueryDslUtils
 	}
 
 	public static <V> Predicate toPredicate( EntityQuery query, EntityConfiguration entityConfiguration ) {
+		try {
+			return toPredicate( query, entityConfiguration.getEntityType() );
+		}
+		catch ( Exception e ) {
+			/* ignore exception, try creating predicate using entity configuration */
+		}
+
 		return toPredicate( query, entityConfiguration.getEntityType(), entityConfiguration.getName() );
 	}
 

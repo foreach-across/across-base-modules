@@ -26,6 +26,7 @@ import javax.persistence.*;
  * @author Arne Vandamme
  */
 @Entity
+@Table(name = "test_group")
 public class Group extends SettableIdBasedEntity<Group>
 {
 	@Id
@@ -43,6 +44,13 @@ public class Group extends SettableIdBasedEntity<Group>
 	@NotBlank
 	@Column(unique = true)
 	private String name;
+
+	public Group() {
+	}
+
+	public Group( String name ) {
+		this.name = name;
+	}
 
 	public Long getId() {
 		return id;

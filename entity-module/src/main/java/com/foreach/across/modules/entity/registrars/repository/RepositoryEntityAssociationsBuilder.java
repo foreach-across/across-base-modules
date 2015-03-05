@@ -25,6 +25,8 @@ import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.SimpleAssociationHandler;
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 
+import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
 import java.util.Collection;
 
 /**
@@ -39,7 +41,7 @@ public class RepositoryEntityAssociationsBuilder
 
 	public <T> void buildAssociations( final MutableEntityRegistry entityRegistry,
 	                                   final MutableEntityConfiguration entityConfiguration ) {
-		RepositoryFactoryInformation<T, ?> repositoryFactoryInformation
+		final RepositoryFactoryInformation<T, ?> repositoryFactoryInformation
 				= entityConfiguration.getAttribute( RepositoryFactoryInformation.class );
 
 		if ( repositoryFactoryInformation != null ) {
@@ -52,13 +54,19 @@ public class RepositoryEntityAssociationsBuilder
 						public void doWithAssociation( Association<? extends PersistentProperty<?>> association ) {
 							PersistentProperty property = association.getInverse();
 
-							for ( EntityAssociationBuilder builder : entityAssociationBuilders ) {
-								if ( builder.supports( property ) ) {
-									builder.buildAssociation(
-											entityRegistry,
-											entityConfiguration,
-											property
-									);
+							if ( property.isAnnotationPresent( Embedded.class )
+									|| property.isAnnotationPresent( EmbeddedId.class ) ) {
+								// todo: implement embedded entity associations, as separate EntityAssociationBuilder ?
+							}
+							else {
+								for ( EntityAssociationBuilder builder : entityAssociationBuilders ) {
+									if ( builder.supports( property ) ) {
+										builder.buildAssociation(
+												entityRegistry,
+												entityConfiguration,
+												property
+										);
+									}
 								}
 							}
 						}

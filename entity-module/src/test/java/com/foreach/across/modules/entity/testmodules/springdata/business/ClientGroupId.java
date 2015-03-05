@@ -46,4 +46,32 @@ public class ClientGroupId implements Serializable
 	public void setGroup( Group group ) {
 		this.group = group;
 	}
+
+	@Override
+	public boolean equals( Object o ) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		ClientGroupId that = (ClientGroupId) o;
+
+		if ( client != null ? !client.equals( that.client ) : that.client != null ) {
+			return false;
+		}
+		if ( group != null ? !group.equals( that.group ) : that.group != null ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = client != null ? client.hashCode() : 0;
+		result = 31 * result + ( group != null ? group.hashCode() : 0 );
+		return result;
+	}
 }

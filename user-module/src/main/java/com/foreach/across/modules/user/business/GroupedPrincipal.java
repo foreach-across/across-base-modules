@@ -32,6 +32,7 @@ import java.util.*;
  * @author Arne Vandamme
  */
 @MappedSuperclass
+@Access(AccessType.FIELD)
 public abstract class GroupedPrincipal<T extends SettableIdBasedEntity<?>>
 		extends BasicSecurityPrincipal<T>
 		implements SecurityPrincipalHierarchy

@@ -113,6 +113,35 @@ public class TestManyToOneAssociations
 		assertTrue( association.hasView( EntityListView.VIEW_NAME ) );
 	}
 
+	// todo: implement once supporting MappingContext items
+	/*
+	@Test
+	public void companyShouldHaveAnAssociationToItsClientGroups() {
+		EntityConfiguration company = entityRegistry.getEntityConfiguration( Company.class );
+		EntityConfiguration clientGroup = entityRegistry.getEntityConfiguration( ClientGroup.class );
+
+		EntityAssociation association = company.association( "clientGroup.id.company" );
+
+		assertNotNull( association );
+		assertEquals(
+				"Association name should be target entity name joined with target property name",
+				"clientGroup.id.company", association.getName()
+		);
+
+		assertSame( company, association.getSourceEntityConfiguration() );
+		assertSame( clientGroup, association.getTargetEntityConfiguration() );
+
+		assertNull(
+				"Regular ManyToOne should not have a source property as the association starts at the other end",
+				association.getSourceProperty()
+		);
+		assertNotNull( association.getTargetProperty() );
+		assertSame( clientGroup.getPropertyRegistry().getProperty( "company" ), association.getTargetProperty() );
+
+		assertTrue( association.hasView( EntityListView.VIEW_NAME ) );
+	}
+	*/
+
 	@Test
 	public void companyShouldNotHaveAssociationToItsCarsAsTheRepositoryDoesNotSupportSpecifications() {
 		EntityConfiguration company = entityRegistry.getEntityConfiguration( Company.class );
