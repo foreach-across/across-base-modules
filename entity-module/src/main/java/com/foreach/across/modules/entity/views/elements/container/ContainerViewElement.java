@@ -30,7 +30,8 @@ public class ContainerViewElement extends ViewElements implements ViewElement
 {
 	public static final String TYPE = CommonViewElements.CONTAINER;
 
-	private String name, customTemplate;
+	private String elementType = TYPE;
+	private String name, label = "", customTemplate;
 
 	public ContainerViewElement() {
 	}
@@ -41,7 +42,11 @@ public class ContainerViewElement extends ViewElements implements ViewElement
 
 	@Override
 	public String getElementType() {
-		return TYPE;
+		return elementType;
+	}
+
+	public void setElementType( String elementType ) {
+		this.elementType = elementType;
 	}
 
 	@Override
@@ -64,7 +69,11 @@ public class ContainerViewElement extends ViewElements implements ViewElement
 
 	@Override
 	public String getLabel() {
-		return name;
+		return label;
+	}
+
+	public void setLabel( String label ) {
+		this.label = label;
 	}
 
 	@Override

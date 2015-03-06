@@ -21,6 +21,7 @@ import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.*;
 import com.foreach.across.modules.entity.views.elements.button.ButtonViewElement;
 import com.foreach.across.modules.entity.views.elements.container.ContainerViewElement;
+import com.foreach.across.modules.entity.views.elements.table.SortableTableHeaderCellProcessor;
 import com.foreach.across.modules.entity.views.elements.table.TableViewElement;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.views.support.ListViewEntityMessages;
@@ -31,6 +32,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.ui.ModelMap;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Handles a list of items (entities) with support for the properties to show,
@@ -116,12 +119,31 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 		view.setPage( page );
 		view.setShowResultNumber( isShowResultNumber() );
 
+		SortableTableHeaderCellProcessor sortableTableHeaderCellProcessor = new SortableTableHeaderCellProcessor();
+		sortableTableHeaderCellProcessor.setSortableProperties( sortableProperties );
+		sortableTableHeaderCellProcessor.setViewElementDescriptorMap(
+				(Map<ViewElement, EntityPropertyDescriptor>)
+						viewCreationContext.removeAttribute( "descriptorElementsMap" )
+		);
+
 		TableViewElement table = new TableViewElement();
+		table.getHeader().setCellProcessor( sortableTableHeaderCellProcessor );
 		table.setName( "resultsTable" );
 		table.setPage( page );
 		table.setColumns( (Iterable<ViewElement>) view.getEntityProperties().remove( "table" ) );
 
+		Map<String, String> tableAttributs = new HashMap<>();
+		tableAttributs.put( "data-tbl", "entity-list" );
+		tableAttributs.put( "data-tbl-type", "paged" );
+		tableAttributs.put( "data-tbl-entity-type", view.getEntityConfiguration().getName() );
+		tableAttributs.put( "data-tbl-current-page", "" + page.getNumber() );
+		tableAttributs.put( "data-tbl-size", "" + page.getSize() );
+		tableAttributs.put( "data-tbl-sort", "" + page.getSort() );
+
+		table.setAttributes( tableAttributs );
+
 		ContainerViewElement buttons = new ContainerViewElement( "buttons" );
+		buttons.setElementType( "paragraph" );
 
 		EntityMessages messages = view.getEntityMessages();
 
@@ -132,6 +154,8 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 		create.setLabel( messages.createAction() );
 		buttons.add( create );
 
+		ContainerViewElement itemButtons = new ContainerViewElement( "itemButtons" );
+
 		ButtonViewElement edit = new ButtonViewElement()
 		{
 			@Override
@@ -141,9 +165,13 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 		};
 		edit.setName( "btn-edit" );
 		edit.setElementType( CommonViewElements.LINK_BUTTON );
+		edit.setStyle( ButtonViewElement.Style.ICON );
+		edit.setIcon( "edit" );
 		edit.setLabel( messages.updateAction() );
 
-		( (ViewElements) table.getColumns() ).add( edit );
+		itemButtons.add( edit );
+
+		( (ViewElements) table.getColumns() ).add( itemButtons );
 
 		view.getEntityProperties().addFirst( table );
 		view.getEntityProperties().addFirst( buttons );
@@ -162,6 +190,25 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 	@Override
 	protected EntityMessages createEntityMessages( EntityMessageCodeResolver codeResolver ) {
 		return new ListViewEntityMessages( codeResolver );
+	}
+
+	@Override
+	protected void buildViewElements( V viewCreationContext,
+	                                  ViewElementBuilderContext builderContext,
+	                                  Collection<EntityPropertyDescriptor> descriptors,
+	                                  ViewElements viewElements ) {
+		Map<ViewElement, EntityPropertyDescriptor> descriptorMap = new HashMap<>();
+
+		for ( EntityPropertyDescriptor descriptor : descriptors ) {
+			ViewElement propertyView = createPropertyView( builderContext, descriptor );
+
+			if ( propertyView != null ) {
+				descriptorMap.put( propertyView, descriptor );
+				viewElements.add( propertyView );
+			}
+		}
+
+		viewCreationContext.addAttribute( "descriptorElementsMap", descriptorMap );
 	}
 
 	@Override

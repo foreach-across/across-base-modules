@@ -17,6 +17,7 @@ package com.foreach.across.modules.entity.web;
 
 import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.support.AttributeSupport;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
 import com.foreach.across.modules.web.resource.WebResourceUtils;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -24,7 +25,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 /**
  * @author Arne Vandamme
  */
-public class WebViewCreationContextImpl implements WebViewCreationContext
+public class WebViewCreationContextImpl extends AttributeSupport implements WebViewCreationContext
 {
 	private NativeWebRequest request;
 	private EntityConfiguration entityConfiguration;

@@ -23,9 +23,17 @@ import com.foreach.across.modules.entity.views.elements.ViewElementSupport;
  */
 public class ButtonViewElement extends ViewElementSupport
 {
+	public static class Style {
+		public static final String BUTTON = "btn-primary";
+		public static final String LINK = "btn-link";
+		public static final String ICON = "icon";
+	}
+
 	public static final String TYPE = CommonViewElements.BUTTON;
 
 	private String link;
+	private String style = Style.BUTTON;
+	private String icon = null;
 
 	public ButtonViewElement() {
 		setElementType( TYPE );
@@ -34,6 +42,14 @@ public class ButtonViewElement extends ViewElementSupport
 	@Override
 	public void setElementType( String elementType ) {
 		super.setElementType( elementType );
+	}
+
+	public String getStyle() {
+		return style;
+	}
+
+	public void setStyle( String style ) {
+		this.style = style;
 	}
 
 	public String getLink() {
@@ -46,6 +62,18 @@ public class ButtonViewElement extends ViewElementSupport
 
 	public boolean hasLink() {
 		return link != null;
+	}
+
+	public void setIcon( String icon ) {
+		this.icon = icon;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public boolean hasIcon() {
+		return icon != null;
 	}
 
 	@Override

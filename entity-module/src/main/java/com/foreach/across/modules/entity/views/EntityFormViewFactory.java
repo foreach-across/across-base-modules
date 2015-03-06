@@ -84,6 +84,7 @@ public class EntityFormViewFactory<V extends ViewCreationContext> extends Config
 		ButtonViewElement cancel = new ButtonViewElement();
 		cancel.setName( "btn-cancel" );
 		cancel.setElementType( CommonViewElements.LINK_BUTTON );
+		cancel.setStyle( ButtonViewElement.Style.LINK );
 		cancel.setLink( view.getEntityLinkBuilder().overview() );
 		cancel.setLabel( messages.messageWithFallback( "actions.cancel" ) );
 		buttons.add( cancel );

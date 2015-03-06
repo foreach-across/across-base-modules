@@ -35,6 +35,12 @@
 						group members
 					</div>
 				</div>
+				<!--/* paragraph */-->
+				<p th:if="${element.elementType eq 'paragraph'}">
+					<div th:replace="th/entity/formFields :: form_fields(${element})">
+						group members
+					</div>
+				</p>
 				<!--/* columns */-->
 				<div class="row"
 				     th:if="${element.elementType eq 'columns' and #elements.hasChildren(element)}"
@@ -46,36 +52,60 @@
 					</div>
 				</div>
 				<!--/* table */-->
-				<div th:if="${element.elementType eq 'table'}" th:with="table=${element}">
-					<table class="table table-striped table-hover" em:attributes="${table.attributes}">
-						<thead th:if="${table.header != null}" em:attributes="${table.header.attributes}">
-						<tr>
-							<th th:if="${table.showResultNumber}">#</th>
-							<th th:each="column : ${table.columns}" em:attributes="${table.header.cellProcessor(column)}">
-								<span th:text="${column.label}">Property name</span>
-							</th>
-						</tr>
-						</thead>
-						<tbody>
-						<tr th:each="entity,entityStats : ${table.rows}" em:attributes="${table.rowProcessor(entity)}">
-							<td th:if="${table.showResultNumber}" th:text="${entityStats.count + table.page.number * table.page.size}"></td>
-							<td th:each="column : ${table.columns}" em:attributes="${table.cellProcessor(column, entity)}">
-								<th:block th:replace="th/entity/formFields :: form_fields(${column})">
-									CELL CONTENT
-								</th:block>
-							</td>
-						</tr>
-						</tbody>
-					</table>
+				<div th:if="${element.elementType eq 'table'}" th:with="table=${element}" class="table-responsive">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<span th:utext="${messages.resultsFound(page)}">Number of items found.</span><br/>
+							<a th:unless="${page.first}" href="#" data-tbl="entity-list"
+							   th:attr="data-tbl-page=${page.number - 1}" th:utext="${messages.previousPage(page)}">previous
+								page</a>
+							<span th:if="${page.totalPages gt 1}" th:utext="${messages.pagerText(page)}">Showing page 1 of 13</span>
+							<a th:unless="${page.last}" href="#" data-tbl="entity-list"
+							   th:attr="data-tbl-page=${page.number + 1}" th:utext="${messages.nextPage(page)}">next</a>
+						</div>
+						<div class="panel-body" th:unless="${table.rows.empty}">
+							<div class="table-responsive">
+								<table class="table table-striped table-hover" em:attributes="${table.attributes}">
+									<thead th:if="${table.header != null}" em:attributes="${table.header.attributes}">
+									<tr>
+										<th th:if="${table.showResultNumber}">#</th>
+										<th th:each="column : ${table.columns}" em:attributes="${table.header.cellProcessor(column)}">
+											<span th:text="${column.label}">Property name</span>
+										</th>
+									</tr>
+									</thead>
+									<tbody>
+									<tr th:each="entity,entityStats : ${table.rows}" em:attributes="${table.rowProcessor(entity)}">
+										<td th:if="${table.showResultNumber}" th:text="${entityStats.count + table.page.number * table.page.size}"></td>
+										<td th:each="column : ${table.columns}" em:attributes="${table.cellProcessor(column, entity)}">
+											<th:block th:replace="th/entity/formFields :: form_fields(${column})">
+												CELL CONTENT
+											</th:block>
+										</td>
+									</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
 				</div>
 				<!--/* submit button */-->
 				<th:block th:if="${element.elementType eq 'submit'}">
-					<input type="submit" class="btn btn-primary" th:name="${element.name}" th:value="${element.label}"/>
+					<input type="submit" th:class="|btn ${element.style}|" th:name="${element.name}" th:value="${element.label}"/>
 				</th:block>
-				<!--/* link button */-->
-				<th:block th:if="${element.elementType eq 'button-link'}">
-					<a class="btn btn-link" th:href="@{${@adminWeb.path(element.print(entity))}}" th:text="${element.label}">
+				<!--/* submit button */-->
+				<th:block th:if="${element.elementType eq 'button'}">
+					<button type="button" th:class="|btn ${element.style}|" th:name="${element.name}" th:value="${element.label}"/>
+				</th:block>
+				<!--/* link */-->
+				<th:block th:if="${element.elementType eq 'link-button'}">
+					<a th:unless="${element.style eq 'icon'}" th:class="|btn ${element.style}|"
+					   th:href="@{${#webapp.path(element.print(entity))}}"
+					   th:text="${element.label}">
 						link text
+					</a>
+					<a th:if="${element.style eq 'icon'}" th:title="${element.label}" th:href="@{${#webapp.path(element.print(entity))}}">
+						<span th:class="|glyphicon glyphicon-${element.icon}|"></span>
 					</a>
 				</th:block>
 				<!--/* fieldset */-->
@@ -90,6 +120,7 @@
 				<!--/* label */-->
 				<div th:if="${element.elementType eq 'text'}">
 					<label th:for="${element.name}" th:text="${element.label}">label</label>
+
 					<div th:utext="${element.print(entity)}">text value</div>
 				</div>
 				<!--/* hidden */-->

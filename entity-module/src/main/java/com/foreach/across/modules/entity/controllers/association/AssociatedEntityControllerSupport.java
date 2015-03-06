@@ -187,7 +187,9 @@ public abstract class AssociatedEntityControllerSupport extends AbstractEntityMo
 
 		// todo: remove direct dependency on spring data - use a regular entitypropertydescriptor ?
 		BeanWrapper associatedBeanWrapper = new BeanWrapperImpl( entityModel.createNew() );
-		associatedBeanWrapper.setPropertyValue( association.getTargetProperty().getName(), sourceEntity );
+		if ( association.getTargetProperty() != null ) {
+			associatedBeanWrapper.setPropertyValue( association.getTargetProperty().getName(), sourceEntity );
+		}
 
 		Object entity = associatedBeanWrapper.getWrappedInstance();
 

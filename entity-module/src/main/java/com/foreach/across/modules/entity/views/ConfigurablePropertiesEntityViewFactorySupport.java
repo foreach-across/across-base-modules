@@ -22,6 +22,7 @@ import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -77,12 +78,14 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<V extends V
 	                               EntityConfiguration entityConfiguration,
 	                               EntityMessageCodeResolver messageCodeResolver,
 	                               T view ) {
-		view.setEntityProperties( getEntityProperties( entityConfiguration, messageCodeResolver ) );
+		view.setEntityProperties( getEntityProperties( viewCreationContext, entityConfiguration,
+		                                               messageCodeResolver ) );
 
 		extendViewModel( viewCreationContext, view );
 	}
 
-	private ViewElements getEntityProperties( EntityConfiguration entityConfiguration,
+	private ViewElements getEntityProperties( V viewCreationContext,
+	                                          EntityConfiguration entityConfiguration,
 	                                          EntityMessageCodeResolver messageCodeResolver ) {
 		EntityPropertyFilter filter = getPropertyFilter() != null ? getPropertyFilter() : EntityPropertyFilters.NoOp;
 
@@ -106,20 +109,26 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<V extends V
 		}
 
 		ViewElements propertyViews = new ViewElements();
-
-		for ( EntityPropertyDescriptor descriptor : descriptors ) {
-			ViewElement propertyView = createPropertyView( builderContext, descriptor );
-
-			if ( propertyView != null ) {
-				propertyViews.add( propertyView );
-			}
-		}
+		buildViewElements( viewCreationContext, builderContext, descriptors, propertyViews );
 
 		return customizeViewElements( propertyViews );
 	}
 
 	protected ViewElements customizeViewElements( ViewElements elements ) {
 		return elements;
+	}
+
+	protected void buildViewElements( V viewCreationContext,
+	                                  ViewElementBuilderContext builderContext,
+	                                  Collection<EntityPropertyDescriptor> descriptors,
+	                                  ViewElements viewElements ) {
+		for ( EntityPropertyDescriptor descriptor : descriptors ) {
+			ViewElement propertyView = createPropertyView( builderContext, descriptor );
+
+			if ( propertyView != null ) {
+				viewElements.add( propertyView );
+			}
+		}
 	}
 
 	protected ViewElement createPropertyView( ViewElementBuilderContext builderContext,
@@ -137,7 +146,7 @@ public abstract class ConfigurablePropertiesEntityViewFactorySupport<V extends V
 		}
 
 		if ( element instanceof ViewElements ) {
-			for ( ViewElement child : ((ViewElements) element) ) {
+			for ( ViewElement child : ( (ViewElements) element ) ) {
 				applyNamePrefix( child, prefix );
 			}
 		}

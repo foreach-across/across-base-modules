@@ -17,11 +17,12 @@ package com.foreach.across.modules.entity.views;
 
 import com.foreach.across.modules.entity.registry.EntityAssociation;
 import com.foreach.across.modules.entity.registry.EntityConfiguration;
+import com.foreach.across.modules.entity.registry.support.WritableAttributes;
 
 /**
  * @author Arne Vandamme
  */
-public interface ViewCreationContext
+public interface ViewCreationContext extends WritableAttributes
 {
 	/**
  	 * @return EntityConfiguration the view is generated for.

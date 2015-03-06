@@ -34,5 +34,6 @@ public interface CommonViewElements
 
 	String BUTTON = "button";
 	String SUBMIT_BUTTON = "submit";
-	String LINK_BUTTON = "button-link";
+	String LINK_BUTTON = "link-button";
+	String LINK = "link";
 }
