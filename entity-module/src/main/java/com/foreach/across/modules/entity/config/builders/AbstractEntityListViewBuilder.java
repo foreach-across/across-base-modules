@@ -18,6 +18,7 @@ package com.foreach.across.modules.entity.config.builders;
 import com.foreach.across.modules.entity.registry.EntityViewRegistry;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewPageFetcher;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.Assert;
 
@@ -40,8 +41,8 @@ public abstract class AbstractEntityListViewBuilder<SELF extends AbstractSimpleE
 	private EntityListViewPageFetcher pageFetcher;
 
 	@Override
-	protected EntityListViewFactory createFactoryInstance() {
-		return new EntityListViewFactory();
+	protected EntityListViewFactory createFactoryInstance( AutowireCapableBeanFactory beanFactory ) {
+		return beanFactory.getBean( EntityListViewFactory.class );
 	}
 
 	/**

@@ -118,6 +118,23 @@ public void configure( EntitiesConfigurationBuilder configuration ) {
 
 == Entity views
 
+=== List views
+
+==== List summary view
+
+It is possible to activate a detail view inline in a list view.  If the `EntityConfiguration` or `EntityAssociation` has
+as view named *listSummaryView* a summary pane will automatically become available when clicking on the item row in the table.
+The summary pane is called using AJAX and only the _content_ fragment of the page will be rendered.
+
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+// Activate a summary view in the main user results table using a custom Thymeleaf template
+configuration.entity( User.class ).view( EntityListView.SUMMARY_VIEW_NAME ).template( "th/myModule/userSummary" );
+----
+
+=== Custom views
+
 === EntityLinkBuilder
 
 An `EntityConfiguration` or `EntityAssociation` can have one or more `EntityLinkBuilder` instances registered in its atttributes.

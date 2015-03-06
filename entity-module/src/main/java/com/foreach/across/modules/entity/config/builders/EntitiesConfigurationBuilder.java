@@ -24,6 +24,7 @@ import com.foreach.across.modules.entity.registry.MutableEntityConfiguration;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.util.Assert;
 
 import java.util.LinkedHashMap;
@@ -95,19 +96,20 @@ public class EntitiesConfigurationBuilder extends AbstractAttributesAndViewsBuil
 	 * the post processors after the configuration has been applied.
 	 *
 	 * @param entityRegistry EntityRegistry to which the configuration should be applied.
+	 * @param beanFactory    The BeanFactory that should be used to create beans like ViewFactory instances.
 	 */
-	public synchronized void apply( MutableEntityRegistry entityRegistry ) {
+	public synchronized void apply( MutableEntityRegistry entityRegistry, AutowireCapableBeanFactory beanFactory ) {
 		for ( EntityConfiguration entityConfiguration : entityRegistry.getEntities() ) {
 			MutableEntityConfiguration mutableEntityConfiguration
 					= entityRegistry.getMutableEntityConfiguration( entityConfiguration.getEntityType() );
 
 			applyAttributes( mutableEntityConfiguration );
-			applyViewBuilders( mutableEntityConfiguration );
+			applyViewBuilders( mutableEntityConfiguration, beanFactory );
 		}
 
 		// Apply the individual builder
 		for ( EntityConfigurationBuilder builder : builders.values() ) {
-			builder.apply( entityRegistry );
+			builder.apply( entityRegistry, beanFactory );
 		}
 	}
 

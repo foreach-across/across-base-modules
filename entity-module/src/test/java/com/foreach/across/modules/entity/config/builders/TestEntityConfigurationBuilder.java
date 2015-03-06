@@ -26,6 +26,7 @@ import com.foreach.across.modules.entity.views.EntityListView;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +42,7 @@ public class TestEntityConfigurationBuilder
 {
 	private EntitiesConfigurationBuilder entities;
 	private MutableEntityRegistry entityRegistry;
+	private AutowireCapableBeanFactory beanFactory;
 
 	private EntityConfigurationBuilder<Client> builder;
 	private MutableEntityConfiguration client, company;
@@ -50,6 +52,7 @@ public class TestEntityConfigurationBuilder
 		entities = new EntitiesConfigurationBuilder();
 
 		entityRegistry = new EntityRegistryImpl();
+		beanFactory = mock( AutowireCapableBeanFactory.class );
 
 		client = mock( MutableEntityConfiguration.class );
 		when( client.getEntityType() ).thenReturn( Client.class );
@@ -84,7 +87,7 @@ public class TestEntityConfigurationBuilder
 		builder.attribute( Company.class, companyAttribute );
 		builder.attribute( "attributeKey", 123 );
 
-		builder.apply( entityRegistry );
+		builder.apply( entityRegistry, beanFactory );
 
 		verify( client ).addAttribute( Company.class, companyAttribute );
 		verify( client ).addAttribute( "attributeKey", 123 );
@@ -120,7 +123,7 @@ public class TestEntityConfigurationBuilder
 	@Test
 	public void hidden() {
 		builder.hidden( true );
-		builder.apply( entityRegistry );
+		builder.apply( entityRegistry, beanFactory );
 
 		verify( client ).setHidden( true );
 	}
@@ -128,7 +131,7 @@ public class TestEntityConfigurationBuilder
 	@Test
 	public void show() {
 		builder.show();
-		builder.apply( entityRegistry );
+		builder.apply( entityRegistry, beanFactory );
 
 		verify( client ).setHidden( false );
 	}
@@ -136,7 +139,7 @@ public class TestEntityConfigurationBuilder
 	@Test
 	public void hide() {
 		builder.hide();
-		builder.apply( entityRegistry );
+		builder.apply( entityRegistry, beanFactory );
 
 		verify( client ).setHidden( true );
 	}

@@ -16,6 +16,7 @@
 package com.foreach.across.modules.entity.config.builders;
 
 import com.foreach.across.modules.entity.views.EntityFormViewFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 /**
  * @author Arne Vandamme
@@ -24,7 +25,7 @@ public abstract class AbstractEntityFormViewBuilder<SELF extends AbstractEntityF
 		extends AbstractSimpleEntityViewBuilder<EntityFormViewFactory, SELF>
 {
 	@Override
-	protected EntityFormViewFactory createFactoryInstance() {
-		return new EntityFormViewFactory();
+	protected EntityFormViewFactory createFactoryInstance( AutowireCapableBeanFactory beanFactory ) {
+		return beanFactory.getBean( EntityFormViewFactory.class );
 	}
 }

@@ -78,8 +78,11 @@
 									<tr th:each="entity,entityStats : ${table.rows}" em:attributes="${table.rowProcessor(entity)}">
 										<td th:if="${table.showResultNumber}" th:text="${entityStats.count + table.page.number * table.page.size}"></td>
 										<td th:each="column : ${table.columns}" em:attributes="${table.cellProcessor(column, entity)}">
-											<th:block th:replace="th/entity/formFields :: form_fields(${column})">
-												CELL CONTENT
+											<div th:utext="${column.print(entity)}" th:remove="tag"></div>
+											<th:block th:if="${#elements.hasChildren(column)}">
+												<th:block th:replace="th/entity/formFields :: form_fields(${column})">
+													CELL CONTENT
+												</th:block>
 											</th:block>
 										</td>
 									</tr>
@@ -120,7 +123,6 @@
 				<!--/* label */-->
 				<div th:if="${element.elementType eq 'text'}">
 					<label th:for="${element.name}" th:text="${element.label}">label</label>
-
 					<div th:utext="${element.print(entity)}">text value</div>
 				</div>
 				<!--/* hidden */-->

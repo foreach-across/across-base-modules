@@ -19,6 +19,7 @@ import com.foreach.across.modules.entity.config.PostProcessor;
 import com.foreach.across.modules.entity.registry.ConfigurableEntityViewRegistry;
 import com.foreach.across.modules.entity.registry.support.WritableAttributes;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
@@ -154,9 +155,10 @@ public abstract class AbstractAttributesAndViewsBuilder<T extends AbstractAttrib
 		return builder;
 	}
 
-	protected void applyViewBuilders( ConfigurableEntityViewRegistry viewRegistry ) {
+	protected void applyViewBuilders( ConfigurableEntityViewRegistry viewRegistry,
+	                                  AutowireCapableBeanFactory beanFactory ) {
 		for ( AbstractEntityViewBuilder viewBuilder : viewBuilders.values() ) {
-			viewBuilder.apply( viewRegistry );
+			viewBuilder.apply( viewRegistry, beanFactory );
 		}
 	}
 

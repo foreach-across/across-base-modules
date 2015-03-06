@@ -28,6 +28,7 @@ import com.foreach.across.modules.entity.views.processors.ViewDataBinderProcesso
 import com.foreach.across.modules.entity.views.processors.ViewModelAndCommandProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPostProcessor;
 import com.foreach.across.modules.entity.views.processors.ViewPreProcessor;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -196,8 +197,8 @@ public abstract class AbstractSimpleEntityViewBuilder<T extends ConfigurableProp
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected T createFactoryInstance() {
-		return (T) new SimpleEntityViewFactory();
+	protected T createFactoryInstance( AutowireCapableBeanFactory beanFactory ) {
+		return (T) beanFactory.getBean( SimpleEntityViewFactory.class );
 	}
 
 	@Override

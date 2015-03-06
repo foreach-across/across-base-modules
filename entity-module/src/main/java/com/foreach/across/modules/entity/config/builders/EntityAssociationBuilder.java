@@ -26,6 +26,7 @@ import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.util.Assert;
 
 public class EntityAssociationBuilder extends AbstractAttributesAndViewsBuilder<EntityAssociationBuilder, MutableEntityAssociation>
@@ -185,7 +186,9 @@ public class EntityAssociationBuilder extends AbstractAttributesAndViewsBuilder<
 		return view( name, FormViewBuilder.class );
 	}
 
-	void apply( MutableEntityConfiguration configuration, MutableEntityRegistry entityRegistry ) {
+	void apply( MutableEntityConfiguration configuration,
+	            MutableEntityRegistry entityRegistry,
+	            AutowireCapableBeanFactory beanFactory ) {
 		MutableEntityAssociation association = configuration.association( name );
 
 		if ( association == null ) {
@@ -244,7 +247,7 @@ public class EntityAssociationBuilder extends AbstractAttributesAndViewsBuilder<
 		}
 
 		applyAttributes( association );
-		applyViewBuilders( association );
+		applyViewBuilders( association, beanFactory );
 	}
 
 	void postProcess( MutableEntityConfiguration configuration ) {

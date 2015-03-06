@@ -21,9 +21,11 @@ import com.foreach.across.modules.entity.registry.EntityRegistryImpl;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Arne Vandamme
@@ -32,11 +34,13 @@ public class TestEntityAssociationBuilder
 {
 	private EntitiesConfigurationBuilder entities;
 	private MutableEntityRegistry entityRegistry;
+	private AutowireCapableBeanFactory beanFactory;
 
 	@Before
 	public void before() {
 		entities = new EntitiesConfigurationBuilder();
 		entityRegistry = new EntityRegistryImpl();
+		beanFactory = mock( AutowireCapableBeanFactory.class );
 	}
 
 	@Test
@@ -48,7 +52,7 @@ public class TestEntityAssociationBuilder
 		        .targetEntityType( OtherEntity.class )
 		        .hide();
 
-		entities.apply( entityRegistry );
+		entities.apply( entityRegistry, beanFactory );
 
 		EntityConfiguration config = entityRegistry.getEntityConfiguration( SomeEntity.class );
 		assertNotNull( config );

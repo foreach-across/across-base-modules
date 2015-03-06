@@ -15,23 +15,29 @@
  */
 package com.foreach.across.modules.entity.views;
 
-import com.foreach.across.modules.entity.EntityAttributes;
+import com.foreach.across.modules.adminweb.AdminWeb;
 import com.foreach.across.modules.entity.registry.properties.EntityPropertyDescriptor;
 import com.foreach.across.modules.entity.support.EntityMessageCodeResolver;
 import com.foreach.across.modules.entity.views.elements.*;
 import com.foreach.across.modules.entity.views.elements.button.ButtonViewElement;
 import com.foreach.across.modules.entity.views.elements.container.ContainerViewElement;
 import com.foreach.across.modules.entity.views.elements.table.SortableTableHeaderCellProcessor;
+import com.foreach.across.modules.entity.views.elements.table.TableRowProcessor;
 import com.foreach.across.modules.entity.views.elements.table.TableViewElement;
 import com.foreach.across.modules.entity.views.support.EntityMessages;
 import com.foreach.across.modules.entity.views.support.ListViewEntityMessages;
+import com.foreach.across.modules.entity.web.WebViewCreationContext;
+import com.foreach.across.modules.web.resource.WebResource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +49,9 @@ import java.util.Map;
  */
 public class EntityListViewFactory<V extends ViewCreationContext> extends ConfigurablePropertiesEntityViewFactorySupport<V, EntityListView>
 {
+	@Autowired
+	private AdminWeb adminWeb;
+
 	private int pageSize = 50;
 	private boolean showResultNumber = true;
 
@@ -142,6 +151,34 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 
 		table.setAttributes( tableAttributs );
 
+		boolean hasListSummaryView = viewCreationContext.isForAssociation()
+				? viewCreationContext.getEntityAssociation().hasView( EntityListView.SUMMARY_VIEW_NAME )
+				: viewCreationContext.getEntityConfiguration().hasView( EntityListView.SUMMARY_VIEW_NAME );
+
+		if ( hasListSummaryView ) {
+			table.setRowProcessor( new TableRowProcessor()
+			{
+				@Override
+				public Map<String, String> attributes( Object entity ) {
+					return Collections.singletonMap(
+							"data-summary-url",
+							ServletUriComponentsBuilder
+									.fromCurrentContextPath()
+									.path( adminWeb.path( view.getEntityLinkBuilder().view( entity ) ) )
+									.queryParam( "view", EntityListView.SUMMARY_VIEW_NAME )
+									.queryParam( "_partial", "content" )
+									.toUriString()
+					);
+				}
+			} );
+
+			if ( viewCreationContext instanceof WebViewCreationContext ) {
+				( (WebViewCreationContext) viewCreationContext )
+						.getWebResourceRegistry()
+						.add( WebResource.JAVASCRIPT_PAGE_END, "/js/entity/expandable.js", WebResource.VIEWS );
+			}
+		}
+
 		ContainerViewElement buttons = new ContainerViewElement( "buttons" );
 		buttons.setElementType( "paragraph" );
 
@@ -212,21 +249,6 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 	}
 
 	@Override
-	protected ViewElement createPropertyView( ViewElementBuilderContext builderContext,
-	                                          EntityPropertyDescriptor descriptor ) {
-		ViewElement viewElement = super.createPropertyView( builderContext, descriptor );
-
-		if ( viewElement != null ) {
-			SortablePropertyViewElement sortablePropertyView = new SortablePropertyViewElement( viewElement );
-			sortablePropertyView.setSortableProperty( determineSortableProperty( descriptor ) );
-
-			return sortablePropertyView;
-		}
-
-		return null;
-	}
-
-	@Override
 	protected ViewElements customizeViewElements( ViewElements elements ) {
 		ContainerViewElement root = new ContainerViewElement( "root" );
 
@@ -239,76 +261,8 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 		return root;
 	}
 
-	private String determineSortableProperty( EntityPropertyDescriptor descriptor ) {
-		String sortableProperty = descriptor.getAttribute( EntityAttributes.SORTABLE_PROPERTY, String.class );
-
-		if ( sortableProperties != null && !sortableProperties.contains( descriptor.getName() ) ) {
-			sortableProperty = null;
-		}
-
-		return sortableProperty;
-	}
-
 	@Override
 	protected ViewElementMode getMode() {
 		return ViewElementMode.FOR_READING;
-	}
-
-	@Deprecated
-	public static class SortablePropertyViewElement implements ViewElement
-	{
-		private final ViewElement wrapped;
-		private String sortableProperty;
-
-		public SortablePropertyViewElement( ViewElement wrapped ) {
-			this.wrapped = wrapped;
-		}
-
-		@Override
-		public String getElementType() {
-			return "sortable-property";
-		}
-
-		@Override
-		public String getName() {
-			return wrapped.getName();
-		}
-
-		@Override
-		public String getLabel() {
-			return wrapped.getLabel();
-		}
-
-		@Override
-		public String getCustomTemplate() {
-			return wrapped.getCustomTemplate();
-		}
-
-		@Override
-		public Object value( Object entity ) {
-			return wrapped.value( entity );
-		}
-
-		@Override
-		public String print( Object entity ) {
-			return wrapped.print( entity );
-		}
-
-		public boolean isSortable() {
-			return sortableProperty != null;
-		}
-
-		public String getSortableProperty() {
-			return sortableProperty;
-		}
-
-		public void setSortableProperty( String sortableProperty ) {
-			this.sortableProperty = sortableProperty;
-		}
-
-		@Override
-		public boolean isField() {
-			return false;
-		}
 	}
 }

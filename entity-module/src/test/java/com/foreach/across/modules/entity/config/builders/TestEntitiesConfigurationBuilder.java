@@ -24,6 +24,7 @@ import com.foreach.across.modules.entity.testmodules.springdata.business.Company
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,12 +42,14 @@ public class TestEntitiesConfigurationBuilder
 	private MutableEntityRegistry entityRegistry;
 
 	private MutableEntityConfiguration client, company;
+	private AutowireCapableBeanFactory beanFactory;
 
 	@Before
 	public void reset() {
 		builder = new EntitiesConfigurationBuilder();
 
 		entityRegistry = new EntityRegistryImpl();
+		beanFactory = mock( AutowireCapableBeanFactory.class );
 
 		client = mock( MutableEntityConfiguration.class );
 		when( client.getEntityType() ).thenReturn( Client.class );
@@ -67,7 +70,7 @@ public class TestEntitiesConfigurationBuilder
 		builder.attribute( Company.class, companyAttribute );
 		builder.attribute( "attributeKey", 123 );
 
-		builder.apply( entityRegistry );
+		builder.apply( entityRegistry, beanFactory );
 
 		verify( client ).addAttribute( Company.class, companyAttribute );
 		verify( company ).addAttribute( Company.class, companyAttribute );
@@ -100,7 +103,7 @@ public class TestEntitiesConfigurationBuilder
 		builder.attribute( "someAttribute", 1000 )
 		       .entity( Client.class ).attribute( "someAttribute", 2000 );
 
-		builder.apply( entityRegistry );
+		builder.apply( entityRegistry, beanFactory );
 
 		InOrder order = inOrder( client );
 		order.verify( client ).addAttribute( "someAttribute", 1000 );

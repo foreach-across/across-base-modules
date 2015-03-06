@@ -26,6 +26,7 @@ import com.foreach.across.modules.entity.registry.properties.DefaultEntityProper
 import com.foreach.across.modules.entity.views.EntityFormView;
 import com.foreach.across.modules.entity.views.EntityListView;
 import com.foreach.across.modules.entity.views.support.ValueFetcher;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -195,7 +196,7 @@ public class EntityConfigurationBuilder<T> extends AbstractAttributesAndViewsBui
 		return builder;
 	}
 
-	void apply( MutableEntityRegistry entityRegistry ) {
+	void apply( MutableEntityRegistry entityRegistry, AutowireCapableBeanFactory beanFactory ) {
 		MutableEntityConfiguration configuration = entityRegistry.getMutableEntityConfiguration( entityType );
 
 		if ( configuration == null ) {
@@ -213,10 +214,10 @@ public class EntityConfigurationBuilder<T> extends AbstractAttributesAndViewsBui
 		}
 
 		applyAttributes( configuration );
-		applyViewBuilders( configuration );
+		applyViewBuilders( configuration, beanFactory );
 
 		for ( EntityAssociationBuilder associationBuilder : associations.values() ) {
-			associationBuilder.apply( configuration, entityRegistry );
+			associationBuilder.apply( configuration, entityRegistry, beanFactory );
 		}
 	}
 

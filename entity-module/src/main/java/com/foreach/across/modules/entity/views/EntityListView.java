@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.foreach.across.modules.entity.views;
 
 import com.foreach.across.modules.entity.views.processors.NoOpRowProcessor;
@@ -13,6 +28,8 @@ import org.springframework.ui.ModelMap;
  */
 public class EntityListView extends EntityView
 {
+	public static final String SUMMARY_VIEW_NAME = "listSummaryView";
+
 	public static final String VIEW_NAME = "listView";
 	public static final String VIEW_TEMPLATE = "th/entity/list";
 
@@ -56,6 +73,7 @@ public class EntityListView extends EntityView
 		addAttribute( ATTRIBUTE_SHOW_RESULT_NUMBER, showResultNumber );
 	}
 
+	@Deprecated
 	public void setRowProcessor( RowProcessor rowProcessor ) {
 		addAttribute( ATTRIBUTE_ROW_PROCESSOR, rowProcessor );
 	}

@@ -31,6 +31,7 @@ import com.foreach.across.modules.entity.registry.properties.EntityPropertyRegis
 import com.foreach.across.modules.entity.services.EntityFormService;
 import com.foreach.across.modules.entity.views.EntityFormViewFactory;
 import com.foreach.across.modules.entity.views.EntityListViewFactory;
+import com.foreach.across.modules.entity.views.SimpleEntityViewFactory;
 import com.foreach.across.modules.entity.views.elements.CommonViewElementTypeLookupStrategy;
 import com.foreach.across.modules.entity.views.elements.fieldset.FieldsetViewElementBuilderFactoryAssembler;
 import com.foreach.across.modules.entity.views.elements.form.checkbox.CheckboxFormElementBuilderFactoryAssembler;
@@ -167,6 +168,13 @@ public class EntityModuleConfiguration
 	@Bean
 	@Exposed
 	@Scope("prototype")
+	public SimpleEntityViewFactory simpleEntityViewFactory() {
+		return new SimpleEntityViewFactory();
+	}
+
+	@Bean
+	@Exposed
+	@Scope("prototype")
 	public EntityListViewFactory entityListViewFactory() {
 		return new EntityListViewFactory();
 	}
@@ -177,11 +185,4 @@ public class EntityModuleConfiguration
 	public EntityFormViewFactory entityCreateViewFactory() {
 		return new EntityFormViewFactory();
 	}
-
-/*
-    @Bean
-	public LocalValidatorFactoryBean entityValidatorFactory() {
-		return new LocalValidatorFactoryBean();
-	}
-	*/
 }

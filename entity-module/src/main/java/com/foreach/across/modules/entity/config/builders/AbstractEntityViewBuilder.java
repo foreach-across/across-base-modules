@@ -18,6 +18,7 @@ package com.foreach.across.modules.entity.config.builders;
 import com.foreach.across.modules.entity.registry.ConfigurableEntityViewRegistry;
 import com.foreach.across.modules.entity.registry.EntityViewRegistry;
 import com.foreach.across.modules.entity.views.EntityViewFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 /**
  * @author Arne Vandamme
@@ -43,18 +44,18 @@ public abstract class AbstractEntityViewBuilder<T extends EntityViewFactory, SEL
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void apply( ConfigurableEntityViewRegistry viewRegistry ) {
+	protected void apply( ConfigurableEntityViewRegistry viewRegistry, AutowireCapableBeanFactory beanFactory ) {
 		T configuredFactory = viewRegistry.getViewFactory( name );
 
 		if ( configuredFactory == null ) {
-			configuredFactory = factory != null ? factory : createFactoryInstance();
+			configuredFactory = factory != null ? factory : createFactoryInstance( beanFactory );
 			viewRegistry.registerView( name, configuredFactory );
 		}
 
 		applyToFactory( viewRegistry, configuredFactory );
 	}
 
-	protected abstract T createFactoryInstance();
+	protected abstract T createFactoryInstance( AutowireCapableBeanFactory beanFactory );
 
 	protected abstract void applyToFactory( EntityViewRegistry viewRegistry, T factory );
 }

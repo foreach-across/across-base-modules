@@ -45,6 +45,7 @@ public class UserEntitiesConfiguration implements EntityConfigurer
 		             .association( "user.groups" ).show();
 
 		configuration.entity( User.class )
+				//.view( EntityListView.SUMMARY_VIEW_NAME ).template( "th/user/bla" ).and()
 					 /*.properties()
 						.order( "id", "email", "displayName" )
 						.property( "created", "Created", new AuditableCreatedPrinter() ).and()

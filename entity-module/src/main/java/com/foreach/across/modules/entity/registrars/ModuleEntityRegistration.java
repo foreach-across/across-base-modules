@@ -28,6 +28,7 @@ import com.foreach.across.modules.entity.config.EntityConfigurer;
 import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.registry.MutableEntityRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -56,6 +57,9 @@ public class ModuleEntityRegistration
 
 	@Autowired
 	private MutableEntityRegistry entityRegistry;
+
+	@Autowired
+	private AutowireCapableBeanFactory beanFactory;
 
 	@SuppressWarnings("all")
 	@RefreshableCollection(includeModuleInternals = true, incremental = true)
@@ -97,7 +101,7 @@ public class ModuleEntityRegistration
 
 		// Apply the builders to the registry
 		for ( EntitiesConfigurationBuilder builder : builders ) {
-			builder.apply( entityRegistry );
+			builder.apply( entityRegistry, beanFactory );
 		}
 
 		// Run the builder post processors

@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -52,6 +53,7 @@ public class TestEntityListViewBuilder
 	private ListViewBuilder view;
 
 	private EntityListViewFactory viewFactory;
+	private AutowireCapableBeanFactory beanFactory;
 
 	@Before
 	public void before() {
@@ -60,6 +62,8 @@ public class TestEntityListViewBuilder
 		entityRegistry = new EntityRegistryImpl();
 
 		clientProperties = mock( MutableEntityPropertyRegistry.class );
+		beanFactory = mock( AutowireCapableBeanFactory.class );
+		when( beanFactory.getBean( EntityListViewFactory.class ) ).thenReturn( new EntityListViewFactory() );
 
 		client = mock( MutableEntityConfiguration.class );
 		when( client.getEntityType() ).thenReturn( Client.class );
@@ -95,7 +99,7 @@ public class TestEntityListViewBuilder
 	@Test
 	public void customTemplate() {
 		view.template( "th/someTemplate" );
-		view.apply( client );
+		view.apply( client, beanFactory );
 
 		assertNotNull( viewFactory );
 		assertEquals( "th/someTemplate", viewFactory.getTemplate() );
@@ -108,7 +112,7 @@ public class TestEntityListViewBuilder
 		    .property( "three" ).and()
 		    .and()
 		    .showResultNumber( false );
-		view.apply( client );
+		view.apply( client, beanFactory );
 
 		assertNotNull( viewFactory );
 
