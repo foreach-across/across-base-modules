@@ -29,6 +29,8 @@ public class EntityAssociationImpl
 	private final String name;
 	private final MutableEntityConfiguration sourceEntityConfiguration;
 
+	private Boolean hidden;
+
 	private EntityConfiguration targetEntityConfiguration;
 
 	private EntityPropertyDescriptor sourceProperty, targetProperty;
@@ -37,6 +39,24 @@ public class EntityAssociationImpl
 	                              MutableEntityConfiguration sourceEntityConfiguration ) {
 		this.name = name;
 		this.sourceEntityConfiguration = sourceEntityConfiguration;
+	}
+
+	@Override
+	public void setHidden( Boolean hidden ) {
+		this.hidden = hidden;
+	}
+
+	@Override
+	public boolean isHidden() {
+		if ( hidden != null ) {
+			return hidden;
+		}
+
+		if ( sourceEntityConfiguration.isHidden() ) {
+			return true;
+		}
+
+		return targetEntityConfiguration != null && targetEntityConfiguration.isHidden();
 	}
 
 	@Override

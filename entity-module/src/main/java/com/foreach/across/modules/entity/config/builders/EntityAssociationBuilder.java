@@ -32,6 +32,9 @@ public class EntityAssociationBuilder extends AbstractAttributesAndViewsBuilder<
 {
 	private final String name;
 
+	private boolean hiddenSpecified;
+	private Boolean hidden;
+
 	private Class<?> targetEntityType;
 	private String sourceProperty, targetProperty;
 
@@ -107,6 +110,48 @@ public class EntityAssociationBuilder extends AbstractAttributesAndViewsBuilder<
 	 */
 	public EntityAssociationBuilder removeTargetProperty() {
 		targetPropertyRemoved = true;
+		return this;
+	}
+
+	/**
+	 * Ensures the association <strong>will not</strong> be labeled as hidden for UI implementations.
+	 *
+	 * @return current builder
+	 */
+	public EntityAssociationBuilder show() {
+		return hidden( false );
+	}
+
+	/**
+	 * Ensures the association <strong>will</strong> be labeled as hidden for UI implementations.
+	 *
+	 * @return current builder
+	 */
+	public EntityAssociationBuilder hide() {
+		return hidden( true );
+	}
+
+	/**
+	 * Ensures the configuration will be labeled as hidden for UI implementations if any of its
+	 * participating configurations is hidden.  This is the default behavior if the property is not
+	 * specified explicitly on the association.
+	 *
+	 * @return current builder
+	 */
+	public EntityAssociationBuilder autoHide() {
+		return hidden( null );
+	}
+
+	/**
+	 * Should the {@link com.foreach.across.modules.entity.registry.EntityAssociation} be hidden from UI
+	 * implementations. This property can be considered a hint for automatically generated user interfaces.
+	 *
+	 * @param hidden True if the association should be hidden from UI.
+	 * @return current builder
+	 */
+	public EntityAssociationBuilder hidden( Boolean hidden ) {
+		hiddenSpecified = true;
+		this.hidden = hidden;
 		return this;
 	}
 
@@ -192,6 +237,10 @@ public class EntityAssociationBuilder extends AbstractAttributesAndViewsBuilder<
 			}
 
 			association.setTargetProperty( targetPropertyDescriptor );
+		}
+
+		if ( hiddenSpecified ) {
+			association.setHidden( hidden );
 		}
 
 		applyAttributes( association );

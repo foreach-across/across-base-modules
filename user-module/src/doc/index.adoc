@@ -43,8 +43,7 @@
 The `UserModule` configures all its domain objects in the `EntityRegistry` if the `EntityModule` is present.  Along with
 the `AdminWebModule` this will also enable the administrative management controllers for those entities.
 
-NOTE: By default the `Permission` entity is `hidden` from the admin UI and can only be managed through code.  If you
-want to enable UI management of `Permission` entities, you can modify the `hidden` property using a custom
-`EntityConfigurer`.
+NOTE: By default the `Permission` and `PermissionGroup` entities are `hidden` from the admin UI and can only be managed through code.  If you
+want to enable UI management of those entities, you can modify the `hidden` property using a custom `EntityConfigurer`.
 
 

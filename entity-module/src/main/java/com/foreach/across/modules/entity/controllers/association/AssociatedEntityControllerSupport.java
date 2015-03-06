@@ -27,10 +27,13 @@ import com.foreach.across.modules.entity.views.EntityViewFactory;
 import com.foreach.across.modules.entity.web.WebViewCreationContextImpl;
 import com.foreach.across.modules.web.template.WebTemplateInterceptor;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -47,6 +50,8 @@ import java.io.Serializable;
 public abstract class AssociatedEntityControllerSupport extends AbstractEntityModuleController
 {
 	private static final String ATTRIBUTE_DATABINDER = EntityViewRequest.class.getName() + ".DataBinder";
+
+	protected final Logger LOG = LoggerFactory.getLogger( getClass() );
 
 	@Autowired
 	private ConversionService conversionService;
@@ -75,6 +80,14 @@ public abstract class AssociatedEntityControllerSupport extends AbstractEntityMo
 		String viewName = StringUtils.defaultString( requestedViewName, getDefaultViewName() );
 
 		EntityAssociation association = entityConfiguration.association( associationName );
+
+		if ( association.isHidden() ) {
+			LOG.warn(
+					"AssociatedEntityControllers for association {} on {} are disabled because the EntityAssociation is hidden",
+					association.getName(), entityConfiguration.getName() );
+			throw new AccessDeniedException( "Not allowed to manage this associated entity type." );
+		}
+
 		EntityViewFactory viewFactory = association.getViewFactory( viewName );
 		model.addAttribute( VIEW_FACTORY, viewFactory );
 

@@ -29,6 +29,11 @@ public interface EntityAssociation extends ReadableAttributes, EntityViewRegistr
 
 	Class<?> getEntityType();
 
+	/**
+	 * @return True if the association should be hidden from administrative UI implementations.
+	 */
+	boolean isHidden();
+
 	EntityConfiguration getSourceEntityConfiguration();
 
 	EntityPropertyDescriptor getSourceProperty();

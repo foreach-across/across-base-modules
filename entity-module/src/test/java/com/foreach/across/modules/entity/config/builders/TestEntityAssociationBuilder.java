@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Arne Vandamme
@@ -44,7 +45,8 @@ public class TestEntityAssociationBuilder
 
 		entities.entity( SomeEntity.class )
 		        .association( "other" )
-		        .targetEntityType( OtherEntity.class );
+		        .targetEntityType( OtherEntity.class )
+		        .hide();
 
 		entities.apply( entityRegistry );
 
@@ -53,6 +55,7 @@ public class TestEntityAssociationBuilder
 
 		EntityAssociation association = config.association( "other" );
 		assertNotNull( association );
+		assertTrue( association.isHidden() );
 	}
 
 	static class SomeEntity

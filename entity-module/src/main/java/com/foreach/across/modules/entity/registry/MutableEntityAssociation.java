@@ -23,6 +23,15 @@ import com.foreach.across.modules.entity.registry.support.WritableAttributes;
  */
 public interface MutableEntityAssociation extends EntityAssociation, WritableAttributes, ConfigurableEntityViewRegistry
 {
+	/**
+	 * Should the association be hidden or explicitly shown in the administrative UI.  If the property is not set
+	 * explicitly on the association (or set to null), an association should be hidden if any of its participating
+	 * {@link com.foreach.across.modules.entity.registry.EntityConfiguration} instances is hidden.
+	 *
+	 * @param hidden true if should not show in the UI, can be null to revert to default check
+	 */
+	void setHidden( Boolean hidden );
+
 	void setTargetEntityConfiguration( EntityConfiguration entityConfiguration );
 
 	void setSourceProperty( EntityPropertyDescriptor descriptor );

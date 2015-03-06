@@ -90,6 +90,32 @@ entities is hidden.  If you specify the `hidden` property of an `EntityAssociati
 precendence of the entity configurations.  This way it is possible to generate management pages for associated
 entities, but not for the main entity type.
 
+== Entity associations
+
+The `EntityModule` attempts to automatically detect related entities and creates associations mainly to facilitate UI
+generation.  Currently `@OneToMany`, `@ManyToMany` and `@ManyToOne` annotations from `javax.persistence` API are all
+scanned and used to build `EntityAssociation` entries.
+
+In the administrative UI the management of related entities can often be done either through the property or the association.
+This is especially the case for `@ManyToMany` and `@OneToMany` associations that are mapped through a property with collection type.
+By default related entity management will be done through the property and the association will be generated but hidden.
+
+NOTE: If you want to enable management through the association interface, you should manipulate the `hidden` property of
+both the association and the property using an `EntityConfigurer`.
+
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@Override
+public void configure( EntitiesConfigurationBuilder configuration ) {
+    // Groups should be managed through the association instead of the property
+    configuration.entity( MachinePrincipal.class )
+                 .properties().property( "groups" ).hidden( true ).and().and()
+                 .association( "machinePrincipal.groups" ).show();
+}
+----
+
+
 == Entity views
 
 === EntityLinkBuilder

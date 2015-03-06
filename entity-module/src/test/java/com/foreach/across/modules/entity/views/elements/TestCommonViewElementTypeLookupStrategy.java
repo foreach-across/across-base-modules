@@ -27,7 +27,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -68,10 +67,10 @@ public class TestCommonViewElementTypeLookupStrategy
 	}
 
 	@Test
-	public void hiddenType() {
+	public void hiddenTypeShouldNeverBeDisplayed() {
 		when( descriptor.isHidden() ).thenReturn( true );
-		assertEquals( CommonViewElements.HIDDEN, lookup( ViewElementMode.FOR_WRITING ) );
-		assertEquals( CommonViewElements.TEXT, lookup( ViewElementMode.FOR_READING ) );
+		assertNull( lookup( ViewElementMode.FOR_WRITING ) );
+		assertNull( lookup( ViewElementMode.FOR_READING ) );
 	}
 
 	@Test
@@ -133,8 +132,9 @@ public class TestCommonViewElementTypeLookupStrategy
 		when( entityRegistry.getEntityConfiguration( Client.class ) ).thenReturn( clientConfig );
 
 		when( descriptor.getPropertyType() ).thenReturn( (Class) List.class );
-		TypeDescriptor collectionTypeDescriptor = TypeDescriptor.collection( List.class, TypeDescriptor.valueOf( Client.class ) );
-		when(descriptor.getPropertyTypeDescriptor()).thenReturn( collectionTypeDescriptor );
+		TypeDescriptor collectionTypeDescriptor = TypeDescriptor.collection( List.class, TypeDescriptor.valueOf(
+				Client.class ) );
+		when( descriptor.getPropertyTypeDescriptor() ).thenReturn( collectionTypeDescriptor );
 //		when( descriptor.getPropertyTypeDescriptor().getResolvableType() )
 //				.thenReturn( ResolvableType.forClassWithGenerics( List.class, Client.class ) );
 

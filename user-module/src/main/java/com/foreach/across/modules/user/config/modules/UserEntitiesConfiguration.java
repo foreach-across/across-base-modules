@@ -19,7 +19,9 @@ import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
 import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
 import com.foreach.across.modules.entity.views.EntityListView;
+import com.foreach.across.modules.user.business.MachinePrincipal;
 import com.foreach.across.modules.user.business.Permission;
+import com.foreach.across.modules.user.business.PermissionGroup;
 import com.foreach.across.modules.user.business.User;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,7 +32,17 @@ public class UserEntitiesConfiguration implements EntityConfigurer
 	@Override
 	public void configure( EntitiesConfigurationBuilder configuration ) {
 		// By default permissions cannot be managed through the user interface
-		configuration.entity( Permission.class ).hide();
+		configuration.entity( Permission.class ).hide().and()
+		             .entity( PermissionGroup.class ).hide();
+
+		// Groups should be managed through the association
+		configuration.entity( MachinePrincipal.class )
+		             .properties().property( "groups" ).hidden( true ).and().and()
+		             .association( "machinePrincipal.groups" ).show();
+
+		configuration.entity( User.class )
+		             .properties().property( "groups" ).hidden( true ).and().and()
+		             .association( "user.groups" ).show();
 
 		configuration.entity( User.class )
 					 /*.properties()

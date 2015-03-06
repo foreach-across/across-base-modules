@@ -138,6 +138,15 @@ public class TestOneToManyAssociations
 	}
 
 	@Test
+	public void clientGroupsShouldBeHiddenByDefault() {
+		EntityConfiguration client = entityRegistry.getEntityConfiguration( Client.class );
+		EntityAssociation association = client.association( "client.groups" );
+
+		assertNotNull( association );
+		assertTrue( association.isHidden() );
+	}
+
+	@Test
 	public void clientHasGroup() {
 		EntityConfiguration client = entityRegistry.getEntityConfiguration( Client.class );
 		EntityAssociation association = client.association( "client.groups" );

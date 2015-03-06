@@ -111,6 +111,15 @@ public class TestManyToManyAssociations
 	}
 
 	@Test
+	public void companyRepresentativesShouldBeHiddenByDefault() {
+		EntityConfiguration company = entityRegistry.getEntityConfiguration( Company.class );
+		EntityAssociation association = company.association( "company.representatives" );
+
+		assertNotNull( association );
+		assertTrue( association.isHidden() );
+	}
+
+	@Test
 	public void representativeHasCompanies() {
 		EntityConfiguration representative = entityRegistry.getEntityConfiguration( Representative.class );
 		EntityAssociation association = representative.association( "company.representatives" );
@@ -129,6 +138,15 @@ public class TestManyToManyAssociations
 		verifyCompanies( john, one, two );
 		verifyCompanies( joe, two );
 		verifyCompanies( peter, two, three );
+	}
+
+	@Test
+	public void representativeCompaniesShouldNotBeHidden() {
+		EntityConfiguration representative = entityRegistry.getEntityConfiguration( Representative.class );
+		EntityAssociation association = representative.association( "company.representatives" );
+
+		assertNotNull( association );
+		assertFalse( association.isHidden() );
 	}
 
 	@SuppressWarnings("unchecked")

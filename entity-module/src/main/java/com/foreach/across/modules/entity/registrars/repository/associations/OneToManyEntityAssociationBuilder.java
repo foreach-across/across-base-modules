@@ -77,11 +77,13 @@ public class OneToManyEntityAssociationBuilder implements EntityAssociationBuild
 				association.setTargetEntityConfiguration( other );
 				association.setTargetProperty( other.getPropertyRegistry().getProperty( mappedBy ) );
 
+				// Hide by default as will be managed through the property
+				association.setHidden( true );
+
 				buildCreateView( association );
 				buildListView( association, property );
 			}
 		}
-
 	}
 
 	public void buildListView( MutableEntityAssociation association, final PersistentProperty property ) {

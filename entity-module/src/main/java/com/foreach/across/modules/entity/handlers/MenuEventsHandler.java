@@ -84,15 +84,18 @@ public class MenuEventsHandler
 
 			// Get associations
 			for ( EntityAssociation association : entityConfiguration.getAssociations() ) {
-				EntityConfiguration associated = association.getTargetEntityConfiguration();
-				EntityLinkBuilder associatedLinkBuilder = association.getAttribute( EntityLinkBuilder.class )
-				                                                     .asAssociationFor( linkBuilder, menu.getEntity() );
-				String itemTitle = messageCodeResolver.getMessageWithFallback(
-						"adminMenu." + association.getName(),
-						associated.getEntityMessageCodeResolver().getNamePlural()
-				);
+				if ( !association.isHidden() ) {
+					EntityConfiguration associated = association.getTargetEntityConfiguration();
+					EntityLinkBuilder associatedLinkBuilder = association.getAttribute( EntityLinkBuilder.class )
+					                                                     .asAssociationFor( linkBuilder,
+					                                                                        menu.getEntity() );
+					String itemTitle = messageCodeResolver.getMessageWithFallback(
+							"adminMenu." + association.getName(),
+							associated.getEntityMessageCodeResolver().getNamePlural()
+					);
 
-				builder.item( association.getName(), itemTitle, associatedLinkBuilder.overview() );
+					builder.item( association.getName(), itemTitle, associatedLinkBuilder.overview() );
+				}
 			}
 		}
 		else {

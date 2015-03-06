@@ -132,7 +132,8 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 		create.setLabel( messages.createAction() );
 		buttons.add( create );
 
-		ButtonViewElement edit = new ButtonViewElement() {
+		ButtonViewElement edit = new ButtonViewElement()
+		{
 			@Override
 			public String print( Object entity ) {
 				return view.getEntityLinkBuilder().update( entity );
@@ -142,7 +143,7 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 		edit.setElementType( CommonViewElements.LINK_BUTTON );
 		edit.setLabel( messages.updateAction() );
 
-		((ViewElements) table.getColumns()).add( edit );
+		( (ViewElements) table.getColumns() ).add( edit );
 
 		view.getEntityProperties().addFirst( table );
 		view.getEntityProperties().addFirst( buttons );
@@ -166,12 +167,16 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 	@Override
 	protected ViewElement createPropertyView( ViewElementBuilderContext builderContext,
 	                                          EntityPropertyDescriptor descriptor ) {
-		SortablePropertyViewElement sortablePropertyView = new SortablePropertyViewElement(
-				super.createPropertyView( builderContext, descriptor )
-		);
-		sortablePropertyView.setSortableProperty( determineSortableProperty( descriptor ) );
+		ViewElement viewElement = super.createPropertyView( builderContext, descriptor );
 
-		return sortablePropertyView;
+		if ( viewElement != null ) {
+			SortablePropertyViewElement sortablePropertyView = new SortablePropertyViewElement( viewElement );
+			sortablePropertyView.setSortableProperty( determineSortableProperty( descriptor ) );
+
+			return sortablePropertyView;
+		}
+
+		return null;
 	}
 
 	@Override

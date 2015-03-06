@@ -71,6 +71,9 @@ public class ManyToManyEntityAssociationBuilder implements EntityAssociationBuil
 				);
 				association.addAttribute( PersistentProperty.class, property );
 
+				// By default hide this association as it would be managed as a regular property
+				association.setHidden( true );
+
 				buildCreateView( association );
 				buildListView( association );
 			}
