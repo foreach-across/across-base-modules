@@ -209,6 +209,7 @@
 		<module>properties-module</module>
 		<module>spring-security-acl</module>
 		<module>entity-module</module>
+		<module>metric-module</module>
 		<module>user-module</module>
 		<module>application-info</module>
 		<module>logging-module</module>
