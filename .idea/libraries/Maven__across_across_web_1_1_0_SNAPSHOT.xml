@@ -8,6 +8,7 @@
     </JAVADOC>
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/across/across-web/1.1.0-SNAPSHOT/across-web-1.1.0-20150303.155224-4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/across/across-web/1.1.0-SNAPSHOT/across-web-1.1.0-SNAPSHOT-sources.jar!/" />
     </SOURCES>
   </library>
 </component>
