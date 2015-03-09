@@ -23,7 +23,6 @@ import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 import com.foreach.across.core.annotations.AcrossCondition;
-import com.foreach.across.modules.metrics.AcrossMetric;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
@@ -34,11 +33,13 @@ import java.util.Map;
 @AcrossCondition("settings.metricsJvmEnabled")
 public class JvmMetricModuleConfiguration extends BaseMetricModuleConfiguration
 {
+	public JvmMetricModuleConfiguration() {
+		super( new MetricRegistry() );
+	}
+
 	@PostConstruct
 	public void setup() {
-		AcrossMetric metric = getAcrossMetric();
-
-		MetricRegistry registry = metric.getMetricRegistry();
+		MetricRegistry registry = getMetricRegistry();
 
 		registerAll( "gc", new GarbageCollectorMetricSet(), registry );
 		registerAll( "buffers", new BufferPoolMetricSet( ManagementFactory.getPlatformMBeanServer() ), registry );
@@ -58,7 +59,17 @@ public class JvmMetricModuleConfiguration extends BaseMetricModuleConfiguration
 	}
 
 	@Override
-	public AcrossMetric getAcrossMetric() {
-		return AcrossMetric.JVM;
+	public String getDependencyClass() {
+		return "com.codahale.metrics.jvm.MemoryUsageGaugeSet";
+	}
+
+	@Override
+	public String getDependencyInfo() {
+		return "<groupId>io.dropwizard.metrics</groupId>, <artifactId>metrics-jvm</artifactId>";
+	}
+
+	@Override
+	public String getName() {
+		return "JVM";
 	}
 }

@@ -18,10 +18,7 @@ package com.foreach.across.modules.metrics;
 import com.codahale.metrics.*;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.PrintStream;
-import java.util.Locale;
 import java.util.SortedMap;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class InMemoryReporter extends ScheduledReporter

@@ -15,25 +15,30 @@
  */
 package com.foreach.across.modules.metrics.config;
 
-import com.foreach.across.modules.metrics.AcrossMetric;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class AcrossMetricRegistry
 {
-	private Map<AcrossMetric, BaseMetricModuleConfiguration> registry = new ConcurrentHashMap<>();
+	private List<BaseMetricModuleConfiguration> registry = new LinkedList<>();
 
-	public void register( BaseMetricModuleConfiguration baseModuleConfiguration, AcrossMetric acrossMetric ) {
-		registry.put( acrossMetric, baseModuleConfiguration );
+	public void register( BaseMetricModuleConfiguration baseModuleConfiguration ) {
+		registry.add( baseModuleConfiguration );
 	}
 
-	public BaseMetricModuleConfiguration getAcrossMetric( AcrossMetric acrossMetric ) {
-		return registry.get( acrossMetric );
+	public List<BaseMetricModuleConfiguration> getItems() {
+		return Collections.unmodifiableList( registry );
 	}
 
-	public Map<AcrossMetric, BaseMetricModuleConfiguration> getItems() {
-		return Collections.unmodifiableMap( registry );
+	public BaseMetricModuleConfiguration getAcrossMetric( String metricName ) {
+		for( BaseMetricModuleConfiguration module : registry ) {
+			if( StringUtils.equals( module.getName(), metricName ) ) {
+				return module;
+			}
+		}
+		return null;
 	}
 }

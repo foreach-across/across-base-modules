@@ -15,36 +15,21 @@
  */
 package com.foreach.across.modules.metrics.config;
 
-import com.codahale.metrics.Metric;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.MetricSet;
-import com.codahale.metrics.jvm.BufferPoolMetricSet;
-import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
-import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
-import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
-import com.foreach.across.modules.metrics.AcrossMetric;
-import com.foreach.across.modules.metrics.MetricModuleSettings;
+import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.modules.metrics.controllers.MetricsController;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
-import java.lang.management.ManagementFactory;
-import java.util.Map;
 
 @Configuration
 public class MetricModuleConfiguration
 {
-	@Autowired
-	private MetricModuleSettings settings;
-
 	@Bean
 	public MetricsController metricsController() {
 		return new MetricsController();
 	}
 
 	@Bean
+	@Exposed
 	public AcrossMetricRegistry acrossMetricRegistry() {
 		return new AcrossMetricRegistry();
 	}

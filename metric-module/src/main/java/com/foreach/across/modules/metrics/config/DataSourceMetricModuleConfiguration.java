@@ -15,8 +15,8 @@
  */
 package com.foreach.across.modules.metrics.config;
 
+import com.codahale.metrics.MetricRegistry;
 import com.foreach.across.core.annotations.AcrossCondition;
-import com.foreach.across.modules.metrics.AcrossMetric;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -24,9 +24,21 @@ import org.springframework.context.annotation.Configuration;
 public class DataSourceMetricModuleConfiguration extends BaseMetricModuleConfiguration
 {
 	//TODO: for now it's up to the user to setMetricRegistry on the DataSource, maybe later we can inject the DataSources MetricRegistry into the DataSource
+	public static final MetricRegistry METRIC_REGISTRY = new MetricRegistry();
+
+	public DataSourceMetricModuleConfiguration() {
+		super( METRIC_REGISTRY );
+	}
 
 	@Override
-	public AcrossMetric getAcrossMetric() {
-		return AcrossMetric.DATASOURCES;
+	public String getDependencyClass() {
+		return null;
 	}
+
+	@Override
+	public String getName() {
+		return "Datasource";
+	}
+
+
 }

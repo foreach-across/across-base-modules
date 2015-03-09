@@ -21,7 +21,6 @@ import com.foreach.across.core.annotations.Event;
 import com.foreach.across.modules.debugweb.DebugWebModule;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
-import com.foreach.across.modules.metrics.AcrossMetric;
 import com.foreach.across.modules.metrics.config.AcrossMetricRegistry;
 import com.foreach.across.modules.metrics.config.BaseMetricModuleConfiguration;
 import com.foreach.across.modules.web.menu.PathBasedMenuBuilder;
@@ -48,12 +47,12 @@ public class MetricsController
 
 	@Event
 	public void buildMenu( DebugMenuEvent event ) {
-		Map<AcrossMetric, BaseMetricModuleConfiguration> enabledMetrics = acrossMetricRegistry.getItems();
+		List<BaseMetricModuleConfiguration> enabledMetrics = acrossMetricRegistry.getItems();
 		if( !CollectionUtils.isEmpty( enabledMetrics ) ) {
 			PathBasedMenuBuilder.PathBasedMenuItemBuilder builder = event.builder().group( "/metrics", "Metrics" );
-			for ( Map.Entry<AcrossMetric, BaseMetricModuleConfiguration> entry : enabledMetrics.entrySet() ) {
-				AcrossMetric acrossMetric = entry.getKey();
-				builder.and().item( "/metrics/" + acrossMetric.name(), acrossMetric.name() );
+			for ( BaseMetricModuleConfiguration entry : enabledMetrics ) {
+				int index = enabledMetrics.indexOf( entry );
+				builder.and().item( "/metrics/" + index, entry.getName() );
 			}
 		}
 	}
@@ -64,14 +63,13 @@ public class MetricsController
 		return "th/metrics/metricsList";
 	}
 
-	@RequestMapping("/metrics/{metric}")
-	public String showMetricsJvm( Model model, @PathVariable("metric") String metricName ) {
-		AcrossMetric acrossMetric = AcrossMetric.valueOf( metricName );
+	@RequestMapping("/metrics/{index}")
+	public String showMetricsJvm( Model model, @PathVariable("index") int index ) {
 		TimeUnit rateUnit = TimeUnit.SECONDS;
 
 		List<Table> metrics = new LinkedList<>();
-		BaseMetricModuleConfiguration module = acrossMetricRegistry.getAcrossMetric( acrossMetric );
-		MetricRegistry metricRegistry = module.getAcrossMetric().getMetricRegistry();
+		BaseMetricModuleConfiguration module = acrossMetricRegistry.getItems().get( index );
+		MetricRegistry metricRegistry = module.getMetricRegistry();
 		Table gauges = new Table( "Gauges" );
 		for ( Map.Entry<String, Gauge> entry : metricRegistry.getGauges().entrySet() ) {
 			writeField( gauges, entry.getKey(), entry.getValue().getValue() );

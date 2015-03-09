@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="Maven: across:across-core:1.1.0-SNAPSHOT">
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/across/across-core/1.1.0-SNAPSHOT/across-core-1.1.0-20150303.155219-4.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/across/across-core/1.1.0-SNAPSHOT/across-core-1.1.0-20150309.063942-5.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$MAVEN_REPOSITORY$/across/across-core/1.1.0-SNAPSHOT/across-core-1.1.0-20150303.155219-4-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/across/across-core/1.1.0-SNAPSHOT/across-core-1.1.0-20150309.063942-5-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$MAVEN_REPOSITORY$/across/across-core/1.1.0-SNAPSHOT/across-core-1.1.0-20150303.155219-4-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/across/across-core/1.1.0-SNAPSHOT/across-core-1.1.0-20150309.063942-5-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

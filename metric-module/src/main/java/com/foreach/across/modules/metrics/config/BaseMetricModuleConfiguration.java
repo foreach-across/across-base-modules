@@ -15,7 +15,9 @@
  */
 package com.foreach.across.modules.metrics.config;
 
-import com.foreach.across.modules.metrics.AcrossMetric;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricRegistry;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -25,15 +27,48 @@ public abstract class BaseMetricModuleConfiguration
 	@Autowired
 	private AcrossMetricRegistry acrossMetricRegistry;
 
+	private final MetricRegistry metricRegistry;
+
+	protected BaseMetricModuleConfiguration( MetricRegistry metricRegistry ) {
+		this.metricRegistry = metricRegistry;
+	}
+
 	@PostConstruct
 	public void validate() {
-		getAcrossMetric().validateDependency();
+		validateDependency();
 		register();
 	}
 
 	public void register() {
-		acrossMetricRegistry.register( this, getAcrossMetric() );
+		acrossMetricRegistry.register( this );
 	}
 
-	public abstract AcrossMetric getAcrossMetric();
+	public AcrossMetricRegistry acrossMetricRegistry() {
+		return acrossMetricRegistry;
+	}
+
+	public void validateDependency() {
+		String dependencyClass = getDependencyClass();
+		if( dependencyClass != null ) {
+			try {
+				Class.forName( dependencyClass );
+			}
+			catch ( ClassNotFoundException e ) {
+				String implementationVersion = Metric.class.getPackage().getImplementationVersion();
+				throw new IllegalArgumentException( this.getClass() + " Metrics depends on " + getDependencyInfo() + ", please add the dependency or disable the metric in MetricModuleSettings version: " + implementationVersion );
+			}
+		}
+	}
+
+	public abstract String getDependencyClass();
+
+	public String getDependencyInfo() {
+		return StringUtils.EMPTY;
+	}
+
+	public abstract String getName();
+
+	public MetricRegistry getMetricRegistry() {
+		return metricRegistry;
+	}
 }
