@@ -16,6 +16,7 @@
 package com.foreach.across.modules.metrics;
 
 import com.codahale.metrics.*;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.PrintStream;
 import java.util.Locale;
@@ -109,7 +110,6 @@ public class InMemoryReporter extends ScheduledReporter
 	                    SortedMap<String, Histogram> histograms,
 	                    SortedMap<String, Meter> meters,
 	                    SortedMap<String, Timer> timers ) {
-		System.out.println( gauges );
-
+		throw new NotImplementedException( "WIP" );
 	}
 }
