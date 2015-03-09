@@ -23,6 +23,7 @@ import com.foreach.across.modules.entity.controllers.EntityControllerAttributes;
 import com.foreach.across.modules.entity.controllers.association.AssociatedEntityCreateController;
 import com.foreach.across.modules.entity.controllers.association.AssociatedEntityListController;
 import com.foreach.across.modules.entity.controllers.association.AssociatedEntityUpdateController;
+import com.foreach.across.modules.entity.controllers.association.AssociatedEntityViewController;
 import com.foreach.across.modules.entity.controllers.entity.EntityCreateController;
 import com.foreach.across.modules.entity.controllers.entity.EntityListController;
 import com.foreach.across.modules.entity.controllers.entity.EntityUpdateController;
@@ -69,6 +70,11 @@ public class AdminWebConfiguration implements EntityConfigurer
 	@Bean
 	public EntityViewController entityViewController() {
 		return new EntityViewController();
+	}
+
+	@Bean
+	public AssociatedEntityViewController associatedEntityViewController() {
+		return new AssociatedEntityViewController();
 	}
 
 	@Bean

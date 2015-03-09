@@ -139,6 +139,7 @@ public class EntityListViewFactory<V extends ViewCreationContext> extends Config
 		table.getHeader().setCellProcessor( sortableTableHeaderCellProcessor );
 		table.setName( "resultsTable" );
 		table.setPage( page );
+		table.setShowResultNumber( isShowResultNumber() );
 		table.setColumns( (Iterable<ViewElement>) view.getEntityProperties().remove( "table" ) );
 
 		Map<String, String> tableAttributs = new HashMap<>();
