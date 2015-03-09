@@ -17,6 +17,7 @@ package com.foreach.across.modules.it.user;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
+import com.foreach.across.modules.adminweb.AdminWebModule;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.query.EntityQuery;
 import com.foreach.across.modules.entity.query.EntityQueryCondition;
@@ -28,7 +29,7 @@ import com.foreach.across.modules.entity.registry.EntityRegistry;
 import com.foreach.across.modules.user.business.*;
 import com.foreach.across.modules.user.services.GroupService;
 import com.foreach.across.modules.user.services.UserService;
-import com.foreach.across.test.AcrossTestConfiguration;
+import com.foreach.across.test.AcrossTestWebConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Collection;
 
@@ -48,6 +50,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
+@WebAppConfiguration
 @ContextConfiguration(classes = { ITUserModule.Config.class, ITEntityModuleDependency.Config.class })
 public class ITEntityModuleDependency
 {
@@ -121,11 +124,12 @@ public class ITEntityModuleDependency
 	}
 
 	@Configuration
-	@AcrossTestConfiguration
+	@AcrossTestWebConfiguration
 	static class Config implements AcrossContextConfigurer
 	{
 		@Override
 		public void configure( AcrossContext context ) {
+			context.addModule( new AdminWebModule() );
 			context.addModule( new EntityModule() );
 		}
 	}

@@ -19,6 +19,7 @@ import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.EmptyAcrossModule;
 import com.foreach.across.core.filters.ClassBeanFilter;
+import com.foreach.across.modules.adminweb.AdminWebModule;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.config.EntityConfigurer;
 import com.foreach.across.modules.entity.config.builders.EntitiesConfigurationBuilder;
@@ -37,7 +38,8 @@ import com.foreach.across.modules.entity.views.support.SpelValueFetcher;
 import com.foreach.across.modules.entity.web.EntityConfigurationLinkBuilder;
 import com.foreach.across.modules.entity.web.EntityLinkBuilder;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import com.foreach.across.test.AcrossTestConfiguration;
+import com.foreach.across.modules.spring.security.SpringSecurityModule;
+import com.foreach.across.test.AcrossTestWebConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,6 +48,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -55,6 +58,7 @@ import static org.mockito.Mockito.mock;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
+@WebAppConfiguration
 @ContextConfiguration(classes = TestCustomizingEntityConfiguration.Config.class)
 public class TestCustomizingEntityConfiguration
 {
@@ -128,11 +132,13 @@ public class TestCustomizingEntityConfiguration
 	}
 
 	@Configuration
-	@AcrossTestConfiguration
+	@AcrossTestWebConfiguration
 	protected static class Config implements AcrossContextConfigurer
 	{
 		@Override
 		public void configure( AcrossContext context ) {
+			context.addModule( new SpringSecurityModule() );
+			context.addModule( new AdminWebModule() );
 			context.addModule( new EntityModule() );
 
 			AcrossHibernateJpaModule hibernateModule = new AcrossHibernateJpaModule();

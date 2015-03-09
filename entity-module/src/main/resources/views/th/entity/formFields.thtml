@@ -163,7 +163,8 @@
 						<sup th:if="${element.required}"><strong>*</strong></sup>
 					</label>
 					<select th:id="${#ids.seq(element.name)}" class="form-control" th:name="${element.name}"
-					        th:with="selectedValue = ${element.value(entity)}" em:dependencies="${element.dependencies}">
+					        th:with="selectedValue = ${element.value(entity)}"
+					        em:dependencies="${element.dependencies}" em:attributes="${element.attributes}">
 						<option th:if="${not element.required or selectedValue == null}"></option>
 						<option th:each="option : ${element.options}"
 						        th:value="${option.value}"

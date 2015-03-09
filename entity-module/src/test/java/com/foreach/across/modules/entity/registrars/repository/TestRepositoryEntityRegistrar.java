@@ -18,6 +18,7 @@ package com.foreach.across.modules.entity.registrars.repository;
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.filters.ClassBeanFilter;
+import com.foreach.across.modules.adminweb.AdminWebModule;
 import com.foreach.across.modules.entity.EntityAttributes;
 import com.foreach.across.modules.entity.EntityModule;
 import com.foreach.across.modules.entity.annotations.EntityValidator;
@@ -34,7 +35,8 @@ import com.foreach.across.modules.entity.testmodules.springdata.business.Represe
 import com.foreach.across.modules.entity.testmodules.springdata.repositories.ClientRepository;
 import com.foreach.across.modules.entity.views.*;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import com.foreach.across.test.AcrossTestConfiguration;
+import com.foreach.across.modules.spring.security.SpringSecurityModule;
+import com.foreach.across.test.AcrossTestWebConfiguration;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +52,7 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.Validator;
 
@@ -62,6 +65,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
+@WebAppConfiguration
 @ContextConfiguration(classes = TestRepositoryEntityRegistrar.Config.class)
 public class TestRepositoryEntityRegistrar
 {
@@ -270,7 +274,7 @@ public class TestRepositoryEntityRegistrar
 	}
 
 	@Configuration
-	@AcrossTestConfiguration
+	@AcrossTestWebConfiguration
 	public static class Config implements AcrossContextConfigurer
 	{
 		@Bean
@@ -280,8 +284,11 @@ public class TestRepositoryEntityRegistrar
 
 		@Override
 		public void configure( AcrossContext context ) {
+			context.addModule( new SpringSecurityModule() );
+			context.addModule( new AdminWebModule() );
 			context.addModule( new EntityModule() );
 			context.setDevelopmentMode( true );
+
 			AcrossHibernateJpaModule hibernateModule = new AcrossHibernateJpaModule();
 			hibernateModule.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
 			context.addModule( hibernateModule );
