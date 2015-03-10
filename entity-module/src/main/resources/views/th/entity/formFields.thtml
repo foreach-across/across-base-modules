@@ -90,6 +90,13 @@
 								</table>
 							</div>
 						</div>
+						<div th:if="${page.totalPages gt 1}" class="panel-footer">
+                        	<a th:unless="${page.first}" href="#" data-tbl="entity-list"
+                        	  th:attr="data-tbl-page=${page.number - 1}" th:utext="${messages.previousPage(page)}">previous page</a>
+                        	<span th:utext="${messages.pagerText(page)}">Showing page 1 of 13</span>
+                        	<a th:unless="${page.last}" href="#" data-tbl="entity-list"
+                        	  th:attr="data-tbl-page=${page.number + 1}" th:utext="${messages.nextPage(page)}">next</a>
+                        </div>
 					</div>
 				</div>
 				<!--/* submit button */-->
