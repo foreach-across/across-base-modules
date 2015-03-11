@@ -23,7 +23,7 @@ var TablePager = function ( element )
 
     var tblSort = table.attr( 'data-tbl-sort' );
 
-    var props = tblSort && tblSort != 'null' ? tblSort.split( ',' ).replace(/,\s*ignoring case/g,'') : [];
+    var props = tblSort && tblSort != 'null' ? tblSort.replace(/,\s*ignoring case/g,'').split( ',' ) : [];
 
     this.sortables = $( "[data-tbl='" + id + "'][data-tbl-sort-property]" );
 
