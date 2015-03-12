@@ -65,7 +65,7 @@
 						</div>
 						<div class="panel-body" th:unless="${table.rows.empty}">
 							<div class="table-responsive">
-								<table class="table table-striped table-hover" em:attributes="${table.attributes}">
+								<table class="table table-hover" em:attributes="${table.attributes}">
 									<thead th:if="${table.header != null}" em:attributes="${table.header.attributes}">
 									<tr>
 										<th th:if="${table.showResultNumber}">#</th>
@@ -75,7 +75,7 @@
 									</tr>
 									</thead>
 									<tbody>
-									<tr th:each="entity,entityStats : ${table.rows}" em:attributes="${table.rowProcessor(entity)}">
+									<tr th:each="entity,entityStats : ${table.rows}" th:class="${entityStats.even} ? 'even' : 'odd'" em:attributes="${table.rowProcessor(entity)}">
 										<td th:if="${table.showResultNumber}" th:text="${entityStats.count + table.page.number * table.page.size}"></td>
 										<td th:each="column : ${table.columns}" em:attributes="${table.cellProcessor(column, entity)}">
 											<div th:utext="${column.print(entity)}" th:remove="tag"></div>
