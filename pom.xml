@@ -38,7 +38,7 @@
 		<dependency>
 			<groupId>across-standard-modules</groupId>
 			<artifactId>debug-web</artifactId>
-			<version>${project.parent.version}</version>
+			<version>1.0.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -58,7 +58,7 @@
 		<dependency>
 			<groupId>across-standard-modules</groupId>
 			<artifactId>across-hibernate</artifactId>
-			<version>${project.parent.version}</version>
+			<version>1.0.5-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
