@@ -18,7 +18,7 @@
 	<parent>
 		<artifactId>across-standard-modules</artifactId>
 		<groupId>across-standard-modules</groupId>
-		<version>1.0.5</version>
+		<version>1.0.6-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -33,19 +33,19 @@
 		<dependency>
 			<groupId>across-standard-modules</groupId>
 			<artifactId>admin-web</artifactId>
-			<version>1.0.5</version>
+			<version>1.0.6-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>across-standard-modules</groupId>
 			<artifactId>across-hibernate</artifactId>
-			<version>1.0.5</version>
+			<version>1.0.6-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>across-standard-modules</groupId>
 			<artifactId>spring-security</artifactId>
-			<version>1.0.5</version>
+			<version>1.0.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>

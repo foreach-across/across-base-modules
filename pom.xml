@@ -18,7 +18,7 @@
 
 	<groupId>across-standard-modules</groupId>
 	<artifactId>across-standard-modules</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -227,7 +227,7 @@
 	<scm>
 		<connection>scm:git:https://bitbucket.org/beforeach/across-standard-modules.git</connection>
 		<developerConnection>scm:git:https://bitbucket.org/beforeach/across-standard-modules.git</developerConnection>
-		<tag>across-standard-modules-1.0.5</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<dependencyManagement>

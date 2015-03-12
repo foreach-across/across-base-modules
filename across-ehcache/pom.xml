@@ -18,12 +18,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>across-ehcache</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.6-SNAPSHOT</version>
 
 	<parent>
 		<groupId>across-standard-modules</groupId>
 		<artifactId>across-standard-modules</artifactId>
-		<version>1.0.5</version>
+		<version>1.0.6-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>across-standard-modules</groupId>
 			<artifactId>debug-web</artifactId>
-			<version>1.0.5</version>
+			<version>1.0.6-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
