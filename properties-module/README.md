@@ -9,7 +9,7 @@ The Properties module provides facilities to extend existing entities with custo
   <dependency>
     <groupId>across-standard-modules</groupId>
     <artifactId>properties-module</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.1.0</version>
   </dependency>
 </dependencies>
 ```

@@ -45,6 +45,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:4.0.8.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-orm:4.0.8.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.9.5" level="project" />
+    <orderEntry type="library" name="Maven: across-standard-modules:spring-security:1.1.0-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="properties-module" />
     <orderEntry type="module" module-name="debug-web" />
     <orderEntry type="library" name="Maven: across:across-web:1.1.0-SNAPSHOT" level="project" />
