@@ -10,7 +10,7 @@ It also provides a debug web controller to view the running application informat
   <dependency>
     <groupId>across-standard-modules</groupId>
     <artifactId>application-info</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
   </dependency>
 </dependencies>
 ```

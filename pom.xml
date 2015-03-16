@@ -23,7 +23,7 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<across.version>1.1.0-SNAPSHOT</across.version>
+		<across.version>1.1.0</across.version>
 		<querydsl.version>3.5.1</querydsl.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
