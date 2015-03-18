@@ -18,7 +18,7 @@
 <head>
 	<title>Debug controller</title>
 	<link rel="stylesheet" type="text/css" th:each="css : ${webResourceRegistry.getResources('css')}" th:href="@{${css.data}}"/>
-	<script th:each="javascript : ${webResourceRegistry.getResources('javascript')}" th:src="${javascript.data}" th:if="${javascript.location != 'inline'}"></script>
+	<script th:each="javascript : ${webResourceRegistry.getResources('javascript')}" th:src="@{${javascript.data}}" th:if="${javascript.location != 'inline'}"></script>
 </head>
 <body>
 <div class="container">
