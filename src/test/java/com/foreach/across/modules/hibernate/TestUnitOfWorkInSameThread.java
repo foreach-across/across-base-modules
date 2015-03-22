@@ -23,7 +23,7 @@ import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Mod
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.User;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.UserRepository;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
-import org.apache.commons.dbcp.BasicDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -136,9 +136,9 @@ public class TestUnitOfWorkInSameThread
 	{
 		@Bean
 		public DataSource dataSource() throws Exception {
-			BasicDataSource dataSource = new BasicDataSource();
+			HikariDataSource dataSource = new HikariDataSource();
 			dataSource.setDriverClassName( "org.hsqldb.jdbc.JDBCDriver" );
-			dataSource.setUrl( "jdbc:hsqldb:mem:acrosscore" );
+			dataSource.setJdbcUrl( "jdbc:hsqldb:mem:acrosscore" );
 			dataSource.setUsername( "sa" );
 			dataSource.setPassword( "" );
 

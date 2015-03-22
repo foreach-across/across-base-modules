@@ -22,7 +22,7 @@ import com.foreach.across.modules.hibernate.testmodules.hibernate1.Product;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.ProductRepository;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Module;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
-import org.apache.commons.dbcp.BasicDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import org.hibernate.HibernateException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -96,9 +96,9 @@ public class TestNoTransactionManager
 	{
 		@Bean
 		public DataSource dataSource() throws Exception {
-			BasicDataSource dataSource = new BasicDataSource();
+			HikariDataSource dataSource = new HikariDataSource();
 			dataSource.setDriverClassName( "org.hsqldb.jdbc.JDBCDriver" );
-			dataSource.setUrl( "jdbc:hsqldb:mem:acrosscore" );
+			dataSource.setJdbcUrl( "jdbc:hsqldb:mem:acrosscore" );
 			dataSource.setUsername( "sa" );
 			dataSource.setPassword( "" );
 

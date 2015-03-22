@@ -22,7 +22,7 @@ import com.foreach.across.modules.hibernate.testmodules.hibernate1.ProductReposi
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Module;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.User;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.UserRepository;
-import org.apache.commons.dbcp.BasicDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.After;
@@ -146,9 +146,9 @@ public class TestTransactionalWithBaseModule
 	{
 		@Bean
 		public DataSource dataSource() throws Exception {
-			BasicDataSource dataSource = new BasicDataSource();
+			HikariDataSource dataSource = new HikariDataSource();
 			dataSource.setDriverClassName( "org.hsqldb.jdbc.JDBCDriver" );
-			dataSource.setUrl( "jdbc:hsqldb:mem:acrosscore" );
+			dataSource.setJdbcUrl( "jdbc:hsqldb:mem:acrosscore" );
 			dataSource.setUsername( "sa" );
 			dataSource.setPassword( "" );
 
