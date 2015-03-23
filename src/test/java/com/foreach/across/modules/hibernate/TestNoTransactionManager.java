@@ -17,12 +17,14 @@ package com.foreach.across.modules.hibernate;
 
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.context.AcrossContextUtils;
+import com.foreach.across.database.support.HikariDataSourceHelper;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Hibernate1Module;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Product;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.ProductRepository;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Module;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -96,13 +98,8 @@ public class TestNoTransactionManager
 	{
 		@Bean
 		public DataSource dataSource() throws Exception {
-			HikariDataSource dataSource = new HikariDataSource();
-			dataSource.setDriverClassName( "org.hsqldb.jdbc.JDBCDriver" );
-			dataSource.setJdbcUrl( "jdbc:hsqldb:mem:acrosscore" );
-			dataSource.setUsername( "sa" );
-			dataSource.setPassword( "" );
-
-			return dataSource;
+			return HikariDataSourceHelper.create( "org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:mem:acrosscore", "sa",
+			                                      StringUtils.EMPTY );
 		}
 
 		@Bean

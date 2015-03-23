@@ -16,6 +16,7 @@
 package com.foreach.across.modules.hibernate;
 
 import com.foreach.across.core.AcrossContext;
+import com.foreach.across.database.support.HikariDataSourceHelper;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Hibernate1Module;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Product;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.ProductRepository;
@@ -23,6 +24,7 @@ import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Mod
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.User;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.UserRepository;
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,13 +114,8 @@ public class TestAutoOpenSessions
 	{
 		@Bean
 		public DataSource dataSource() throws Exception {
-			HikariDataSource dataSource = new HikariDataSource();
-			dataSource.setDriverClassName( "org.hsqldb.jdbc.JDBCDriver" );
-			dataSource.setJdbcUrl( "jdbc:hsqldb:mem:acrosscore" );
-			dataSource.setUsername( "sa" );
-			dataSource.setPassword( "" );
-
-			return dataSource;
+			return HikariDataSourceHelper.create( "org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:mem:acrosscore", "sa",
+			                                      StringUtils.EMPTY );
 		}
 
 		@Bean
