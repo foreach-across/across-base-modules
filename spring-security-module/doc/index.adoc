@@ -1,0 +1,76 @@
+= SpringSecurityModule
+:toc:
+
+== General information
+
+=== Artifact
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+	<dependencies>
+		<dependency>
+			<groupId>across-standard-modules</groupId>
+			<artifactId>spring-security</artifactId>
+			<version>{across-version}</version>
+		</dependency>
+	</dependencies>
+----
+
+=== Module dependencies
+none
+
+=== Module settings
+none
+
+== About the SpringSecurityModule
+This module enables support for Spring security throughout the Across application.  Both the standard Spring security
+filter chain and method security annotation processors will be registered automatically if this module is present.
+
+The `SpringSecurityModule` registers 2 separate modules: the `SpringSecurityInfrastructureModule` provides the `SecurityPrincipal`
+ infrastructure as early as possible during the bootstrap phase, whereas the `SpringSecurityModule` itself is responsible
+ for registering the security filters.  Only the `SpringSecurityModule` should be manually added to the `AcrossContext`, the
+ infrastructure module will be added automatically.
+
+=== SecurityPrincipal abstraction
+The `SpringSecurityModule` provides an additional abstraction layer on top of the standard `Authentication` in the form
+of the `SecurityPrincipal` interface.  Other modules like the `UserModule` and `OAuth2Module` provide an implementation
+ of  the `SecurityPrincipal` concept.
+
+Since `SecurityPrincipal` is a relatively straightforward interface, a principal can be pretty much anything
+(user, group, machine...).  The only requirement is that every `SecurityPrincipal` has a *unique principal name* that
+identifies it.
+
+Several beans are available for interacting with the current security principal:
+
+|===
+| Type | Description
+
+| `SecurityPrincipalService`
+| Allows you to fetch any `SecurityPrincipal` by its unique principal name using a backing `SecurityPrincipalRetrievalStrategy`.
+Also provides some helper methods to quickly authenticate or de-authenticate a principal.
+
+| `CurrentSecurityPrincipalProxy`
+| Proxies the current security principal (if there is one).  Allows authority checking from anywhere in your code using the `hasAuthority(String)` method.
+
+The `SpringSecurityAclModule` wires a `CurrentAclSecurityPrincipalProxy` instead that provides additional methods
+to check for ACL permissions.
+
+|===
+
+.Example of using the SecurityPrincipalService to authenticate a principal
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+    // execute a section within the scope of an authenticated SecurityPrincipal,
+    // when the block closes the previous authentication will be reset
+    try ( CloseableAuthentication authenticatedBlock
+                        = securityPrincipalService.authenticate( principal ) ) {
+        // do something
+    }
+----
+
+
+
+
+
+

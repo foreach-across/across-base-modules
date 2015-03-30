@@ -28,8 +28,9 @@ public interface SecurityPrincipalService
 	 * as the security context for the current thread.
 	 *
 	 * @param principal Principal that should authenticate.
+	 * @return instance that can be used to reset to the previous authentication upon closing
 	 */
-	void authenticate( SecurityPrincipal principal );
+	CloseableAuthentication authenticate( SecurityPrincipal principal );
 
 	/**
 	 * Clears the authentication of the current thread.
