@@ -44,12 +44,12 @@ public class SecurityPrincipalServiceImpl implements SecurityPrincipalService
 	}
 
 	@Override
-	public void authenticate( SecurityPrincipal principal ) {
+	public CloseableAuthentication authenticate( SecurityPrincipal principal ) {
 		PreAuthenticatedAuthenticationToken authRequest = new PreAuthenticatedAuthenticationToken(
 				principal, null, principal.getAuthorities()
 		);
 
-		SecurityContextHolder.getContext().setAuthentication( authRequest );
+		return new CloseableAuthentication( authRequest );
 	}
 
 	@Override
