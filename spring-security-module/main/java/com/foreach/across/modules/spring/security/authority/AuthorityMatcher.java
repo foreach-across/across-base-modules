@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.spring.security;
+package com.foreach.across.modules.spring.security.authority;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -27,37 +26,6 @@ import java.util.Collection;
  */
 public abstract class AuthorityMatcher
 {
-	private static class NameBasedGrantedAuthority implements GrantedAuthority
-	{
-		private final String authority;
-
-		public NameBasedGrantedAuthority( String authority ) {
-			this.authority = authority;
-		}
-
-		@Override
-		public String getAuthority() {
-			return authority;
-		}
-
-		@Override
-		public boolean equals( Object o ) {
-			if ( this == o ) {
-				return true;
-			}
-			if ( o == null || !( o instanceof GrantedAuthority ) ) {
-				return false;
-			}
-
-			return StringUtils.equals( authority, ( (GrantedAuthority) o ).getAuthority() );
-		}
-
-		@Override
-		public int hashCode() {
-			return authority != null ? authority.hashCode() : 0;
-		}
-	}
-
 	public abstract boolean matches( Collection<? extends GrantedAuthority> authorities );
 
 	/**
@@ -77,7 +45,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( String authority : authorities ) {
-					if ( actual.contains( new NameBasedGrantedAuthority( authority ) ) ) {
+					if ( actual.contains( new NamedGrantedAuthority( authority ) ) ) {
 						return true;
 					}
 				}
@@ -133,7 +101,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( String authority : authorities ) {
-					if ( !actual.contains( new NameBasedGrantedAuthority( authority ) ) ) {
+					if ( !actual.contains( new NamedGrantedAuthority( authority ) ) ) {
 						return false;
 					}
 				}
@@ -189,7 +157,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( String authority : authorities ) {
-					if ( actual.contains( new NameBasedGrantedAuthority( authority ) ) ) {
+					if ( actual.contains( new NamedGrantedAuthority( authority ) ) ) {
 						return false;
 					}
 				}

@@ -15,7 +15,7 @@
  */
 package com.foreach.across.modules.spring.security.actions;
 
-import com.foreach.across.modules.spring.security.AuthorityMatcher;
+import com.foreach.across.modules.spring.security.authority.AuthorityMatcher;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * Implementation of {@link com.foreach.across.modules.spring.security.actions.AllowableActions} that takes a map
  * of {@link com.foreach.across.modules.spring.security.actions.AllowableAction} and
- * {@link com.foreach.across.modules.spring.security.AuthorityMatcher} as input.
+ * {@link com.foreach.across.modules.spring.security.authority.AuthorityMatcher} as input.
  * <p/>
  * Every action requested will be checked against the actual authorities provides.  This class is an abstract
  * providing nested implementations easily constructed through static helper methods.

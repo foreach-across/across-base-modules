@@ -15,13 +15,13 @@
  */
 package com.foreach.across.modules.spring.security.infrastructure.services;
 
+import com.foreach.across.modules.spring.security.authority.NamedGrantedAuthority;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalAuthenticationToken;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalHierarchy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +55,12 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 
 	@Override
 	public boolean hasAuthority( String authority ) {
-		return isAuthenticated() && getPrincipal().getAuthorities().contains( new SimpleGrantedAuthority( authority ) );
+		return hasAuthority( new NamedGrantedAuthority( authority ) );
+	}
+
+	@Override
+	public boolean hasAuthority( GrantedAuthority authority ) {
+		return isAuthenticated() && getPrincipal().getAuthorities().contains( authority);
 	}
 
 	@Override

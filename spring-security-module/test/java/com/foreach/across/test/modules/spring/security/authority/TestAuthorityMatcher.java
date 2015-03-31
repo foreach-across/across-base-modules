@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.test.modules;
+package com.foreach.across.test.modules.spring.security.authority;
 
-import com.foreach.across.modules.spring.security.AuthorityMatcher;
+import com.foreach.across.modules.spring.security.authority.AuthorityMatcher;
 import org.junit.Test;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 

@@ -15,10 +15,10 @@
  */
 package com.foreach.across.test.modules.spring.security.actions;
 
-import com.foreach.across.modules.spring.security.AuthorityMatcher;
 import com.foreach.across.modules.spring.security.actions.AllowableAction;
 import com.foreach.across.modules.spring.security.actions.AllowableActions;
 import com.foreach.across.modules.spring.security.actions.AuthorityMatchingAllowableActions;
+import com.foreach.across.modules.spring.security.authority.AuthorityMatcher;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.junit.Before;
 import org.junit.Test;

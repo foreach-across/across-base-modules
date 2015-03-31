@@ -15,6 +15,7 @@
  */
 package com.foreach.across.test.modules.spring.security.infrastructure.services;
 
+import com.foreach.across.modules.spring.security.authority.NamedGrantedAuthority;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxyImpl;
@@ -28,10 +29,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -109,6 +114,30 @@ public class TestCurrentSecurityPrincipalProxy
 		assertNull( currentPrincipal.getPrincipal() );
 
 		verify( securityPrincipalService, times( 1 ) ).getPrincipalByName( anyString() );
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void hasAuthority() {
+		assertFalse( currentPrincipal.hasAuthority( "some authority" ) );
+
+		Collection authorities = new HashSet<>();
+		authorities.add( new SimpleGrantedAuthority( "some authority" ) );
+
+		SecurityPrincipal principal = mock( SecurityPrincipal.class );
+		when( principal.getPrincipalName() ).thenReturn( "principal" );
+		when( principal.getAuthorities() ).thenReturn( authorities );
+
+		Authentication auth = mock( Authentication.class );
+		when( auth.getPrincipal() ).thenReturn( principal );
+		when( auth.getName() ).thenReturn( "principal" );
+		when( auth.isAuthenticated() ).thenReturn( true );
+
+		SecurityContextHolder.getContext().setAuthentication( auth );
+
+		assertTrue( currentPrincipal.hasAuthority( "some authority" ) );
+		assertTrue( currentPrincipal.hasAuthority( new SimpleGrantedAuthority( "some authority" ) ) );
+		assertTrue( currentPrincipal.hasAuthority( new NamedGrantedAuthority( "some authority" ) ) );
 	}
 
 	// Has authority
