@@ -51,7 +51,7 @@ public class TestAuthorityMatchingAllowableActions
 
 		Map<AllowableAction, AuthorityMatcher> matcherMap = new TreeMap<>();
 		matcherMap.put( AllowableAction.READ, AuthorityMatcher.allOf( "view users" ) );
-		matcherMap.put( AllowableAction.WRITE, AuthorityMatcher.allOf( "modify users" ) );
+		matcherMap.put( AllowableAction.UPDATE, AuthorityMatcher.allOf( "modify users" ) );
 		matcherMap.put( AllowableAction.DELETE, AuthorityMatcher.allOf( "view users", "delete stuff" ) );
 
 		allowableActions = AuthorityMatchingAllowableActions.forSecurityPrincipal( principal, matcherMap );
@@ -60,7 +60,7 @@ public class TestAuthorityMatchingAllowableActions
 	@Test
 	public void singleActions() {
 		assertTrue( allowableActions.contains( AllowableAction.READ ) );
-		assertFalse( allowableActions.contains( AllowableAction.WRITE ) );
+		assertFalse( allowableActions.contains( AllowableAction.UPDATE ) );
 		assertTrue( allowableActions.contains( AllowableAction.DELETE ) );
 		assertFalse( allowableActions.contains( AllowableAction.ADMINISTER ) );
 	}

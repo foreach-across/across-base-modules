@@ -35,7 +35,7 @@ public class AllowableAction implements Comparable<AllowableAction>
 	 * Default actions mapped to common ACL permissions.
 	 */
 	public static final AllowableAction READ = new AllowableAction( "read" );
-	public static final AllowableAction WRITE = new AllowableAction( "write" );
+	public static final AllowableAction UPDATE = new AllowableAction( "update" );
 	public static final AllowableAction CREATE = new AllowableAction( "create" );
 	public static final AllowableAction DELETE = new AllowableAction( "delete" );
 	public static final AllowableAction ADMINISTER = new AllowableAction( "administer" );

@@ -85,7 +85,7 @@ public class TestCurrentSecurityPrincipalProxy
 	}
 
 	@Test
-	public void principalLoadedOnlyOnceIfNecessary() {
+	public void principalLoadedOnlyIfNecessary() {
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
 
 		Authentication auth = mock( Authentication.class );
@@ -99,11 +99,11 @@ public class TestCurrentSecurityPrincipalProxy
 		assertSame( principal, currentPrincipal.getPrincipal() );
 		assertSame( principal, currentPrincipal.getPrincipal() );
 
-		verify( securityPrincipalService, times( 1 ) ).getPrincipalByName( anyString() );
+		verify( securityPrincipalService, times( 2 ) ).getPrincipalByName( anyString() );
 	}
 
 	@Test
-	public void principalLoadedOnlyOnceEvenIfNull() {
+	public void principalLoadedEvenIfNull() {
 		Authentication auth = mock( Authentication.class );
 		when( auth.getName() ).thenReturn( "principal" );
 		when( auth.isAuthenticated() ).thenReturn( true );
@@ -113,7 +113,7 @@ public class TestCurrentSecurityPrincipalProxy
 		assertNull( currentPrincipal.getPrincipal() );
 		assertNull( currentPrincipal.getPrincipal() );
 
-		verify( securityPrincipalService, times( 1 ) ).getPrincipalByName( anyString() );
+		verify( securityPrincipalService, times( 2 ) ).getPrincipalByName( anyString() );
 	}
 
 	@Test
@@ -131,6 +131,7 @@ public class TestCurrentSecurityPrincipalProxy
 		Authentication auth = mock( Authentication.class );
 		when( auth.getPrincipal() ).thenReturn( principal );
 		when( auth.getName() ).thenReturn( "principal" );
+		when( auth.getAuthorities() ).thenReturn( authorities );
 		when( auth.isAuthenticated() ).thenReturn( true );
 
 		SecurityContextHolder.getContext().setAuthentication( auth );
