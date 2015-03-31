@@ -24,6 +24,7 @@ import com.foreach.across.modules.spring.security.infrastructure.services.Curren
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalRetrievalStrategy;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
 import com.foreach.across.test.AcrossTestConfiguration;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,11 @@ public class ITSpringSecurityWithoutWeb
 
 	@Autowired
 	private SecurityPrincipalRetrievalStrategy principalRetrievalStrategy;
+
+	@After
+	public void clearSecurityContext() {
+		SecurityContextHolder.clearContext();
+	}
 
 	@Test
 	public void authenticationManagerBuilderShouldExist() {

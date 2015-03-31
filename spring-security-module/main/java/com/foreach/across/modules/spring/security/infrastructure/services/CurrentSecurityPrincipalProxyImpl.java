@@ -16,8 +16,8 @@
 package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalAuthenticationToken;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalHierarchy;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,18 +32,19 @@ import java.util.Collections;
  * Provides a proxy for the Authentication, where a request is only assumed to be authenticated
  * if the the principal associated with it is in fact a valid
  * {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal}.
- * <p/>
+ * <p>
  * The proxy will attempt to load the SecurityPrincipal if it is not yet available (for example
- * only the principal name is loaded on the Authentication object).
+ * only the principal name is loaded on the Authentication object).  This will replace the entire
+ * {@link org.springframework.security.core.Authentication} instance by a
+ * {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalAuthenticationToken}
+ * with the same credentials and authorities as the original authentication.
+ * </p>
  *
  * @author Arne Vandamme
  */
 @Service
 public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincipalProxy, SecurityPrincipalHierarchy
 {
-	private static final ThreadLocal<SecurityPrincipal> principal = new ThreadLocal<>();
-	private static final ThreadLocal<String> principalName = new ThreadLocal<>();
-
 	@Autowired
 	private SecurityPrincipalService securityPrincipalService;
 
@@ -83,31 +84,36 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 	}
 
 	private SecurityPrincipal loadPrincipal() {
-		String loadedName = principalName.get();
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if ( authentication != null && authentication.isAuthenticated() ) {
-			if ( loadedName == null || !StringUtils.equals( loadedName, authentication.getName() ) ) {
-				principalName.set( authentication.getName() );
 
-				if ( authentication.getPrincipal() instanceof SecurityPrincipal ) {
-					principal.set( (SecurityPrincipal) authentication.getPrincipal() );
-				}
-				else if ( authentication.getPrincipal() instanceof String ) {
-					principal.set( securityPrincipalService.getPrincipalByName(
-							(String) authentication.getPrincipal() ) );
-				}
-				else {
-					principal.set( securityPrincipalService.getPrincipalByName( authentication.getName() ) );
-				}
+			if ( authentication instanceof SecurityPrincipalAuthenticationToken ) {
+				return ( (SecurityPrincipalAuthenticationToken) authentication ).getPrincipal();
 			}
 
-			return principal.get();
-		}
+			Object authenticationPrincipal = authentication.getPrincipal();
 
-		if ( loadedName != null ) {
-			principalName.remove();
-			principal.remove();
+			if ( authenticationPrincipal instanceof SecurityPrincipal ) {
+				return (SecurityPrincipal) authenticationPrincipal;
+			}
+
+			SecurityPrincipal fetchedPrincipal;
+
+			if ( authenticationPrincipal instanceof String ) {
+				fetchedPrincipal = securityPrincipalService.getPrincipalByName( (String) authenticationPrincipal );
+			}
+			else {
+				fetchedPrincipal = securityPrincipalService.getPrincipalByName( authentication.getName() );
+			}
+
+			SecurityContextHolder.getContext().setAuthentication(
+					new SecurityPrincipalAuthenticationToken(
+							fetchedPrincipal, authentication.getCredentials(), authentication.getAuthorities()
+					)
+			);
+
+			return fetchedPrincipal;
 		}
 
 		return null;

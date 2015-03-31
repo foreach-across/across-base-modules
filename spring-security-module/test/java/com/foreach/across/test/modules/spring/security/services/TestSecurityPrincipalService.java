@@ -18,6 +18,7 @@ package com.foreach.across.test.modules.spring.security.services;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.*;
 import com.foreach.common.test.MockedLoader;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,11 @@ public class TestSecurityPrincipalService
 
 	@Autowired
 	private CurrentSecurityPrincipalProxy currentPrincipal;
+
+	@After
+	public void clearSecurityContext() {
+		SecurityContextHolder.clearContext();
+	}
 
 	@Test
 	public void authenticateAndAuthenticationBlock() {
