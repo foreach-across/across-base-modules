@@ -29,7 +29,7 @@ public interface AllowableActions extends Iterable<AllowableAction>
 	 * Checks if a certain action is allowed by verifying it is present in the collection.
 	 *
 	 * @param action that should be checked
-	 * @return true if the action is allowdd
+	 * @return true if the action is allowed
 	 */
 	boolean contains( AllowableAction action );
 }

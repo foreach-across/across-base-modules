@@ -69,6 +69,41 @@ to check for ACL permissions.
     }
 ----
 
+=== AllowableActions
+`SpringSecurityModule` also provides an `AllowableActions` construct that can easily be used to define a set
+of actions that can be performed on an item.  The purpose is for code to check if an action is present in the `AllowableActions`
+collection, meaning that the action can be performed.  This helps decoupling your business code from the specifics
+of the security layer and can be supported in both an ACL and non-ACL context.
+
+A single `AllowableAction` is identified by a unique string, making it very easy to extend.  Useful implementations
+can be found in the `com.foreach.across.modules.spring.security.actions` package.  The `AuthorityMatchingAllowableActions`
+maps `AllowableAction` on `AuthorityMatcher` and provides concrete implementation supporting both `Authentication` and
+`SecurityPrincipal`.
+
+Actions can be mapped against anything (most likely authorities or ACL permissions) and can also be completely different
+ depending on the target they need to be applied to.  This allows for as much granularity you might want, without having
+ to change your permission model.
+
+.Example of mapping AllowableActions against GrantedAuthorities
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+    @Autowired
+    private CurrentSecurityPrincipalProxy currentPrincipal;
+
+    public AllowableActions createAllowableActionsForCurrentSecurityPrincipal() {
+        Map<AllowableAction, AuthorityMatcher> actionAuthorityMatcherMap = new HashMap<>();
+        actionAuthorityMatcherMap.put( AllowableAction.READ, AuthorityMatcher.allOf( "read items" ) );
+        actionAuthorityMatcherMap.put( AllowableAction.UPDATE, AuthorityMatcher.allOf( "write items" ) );
+
+        return AuthorityMatchingAllowableActions.forSecurityPrincipal( currentPrincipal, actionAuthorityMatcherMap )
+    }
+----
+
+TIP: Use the `AllowableAction` concept to hide specifics of the security permission layer.
+
+
+
 
 
 
