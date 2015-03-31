@@ -32,7 +32,7 @@ public interface SecurityPrincipal
 	/**
 	 * @return The collection of authorities that have been granted to this principal.
 	 */
-	Collection<GrantedAuthority> getAuthorities();
+	Collection<? extends GrantedAuthority> getAuthorities();
 
 	/**
 	 * Any SecurityPrincipal should return the principal name as

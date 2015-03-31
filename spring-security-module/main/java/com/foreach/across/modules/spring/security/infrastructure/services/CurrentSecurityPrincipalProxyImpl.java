@@ -69,7 +69,7 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 	}
 
 	@Override
-	public Collection<GrantedAuthority> getAuthorities() {
+	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return isAuthenticated() ? getPrincipal().getAuthorities() : Collections.<GrantedAuthority>emptyList();
 	}
 
