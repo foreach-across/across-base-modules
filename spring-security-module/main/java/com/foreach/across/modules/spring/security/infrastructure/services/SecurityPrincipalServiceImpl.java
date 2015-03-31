@@ -18,11 +18,11 @@ package com.foreach.across.modules.spring.security.infrastructure.services;
 import com.foreach.across.core.events.AcrossEventPublisher;
 import com.foreach.across.modules.spring.security.SpringSecurityModuleCache;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalAuthenticationToken;
 import com.foreach.across.modules.spring.security.infrastructure.events.SecurityPrincipalRenamedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,11 +47,7 @@ public class SecurityPrincipalServiceImpl implements SecurityPrincipalService
 
 	@Override
 	public CloseableAuthentication authenticate( SecurityPrincipal principal ) {
-		PreAuthenticatedAuthenticationToken authRequest = new PreAuthenticatedAuthenticationToken(
-				principal, null, principal.getAuthorities()
-		);
-
-		return new CloseableAuthentication( authRequest );
+		return new CloseableAuthentication( new SecurityPrincipalAuthenticationToken( principal ) );
 	}
 
 	@Override
