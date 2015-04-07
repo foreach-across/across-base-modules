@@ -39,6 +39,7 @@
 			<groupId>across-standard-modules</groupId>
 			<artifactId>across-hibernate</artifactId>
 			<version>1.0.6-SNAPSHOT</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
