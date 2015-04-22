@@ -34,6 +34,7 @@ public class AcrossHibernateModuleSettings extends AcrossModuleSettings
 			"acrossHibernate.persistenceContextInView.order";
 	public static final String CREATE_TRANSACTION_MANAGER = "acrossHibernate.transactionManager";
 	public static final String CREATE_UNITOFWORK_FACTORY = "acrossHibernate.unitOfWorkFactory";
+	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "acrossHibernate.registerBasicRepositoryInterceptor";
 
 	@Override
 	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
@@ -50,6 +51,8 @@ public class AcrossHibernateModuleSettings extends AcrossModuleSettings
 				                   "request by using either a filter or an interceptor." );
 		registry.register( PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER, Integer.class, Ordered.HIGHEST_PRECEDENCE + 1,
 		                   "Configure the order of the persistence context view handler (if create)." );
+		registry.register( REGISTER_REPOSITORY_INTERCEPTOR, Boolean.class, true,
+		                   "Should BasicRepository implementations in modules automatically be interceptor.");
 	}
 
 	public boolean isCreateTransactionManager() {
@@ -58,6 +61,10 @@ public class AcrossHibernateModuleSettings extends AcrossModuleSettings
 
 	public boolean isCreateUnitOfWorkFactory() {
 		return getProperty( CREATE_UNITOFWORK_FACTORY, Boolean.class );
+	}
+
+	public boolean isRegisterRepositoryInterceptor() {
+		return getProperty( REGISTER_REPOSITORY_INTERCEPTOR, Boolean.class );
 	}
 
 	public PersistenceContextInView getPersistenceContextInView() {

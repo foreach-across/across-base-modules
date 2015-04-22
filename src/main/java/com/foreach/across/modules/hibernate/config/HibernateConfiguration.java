@@ -126,10 +126,12 @@ public class HibernateConfiguration
 	@Event
 	@SuppressWarnings("unused")
 	protected void registerClientModuleRepositoryInterceptors( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
-		LOG.trace( "Enabling BasicRepositoryInterceptor support in module {}",
-		           beforeBootstrapEvent.getModule().getName() );
-		beforeBootstrapEvent.addApplicationContextConfigurers(
-				new AnnotatedClassConfigurer( ModuleBasicRepositoryInterceptorConfiguration.class )
-		);
+		if ( settings.isRegisterRepositoryInterceptor() ) {
+			LOG.trace( "Enabling BasicRepositoryInterceptor support in module {}",
+			           beforeBootstrapEvent.getModule().getName() );
+			beforeBootstrapEvent.addApplicationContextConfigurers(
+					new AnnotatedClassConfigurer( ModuleBasicRepositoryInterceptorConfiguration.class )
+			);
+		}
 	}
 }

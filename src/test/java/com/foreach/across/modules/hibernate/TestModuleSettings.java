@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.foreach.across.modules.hibernate;
 
 import com.foreach.across.config.AcrossContextConfigurer;
@@ -5,6 +20,7 @@ import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.EmptyAcrossModule;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
+import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.test.AcrossTestContext;
 import com.foreach.across.test.AcrossTestWebContext;
@@ -40,6 +56,12 @@ public class TestModuleSettings
 					   .getBeansOfType( TransactionManagementConfigurer.Config.class )
 					   .size()
 			);
+			assertEquals(
+					1,
+					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
+					   .getBeansOfType( ModuleBasicRepositoryInterceptorConfiguration.class )
+					   .size()
+			);
 		}
 	}
 
@@ -65,6 +87,33 @@ public class TestModuleSettings
 					0,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
 					   .getBeansOfType( TransactionManagementConfigurer.Config.class )
+					   .size()
+			);
+		}
+	}
+
+	@Test
+	public void noRepositoryInterceptor() {
+		AcrossContextConfigurer config = new AcrossContextConfigurer()
+		{
+			@Override
+			public void configure( AcrossContext context ) {
+				AcrossHibernateModule module = new AcrossHibernateModule();
+				module.setProperty( AcrossHibernateModuleSettings.REGISTER_REPOSITORY_INTERCEPTOR, false );
+
+				context.addModule( module );
+				context.addModule( new EmptyAcrossModule( "client" ) );
+			}
+		};
+
+		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
+			assertNotNull( ctx.beanRegistry().getBeanOfType( SessionFactory.class ) );
+			assertNotNull( ctx.beanRegistry().getBeanOfType( PlatformTransactionManager.class ) );
+			assertEquals( 0, ctx.beanRegistry().getBeansOfType( UnitOfWorkFactory.class ).size() );
+			assertEquals(
+					0,
+					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
+					   .getBeansOfType( ModuleBasicRepositoryInterceptorConfiguration.class )
 					   .size()
 			);
 		}
