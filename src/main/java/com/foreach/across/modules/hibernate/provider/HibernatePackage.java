@@ -25,7 +25,6 @@ public class HibernatePackage implements HibernatePackageRegistry
 	private final String name;
 
 	private Collection<String> packagesToScan = new HashSet<String>();
-	private Collection<Class<?>> annotatedClasses = new HashSet<Class<?>>();
 	private Collection<String> mappingResources = new HashSet<String>();
 	private Map<String, String> tableAliases = new HashMap<>();
 
@@ -35,10 +34,6 @@ public class HibernatePackage implements HibernatePackageRegistry
 
 	public String getName() {
 		return name;
-	}
-
-	public Class<?>[] getAnnotatedClasses() {
-		return annotatedClasses.toArray( new Class[annotatedClasses.size()] );
 	}
 
 	public String[] getPackagesToScan() {
@@ -64,17 +59,12 @@ public class HibernatePackage implements HibernatePackageRegistry
 		}
 	}
 
-	public void addAnnotatedClass( Class<?>... annotatedClass ) {
-		annotatedClasses.addAll( Arrays.asList( annotatedClass ) );
-	}
-
 	public void addMappingResource( String... mappingResource ) {
 		mappingResources.addAll( Arrays.asList( mappingResource ) );
 	}
 
 	public void add( HibernatePackageProvider provider ) {
 		packagesToScan.addAll( Arrays.asList( provider.getPackagesToScan() ) );
-		annotatedClasses.addAll( Arrays.asList( provider.getAnnotatedClasses() ) );
 		mappingResources.addAll( Arrays.asList( provider.getMappingResources() ) );
 		tableAliases.putAll( provider.getTableAliases() );
 	}

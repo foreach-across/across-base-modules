@@ -98,8 +98,6 @@ public class HibernateConfiguration
 
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
 		sessionFactory.setDataSource( module.getDataSource() );
-
-		sessionFactory.setAnnotatedClasses( hibernatePackage.getAnnotatedClasses() );
 		sessionFactory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
 		sessionFactory.setMappingResources( hibernatePackage.getMappingResources() );
 

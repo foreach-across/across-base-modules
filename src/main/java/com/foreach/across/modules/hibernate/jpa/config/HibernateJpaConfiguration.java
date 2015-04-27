@@ -81,12 +81,14 @@ public class HibernateJpaConfiguration
 		factory.setJpaVendorAdapter( vendorAdapter );
 		factory.setDataSource( module.getDataSource() );
 
-		if ( hibernatePackage.getAnnotatedClasses().length > 0 ) {
-			throw new IllegalArgumentException( "AcrossHibernateJpaModule does not support annotated classes." );
+		String[] mappingResources = hibernatePackage.getMappingResources();
+		if ( mappingResources.length > 0 ) {
+			LOG.warn( "Using manually specified mapping resources - default orm.xml with {} will not be used.",
+			          EntityInterceptorEntityListener.class );
+			factory.setMappingResources( hibernatePackage.getMappingResources() );
 		}
-
 		factory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
-		factory.setMappingResources( hibernatePackage.getMappingResources() );
+
 		factory.getJpaPropertyMap().putAll( hibernateProperties() );
 
 		Map<String, String> tableAliases = hibernatePackage.getTableAliases();

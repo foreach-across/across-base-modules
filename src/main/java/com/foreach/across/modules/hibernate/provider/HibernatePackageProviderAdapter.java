@@ -20,14 +20,12 @@ import java.util.Map;
 
 public class HibernatePackageProviderAdapter implements HibernatePackageProvider
 {
+	@Override
 	public String[] getPackagesToScan() {
 		return new String[0];
 	}
 
-	public Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[0];
-	}
-
+	@Override
 	public String[] getMappingResources() {
 		return new String[0];
 	}
