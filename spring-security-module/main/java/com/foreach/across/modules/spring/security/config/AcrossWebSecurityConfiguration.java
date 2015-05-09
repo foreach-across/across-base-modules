@@ -97,16 +97,20 @@ public class AcrossWebSecurityConfiguration
 	 */
 	@Bean(name = "autowiredWebSecurityConfigurersIgnoreParents")
 	public Set<WebSecurityConfigurer> autowiredWebSecurityConfigurersIgnoreParents() {
-		Collection<SpringSecurityWebConfigurer> configurers =
-				contextBeanRegistry.getBeansOfType( SpringSecurityWebConfigurer.class, true );
+		Map<String, SpringSecurityWebConfigurer> configurers =
+				contextBeanRegistry.getBeansOfTypeAsMap( SpringSecurityWebConfigurer.class, true );
 
 		WebSecurityConfigurerSet webSecurityConfigurers = new WebSecurityConfigurerSet();
 		webSecurityConfigurers.addAll( applicationContext.getBeansOfType( WebSecurityConfigurer.class ).values() );
 
 		int index = 1;
-		for ( SpringSecurityWebConfigurer configurer : configurers ) {
-			WebSecurityConfigurerWrapper wrapper = webSecurityConfigurerWrapperFactory().createWrapper( configurer,
-			                                                                                            index++ );
+
+		LOG.debug( "Applying the following security configurers in order:" );
+		for ( Map.Entry<String, SpringSecurityWebConfigurer> entry : configurers.entrySet() ) {
+			LOG.debug( " {} - {} ({})", index, entry.getKey(), ClassUtils.getUserClass( entry.getValue() ).getName() );
+
+			WebSecurityConfigurerWrapper wrapper = webSecurityConfigurerWrapperFactory()
+					.createWrapper( entry.getValue(), index++ );
 
 			webSecurityConfigurers.add( wrapper );
 		}
