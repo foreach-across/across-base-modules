@@ -42,7 +42,13 @@ correctly scoped to the subset of requests they are meant for*.  The `SpringSecu
 rules that Across provides: using the module order by default and allowing the use of `@Order`, `@OrderInModule` or
 their respective interfaces.
 
-NOTE: Spring security itself allows very advanced configuration and customization.  Please refer to the official {spring-security-url}[Spring security documentation] for more details.
+NOTE: Spring security itself allows very advanced configuration and customization.
+Please refer to the official {spring-security-url}[Spring security documentation] for more details.
+
+.Debugging `SpringSecurityWebConfigurer` ordering
+If you want to trace the different configurers that are being applied, you should enable `DEBUG` logging for class
+`com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration`.  This will output the different
+configurer beans in the order they will be applied, along with their type, bean and module name (if available).
 
 === SecurityPrincipal abstraction
 The `SpringSecurityModule` provides an additional abstraction layer on top of the standard `Authentication` in the form
