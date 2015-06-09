@@ -33,6 +33,8 @@ import net.sf.ehcache.distribution.CacheManagerPeerProvider;
 import net.sf.ehcache.distribution.CachePeer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -48,6 +50,8 @@ import java.util.*;
 @AcrossDepends(required = "DebugWebModule")
 public class DebugEhcacheController
 {
+	private static final Logger LOG = LoggerFactory.getLogger( DebugEhcacheController.class );
+
 	@Autowired
 	private CacheManager cacheManager;
 
@@ -68,11 +72,24 @@ public class DebugEhcacheController
 	public String listCaches( Model model ) {
 		Collection<Ehcache> caches = new LinkedList<Ehcache>();
 
+		Map<String, Number> heapSizes = new HashMap<>();
+
 		for ( String cacheName : cacheManager.getCacheNames() ) {
-			caches.add( cacheManager.getCache( cacheName ) );
+			Cache cache = cacheManager.getCache( cacheName );
+
+			try {
+				heapSizes.put( cache.getName(), cache.getStatistics().getExtended().localHeapSizeInBytes().value() );
+			}
+			catch ( Exception e ) {
+				// Exception calculating heap size (classloading exception)
+				LOG.warn( "Unable to calculate heap size for cache {}", cacheName, e );
+			}
+
+			caches.add( cache );
 		}
 
 		model.addAttribute( "cacheList", caches );
+		model.addAttribute( "heapSizes", heapSizes );
 
 		Map<String, CacheManagerPeerProvider> cacheManagerPeerProviders = cacheManager.getCacheManagerPeerProviders();
 		model.addAttribute( "cacheManagerProviders", cacheManagerPeerProviders.keySet() );
@@ -84,7 +101,7 @@ public class DebugEhcacheController
 	public String flushCache( @RequestParam(value = "cache", required = false) String cacheName,
 	                          @RequestParam(value = "from", required = false) String from,
 	                          @RequestParam(value = "replicate", required = false,
-	                                        defaultValue = "false") String replicate ) {
+			                          defaultValue = "false") String replicate ) {
 		String[] cachesToFlush = cacheName == null ? cacheManager.getCacheNames() : new String[] { cacheName };
 
 		for ( String cache : cachesToFlush ) {

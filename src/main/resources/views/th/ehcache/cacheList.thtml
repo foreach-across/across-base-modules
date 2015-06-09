@@ -62,9 +62,9 @@
 				<th>Evictions</th>
 				<td th:text="*{statistics.cacheEvictedCount()}">0</td>
 			</tr>
-			<tr>
+			<tr th:if="${heapSizes[cache.name] != null}">
 				<th>Heap size</th>
-				<td th:text="*{#numbers.formatDecimal(statistics.getExtended().localHeapSizeInBytes().value() / 1024.0,1,2)} + ' KB'">
+				<td th:text="${#numbers.formatDecimal(heapSizes[cache.name] / 1024.0,1,2)} + ' KB'">
 					0 KB
 				</td>
 			</tr>
