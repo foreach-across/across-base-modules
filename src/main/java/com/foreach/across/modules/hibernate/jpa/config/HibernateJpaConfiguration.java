@@ -27,6 +27,8 @@ import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings
 import com.foreach.across.modules.hibernate.jpa.intercept.EntityInterceptorEntityListener;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
+import com.foreach.across.modules.hibernate.jpa.services.JpaHibernateSessionHolderImpl;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
@@ -149,6 +151,12 @@ public class HibernateJpaConfiguration
 		AbstractTableAliasNamingStrategy.registerTableAliases( strategyClass, tableAliases );
 
 		return strategyClass;
+	}
+
+	@Bean
+	@Exposed
+	public HibernateSessionHolder hibernateSessionHolder() {
+		return new JpaHibernateSessionHolderImpl();
 	}
 
 	// Use a static method to set entity interceptors - so we do not require @Configurable and load time weaving.

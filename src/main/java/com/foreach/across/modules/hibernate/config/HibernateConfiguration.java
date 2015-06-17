@@ -26,6 +26,8 @@ import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.cfg.Environment;
 import org.hibernate.engine.jdbc.batch.internal.BatchBuilderInitiator;
@@ -113,6 +115,12 @@ public class HibernateConfiguration
 		sessionFactory.setHibernateProperties( propertiesToSet );
 
 		return sessionFactory;
+	}
+
+	@Bean
+	@Exposed
+	public HibernateSessionHolder hibernateSessionHolder() {
+		return new HibernateSessionHolderImpl();
 	}
 
 	@Bean

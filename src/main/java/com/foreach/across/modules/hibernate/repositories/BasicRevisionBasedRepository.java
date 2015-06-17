@@ -18,9 +18,9 @@ package com.foreach.across.modules.hibernate.repositories;
 import com.foreach.across.core.revision.Revision;
 import com.foreach.across.core.revision.RevisionBasedEntity;
 import com.foreach.across.core.revision.RevisionBasedEntityManager;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,7 +37,7 @@ public abstract class BasicRevisionBasedRepository<T extends RevisionBasedEntity
 	private final Class<T> clazz;
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private HibernateSessionHolder hibernateSessionHolder;
 
 	@SuppressWarnings("unchecked")
 	public BasicRevisionBasedRepository() {
@@ -170,6 +170,6 @@ public abstract class BasicRevisionBasedRepository<T extends RevisionBasedEntity
 	}
 
 	protected Session session() {
-		return sessionFactory.getCurrentSession();
+		return hibernateSessionHolder.getCurrentSession();
 	}
 }

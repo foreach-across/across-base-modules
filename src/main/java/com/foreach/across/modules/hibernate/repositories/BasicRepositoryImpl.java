@@ -15,9 +15,9 @@
  */
 package com.foreach.across.modules.hibernate.repositories;
 
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +32,7 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 	private static final int MAX_RESULTS = 5000;
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private HibernateSessionHolder hibernateSessionHolder;
 
 	@SuppressWarnings("unchecked")
 	public BasicRepositoryImpl() {
@@ -62,7 +62,7 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 	}
 
 	protected Session session() {
-		return sessionFactory.getCurrentSession();
+		return hibernateSessionHolder.getCurrentSession();
 	}
 
 	/**

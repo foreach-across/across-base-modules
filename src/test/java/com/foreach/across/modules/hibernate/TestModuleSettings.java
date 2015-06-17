@@ -21,6 +21,8 @@ import com.foreach.across.core.EmptyAcrossModule;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.test.AcrossTestContext;
 import com.foreach.across.test.AcrossTestWebContext;
@@ -245,6 +247,23 @@ public class TestModuleSettings
 
 			assertEquals( 0, module.getBeansOfType( OpenSessionInViewInterceptor.class ).size() );
 			assertEquals( 1, module.getBeansOfType( OpenSessionInViewFilter.class ).size() );
+		}
+	}
+
+	@Test
+	public void hibernateSessionHolderIsNormalImplementation() throws Exception {
+		AcrossContextConfigurer config = new AcrossContextConfigurer()
+		{
+			@Override
+			public void configure( AcrossContext context ) {
+				context.addModule( new AcrossHibernateModule() );
+				context.addModule( new EmptyAcrossModule( "client" ) );
+			}
+		};
+
+		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
+			HibernateSessionHolder sessionHolder = ctx.beanRegistry().getBeanOfType( HibernateSessionHolder.class );
+			assertTrue( sessionHolder instanceof HibernateSessionHolderImpl );
 		}
 	}
 }
