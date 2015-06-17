@@ -116,15 +116,21 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Transactional
 	@Override
 	public void delete( T object ) {
+		Session session = session();
+
+		if ( !session.contains( object ) ) {
+			object = (T) session.merge( object );
+		}
 		if ( object instanceof Undeletable ) {
 			( (Undeletable) object ).setDeleted( true );
-			session().saveOrUpdate( object );
+			session.saveOrUpdate( object );
 		}
 		else {
-			session().delete( object );
+			session.delete( object );
 		}
 	}
 }
