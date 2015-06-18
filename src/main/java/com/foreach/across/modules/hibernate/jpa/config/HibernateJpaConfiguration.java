@@ -16,19 +16,20 @@
 package com.foreach.across.modules.hibernate.jpa.config;
 
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.annotations.AcrossEventHandler;
+import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
+import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.database.DatabaseInfo;
-import com.foreach.across.core.registry.IncrementalRefreshableRegistry;
-import com.foreach.across.core.registry.RefreshableRegistry;
-import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
+import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
-import com.foreach.across.modules.hibernate.jpa.intercept.EntityInterceptorEntityListener;
-import com.foreach.across.modules.hibernate.provider.HibernatePackage;
-import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
 import com.foreach.across.modules.hibernate.jpa.services.JpaHibernateSessionHolderImpl;
+import com.foreach.across.modules.hibernate.modules.config.ModuleCrudRepositoryInterceptorConfiguration;
+import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
+import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
@@ -57,6 +58,7 @@ import java.util.Map;
  * @see com.foreach.across.modules.hibernate.config.TransactionManagerConfiguration
  */
 @Configuration
+@AcrossEventHandler
 public class HibernateJpaConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "jpaTransactionManager";
@@ -85,8 +87,6 @@ public class HibernateJpaConfiguration
 
 		String[] mappingResources = hibernatePackage.getMappingResources();
 		if ( mappingResources.length > 0 ) {
-			LOG.warn( "Using manually specified mapping resources - default orm.xml with {} will not be used.",
-			          EntityInterceptorEntityListener.class );
 			factory.setMappingResources( hibernatePackage.getMappingResources() );
 		}
 		factory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
@@ -159,15 +159,16 @@ public class HibernateJpaConfiguration
 		return new JpaHibernateSessionHolderImpl();
 	}
 
-	// Use a static method to set entity interceptors - so we do not require @Configurable and load time weaving.
-	// This effectively limits the use of AcrossHibernateJpaModule to once per class loader however.
-	@Bean
-	public RefreshableRegistry<EntityInterceptor> entityInterceptors() {
-		IncrementalRefreshableRegistry<EntityInterceptor> interceptors =
-				new IncrementalRefreshableRegistry<>( EntityInterceptor.class, true );
-		EntityInterceptorEntityListener.setEntityInterceptors( interceptors );
-
-		return interceptors;
+	@Event
+	@SuppressWarnings("unused")
+	public void registerClientModuleRepositoryInterceptors( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
+		if ( settings.isRegisterRepositoryInterceptor() ) {
+			LOG.trace( "Enabling CrudRepositoryInterceptor support in module {}",
+			           beforeBootstrapEvent.getModule().getName() );
+			beforeBootstrapEvent.addApplicationContextConfigurers(
+					new AnnotatedClassConfigurer( ModuleCrudRepositoryInterceptorConfiguration.class )
+			);
+		}
 	}
 
 	private Database determineDatabase( DataSource dataSource ) {

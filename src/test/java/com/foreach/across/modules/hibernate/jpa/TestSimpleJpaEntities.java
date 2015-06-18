@@ -52,8 +52,8 @@ public class TestSimpleJpaEntities
 
 	@Test
 	public void crudClientWithFixedId() {
-		List<Client> clients = clientRepository.findAll();
-		assertTrue( clients.isEmpty() );
+		Iterable<Client> clients = clientRepository.findAll();
+		assertFalse( clients.iterator().hasNext() );
 
 		Client autoId = new Client( "one" );
 		assertTrue( autoId.isNew() );

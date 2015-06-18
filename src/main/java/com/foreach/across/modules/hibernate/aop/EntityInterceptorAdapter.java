@@ -22,7 +22,9 @@ import java.lang.reflect.ParameterizedType;
  * persistence methods.
  * <p/>
  * Implementations will be picked up automatically by the
- * {@link com.foreach.across.modules.hibernate.aop.BasicRepositoryInterceptor} if it is active.
+ * {@link com.foreach.across.modules.hibernate.aop.BasicRepositoryInterceptor} or the
+ * {@link com.foreach.across.modules.hibernate.jpa.aop.CrudRepositoryInterceptor}
+ * if it is active.
  *
  * @author Arne Vandamme
  */
@@ -46,7 +48,7 @@ public abstract class EntityInterceptorAdapter<T> implements EntityInterceptor<T
 	}
 
 	@Override
-	public void beforeUpdate( T Entity ) {
+	public void beforeUpdate( T entity ) {
 	}
 
 	@Override
@@ -63,5 +65,13 @@ public abstract class EntityInterceptorAdapter<T> implements EntityInterceptor<T
 
 	@Override
 	public void beforeDelete( T entity, boolean isSoftDelete ) {
+	}
+
+	@Override
+	public void beforeDeleteAll() {
+	}
+
+	@Override
+	public void afterDeleteAll() {
 	}
 }

@@ -23,11 +23,15 @@ public interface EntityInterceptor<T>
 
 	void afterCreate( T entity );
 
-	void beforeUpdate( T Entity );
+	void beforeUpdate( T entity );
 
 	void afterUpdate( T entity );
 
 	void beforeDelete( T entity, boolean isSoftDelete );
 
 	void afterDelete( T entity, boolean isSoftDelete );
+
+	void beforeDeleteAll();
+
+	void afterDeleteAll();
 }

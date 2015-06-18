@@ -4,6 +4,7 @@ import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
+import com.foreach.across.modules.hibernate.aop.EntityInterceptorAdapter;
 import com.foreach.across.modules.hibernate.testmodules.jpa.Customer;
 import com.foreach.across.modules.hibernate.testmodules.jpa.CustomerRepository;
 import com.foreach.across.modules.hibernate.testmodules.jpa.SimpleJpaModule;
@@ -65,8 +66,8 @@ public class TestInterceptors
 
 		customerRepository.save( customer );
 
-		verify( customerInterceptor, times( 1 ) ).beforeCreate( any( Customer.class ) );
-		verify( customerInterceptor, times( 1 ) ).afterCreate( any( Customer.class ) );
+		verify( customerInterceptor, never() ).beforeCreate( any( Customer.class ) );
+		verify( customerInterceptor, never() ).afterCreate( any( Customer.class ) );
 		verify( customerInterceptor, never() ).beforeUpdate( any( Customer.class ) );
 		verify( customerInterceptor, never() ).afterUpdate( any( Customer.class ) );
 		verify( customerInterceptor, never() ).beforeDelete( any( Customer.class ), any( Boolean.class ) );
@@ -78,23 +79,22 @@ public class TestInterceptors
 
 		customerRepository.save( update );
 
-		verify( customerInterceptor, times( 1 ) ).beforeCreate( any( Customer.class ) );
-		verify( customerInterceptor, times( 1 ) ).afterCreate( any( Customer.class ) );
-		verify( customerInterceptor, times( 1 ) ).beforeUpdate( any( Customer.class ) );
-		verify( customerInterceptor, times( 1 ) ).afterUpdate( any( Customer.class ) );
+		verify( customerInterceptor, never() ).beforeCreate( any( Customer.class ) );
+		verify( customerInterceptor, never() ).afterCreate( any( Customer.class ) );
+		verify( customerInterceptor, never() ).beforeUpdate( any( Customer.class ) );
+		verify( customerInterceptor, never() ).afterUpdate( any( Customer.class ) );
 		verify( customerInterceptor, never() ).beforeDelete( any( Customer.class ), any( Boolean.class ) );
 		verify( customerInterceptor, never() ).afterDelete( any( Customer.class ), any( Boolean.class ) );
 
 		customerRepository.delete( customer );
 
-		verify( customerInterceptor, times( 1 ) ).beforeCreate( any( Customer.class ) );
-		verify( customerInterceptor, times( 1 ) ).afterCreate( any( Customer.class ) );
-		verify( customerInterceptor, times( 1 ) ).beforeUpdate( any( Customer.class ) );
-		verify( customerInterceptor, times( 1 ) ).afterUpdate( any( Customer.class ) );
-		verify( customerInterceptor, times( 1 ) ).beforeDelete( any( Customer.class ), eq( Boolean.FALSE ) );
-		verify( customerInterceptor, times( 1 ) ).afterDelete( any( Customer.class ), eq( Boolean.FALSE ) );
+		verify( customerInterceptor, never() ).beforeCreate( any( Customer.class ) );
+		verify( customerInterceptor, never() ).afterCreate( any( Customer.class ) );
+		verify( customerInterceptor, never() ).beforeUpdate( any( Customer.class ) );
+		verify( customerInterceptor, never() ).afterUpdate( any( Customer.class ) );
+		verify( customerInterceptor, never() ).beforeDelete( any( Customer.class ), eq( Boolean.FALSE ) );
+		verify( customerInterceptor, never() ).afterDelete( any( Customer.class ), eq( Boolean.FALSE ) );
 
-		verify( clientInterceptor, atLeastOnce() ).getEntityClass();
 		verifyNoMoreInteractions( clientInterceptor );
 	}
 
@@ -164,6 +164,7 @@ public class TestInterceptors
 		public void configure( AcrossContext context ) {
 			AcrossHibernateJpaModule hibernateModule = new AcrossHibernateJpaModule();
 			hibernateModule.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
+			hibernateModule.setProperty( AcrossHibernateJpaModuleSettings.REGISTER_REPOSITORY_INTERCEPTOR, true );
 			context.addModule( hibernateModule );
 
 			context.addModule( new SimpleJpaModule() );
