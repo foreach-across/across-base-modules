@@ -41,7 +41,7 @@ public class JpaRepositoryPointcut extends StaticMethodMatcherPointcut
 			case JpaRepositoryInterceptor.DELETE_IN_BATCH:
 				return ( method.getParameterTypes().length == 1 );
 			case JpaRepositoryInterceptor.DELETE_ALL:
-			case JpaRepositoryInterceptor.DELETE_ALL_BATCH:
+			case JpaRepositoryInterceptor.DELETE_ALL_IN_BATCH:
 				return method.getParameterTypes().length == 0;
 			default:
 				return false;
