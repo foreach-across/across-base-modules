@@ -4,7 +4,6 @@ import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.filters.ClassBeanFilter;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
-import com.foreach.across.modules.hibernate.aop.EntityInterceptorAdapter;
 import com.foreach.across.modules.hibernate.testmodules.jpa.Customer;
 import com.foreach.across.modules.hibernate.testmodules.jpa.CustomerRepository;
 import com.foreach.across.modules.hibernate.testmodules.jpa.SimpleJpaModule;
@@ -22,6 +21,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -53,7 +54,7 @@ public class TestInterceptors
 	}
 
 	@Test
-	public void crudCustomer() {
+	public void methodsNormalRepository() {
 		Customer customer = new Customer();
 		customer.setName( UUID.randomUUID().toString() );
 
@@ -99,7 +100,7 @@ public class TestInterceptors
 	}
 
 	@Test
-	public void crudClient() {
+	public void methodsJpaRepository() {
 		Client client = new Client();
 		client.setName( UUID.randomUUID().toString() );
 
@@ -133,6 +134,72 @@ public class TestInterceptors
 		verify( clientInterceptor, never() ).afterDelete( any( Client.class ), any( Boolean.class ) );
 
 		clientRepository.delete( client );
+
+		verify( clientInterceptor, times( 1 ) ).beforeCreate( any( Client.class ) );
+		verify( clientInterceptor, times( 1 ) ).afterCreate( any( Client.class ) );
+		verify( clientInterceptor, times( 1 ) ).beforeUpdate( any( Client.class ) );
+		verify( clientInterceptor, times( 1 ) ).afterUpdate( any( Client.class ) );
+		verify( clientInterceptor, times( 1 ) ).beforeDelete( any( Client.class ), eq( Boolean.FALSE ) );
+		verify( clientInterceptor, times( 1 ) ).afterDelete( any( Client.class ), eq( Boolean.FALSE ) );
+
+		verify( customerInterceptor, atLeastOnce() ).getEntityClass();
+		verifyNoMoreInteractions( customerInterceptor );
+	}
+
+	@Test
+	public void deleteAllJpaRepository() {
+		verify( clientInterceptor, never() ).beforeDeleteAll( eq( Client.class ) );
+		verify( clientInterceptor, never() ).afterDeleteAll( eq( Client.class ) );
+
+		clientRepository.deleteAllInBatch();
+
+		verify( clientInterceptor, times( 1 ) ).beforeDeleteAll( eq( Client.class ) );
+		verify( clientInterceptor, times( 1 ) ).afterDeleteAll( eq( Client.class ) );
+
+		clientRepository.deleteAll();
+
+		verify( clientInterceptor, times( 2 ) ).beforeDeleteAll( eq( Client.class ) );
+		verify( clientInterceptor, times( 2 ) ).afterDeleteAll( eq( Client.class ) );
+	}
+
+	@Test
+	public void iterableMethodsJpaRepository() {
+		Client client = new Client();
+		client.setName( UUID.randomUUID().toString() );
+		List<Client> clients = new ArrayList<>();
+		clients.add( client );
+
+		verify( clientInterceptor, never() ).beforeCreate( any( Client.class ) );
+		verify( clientInterceptor, never() ).afterCreate( any( Client.class ) );
+		verify( clientInterceptor, never() ).beforeUpdate( any( Client.class ) );
+		verify( clientInterceptor, never() ).afterUpdate( any( Client.class ) );
+		verify( clientInterceptor, never() ).beforeDelete( any( Client.class ), any( Boolean.class ) );
+		verify( clientInterceptor, never() ).afterDelete( any( Client.class ), any( Boolean.class ) );
+
+		clientRepository.save( clients );
+
+		verify( clientInterceptor, times( 1 ) ).beforeCreate( any( Client.class ) );
+		verify( clientInterceptor, times( 1 ) ).afterCreate( any( Client.class ) );
+		verify( clientInterceptor, never() ).beforeUpdate( any( Client.class ) );
+		verify( clientInterceptor, never() ).afterUpdate( any( Client.class ) );
+		verify( clientInterceptor, never() ).beforeDelete( any( Client.class ), any( Boolean.class ) );
+		verify( clientInterceptor, never() ).afterDelete( any( Client.class ), any( Boolean.class ) );
+
+		Client update = new Client();
+		update.setId( client.getId() );
+		update.setName( "updated" );
+		clients.clear();
+		clients.add( update );
+		clientRepository.save( clients );
+
+		verify( clientInterceptor, times( 1 ) ).beforeCreate( any( Client.class ) );
+		verify( clientInterceptor, times( 1 ) ).afterCreate( any( Client.class ) );
+		verify( clientInterceptor, times( 1 ) ).beforeUpdate( any( Client.class ) );
+		verify( clientInterceptor, times( 1 ) ).afterUpdate( any( Client.class ) );
+		verify( clientInterceptor, never() ).beforeDelete( any( Client.class ), any( Boolean.class ) );
+		verify( clientInterceptor, never() ).afterDelete( any( Client.class ), any( Boolean.class ) );
+
+		clientRepository.delete( clients );
 
 		verify( clientInterceptor, times( 1 ) ).beforeCreate( any( Client.class ) );
 		verify( clientInterceptor, times( 1 ) ).afterCreate( any( Client.class ) );

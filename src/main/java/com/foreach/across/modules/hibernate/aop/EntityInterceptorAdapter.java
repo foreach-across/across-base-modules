@@ -70,10 +70,10 @@ public abstract class EntityInterceptorAdapter<T> implements EntityInterceptor<T
 	}
 
 	@Override
-	public void beforeDeleteAll() {
+	public void beforeDeleteAll( Class<T> entityClass ) {
 	}
 
 	@Override
-	public void afterDeleteAll() {
+	public void afterDeleteAll( Class<T> entityClass ) {
 	}
 }

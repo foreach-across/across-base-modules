@@ -31,7 +31,7 @@ public interface EntityInterceptor<T>
 
 	void afterDelete( T entity, boolean isSoftDelete );
 
-	void beforeDeleteAll();
+	void beforeDeleteAll( Class<T> entityClass );
 
-	void afterDeleteAll();
+	void afterDeleteAll( Class<T> entityClass );
 }

@@ -16,7 +16,6 @@
 package com.foreach.across.modules.hibernate.jpa.aop;
 
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.util.ClassUtils;
 
@@ -37,10 +36,12 @@ public class JpaRepositoryPointcut extends StaticMethodMatcherPointcut
 	static boolean isEntityMethod( Method method ) {
 		switch ( method.getName() ) {
 			case JpaRepositoryInterceptor.SAVE:
+			case JpaRepositoryInterceptor.SAVE_AND_FLUSH:
 			case JpaRepositoryInterceptor.DELETE:
-				return ( method.getParameterTypes().length == 1 && method.getParameterTypes()[0].isAssignableFrom(
-						Persistable.class ) );
+			case JpaRepositoryInterceptor.DELETE_IN_BATCH:
+				return ( method.getParameterTypes().length == 1 );
 			case JpaRepositoryInterceptor.DELETE_ALL:
+			case JpaRepositoryInterceptor.DELETE_ALL_BATCH:
 				return method.getParameterTypes().length == 0;
 			default:
 				return false;

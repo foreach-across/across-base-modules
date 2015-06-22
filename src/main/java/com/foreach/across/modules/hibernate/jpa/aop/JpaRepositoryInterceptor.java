@@ -19,14 +19,17 @@ import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
 import com.foreach.across.modules.hibernate.repositories.Undeletable;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * Intercepts persistence calls on a {@link org.springframework.data.jpa.repository.JpaRepository}.
@@ -36,8 +39,11 @@ import java.util.Collection;
 public class JpaRepositoryInterceptor implements MethodInterceptor
 {
 	static final String SAVE = "save";
+	static final String SAVE_AND_FLUSH = "saveAndFlush";
 	static final String DELETE = "delete";
+	static final String DELETE_IN_BATCH = "deleteInBatch";
 	static final String DELETE_ALL = "deleteAll";
+	static final String DELETE_ALL_BATCH = "deleteAllInBatch";
 
 	private final Collection<EntityInterceptor> interceptors;
 
@@ -50,22 +56,58 @@ public class JpaRepositoryInterceptor implements MethodInterceptor
 		Method method = invocation.getMethod();
 		if ( JpaRepositoryPointcut.isEntityMethod( method ) ) {
 			Object[] arguments = invocation.getArguments();
-			if ( !StringUtils.equals( DELETE_ALL, method.getName() ) ) {
+			String methodName = method.getName();
+			if ( DELETE_ALL.equalsIgnoreCase( methodName ) || DELETE_ALL_BATCH.equalsIgnoreCase( methodName ) ) {
+				// handle deleteAll
+				Class<?> entityClass = TypeDescriptor.forObject( invocation.getThis() )
+				                                     .upcast( CrudRepository.class ).getResolvableType().getGeneric( 0 )
+				                                     .resolve();
+				Collection<EntityInterceptor> interceptors = findInterceptorsToApply( entityClass,
+				                                                                      this.interceptors );
+				callBeforeDeleteAll( interceptors, entityClass );
+
+				Object returnValue = invocation.proceed();
+				callAfterDeleteAll( interceptors, entityClass );
+				return returnValue;
+			}
+			else {
 				Object entityObject = arguments[0];
 
 				Class<?> targetClass = method.getParameterTypes()[0];
 				Class<?> userClass = ClassUtils.getUserClass( targetClass );
 
 				if ( Iterable.class.isAssignableFrom( userClass ) ) {
-					// handle iterable
+					Class<?> entityClass = TypeDescriptor.forObject( invocation.getThis() )
+					                                     .upcast( CrudRepository.class ).getResolvableType().getGeneric( 0 )
+					                                     .resolve();
+					Iterable iterable = (Iterable) entityObject;
+					IdentityHashMap<Persistable, Boolean> objects = new IdentityHashMap<>();
+					Collection<EntityInterceptor> interceptors = findInterceptorsToApply( entityClass,
+					                                                                      this.interceptors );
 
+					for ( Object o : iterable ) {
+						boolean isNew = ( (Persistable) o ).isNew();
+						objects.put( (Persistable) o, isNew );
+					}
+					for ( Map.Entry<Persistable, Boolean> persistableBooleanEntry : objects.entrySet() ) {
+						callBefore( interceptors, methodName, persistableBooleanEntry.getKey(),
+						            persistableBooleanEntry.getValue() );
+					}
+
+					Object returnValue = invocation.proceed();
+					for ( Map.Entry<Persistable, Boolean> persistableBooleanEntry : objects.entrySet() ) {
+						callAfter( interceptors, methodName, persistableBooleanEntry.getKey(),
+						           persistableBooleanEntry.getValue() );
+					}
+					return returnValue;
 				}
 				else {
-					Collection<EntityInterceptor> interceptors = findInterceptorsToApply( entityObject,
+					Class<?> entityClass = ClassUtils.getUserClass( AopProxyUtils.ultimateTargetClass( entityObject ) );
+
+					Collection<EntityInterceptor> interceptors = findInterceptorsToApply( entityClass,
 					                                                                      this.interceptors );
 
 					boolean isNew = ( (Persistable) entityObject ).isNew();
-					String methodName = method.getName();
 					callBefore( interceptors, methodName, entityObject, isNew );
 
 					Object returnValue = invocation.proceed();
@@ -75,19 +117,14 @@ public class JpaRepositoryInterceptor implements MethodInterceptor
 					return returnValue;
 				}
 			}
-			else {
-				// handle deleteAll
-			}
 		}
 
 		return invocation.proceed();
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection<EntityInterceptor> findInterceptorsToApply( Object entity,
-	                                                               Collection<EntityInterceptor> interceptors ) {
-		Class<?> entityClass = ClassUtils.getUserClass( AopProxyUtils.ultimateTargetClass( entity ) );
-
+	Collection<EntityInterceptor> findInterceptorsToApply( Class<?> entityClass,
+	                                                       Collection<EntityInterceptor> interceptors ) {
 		Collection<EntityInterceptor> matchingInterceptors = new ArrayList<>();
 
 		for ( EntityInterceptor candidate : interceptors ) {
@@ -110,6 +147,7 @@ public class JpaRepositoryInterceptor implements MethodInterceptor
 		for ( EntityInterceptor interceptor : interceptors ) {
 			switch ( methodName ) {
 				case SAVE:
+				case SAVE_AND_FLUSH:
 					if ( isNew ) {
 						interceptor.beforeCreate( entity );
 					}
@@ -117,10 +155,8 @@ public class JpaRepositoryInterceptor implements MethodInterceptor
 						interceptor.beforeUpdate( entity );
 					}
 					break;
-				case DELETE_ALL:
-					interceptor.beforeDeleteAll();
-					break;
 				case DELETE:
+				case DELETE_IN_BATCH:
 					interceptor.beforeDelete( entity, entity instanceof Undeletable );
 					break;
 			}
@@ -135,6 +171,7 @@ public class JpaRepositoryInterceptor implements MethodInterceptor
 		for ( EntityInterceptor interceptor : interceptors ) {
 			switch ( methodName ) {
 				case SAVE:
+				case SAVE_AND_FLUSH:
 					if ( isNew ) {
 						interceptor.afterCreate( entity );
 					}
@@ -142,14 +179,27 @@ public class JpaRepositoryInterceptor implements MethodInterceptor
 						interceptor.afterUpdate( entity );
 					}
 					break;
-				case DELETE_ALL:
-					interceptor.afterDeleteAll();
-					break;
 				case DELETE:
+				case DELETE_IN_BATCH:
 					interceptor.afterDelete( entity, entity instanceof Undeletable );
 					break;
 			}
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private void callBeforeDeleteAll( Collection<EntityInterceptor> interceptors,
+	                                  Class entityClass ) {
+		for ( EntityInterceptor interceptor : interceptors ) {
+			interceptor.beforeDeleteAll( entityClass );
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void callAfterDeleteAll( Collection<EntityInterceptor> interceptors,
+	                                 Class entityClass ) {
+		for ( EntityInterceptor interceptor : interceptors ) {
+			interceptor.afterDeleteAll( entityClass );
+		}
+	}
 }
