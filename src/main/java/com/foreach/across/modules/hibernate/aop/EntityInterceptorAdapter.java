@@ -15,6 +15,8 @@
  */
 package com.foreach.across.modules.hibernate.aop;
 
+import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptor;
+
 import java.lang.reflect.ParameterizedType;
 
 /**
@@ -23,7 +25,7 @@ import java.lang.reflect.ParameterizedType;
  * <p/>
  * Implementations will be picked up automatically by the
  * {@link com.foreach.across.modules.hibernate.aop.BasicRepositoryInterceptor} or the
- * {@link com.foreach.across.modules.hibernate.jpa.aop.CrudRepositoryInterceptor}
+ * {@link JpaRepositoryInterceptor}
  * if it is active.
  *
  * @author Arne Vandamme

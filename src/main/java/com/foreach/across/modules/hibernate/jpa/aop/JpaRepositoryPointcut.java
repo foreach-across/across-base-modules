@@ -17,7 +17,7 @@ package com.foreach.across.modules.hibernate.jpa.aop;
 
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -25,22 +25,22 @@ import java.lang.reflect.Method;
 /**
  * @author Andy Somers
  */
-public class CrudRepositoryPointcut extends StaticMethodMatcherPointcut
+public class JpaRepositoryPointcut extends StaticMethodMatcherPointcut
 {
 	@Override
 	public boolean matches( Method method, Class<?> targetClass ) {
 		Class<?> userClass = ClassUtils.getUserClass( targetClass );
 
-		return CrudRepository.class.isAssignableFrom( userClass ) && isEntityMethod( method );
+		return JpaRepository.class.isAssignableFrom( userClass ) && isEntityMethod( method );
 	}
 
 	static boolean isEntityMethod( Method method ) {
 		switch ( method.getName() ) {
-			case CrudRepositoryInterceptor.SAVE:
-			case CrudRepositoryInterceptor.DELETE:
+			case JpaRepositoryInterceptor.SAVE:
+			case JpaRepositoryInterceptor.DELETE:
 				return ( method.getParameterTypes().length == 1 && method.getParameterTypes()[0].isAssignableFrom(
 						Persistable.class ) );
-			case CrudRepositoryInterceptor.DELETE_ALL:
+			case JpaRepositoryInterceptor.DELETE_ALL:
 				return method.getParameterTypes().length == 0;
 			default:
 				return false;

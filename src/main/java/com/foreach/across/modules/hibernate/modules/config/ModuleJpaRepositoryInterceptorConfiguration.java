@@ -17,8 +17,8 @@ package com.foreach.across.modules.hibernate.modules.config;
 
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import com.foreach.across.modules.hibernate.jpa.aop.CrudRepositoryInterceptor;
-import com.foreach.across.modules.hibernate.jpa.aop.CrudRepositoryInterceptorAdvisor;
+import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptor;
+import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptorAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
@@ -29,21 +29,21 @@ import org.springframework.context.annotation.Role;
  * @author Andy Somers
  */
 @Configuration
-public class ModuleCrudRepositoryInterceptorConfiguration
+public class ModuleJpaRepositoryInterceptorConfiguration
 {
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
 
 	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public CrudRepositoryInterceptorAdvisor crudInterceptorAdvisor() {
-		CrudRepositoryInterceptor interceptor = contextBeanRegistry.getBeanOfTypeFromModule(
-				AcrossHibernateJpaModule.NAME, CrudRepositoryInterceptor.class
+	public JpaRepositoryInterceptorAdvisor jpaRepositoryInterceptorAdvisor() {
+		JpaRepositoryInterceptor interceptor = contextBeanRegistry.getBeanOfTypeFromModule(
+				AcrossHibernateJpaModule.NAME, JpaRepositoryInterceptor.class
 		);
 
-		CrudRepositoryInterceptorAdvisor advisor = new CrudRepositoryInterceptorAdvisor();
+		JpaRepositoryInterceptorAdvisor advisor = new JpaRepositoryInterceptorAdvisor();
 		advisor.setAdvice( interceptor );
-		advisor.setOrder( CrudRepositoryInterceptorAdvisor.INTERCEPT_ORDER );
+		advisor.setOrder( JpaRepositoryInterceptorAdvisor.INTERCEPT_ORDER );
 
 		return advisor;
 	}

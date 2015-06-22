@@ -18,8 +18,8 @@ package com.foreach.across.modules.hibernate.jpa.config;
 import com.foreach.across.core.registry.IncrementalRefreshableRegistry;
 import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
-import com.foreach.across.modules.hibernate.jpa.aop.CrudRepositoryInterceptor;
-import com.foreach.across.modules.hibernate.jpa.aop.CrudRepositoryInterceptorAdvisor;
+import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptor;
+import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptorAdvisor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,16 +40,16 @@ public class InterceptorConfiguration
 
 	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public CrudRepositoryInterceptor crudRepositoryInterceptor() {
-		return new CrudRepositoryInterceptor( idBasedEntityInterceptors() );
+	public JpaRepositoryInterceptor jpaRepositoryInterceptor() {
+		return new JpaRepositoryInterceptor( idBasedEntityInterceptors() );
 	}
 
 	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public CrudRepositoryInterceptorAdvisor crudRepositoryInterceptorAdvisor() {
-		CrudRepositoryInterceptorAdvisor advisor = new CrudRepositoryInterceptorAdvisor();
-		advisor.setAdvice( crudRepositoryInterceptor() );
-		advisor.setOrder( CrudRepositoryInterceptorAdvisor.INTERCEPT_ORDER );
+	public JpaRepositoryInterceptorAdvisor jpaRepositoryInterceptorAdvisor() {
+		JpaRepositoryInterceptorAdvisor advisor = new JpaRepositoryInterceptorAdvisor();
+		advisor.setAdvice( jpaRepositoryInterceptor() );
+		advisor.setOrder( JpaRepositoryInterceptorAdvisor.INTERCEPT_ORDER );
 
 		return advisor;
 	}

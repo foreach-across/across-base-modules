@@ -22,14 +22,14 @@ import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 /**
  * @author Andy Somers
  */
-public class CrudRepositoryInterceptorAdvisor extends AbstractBeanFactoryPointcutAdvisor
+public class JpaRepositoryInterceptorAdvisor extends AbstractBeanFactoryPointcutAdvisor
 {
 	/**
 	 * By default the interceptor should run within the same transaction.
 	 */
 	public static final int INTERCEPT_ORDER = TransactionManagementConfigurer.INTERCEPT_ORDER + 1;
 
-	private final Pointcut pointcut = new CrudRepositoryPointcut();
+	private final Pointcut pointcut = new JpaRepositoryPointcut();
 
 	@Override
 	public Pointcut getPointcut() {

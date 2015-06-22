@@ -29,11 +29,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Intercepts persistence calls on a {@link org.springframework.data.repository.CrudRepository}.
+ * Intercepts persistence calls on a {@link org.springframework.data.jpa.repository.JpaRepository}.
  *
  * @author Andy Somers
  */
-public class CrudRepositoryInterceptor implements MethodInterceptor
+public class JpaRepositoryInterceptor implements MethodInterceptor
 {
 	static final String SAVE = "save";
 	static final String DELETE = "delete";
@@ -41,14 +41,14 @@ public class CrudRepositoryInterceptor implements MethodInterceptor
 
 	private final Collection<EntityInterceptor> interceptors;
 
-	public CrudRepositoryInterceptor( Collection<EntityInterceptor> interceptors ) {
+	public JpaRepositoryInterceptor( Collection<EntityInterceptor> interceptors ) {
 		this.interceptors = interceptors;
 	}
 
 	@Override
 	public Object invoke( MethodInvocation invocation ) throws Throwable {
 		Method method = invocation.getMethod();
-		if ( CrudRepositoryPointcut.isEntityMethod( method ) ) {
+		if ( JpaRepositoryPointcut.isEntityMethod( method ) ) {
 			Object[] arguments = invocation.getArguments();
 			if ( !StringUtils.equals( DELETE_ALL, method.getName() ) ) {
 				Object entityObject = arguments[0];
@@ -58,13 +58,14 @@ public class CrudRepositoryInterceptor implements MethodInterceptor
 
 				if ( Iterable.class.isAssignableFrom( userClass ) ) {
 					// handle iterable
+
 				}
 				else {
-					String methodName = method.getName();
 					Collection<EntityInterceptor> interceptors = findInterceptorsToApply( entityObject,
 					                                                                      this.interceptors );
 
 					boolean isNew = ( (Persistable) entityObject ).isNew();
+					String methodName = method.getName();
 					callBefore( interceptors, methodName, entityObject, isNew );
 
 					Object returnValue = invocation.proceed();
