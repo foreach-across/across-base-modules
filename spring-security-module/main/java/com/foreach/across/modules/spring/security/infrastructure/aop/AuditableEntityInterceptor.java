@@ -35,6 +35,11 @@ public class AuditableEntityInterceptor extends EntityInterceptorAdapter<Auditab
 	private CurrentSecurityPrincipalProxy currentPrincipal;
 
 	@Override
+	public boolean handles( Class<?> entityClass ) {
+		return Auditable.class.isAssignableFrom( entityClass );
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public void beforeCreate( Auditable entity ) {
 		Date createdDate = entity.getCreatedDate() == null ? new Date() : entity.getCreatedDate();
