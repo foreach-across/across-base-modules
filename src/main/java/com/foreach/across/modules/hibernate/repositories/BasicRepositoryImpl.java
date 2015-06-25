@@ -26,6 +26,12 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * <p>Basic implementation for a imple Hibernate based repository.
+ * <strong>Deprecated</strong>, favour the use of Spring Data JPA repositories instead.</p>
+ * @param <T>
+ */
+@Deprecated
 public class BasicRepositoryImpl<T> implements BasicRepository<T>
 {
 	private final Class<T> clazz;

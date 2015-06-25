@@ -15,13 +15,10 @@
  */
 package com.foreach.across.modules.hibernate.testmodules.hibernate2;
 
+import com.foreach.across.modules.hibernate.repositories.BasicRepository;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Product;
 
-public interface UserRepository
+public interface UserRepository extends BasicRepository<User>
 {
-	User getUserWithId( int id );
-
-	void save( User user );
-
 	void save( User user, Product product );
 }

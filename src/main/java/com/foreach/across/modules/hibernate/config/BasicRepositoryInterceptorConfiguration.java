@@ -15,10 +15,8 @@
  */
 package com.foreach.across.modules.hibernate.config;
 
-import com.foreach.across.core.registry.IncrementalRefreshableRegistry;
 import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.modules.hibernate.aop.BasicRepositoryInterceptor;
-import com.foreach.across.modules.hibernate.aop.BasicRepositoryInterceptorAdvisor;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
@@ -29,26 +27,11 @@ import org.springframework.context.annotation.Role;
  * Configures intercepting the BasicRepository methods when an entity gets inserted/updated/deleted.
  */
 @Configuration
-public class InterceptorConfiguration
+public class BasicRepositoryInterceptorConfiguration
 {
 	@Bean
-	public RefreshableRegistry<EntityInterceptor> idBasedEntityInterceptors() {
-		return new IncrementalRefreshableRegistry<>( EntityInterceptor.class, true );
-	}
-
-	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public BasicRepositoryInterceptor basicRepositoryInterceptor() {
-		return new BasicRepositoryInterceptor( idBasedEntityInterceptors() );
-	}
-
-	@Bean
-	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public BasicRepositoryInterceptorAdvisor basicRepositoryInterceptorAdvisor() {
-		BasicRepositoryInterceptorAdvisor advisor = new BasicRepositoryInterceptorAdvisor();
-		advisor.setAdvice( basicRepositoryInterceptor() );
-		advisor.setOrder( BasicRepositoryInterceptorAdvisor.INTERCEPT_ORDER );
-
-		return advisor;
+	public BasicRepositoryInterceptor basicRepositoryInterceptor( RefreshableRegistry<EntityInterceptor> entityInterceptors ) {
+		return new BasicRepositoryInterceptor( entityInterceptors );
 	}
 }

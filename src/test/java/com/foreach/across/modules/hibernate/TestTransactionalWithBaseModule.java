@@ -23,7 +23,6 @@ import com.foreach.across.modules.hibernate.testmodules.hibernate1.ProductReposi
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Module;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.User;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.UserRepository;
-import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -89,15 +88,15 @@ public class TestTransactionalWithBaseModule
 
 	@Test
 	public void otherModuleTransactional() {
-		assertNull( userRepository.getUserWithId( 1 ) );
+		assertNull( userRepository.getById( 1 ) );
 
 		User user = new User( 1, "user 1" );
-		userRepository.save( user );
+		userRepository.update( user );
 
 		closeSession();
 		openSession();
 
-		User other = userRepository.getUserWithId( 1 );
+		User other = userRepository.getById( 1 );
 		assertNotNull( other );
 		assertEquals( user, other );
 	}
@@ -112,7 +111,7 @@ public class TestTransactionalWithBaseModule
 		closeSession();
 		openSession();
 
-		User otherUser = userRepository.getUserWithId( 2 );
+		User otherUser = userRepository.getById( 2 );
 		assertNotNull( otherUser );
 		assertEquals( user, otherUser );
 

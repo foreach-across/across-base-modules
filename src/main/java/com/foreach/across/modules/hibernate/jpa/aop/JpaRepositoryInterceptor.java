@@ -15,12 +15,11 @@
  */
 package com.foreach.across.modules.hibernate.jpa.aop;
 
+import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.aop.framework.AopProxyUtils;
-import org.springframework.core.convert.TypeDescriptor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -31,6 +30,7 @@ import java.util.Collection;
  *
  * @author Andy Somers
  */
+@Exposed
 public class JpaRepositoryInterceptor extends AbstractCrudRepositoryInterceptor
 {
 	static final String SAVE_AND_FLUSH = "saveAndFlush";
@@ -48,9 +48,7 @@ public class JpaRepositoryInterceptor extends AbstractCrudRepositoryInterceptor
 			Object[] arguments = invocation.getArguments();
 			String methodName = method.getName();
 			if ( DELETE_ALL_IN_BATCH.equalsIgnoreCase( methodName ) ) {
-				Class<?> entityClass = TypeDescriptor.forObject( invocation.getThis() )
-				                                     .upcast( CrudRepository.class ).getResolvableType().getGeneric( 0 )
-				                                     .resolve();
+				Class<?> entityClass = getEntityClass( invocation );
 				Collection<EntityInterceptor> interceptors = findInterceptorsToApply( entityClass, getInterceptors() );
 				callBeforeDeleteAll( interceptors, entityClass );
 
@@ -59,10 +57,7 @@ public class JpaRepositoryInterceptor extends AbstractCrudRepositoryInterceptor
 				return returnValue;
 			}
 			else if ( DELETE_IN_BATCH.equalsIgnoreCase( methodName ) ) {
-				Class<?> entityClassForDelete = TypeDescriptor.forObject( invocation.getThis() )
-				                                              .upcast( CrudRepository.class ).getResolvableType()
-				                                              .getGeneric( 0 )
-				                                              .resolve();
+				Class<?> entityClassForDelete = getEntityClass( invocation );
 				Collection<EntityInterceptor> interceptorsForDelete = findInterceptorsToApply( entityClassForDelete,
 				                                                                               getInterceptors() );
 
@@ -78,10 +73,7 @@ public class JpaRepositoryInterceptor extends AbstractCrudRepositoryInterceptor
 			}
 			else if ( SAVE_AND_FLUSH.equalsIgnoreCase( methodName ) ) {
 				Object objectToSave = arguments[0];
-				Class<?> entityClassForSave = ClassUtils.getUserClass(
-						AopProxyUtils.ultimateTargetClass(
-								objectToSave ) );
-
+				Class<?> entityClassForSave = ClassUtils.getUserClass( Hibernate.getClass( objectToSave ) );
 				Collection<EntityInterceptor> interceptorsForSave = findInterceptorsToApply( entityClassForSave,
 				                                                                             getInterceptors() );
 

@@ -25,9 +25,9 @@ import com.foreach.across.modules.hibernate.AcrossHibernateModule;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
-import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
-import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
+import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.cfg.Environment;
 import org.hibernate.engine.jdbc.batch.internal.BatchBuilderInitiator;
@@ -55,6 +55,7 @@ import java.util.Properties;
 public class HibernateConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "transactionManager";
+	public static final String SESSION_HOLDER = "hibernateSessionHolder";
 
 	private static final Logger LOG = LoggerFactory.getLogger( HibernateConfiguration.class );
 
@@ -117,7 +118,7 @@ public class HibernateConfiguration
 		return sessionFactory;
 	}
 
-	@Bean
+	@Bean(name = SESSION_HOLDER)
 	@Exposed
 	public HibernateSessionHolder hibernateSessionHolder() {
 		return new HibernateSessionHolderImpl();

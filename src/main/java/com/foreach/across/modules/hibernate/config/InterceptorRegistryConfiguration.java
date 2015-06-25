@@ -13,14 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.hibernate.testmodules.springdata;
+package com.foreach.across.modules.hibernate.config;
 
+import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.Exposed;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.foreach.across.core.registry.RefreshableRegistry;
+import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@Exposed
-@Repository
-public interface ClientRepository extends JpaRepository<Client, Long>
+/**
+ * @author Arne Vandamme
+ */
+@Configuration
+public class InterceptorRegistryConfiguration
 {
+	@Bean
+	@Exposed
+	@AcrossCondition("not hasBean('entityInterceptors')")
+	public RefreshableRegistry<EntityInterceptor> entityInterceptors() {
+		return new RefreshableRegistry<>( EntityInterceptor.class, true );
+	}
 }

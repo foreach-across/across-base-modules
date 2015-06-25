@@ -23,9 +23,11 @@ import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.database.DatabaseInfo;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
+import com.foreach.across.modules.hibernate.config.InterceptorRegistryConfiguration;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
 import com.foreach.across.modules.hibernate.jpa.services.JpaHibernateSessionHolderImpl;
+import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.modules.config.ModuleJpaRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
@@ -43,6 +45,7 @@ import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -58,6 +61,7 @@ import java.util.Map;
  * @see com.foreach.across.modules.hibernate.config.TransactionManagerConfiguration
  */
 @Configuration
+@Import(InterceptorRegistryConfiguration.class)
 @AcrossEventHandler
 public class HibernateJpaConfiguration
 {
@@ -163,10 +167,11 @@ public class HibernateJpaConfiguration
 	@SuppressWarnings("unused")
 	public void registerClientModuleRepositoryInterceptors( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
 		if ( settings.isRegisterRepositoryInterceptor() ) {
-			LOG.trace( "Enabling CrudRepositoryInterceptor support in module {}",
+			LOG.trace( "Enabling BasicReposityr and JpaReposiroty EntityInterceptor support in module {}",
 			           beforeBootstrapEvent.getModule().getName() );
 			beforeBootstrapEvent.addApplicationContextConfigurers(
-					new AnnotatedClassConfigurer( ModuleJpaRepositoryInterceptorConfiguration.class )
+					new AnnotatedClassConfigurer( ModuleJpaRepositoryInterceptorConfiguration.class,
+					                              ModuleBasicRepositoryInterceptorConfiguration.class )
 			);
 		}
 	}

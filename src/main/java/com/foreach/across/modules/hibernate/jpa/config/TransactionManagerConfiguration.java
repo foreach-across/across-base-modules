@@ -34,7 +34,7 @@ import javax.persistence.EntityManagerFactory;
 /**
  * Configures PlatformTransactionManagers for use with @Transaction annotations.
  * If the module is configured in mixed mode, with both session factory and jpa support enabled,
- * on of both transaction managers should be configured as the primary when exposed.
+ * one of both transaction managers should be configured as the primary when exposed.
  */
 @Configuration
 @AcrossEventHandler

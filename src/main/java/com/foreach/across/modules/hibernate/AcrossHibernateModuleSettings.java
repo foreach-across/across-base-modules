@@ -52,7 +52,7 @@ public class AcrossHibernateModuleSettings extends AcrossModuleSettings
 		registry.register( PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER, Integer.class, Ordered.HIGHEST_PRECEDENCE + 1,
 		                   "Configure the order of the persistence context view handler (if create)." );
 		registry.register( REGISTER_REPOSITORY_INTERCEPTOR, Boolean.class, true,
-		                   "Should BasicRepository implementations in modules automatically be interceptor.");
+		                   "Should BasicRepository implementations in modules automatically be intercepted.");
 	}
 
 	public boolean isCreateTransactionManager() {

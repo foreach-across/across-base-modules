@@ -15,10 +15,9 @@
  */
 package com.foreach.across.modules.hibernate.aop;
 
-import com.foreach.across.modules.hibernate.repositories.Undeletable;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.aop.framework.AopProxyUtils;
+import org.hibernate.Hibernate;
 import org.springframework.util.ClassUtils;
 
 import java.util.ArrayList;
@@ -64,15 +63,12 @@ public class BasicRepositoryInterceptor implements MethodInterceptor
 	@SuppressWarnings("unchecked")
 	private Collection<EntityInterceptor> findInterceptorsToApply( Object entity,
 	                                                               Collection<EntityInterceptor> interceptors ) {
-		Class<?> entityClass = ClassUtils.getUserClass( AopProxyUtils.ultimateTargetClass( entity ) );
+		Class<?> entityClass = ClassUtils.getUserClass( Hibernate.getClass( entity ) );
 
 		Collection<EntityInterceptor> matchingInterceptors = new ArrayList<>();
 
 		for ( EntityInterceptor candidate : interceptors ) {
-			if ( candidate.getEntityClass().equals( entityClass ) ) {
-				matchingInterceptors.add( candidate );
-			}
-			else if ( candidate.getEntityClass().isAssignableFrom( entityClass ) ) {
+			if ( candidate.handles( entityClass ) ) {
 				matchingInterceptors.add( candidate );
 			}
 		}
@@ -91,7 +87,7 @@ public class BasicRepositoryInterceptor implements MethodInterceptor
 					interceptor.beforeUpdate( entity );
 					break;
 				case DELETE:
-					interceptor.beforeDelete( entity, entity instanceof Undeletable );
+					interceptor.beforeDelete( entity );
 					break;
 			}
 		}
@@ -108,7 +104,7 @@ public class BasicRepositoryInterceptor implements MethodInterceptor
 					interceptor.afterUpdate( entity );
 					break;
 				case DELETE:
-					interceptor.afterDelete( entity, entity instanceof Undeletable );
+					interceptor.afterDelete( entity );
 					break;
 			}
 		}

@@ -16,10 +16,10 @@
 package com.foreach.across.modules.hibernate.jpa.aop;
 
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
-import com.foreach.across.modules.hibernate.repositories.Undeletable;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.aop.framework.AopProxyUtils;
+import org.hibernate.Hibernate;
+import org.springframework.aop.ProxyMethodInvocation;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.repository.CrudRepository;
@@ -48,22 +48,21 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 
 	@Override
 	public Object invoke( MethodInvocation invocation ) throws Throwable {
+		Class<?> entityClass = getEntityClass( invocation );
+
 		Method method = invocation.getMethod();
 		if ( JpaRepositoryPointcut.isEntityMethod( method ) ) {
 			Object[] arguments = invocation.getArguments();
 			String methodName = method.getName();
 			switch ( methodName ) {
 				case DELETE_ALL:
-					Class<?> entityClassForDeleteAll =
-							TypeDescriptor.forObject( invocation.getThis() )
-							              .upcast( CrudRepository.class ).getResolvableType().getGeneric( 0 )
-							              .resolve();
-					Collection<EntityInterceptor> interceptorsForDeleteAll = findInterceptorsToApply( entityClassForDeleteAll,
-					                                                                                  getInterceptors() );
-					callBeforeDeleteAll( interceptorsForDeleteAll, entityClassForDeleteAll );
+
+					Collection<EntityInterceptor> interceptorsForDeleteAll
+							= findInterceptorsToApply( entityClass, getInterceptors() );
+					callBeforeDeleteAll( interceptorsForDeleteAll, entityClass );
 
 					Object returnValueForDeleteAll = invocation.proceed();
-					callAfterDeleteAll( interceptorsForDeleteAll, entityClassForDeleteAll );
+					callAfterDeleteAll( interceptorsForDeleteAll, entityClass );
 					return returnValueForDeleteAll;
 				case DELETE:
 					Object entityObject = arguments[0];
@@ -72,12 +71,8 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 					Class<?> userClass = ClassUtils.getUserClass( targetClass );
 
 					if ( Iterable.class.isAssignableFrom( userClass ) ) {
-						Class<?> entityClassForDelete = TypeDescriptor.forObject( invocation.getThis() )
-						                                      .upcast( CrudRepository.class ).getResolvableType()
-						                                      .getGeneric( 0 )
-						                                      .resolve();
-						Collection<EntityInterceptor> interceptorsForDelete = findInterceptorsToApply( entityClassForDelete,
-						                                                                               getInterceptors() );
+						Collection<EntityInterceptor> interceptorsForDelete
+								= findInterceptorsToApply( entityClass, getInterceptors() );
 
 						for ( Object o : (Iterable) entityObject ) {
 							callBeforeDelete( interceptorsForDelete, o );
@@ -89,11 +84,10 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 						return returnValueForDelete;
 					}
 					else {
-						Class<?> entityClassForDelete = ClassUtils.getUserClass( AopProxyUtils.ultimateTargetClass(
-								entityObject ) );
+						Class<?> entityClassForDelete = ClassUtils.getUserClass( Hibernate.getClass( entityObject ) );
 
-						Collection<EntityInterceptor> interceptorsForDelete = findInterceptorsToApply( entityClassForDelete,
-						                                                                       getInterceptors() );
+						Collection<EntityInterceptor> interceptorsForDelete
+								= findInterceptorsToApply( entityClassForDelete, getInterceptors() );
 
 						callBeforeDelete( interceptorsForDelete, entityObject );
 
@@ -108,13 +102,9 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 					Class<?> targetClassToSave = method.getParameterTypes()[0];
 					Class<?> userClassToSave = ClassUtils.getUserClass( targetClassToSave );
 					if ( Iterable.class.isAssignableFrom( userClassToSave ) ) {
-						Class<?> entityClassForSave = TypeDescriptor.forObject( invocation.getThis() )
-						                                      .upcast( CrudRepository.class ).getResolvableType()
-						                                      .getGeneric( 0 )
-						                                      .resolve();
 						IdentityHashMap<Persistable, Boolean> objects = new IdentityHashMap<>();
-						Collection<EntityInterceptor> interceptors1 = findInterceptorsToApply( entityClassForSave,
-						                                                                       getInterceptors() );
+						Collection<EntityInterceptor> interceptors1
+								= findInterceptorsToApply( entityClass, getInterceptors() );
 
 						for ( Object o : (Iterable) objectToSave ) {
 							boolean isNew = ( (Persistable) o ).isNew();
@@ -143,11 +133,10 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 						return returnValueForSave;
 					}
 					else {
-						Class<?> entityClassForSave = ClassUtils.getUserClass( AopProxyUtils.ultimateTargetClass(
-								objectToSave ) );
+						Class<?> entityClassForSave = ClassUtils.getUserClass( Hibernate.getClass( objectToSave ) );
 
 						Collection<EntityInterceptor> interceptorsForSave = findInterceptorsToApply( entityClassForSave,
-						                                                                       getInterceptors() );
+						                                                                             getInterceptors() );
 
 						boolean isNew = ( (Persistable) objectToSave ).isNew();
 						if ( isNew ) {
@@ -176,18 +165,25 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 		return invocation.proceed();
 	}
 
-	public abstract Object handleRepositoryMethods( MethodInvocation invocation ) throws Throwable;
+	protected Class<?> getEntityClass( MethodInvocation invocation ) {
+		Object target = invocation instanceof ProxyMethodInvocation
+				? ( (ProxyMethodInvocation) invocation ).getProxy()
+				: invocation.getThis();
+
+		return TypeDescriptor.forObject( target )
+		                     .upcast( CrudRepository.class ).getResolvableType().getGeneric( 0 )
+		                     .resolve();
+	}
+
+	protected abstract Object handleRepositoryMethods( MethodInvocation invocation ) throws Throwable;
 
 	@SuppressWarnings("unchecked")
-	public Collection<EntityInterceptor> findInterceptorsToApply( Class<?> entityClass,
-	                                                              Collection<EntityInterceptor> interceptors ) {
+	protected Collection<EntityInterceptor> findInterceptorsToApply( Class<?> entityClass,
+	                                                                 Collection<EntityInterceptor> interceptors ) {
 		Collection<EntityInterceptor> matchingInterceptors = new ArrayList<>();
 
 		for ( EntityInterceptor candidate : interceptors ) {
-			if ( candidate.getEntityClass().equals( entityClass ) ) {
-				matchingInterceptors.add( candidate );
-			}
-			else if ( candidate.getEntityClass().isAssignableFrom( entityClass ) ) {
+			if ( candidate.handles( entityClass ) ) {
 				matchingInterceptors.add( candidate );
 			}
 		}
@@ -231,7 +227,7 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 	public void callBeforeDelete( Collection<EntityInterceptor> interceptors,
 	                              Object entity ) {
 		for ( EntityInterceptor interceptor : interceptors ) {
-			interceptor.beforeDelete( entity, entity instanceof Undeletable );
+			interceptor.beforeDelete( entity );
 		}
 	}
 
@@ -239,7 +235,7 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 	public void callAfterDelete( Collection<EntityInterceptor> interceptors,
 	                             Object entity ) {
 		for ( EntityInterceptor interceptor : interceptors ) {
-			interceptor.afterDelete( entity, entity instanceof Undeletable );
+			interceptor.afterDelete( entity );
 		}
 	}
 

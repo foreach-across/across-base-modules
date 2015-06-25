@@ -15,14 +15,14 @@
  */
 package com.foreach.across.modules.hibernate.jpa.config;
 
-import com.foreach.across.core.registry.IncrementalRefreshableRegistry;
 import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
+import com.foreach.across.modules.hibernate.config.BasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptor;
-import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptorAdvisor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Role;
 
 /**
@@ -31,27 +31,12 @@ import org.springframework.context.annotation.Role;
  * @author Andy Somers
  */
 @Configuration
-public class InterceptorConfiguration
+@Import(BasicRepositoryInterceptorConfiguration.class)
+public class JpaRepositoryInterceptorConfiguration
 {
 	@Bean
-	public RefreshableRegistry<EntityInterceptor> idBasedEntityInterceptors() {
-		return new IncrementalRefreshableRegistry<>( EntityInterceptor.class, true );
-	}
-
-	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public JpaRepositoryInterceptor jpaRepositoryInterceptor() {
-		return new JpaRepositoryInterceptor( idBasedEntityInterceptors() );
+	public JpaRepositoryInterceptor jpaRepositoryInterceptor( RefreshableRegistry<EntityInterceptor> entityInterceptors ) {
+		return new JpaRepositoryInterceptor( entityInterceptors );
 	}
-
-	@Bean
-	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public JpaRepositoryInterceptorAdvisor jpaRepositoryInterceptorAdvisor() {
-		JpaRepositoryInterceptorAdvisor advisor = new JpaRepositoryInterceptorAdvisor();
-		advisor.setAdvice( jpaRepositoryInterceptor() );
-		advisor.setOrder( JpaRepositoryInterceptorAdvisor.INTERCEPT_ORDER );
-
-		return advisor;
-	}
-
 }

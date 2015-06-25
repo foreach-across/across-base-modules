@@ -15,37 +15,51 @@
  */
 package com.foreach.across.modules.hibernate.modules.config;
 
-import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
-import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptor;
-import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptorAdvisor;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.foreach.across.modules.hibernate.jpa.repositories.EntityInterceptingJpaRepositoryFactoryBean;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 
 /**
- * @author Andy Somers
+ * @author Andy Somers, Arne Vandamme
  */
 @Configuration
 public class ModuleJpaRepositoryInterceptorConfiguration
 {
-	@Autowired
-	private AcrossContextBeanRegistry contextBeanRegistry;
-
 	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public JpaRepositoryInterceptorAdvisor jpaRepositoryInterceptorAdvisor() {
-		JpaRepositoryInterceptor interceptor = contextBeanRegistry.getBeanOfTypeFromModule(
-				AcrossHibernateJpaModule.NAME, JpaRepositoryInterceptor.class
-		);
-
-		JpaRepositoryInterceptorAdvisor advisor = new JpaRepositoryInterceptorAdvisor();
-		advisor.setAdvice( interceptor );
-		advisor.setOrder( JpaRepositoryInterceptorAdvisor.INTERCEPT_ORDER );
-
-		return advisor;
+	public BeanDefinitionRegistryPostProcessor jpaRepositoryFactoryBeanDefinitionPostProcessor() {
+		return new JpaRepositoryFactoryBeanDefinitionPostProcessor();
 	}
 
+	/**
+	 * PostProcessor that alters bean definitions for {@link JpaRepositoryFactoryBean} and replaces them
+	 * with {@link EntityInterceptingJpaRepositoryFactoryBean} in order to correctly support entity intercepting.
+	 */
+	public static class JpaRepositoryFactoryBeanDefinitionPostProcessor implements BeanDefinitionRegistryPostProcessor
+	{
+		@Override
+		public void postProcessBeanDefinitionRegistry( BeanDefinitionRegistry registry ) throws BeansException {
+			String originalBeanClassName = JpaRepositoryFactoryBean.class.getName();
+			String targetBeanClassName = EntityInterceptingJpaRepositoryFactoryBean.class.getName();
+			for ( String beanDefinitionName : registry.getBeanDefinitionNames() ) {
+				BeanDefinition beanDefinition = registry.getBeanDefinition( beanDefinitionName );
+
+				if ( originalBeanClassName.equals( beanDefinition.getBeanClassName() ) ) {
+					beanDefinition.setBeanClassName( targetBeanClassName );
+				}
+			}
+		}
+
+		@Override
+		public void postProcessBeanFactory( ConfigurableListableBeanFactory beanFactory ) throws BeansException {
+
+		}
+	}
 }

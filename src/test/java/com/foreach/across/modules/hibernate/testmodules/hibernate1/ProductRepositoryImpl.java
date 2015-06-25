@@ -15,7 +15,7 @@
  */
 package com.foreach.across.modules.hibernate.testmodules.hibernate1;
 
-import org.hibernate.SessionFactory;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductRepositoryImpl implements ProductRepository
 {
 	@Autowired
-	private SessionFactory sessionFactory;
+	private HibernateSessionHolder sessionFactory;
 
 	@Transactional(readOnly = true)
 	public Product getProductWithId( int id ) {

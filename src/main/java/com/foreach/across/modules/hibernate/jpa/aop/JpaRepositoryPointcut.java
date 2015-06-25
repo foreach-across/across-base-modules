@@ -15,22 +15,48 @@
  */
 package com.foreach.across.modules.hibernate.jpa.aop;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
+import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 
 /**
+ * Pointcut that only wires entity interception for {@link JpaRepository} implementations
+ * that have a {@link Persistable} entity type.
+ *
  * @author Andy Somers
  */
 public class JpaRepositoryPointcut extends StaticMethodMatcherPointcut
 {
+	private static final Logger LOG = LoggerFactory.getLogger( JpaRepositoryPointcut.class );
+
 	@Override
 	public boolean matches( Method method, Class<?> targetClass ) {
 		Class<?> userClass = ClassUtils.getUserClass( targetClass );
 
-		return JpaRepository.class.isAssignableFrom( userClass ) && isEntityMethod( method );
+		if ( JpaRepository.class.isAssignableFrom( userClass ) ) {
+			Class entityClass = TypeDescriptor.valueOf( targetClass )
+			                                  .upcast( JpaRepository.class )
+			                                  .getResolvableType()
+			                                  .getGeneric( 0 )
+			                                  .resolve();
+
+			if ( !Persistable.class.isAssignableFrom( entityClass ) ) {
+				LOG.warn(
+						"JPA repository {} detected without Persistable type parameter - entity interception is not possible.",
+						targetClass );
+			}
+			else {
+				return isEntityMethod( method );
+			}
+		}
+
+		return false;
 	}
 
 	static boolean isEntityMethod( Method method ) {
