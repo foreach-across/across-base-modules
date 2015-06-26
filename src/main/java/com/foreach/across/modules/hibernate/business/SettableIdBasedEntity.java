@@ -69,7 +69,7 @@ public abstract class SettableIdBasedEntity<T extends Persistable<Long>>
 		if ( this == o ) {
 			return true;
 		}
-		if ( o == null || getClass() != o.getClass() ) {
+		if ( o == null || !getClass().isAssignableFrom( o.getClass() ) ) {
 			return false;
 		}
 
