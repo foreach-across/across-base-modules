@@ -39,10 +39,9 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration(classes = TestEquals.Config.class)
-public class TestEquals
+@ContextConfiguration(classes = TestSettableIdEntityEquality.Config.class)
+public class TestSettableIdEntityEquality
 {
-
 	@Autowired
 	private ClientRepository clientRepository;
 
@@ -51,7 +50,6 @@ public class TestEquals
 
 	@Test
 	public void equalsWhenProxied() {
-
 		unitOfWork.start();
 
 		List<Client> clients = clientRepository.findAll();
@@ -87,7 +85,6 @@ public class TestEquals
 		assertTrue( linkedClient.equals( autoId ) );
 
 		unitOfWork.stop();
-
 	}
 
 	@Configuration
