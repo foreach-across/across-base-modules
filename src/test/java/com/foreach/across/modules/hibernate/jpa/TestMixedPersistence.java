@@ -17,8 +17,12 @@ package com.foreach.across.modules.hibernate.jpa;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
+import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
+import com.foreach.across.core.registry.IncrementalRefreshableRegistry;
+import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.core.transformers.PrimaryBeanTransformer;
 import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
 import com.foreach.across.modules.hibernate.config.HibernateConfiguration;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Hibernate1Module;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Product;
@@ -31,12 +35,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -49,11 +55,28 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestMixedPersistence.Config.class)
 public class TestMixedPersistence
 {
+
+	@Autowired
+	private AcrossContextBeanRegistry beanRegistry;
+
 	@Autowired
 	private CustomerRepository customerRepository;
 
 	@Autowired
 	private ProductRepository productRepository;
+
+	@Test
+	public void singleRefreshableRegistryShouldBeIncremental() {
+		Map<String, RefreshableRegistry> registries
+				= beanRegistry.getBeansOfTypeAsMap(
+				TypeDescriptor.collection( RefreshableRegistry.class,
+				                           TypeDescriptor.valueOf( EntityInterceptor.class ) )
+				              .getResolvableType(),
+				true );
+
+		assertEquals( 1, registries.size() );
+		assertTrue( beanRegistry.getBean( "entityInterceptors" ) instanceof IncrementalRefreshableRegistry );
+	}
 
 	@Test
 	public void crudCustomer() {

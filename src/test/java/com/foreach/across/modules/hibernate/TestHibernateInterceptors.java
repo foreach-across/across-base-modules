@@ -18,6 +18,9 @@ package com.foreach.across.modules.hibernate;
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.annotations.Exposed;
+import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
+import com.foreach.across.core.registry.IncrementalRefreshableRegistry;
+import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Hibernate1Module;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Product;
@@ -35,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -42,6 +46,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -54,6 +59,9 @@ import static org.mockito.Mockito.*;
 @DirtiesContext
 public class TestHibernateInterceptors
 {
+	@Autowired
+	private AcrossContextBeanRegistry beanRegistry;
+
 	@Autowired
 	private UserRepository userRepository;
 
@@ -79,6 +87,19 @@ public class TestHibernateInterceptors
 		when( userInterceptor.handles( User.class ) ).thenReturn( true );
 		when( allInterceptor.handles( any( Class.class ) ) ).thenReturn( true );
 		when( productInterceptor.handles( Product.class ) ).thenReturn( true );
+	}
+
+	@Test
+	public void singleRefreshableRegistryShouldBeIncremental() {
+		Map<String, RefreshableRegistry> registries
+				= beanRegistry.getBeansOfTypeAsMap(
+				TypeDescriptor.collection( RefreshableRegistry.class,
+				                           TypeDescriptor.valueOf( EntityInterceptor.class ) )
+				              .getResolvableType(),
+				true );
+
+		assertEquals( 1, registries.size() );
+		assertTrue( beanRegistry.getBean( "entityInterceptors" ) instanceof IncrementalRefreshableRegistry );
 	}
 
 	@Test

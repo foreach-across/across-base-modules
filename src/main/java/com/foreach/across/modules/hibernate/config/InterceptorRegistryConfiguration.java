@@ -17,6 +17,7 @@ package com.foreach.across.modules.hibernate.config;
 
 import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.Exposed;
+import com.foreach.across.core.registry.IncrementalRefreshableRegistry;
 import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,6 @@ public class InterceptorRegistryConfiguration
 	@Exposed
 	@AcrossCondition("not hasBean('entityInterceptors')")
 	public RefreshableRegistry<EntityInterceptor> entityInterceptors() {
-		return new RefreshableRegistry<>( EntityInterceptor.class, true );
+		return new IncrementalRefreshableRegistry<>( EntityInterceptor.class, true );
 	}
 }
