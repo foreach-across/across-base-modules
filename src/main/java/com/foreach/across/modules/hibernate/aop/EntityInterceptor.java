@@ -38,7 +38,7 @@ public interface EntityInterceptor<T>
 
 	void afterDelete( T entity );
 
-	void beforeDeleteAll( Class<T> entityClass );
+	void beforeDeleteAll( Class<?> entityClass );
 
-	void afterDeleteAll( Class<T> entityClass );
+	void afterDeleteAll( Class<?> entityClass );
 }

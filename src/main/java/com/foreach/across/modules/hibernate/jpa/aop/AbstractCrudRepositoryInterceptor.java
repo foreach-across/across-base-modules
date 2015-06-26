@@ -56,7 +56,6 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 			String methodName = method.getName();
 			switch ( methodName ) {
 				case DELETE_ALL:
-
 					Collection<EntityInterceptor> interceptorsForDeleteAll
 							= findInterceptorsToApply( entityClass, getInterceptors() );
 					callBeforeDeleteAll( interceptorsForDeleteAll, entityClass );
