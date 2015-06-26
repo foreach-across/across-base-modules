@@ -1,0 +1,172 @@
+= AcrossHibernateJpaModule
+:toc:
+
+== General information
+`AcrossHibernateJpaModule` activates JPA support for other modules.  The JPA implementation is built on top of Hibernate.
+The module also activates support for Spring Data `JpaRepository` implementations and comes with a set of common constructs
+to facilitate repository implementations.
+
+WARNING: `AcrossHibernateJpaModule` is also the replacement of the legacy `AcrossHibernateModule`.  The current version
+is still fully compatible with the constructs from the legacy module (eg. `BasicRepository`).  This support will be
+removed at some point in the future, please adapt your code to use `EntityManager` or Spring Data repositories where possible.
+
+=== Artifact
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+	<dependencies>
+		<dependency>
+			<groupId>across-standard-modules</groupId>
+			<artifactId>across-hibernate</artifactId>
+		</dependency>
+	</dependencies>
+----
+
+=== Module settings
+`AcrossHibernateJpaModule` shares the same properties as the legacy `AcrossHibernateModule`.
+
+|===
+|Property |Description |Default
+
+|acrossHibernate.transactionManager
+|Should a TransactionManager bean be created.  If true this will also enable support for @Transaction in all modules bootstrapping later.
+|true
+
+|acrossHibernate.unitOfWorkFactory
+|Should a UnitOfWorkFactory bean be created.
+|false
+
+|acrossHibernate.persistenceContextInView.handler
+|If a view layer is enabled, should an open session/entity manager be created for the entire request by using either a filter or an interceptor.
+|`PersistenceContextInView.NONE`
+
+|acrossHibernate.persistenceContextInView.order
+|Configure the order of the persistence context view handler (if created).
+|`Ordered.HIGHEST_PRECEDENCE + 1`
+
+|acrossHibernate.registerRepositoryInterceptor
+|Should common Repository implementations in modules automatically be intercepted. Currently `JpaRepository` and the legacy
+`BasicRepository` interfaces are intercepted.  See chapter <<EntityInterceptor>> for more information.
+|true
+
+|===
+
+== About the AcrossHibernateJpaModule
+
+=== Base constructs and utilities
+==== AcrossSequenceGenerator
+This is a `TableGenerator` that works cross-database and can be used to work with preset, negative id values.
+Uses the `ACROSS_SEQUENCES` table created by the `AcrossSequencesInstaller` from Across core package.
+
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+	@Id
+	@GeneratedValue(generator = "seq_mm_myentity_id")
+	@GenericGenerator(
+			name = "seq_mm_myentity_id",
+			strategy = AcrossSequenceGenerator.STRATEGY,
+			parameters = {
+					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "seq_mm_myentity_id"),
+					@org.hibernate.annotations.Parameter(name = "allocationSize", value = "10")
+			}
+	)
+	private Long id;
+----
+
+==== SettableIdBasedEntity, SettableIdAuditableEntity
+Base entity classes allowing an id to be set before persisting, using the `newEntityId` property.  The `SettableIdAuditableEntity` extension
+ will automatically have auditing information updated when `SpringSecurityModule` is active and entity intercepting is enabled (default).
+
+The `SettableIdBasedEntity` also implements common interfaces like `IdBasedEntity`, `Persistable` and `EntityWithDto`.
+These are used by many other standard modules to automatically hookup functionality.  The base implementation is
+sufficient for many common use cases.
+
+.Minimal implementation of SettableIdAuditableEntity
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+	@Entity
+    @Table(name = "acl_entity")
+    public class MyEntity extends SettableIdAuditableEntity<MyEntity>
+    {
+    	@Id
+    	@GeneratedValue(generator = "seq_mm_myentity.id")
+    	@GenericGenerator(
+    			name = "seq_mm_myentity",
+    			strategy = AcrossSequenceGenerator.STRATEGY,
+    			parameters = {
+    					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "seq_mm_myentity"),
+    					@org.hibernate.annotations.Parameter(name = "allocationSize", value = "1")
+    			}
+    	)
+    	private Long id;
+
+    	@Override
+    	public Long getId() {
+    		return id;
+    	}
+
+    	@Override
+    	public void setId( Long id ) {
+    		this.id = id;
+    	}
+    }
+----
+
+=== CommonJpaRepository and IdBasedEntityJpaRepository
+Shortcut interfaces to reduce code repetition.  `CommonJpaRepository` extends the basic `JpaRepository` with the
+`JpaSpecificationExecutor` interface.  `IdBasedEntityJpaRepository` is the extension tailored to `SettableIdBasedEntity`
+implementations that use a `Long` as id type.
+
+Using these interfaces will ensure repository integration with other modules (for example `EntityModule`).
+
+[[EntityInterceptor]]
+== EntityInterceptor
+By default `JpaRepository` and `BasicRepository` interfaces have their `save` and `delete` methods intercepted.  Any
+module can then provide an `EntityInterceptor` bean that executes code before or after the entity state is being updated.
+Note that the `EntityInterceptor` listens to the repository calls and does not take into account when the actual session
+flushing happens (which might be at a later point in time).
+
+All beans implementing `EntityInterceptor` will automatically be detected after their owning module has bootstrapped. All
+regular Across bean ordering options apply to entity interceptors.  If you are interested in only implementing part of
+the `EntityInterceptor` interface you can use the `EntityInterceptorAdapter`.
+
+.Example EntityInterceptor implementation
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+	public class MyInterceptor extends EntityInterceptorAdapter<MyEntity>
+    {
+    	@Override
+    	public boolean handles( Class<?> entityClass ) {
+    		return MyEntity.class.equals( entityClass );
+    	}
+
+    	@Override
+    	public void afterCreate( MyEntity entity ) {
+    		System.out.println( "A new entity has just been created!" );
+    	}
+    }
+----
+
+=== Known limitations
+==== Persistable entities only
+Currently `JpaRepository` methods are only intercepted if they manage a `Persistable` entity.  Reason for this is
+the use of the `isNew` method to determine a create or update event.  Entities extending `SettableIdBasedEntity`
+automatically implement the required interface.
+
+==== Transactional behaviour
+The `EntityInterceptor` calls happen outside the repository specific transaction.  If no outer transaction is busy
+yet, calls like `beforeCreate` and `afterCreate` will execute before the transaction is created.  If you want those
+calls to participate in the same transaction as the actual repository method you must ensure there is an outer
+transaction declared.
+
+==== Custom save/delete methods and recursive calls
+The `JpaRepositoryInterceptor` implementation used intercepts only the known `JpaRepository` methods.  If for some
+reason you decide to create your own save or delete methods, these will not be intercepted.
+
+Likewise calling any `save` or `delete` method from within the repository will not trigger them to be intercepted.
+This is due to the standard proxy behaviour.
+
+

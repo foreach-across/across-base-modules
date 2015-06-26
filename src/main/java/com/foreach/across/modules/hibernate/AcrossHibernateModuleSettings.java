@@ -34,7 +34,7 @@ public class AcrossHibernateModuleSettings extends AcrossModuleSettings
 			"acrossHibernate.persistenceContextInView.order";
 	public static final String CREATE_TRANSACTION_MANAGER = "acrossHibernate.transactionManager";
 	public static final String CREATE_UNITOFWORK_FACTORY = "acrossHibernate.unitOfWorkFactory";
-	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "acrossHibernate.registerBasicRepositoryInterceptor";
+	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "acrossHibernate.registerRepositoryInterceptor";
 
 	@Override
 	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
@@ -50,9 +50,9 @@ public class AcrossHibernateModuleSettings extends AcrossModuleSettings
 		                   "If a view layer is enabled, should an open session/entity manager be created for the entire " +
 				                   "request by using either a filter or an interceptor." );
 		registry.register( PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER, Integer.class, Ordered.HIGHEST_PRECEDENCE + 1,
-		                   "Configure the order of the persistence context view handler (if create)." );
+		                   "Configure the order of the persistence context view handler (if created)." );
 		registry.register( REGISTER_REPOSITORY_INTERCEPTOR, Boolean.class, true,
-		                   "Should BasicRepository implementations in modules automatically be intercepted.");
+		                   "Should common Repository implementations in modules automatically be intercepted.");
 	}
 
 	public boolean isCreateTransactionManager() {
