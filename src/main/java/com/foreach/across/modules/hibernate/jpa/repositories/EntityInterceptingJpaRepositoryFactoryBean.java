@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.hibernate.jpa.repositories;
 
-import com.foreach.across.core.AcrossException;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptor;
 import org.slf4j.Logger;
@@ -71,20 +70,23 @@ public class EntityInterceptingJpaRepositoryFactoryBean extends JpaRepositoryFac
 			List<JpaRepositoryInterceptor> interceptors
 					= contextBeanRegistry.getBeansOfType( JpaRepositoryInterceptor.class, true );
 
-			if ( interceptors == null ) {
-				throw new AcrossException( "Expected at least one JpaRepositoryInterceptor bean to be available." );
-			}
-			else if ( interceptors.size() > 1 ) {
-				LOG.warn( "More than one JpaRepositoryInterceptor bean was found: {} in total.", interceptors.size() );
-			}
+			if ( !interceptors.isEmpty() ) {
+				if ( interceptors.size() > 1 ) {
+					LOG.warn( "More than one JpaRepositoryInterceptor bean was found: {} in total.",
+					          interceptors.size() );
+				}
 
-			if ( !Persistable.class.isAssignableFrom( repositoryInformation.getDomainType() ) ) {
-				LOG.warn(
-						"JPA repository {} detected without Persistable type parameter - entity interception is not possible.",
-						repositoryInformation.getRepositoryInterface() );
-			}
+				if ( !Persistable.class.isAssignableFrom( repositoryInformation.getDomainType() ) ) {
+					LOG.warn(
+							"JPA repository {} detected without Persistable type parameter - entity interception is not possible.",
+							repositoryInformation.getRepositoryInterface() );
+				}
 
-			factory.addAdvice( interceptors.get( 0 ) );
+				factory.addAdvice( interceptors.get( 0 ) );
+			}
+			else {
+				LOG.info( "No JpaRepositoryInterceptor found - repository intercepting was possibly disabled." );
+			}
 		}
 	}
 }
