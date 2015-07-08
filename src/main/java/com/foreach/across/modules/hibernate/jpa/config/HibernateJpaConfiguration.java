@@ -28,7 +28,6 @@ import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
 import com.foreach.across.modules.hibernate.jpa.services.JpaHibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
-import com.foreach.across.modules.hibernate.modules.config.ModuleJpaRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
@@ -167,11 +166,10 @@ public class HibernateJpaConfiguration
 	@SuppressWarnings("unused")
 	public void registerClientModuleRepositoryInterceptors( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
 		if ( settings.isRegisterRepositoryInterceptor() ) {
-			LOG.trace( "Enabling BasicReposityr and JpaReposiroty EntityInterceptor support in module {}",
+			LOG.trace( "Enabling BasicRepository EntityInterceptor support in module {}",
 			           beforeBootstrapEvent.getModule().getName() );
 			beforeBootstrapEvent.addApplicationContextConfigurers(
-					new AnnotatedClassConfigurer( ModuleJpaRepositoryInterceptorConfiguration.class,
-					                              ModuleBasicRepositoryInterceptorConfiguration.class )
+					new AnnotatedClassConfigurer( ModuleBasicRepositoryInterceptorConfiguration.class )
 			);
 		}
 	}

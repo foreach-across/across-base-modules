@@ -53,6 +53,12 @@ removed at some point in the future, please adapt your code to use `EntityManage
 
 == About the AcrossHibernateJpaModule
 
+=== Activating Spring Data JPA Repositories
+Use *`@EnableAcrossJpaRepositories`* in your modules to generate JPA repositories based on the `AcrossHibernateJpaModule`.
+The `AcrossHibernateJpaModule` defines its own `PlatformTransactionManager` and requires a custom `JpaRepositoryFactoryBean` to
+be used for entity intercepting to work.  Using the custom annotation provides the correct default values and still allows
+customizing all attributes of the default `@EnableJpaRepositories` from Spring Data.
+
 === Base constructs and utilities
 ==== AcrossSequenceGenerator
 This is a `TableGenerator` that works cross-database and can be used to work with preset, negative id values.
@@ -149,6 +155,10 @@ the `EntityInterceptor` interface you can use the `EntityInterceptorAdapter`.
     	}
     }
 ----
+
+WARNING: Entity intercepting of Spring data JPA Repositories is only activated if they were created using the custom
+`EntityInterceptingJpaRepositoryFactoryBean`.  If you did not activate JPA repositories using the specific
+`@EnableAcrossJpaRepositories`, you might have to specify the factory bean class manually.
 
 === Known limitations
 ==== Persistable entities only
