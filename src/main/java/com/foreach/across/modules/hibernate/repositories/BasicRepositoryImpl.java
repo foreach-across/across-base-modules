@@ -15,9 +15,9 @@
  */
 package com.foreach.across.modules.hibernate.repositories;
 
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +26,19 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * <p>Basic implementation for a imple Hibernate based repository.
+ * <strong>Deprecated</strong>, favour the use of Spring Data JPA repositories instead.</p>
+ * @param <T>
+ */
+@Deprecated
 public class BasicRepositoryImpl<T> implements BasicRepository<T>
 {
 	private final Class<T> clazz;
 	private static final int MAX_RESULTS = 5000;
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private HibernateSessionHolder hibernateSessionHolder;
 
 	@SuppressWarnings("unchecked")
 	public BasicRepositoryImpl() {
@@ -62,7 +68,7 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 	}
 
 	protected Session session() {
-		return sessionFactory.getCurrentSession();
+		return hibernateSessionHolder.getCurrentSession();
 	}
 
 	/**
@@ -116,15 +122,21 @@ public class BasicRepositoryImpl<T> implements BasicRepository<T>
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Transactional
 	@Override
 	public void delete( T object ) {
+		Session session = session();
+
+		if ( !session.contains( object ) ) {
+			object = (T) session.merge( object );
+		}
 		if ( object instanceof Undeletable ) {
 			( (Undeletable) object ).setDeleted( true );
-			session().saveOrUpdate( object );
+			session.saveOrUpdate( object );
 		}
 		else {
-			session().delete( object );
+			session.delete( object );
 		}
 	}
 }

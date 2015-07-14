@@ -6,6 +6,8 @@ import com.foreach.across.core.EmptyAcrossModule;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
+import com.foreach.across.modules.hibernate.jpa.services.JpaHibernateSessionHolderImpl;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.test.AcrossTestContext;
 import com.foreach.across.test.AcrossTestWebContext;
@@ -198,6 +200,23 @@ public class TestJpaModuleSettings
 
 			assertEquals( 0, module.getBeansOfType( OpenEntityManagerInViewInterceptor.class ).size() );
 			assertEquals( 1, module.getBeansOfType( OpenEntityManagerInViewFilter.class ).size() );
+		}
+	}
+
+	@Test
+	public void hibernateSessionHolderIsJpaImplementation() throws Exception {
+		AcrossContextConfigurer config = new AcrossContextConfigurer()
+		{
+			@Override
+			public void configure( AcrossContext context ) {
+				context.addModule( new AcrossHibernateJpaModule() );
+				context.addModule( new EmptyAcrossModule( "client" ) );
+			}
+		};
+
+		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
+			HibernateSessionHolder sessionHolder = ctx.beanRegistry().getBeanOfType( HibernateSessionHolder.class );
+			assertTrue( sessionHolder instanceof JpaHibernateSessionHolderImpl );
 		}
 	}
 }

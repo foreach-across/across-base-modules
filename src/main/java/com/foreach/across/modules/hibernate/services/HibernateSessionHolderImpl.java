@@ -13,18 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.hibernate.provider;
+package com.foreach.across.modules.hibernate.services;
 
-public class AnnotatedClassProvider extends HibernatePackageProviderAdapter
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author Andy Somers
+ */
+@Component
+public class HibernateSessionHolderImpl implements HibernateSessionHolder
 {
-	private Class<?>[] annotatedClasses;
+	@Autowired
+	private SessionFactory sessionFactory;
 
-	public AnnotatedClassProvider( Class<?>... annotatedClasses ) {
-		this.annotatedClasses = annotatedClasses;
+	@Override
+	public Session getCurrentSession() {
+		return sessionFactory.getCurrentSession();
 	}
 
 	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		return annotatedClasses;
+	public Session openSession() {
+		return sessionFactory.openSession();
 	}
 }

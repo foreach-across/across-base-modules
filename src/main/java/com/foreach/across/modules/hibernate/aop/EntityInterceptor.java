@@ -17,17 +17,28 @@ package com.foreach.across.modules.hibernate.aop;
 
 public interface EntityInterceptor<T>
 {
-	Class<T> getEntityClass();
+	/**
+	 * Boolean method that checks if the interceptor should be executed for a particular
+	 * target entity class.
+	 *
+	 * @param entityClass the interceptor should be checked for
+	 * @return true if the interceptor should be applied
+	 */
+	boolean handles( Class<?> entityClass );
 
 	void beforeCreate( T entity );
 
 	void afterCreate( T entity );
 
-	void beforeUpdate( T Entity );
+	void beforeUpdate( T entity );
 
 	void afterUpdate( T entity );
 
-	void beforeDelete( T entity, boolean isSoftDelete );
+	void beforeDelete( T entity );
 
-	void afterDelete( T entity, boolean isSoftDelete );
+	void afterDelete( T entity );
+
+	void beforeDeleteAll( Class<?> entityClass );
+
+	void afterDeleteAll( Class<?> entityClass );
 }

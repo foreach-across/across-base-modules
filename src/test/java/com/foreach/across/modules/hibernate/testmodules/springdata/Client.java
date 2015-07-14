@@ -21,6 +21,10 @@ public class Client extends SettableIdBasedEntity<Client>
 	)
 	private Long id;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn (name = "LINKED_ID", nullable = true)
+	private Client linkedClient;
+
 	@Column(unique = true)
 	private String name;
 
@@ -45,5 +49,13 @@ public class Client extends SettableIdBasedEntity<Client>
 
 	public void setName( String name ) {
 		this.name = name;
+	}
+
+	public Client getLinkedClient() {
+		return linkedClient;
+	}
+
+	public void setLinkedClient( Client linkedClient ) {
+		this.linkedClient = linkedClient;
 	}
 }

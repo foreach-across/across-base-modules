@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.hibernate.provider;
+package com.foreach.across.modules.hibernate.services;
 
-import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import org.hibernate.Session;
 
 /**
- * Interface to be used on AcrossModule instances to indicate they provide Hibernate packages.
+ * @author Andy Somers
  */
-@Deprecated
-public interface HasHibernatePackageProvider
+public interface HibernateSessionHolder
 {
-	/**
-	 * Returns the package provider associated with this implementation.
-	 *
-	 * @param hibernateModule AcrossHibernateModule that is requesting packages.
-	 * @return HibernatePackageProvider instance.
-	 */
-	HibernatePackageProvider getHibernatePackageProvider( AcrossHibernateModule hibernateModule );
+	Session getCurrentSession();
+
+	Session openSession();
 }

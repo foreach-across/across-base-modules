@@ -19,13 +19,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user")
 public class User
 {
 	@Id
-	private int id;
+	private Long id;
 
 	@Column(name = "name")
 	private String name;
@@ -34,15 +35,15 @@ public class User
 	}
 
 	public User( int id, String name ) {
-		this.id = id;
+		this.id = (long) id;
 		this.name = name;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId( int id ) {
+	public void setId( Long id ) {
 		this.id = id;
 	}
 
@@ -77,7 +78,7 @@ public class User
 
 	@Override
 	public int hashCode() {
-		int result = id;
+		int result = Objects.hashCode( id );
 		result = 31 * result + ( getName() != null ? getName().hashCode() : 0 );
 		return result;
 	}

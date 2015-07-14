@@ -21,8 +21,6 @@ public interface HibernatePackageProvider
 {
 	String[] getPackagesToScan();
 
-	Class<?>[] getAnnotatedClasses();
-
 	String[] getMappingResources();
 
 	Map<String, String> getTableAliases();

@@ -23,7 +23,6 @@ import com.foreach.across.modules.hibernate.testmodules.hibernate1.ProductReposi
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Module;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.User;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.UserRepository;
-import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,12 +63,12 @@ public class TestAutoOpenSessions
 
 	@Test
 	public void otherModuleTransactional() {
-		assertNull( userRepository.getUserWithId( 1 ) );
+		assertNull( userRepository.getById( 1 ) );
 
 		User user = new User( 1, "user 1" );
-		userRepository.save( user );
+		userRepository.update( user );
 
-		User other = userRepository.getUserWithId( 1 );
+		User other = userRepository.getById( 1 );
 		assertNotNull( other );
 		assertEquals( user, other );
 	}
@@ -81,7 +80,7 @@ public class TestAutoOpenSessions
 
 		userRepository.save( user, product );
 
-		User otherUser = userRepository.getUserWithId( 2 );
+		User otherUser = userRepository.getById( 2 );
 		assertNotNull( otherUser );
 		assertEquals( user, otherUser );
 
@@ -131,7 +130,6 @@ public class TestAutoOpenSessions
 			return acrossContext;
 		}
 
-		@Bean
 		public AcrossHibernateModule acrossHibernateModule() {
 			AcrossHibernateModule module = new AcrossHibernateModule();
 			module.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
@@ -139,12 +137,10 @@ public class TestAutoOpenSessions
 			return module;
 		}
 
-		@Bean
 		public Hibernate1Module hibernate1Module() {
 			return new Hibernate1Module();
 		}
 
-		@Bean
 		public Hibernate2Module hibernate2Module() {
 			return new Hibernate2Module();
 		}

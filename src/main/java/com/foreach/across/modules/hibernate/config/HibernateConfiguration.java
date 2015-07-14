@@ -25,6 +25,8 @@ import com.foreach.across.modules.hibernate.AcrossHibernateModule;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
+import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.cfg.Environment;
@@ -53,6 +55,7 @@ import java.util.Properties;
 public class HibernateConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "transactionManager";
+	public static final String SESSION_HOLDER = "hibernateSessionHolder";
 
 	private static final Logger LOG = LoggerFactory.getLogger( HibernateConfiguration.class );
 
@@ -98,8 +101,6 @@ public class HibernateConfiguration
 
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
 		sessionFactory.setDataSource( module.getDataSource() );
-
-		sessionFactory.setAnnotatedClasses( hibernatePackage.getAnnotatedClasses() );
 		sessionFactory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
 		sessionFactory.setMappingResources( hibernatePackage.getMappingResources() );
 
@@ -117,6 +118,12 @@ public class HibernateConfiguration
 		return sessionFactory;
 	}
 
+	@Bean(name = SESSION_HOLDER)
+	@Exposed
+	public HibernateSessionHolder hibernateSessionHolder() {
+		return new HibernateSessionHolderImpl();
+	}
+
 	@Bean
 	@Exposed
 	public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
@@ -126,10 +133,12 @@ public class HibernateConfiguration
 	@Event
 	@SuppressWarnings("unused")
 	protected void registerClientModuleRepositoryInterceptors( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
-		LOG.trace( "Enabling BasicRepositoryInterceptor support in module {}",
-		           beforeBootstrapEvent.getModule().getName() );
-		beforeBootstrapEvent.addApplicationContextConfigurers(
-				new AnnotatedClassConfigurer( ModuleBasicRepositoryInterceptorConfiguration.class )
-		);
+		if ( settings.isRegisterRepositoryInterceptor() ) {
+			LOG.trace( "Enabling BasicRepositoryInterceptor support in module {}",
+			           beforeBootstrapEvent.getModule().getName() );
+			beforeBootstrapEvent.addApplicationContextConfigurers(
+					new AnnotatedClassConfigurer( ModuleBasicRepositoryInterceptorConfiguration.class )
+			);
+		}
 	}
 }

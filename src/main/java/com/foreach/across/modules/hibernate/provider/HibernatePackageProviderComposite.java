@@ -36,16 +36,6 @@ public class HibernatePackageProviderComposite implements HibernatePackageProvid
 	}
 
 	@Override
-	public Class<?>[] getAnnotatedClasses() {
-		Collection<Class<?>> annotatedClasses = new HashSet<Class<?>>();
-		for ( HibernatePackageProvider provider : providers ) {
-			annotatedClasses.addAll( Arrays.asList( provider.getAnnotatedClasses() ) );
-		}
-
-		return annotatedClasses.toArray( new Class<?>[annotatedClasses.size()] );
-	}
-
-	@Override
 	public String[] getMappingResources() {
 		Collection<String> mappingResources = new HashSet<String>();
 		for ( HibernatePackageProvider provider : providers ) {

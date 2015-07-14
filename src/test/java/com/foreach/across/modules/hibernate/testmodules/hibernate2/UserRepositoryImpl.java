@@ -15,38 +15,25 @@
  */
 package com.foreach.across.modules.hibernate.testmodules.hibernate2;
 
+import com.foreach.across.modules.hibernate.repositories.BasicRepositoryImpl;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Product;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.ProductRepository;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UserRepositoryImpl implements UserRepository
+public class UserRepositoryImpl extends BasicRepositoryImpl<User> implements UserRepository
 {
-	@Autowired
-	private SessionFactory sessionFactory;
-
-	@Autowired
+	@Autowired(required = false)
 	private ProductRepository productRepository;
-
-	@Transactional(readOnly = true)
-	public User getUserWithId( int id ) {
-		return (User) sessionFactory.getCurrentSession().byId( User.class ).load( id );
-	}
-
-	@Transactional
-	public void save( User user ) {
-		sessionFactory.getCurrentSession().saveOrUpdate( user );
-	}
 
 	@Transactional
 	public void save( User user, Product product ) {
 		productRepository.save( product );
 
 		if ( user != null ) {
-			save( user );
+			update( user );
 		}
 		else {
 			throw new RuntimeException( "rollback transaction" );

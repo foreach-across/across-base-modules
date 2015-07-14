@@ -13,26 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.hibernate.testmodules.hibernate1;
+package com.foreach.across.modules.hibernate.jpa.services;
 
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
-@Service
-public class ProductRepositoryImpl implements ProductRepository
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
+
+/**
+ * @author Andy Somers
+ */
+@Component
+public class JpaHibernateSessionHolderImpl implements HibernateSessionHolder
 {
 	@Autowired
-	private HibernateSessionHolder sessionFactory;
+	private EntityManagerFactory entityManagerFactory;
 
-	@Transactional(readOnly = true)
-	public Product getProductWithId( int id ) {
-		return (Product) sessionFactory.getCurrentSession().byId( Product.class ).load( id );
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@Override
+	public Session getCurrentSession() {
+		return entityManager.unwrap( Session.class );
 	}
 
-	@Transactional
-	public void save( Product product ) {
-		sessionFactory.getCurrentSession().saveOrUpdate( product );
+	@Override
+	public Session openSession() {
+		return entityManagerFactory.createEntityManager().unwrap( Session.class );
 	}
 }

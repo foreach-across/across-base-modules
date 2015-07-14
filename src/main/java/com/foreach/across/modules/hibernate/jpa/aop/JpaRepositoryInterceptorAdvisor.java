@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.hibernate.aop;
+package com.foreach.across.modules.hibernate.jpa.aop;
 
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 
 /**
- * @author Arne Vandamme
+ * @author Andy Somers
  */
-public class BasicRepositoryInterceptorAdvisor extends AbstractBeanFactoryPointcutAdvisor
+public class JpaRepositoryInterceptorAdvisor extends AbstractBeanFactoryPointcutAdvisor
 {
 	/**
-	 * The interceptor should run outside the transaction.
+	 * By default the interceptor should run within the same transaction.
 	 */
-	public static final int INTERCEPT_ORDER = TransactionManagementConfigurer.INTERCEPT_ORDER - 1;
+	public static final int INTERCEPT_ORDER = TransactionManagementConfigurer.INTERCEPT_ORDER + 1;
 
-	private final Pointcut pointcut = new BasicRepositoryPointcut();
+	private final Pointcut pointcut = new JpaRepositoryPointcut();
 
 	@Override
 	public Pointcut getPointcut() {

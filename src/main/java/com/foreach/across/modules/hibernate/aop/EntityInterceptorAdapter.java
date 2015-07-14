@@ -15,42 +15,26 @@
  */
 package com.foreach.across.modules.hibernate.aop;
 
-import java.lang.reflect.ParameterizedType;
-
 /**
- * Base class for an interceptor hooked to {@link com.foreach.across.modules.hibernate.repositories.BasicRepository}
- * persistence methods.
- * <p/>
- * Implementations will be picked up automatically by the
- * {@link com.foreach.across.modules.hibernate.aop.BasicRepositoryInterceptor} if it is active.
+ * <p>Base class for an interceptor hooked to repository persistence events.  Which repositories are
+ * supported is module/implementation dependant.</p>
+ * <p>Currently implementations are available for {@link com.foreach.across.modules.hibernate.repositories.BasicRepository}
+ * and {@link org.springframework.data.jpa.repository.JpaRepository}.</p>
  *
  * @author Arne Vandamme
  */
 public abstract class EntityInterceptorAdapter<T> implements EntityInterceptor<T>
 {
-	protected final Class<T> entityClass;
-
-	@SuppressWarnings("unchecked")
-	public EntityInterceptorAdapter() {
-		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
-		this.entityClass = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
-	}
-
-	@Override
-	public Class<T> getEntityClass() {
-		return entityClass;
-	}
-
 	@Override
 	public void beforeCreate( T entity ) {
 	}
 
 	@Override
-	public void beforeUpdate( T Entity ) {
+	public void beforeUpdate( T entity ) {
 	}
 
 	@Override
-	public void afterDelete( T entity, boolean isSoftDelete ) {
+	public void afterDelete( T entity ) {
 	}
 
 	@Override
@@ -62,6 +46,14 @@ public abstract class EntityInterceptorAdapter<T> implements EntityInterceptor<T
 	}
 
 	@Override
-	public void beforeDelete( T entity, boolean isSoftDelete ) {
+	public void beforeDelete( T entity ) {
+	}
+
+	@Override
+	public void beforeDeleteAll( Class<?> entityClass ) {
+	}
+
+	@Override
+	public void afterDeleteAll( Class<?> entityClass ) {
 	}
 }

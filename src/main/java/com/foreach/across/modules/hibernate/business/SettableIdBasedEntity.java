@@ -55,7 +55,7 @@ public abstract class SettableIdBasedEntity<T extends Persistable<Long>>
 	}
 
 	@Override
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public T toDto() {
 		return (T) DtoUtils.createDto( this );
 	}
@@ -69,17 +69,17 @@ public abstract class SettableIdBasedEntity<T extends Persistable<Long>>
 		if ( this == o ) {
 			return true;
 		}
-		if ( o == null || getClass() != o.getClass() ) {
+		if ( o == null || !getClass().isAssignableFrom( o.getClass() ) ) {
 			return false;
 		}
 
 		SettableIdBasedEntity that = (SettableIdBasedEntity) o;
 
-		if ( isNew() && that.isNew() ) {
+		if ( isNew() ) {
 			return this == that;
 		}
 
-		return getId().equals( that.getId() );
+		return Objects.equals( getId(), that.getId() );
 	}
 
 	@Override

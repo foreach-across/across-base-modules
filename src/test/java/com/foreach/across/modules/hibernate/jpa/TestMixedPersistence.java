@@ -1,9 +1,28 @@
+/*
+ * Copyright 2014 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.foreach.across.modules.hibernate.jpa;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
+import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
+import com.foreach.across.core.registry.IncrementalRefreshableRegistry;
+import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.core.transformers.PrimaryBeanTransformer;
 import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
 import com.foreach.across.modules.hibernate.config.HibernateConfiguration;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Hibernate1Module;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Product;
@@ -16,12 +35,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -34,11 +55,28 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestMixedPersistence.Config.class)
 public class TestMixedPersistence
 {
+
+	@Autowired
+	private AcrossContextBeanRegistry beanRegistry;
+
 	@Autowired
 	private CustomerRepository customerRepository;
 
 	@Autowired
 	private ProductRepository productRepository;
+
+	@Test
+	public void singleRefreshableRegistryShouldBeIncremental() {
+		Map<String, RefreshableRegistry> registries
+				= beanRegistry.getBeansOfTypeAsMap(
+				TypeDescriptor.collection( RefreshableRegistry.class,
+				                           TypeDescriptor.valueOf( EntityInterceptor.class ) )
+				              .getResolvableType(),
+				true );
+
+		assertEquals( 1, registries.size() );
+		assertTrue( beanRegistry.getBean( "entityInterceptors" ) instanceof IncrementalRefreshableRegistry );
+	}
 
 	@Test
 	public void crudCustomer() {
@@ -77,7 +115,8 @@ public class TestMixedPersistence
 			AcrossHibernateModule hibernateModule = new AcrossHibernateModule();
 			hibernateModule.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
 			hibernateModule.setExposeTransformer(
-					new PrimaryBeanTransformer( Arrays.asList( HibernateConfiguration.TRANSACTION_MANAGER ) )
+					new PrimaryBeanTransformer( Arrays.asList( HibernateConfiguration.TRANSACTION_MANAGER,
+					                                           HibernateConfiguration.SESSION_HOLDER ) )
 			);
 			context.addModule( hibernateModule );
 

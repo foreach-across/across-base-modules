@@ -79,14 +79,14 @@ public class TestUnitOfWorkInThread
 		{
 			public void run() {
 				try {
-					assertNull( userRepository.getUserWithId( 1 ) );
+					assertNull( userRepository.getById( 1 ) );
 
 					User user = new User( 1, "user 1" );
-					userRepository.save( user );
+					userRepository.update( user );
 
 					unitOfWork.restart();
 
-					User other = userRepository.getUserWithId( 1 );
+					User other = userRepository.getById( 1 );
 					assertNotNull( other );
 					assertEquals( user, other );
 				}
@@ -110,7 +110,7 @@ public class TestUnitOfWorkInThread
 
 					unitOfWork.restart();
 
-					User otherUser = userRepository.getUserWithId( 2 );
+					User otherUser = userRepository.getById( 2 );
 					assertNotNull( otherUser );
 					assertEquals( user, otherUser );
 
