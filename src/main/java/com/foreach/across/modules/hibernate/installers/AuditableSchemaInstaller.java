@@ -15,36 +15,99 @@
  */
 package com.foreach.across.modules.hibernate.installers;
 
+import com.foreach.across.core.AcrossContext;
+import com.foreach.across.core.annotations.InstallerGroup;
+import com.foreach.across.core.annotations.InstallerMethod;
+import com.foreach.across.core.context.AcrossContextUtils;
+import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.database.SchemaConfiguration;
-import com.foreach.across.core.database.SchemaObject;
 import com.foreach.across.core.installers.AcrossLiquibaseInstaller;
+import liquibase.integration.spring.SpringLiquibase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
+import javax.sql.DataSource;
+import java.util.Collection;
 import java.util.Collections;
 
 /**
- * @author Andy Somers
- *         <p/>
- *         Convenience installer that creates the necessary columns for the default implementation
- *         of the {@link com.foreach.across.modules.hibernate.business.Auditable} interface.
+ * <p>
+ * Convenience installer that creates the necessary columns for the default implementation
+ * of the {@link com.foreach.across.modules.hibernate.business.Auditable} interface.
+ * Supports multiple table names and will add the auditable columns to each of those tables.
+ * </p>
+ *
+ * @author Andy Somers, Arne Vandamme
+ * @see AcrossLiquibaseInstaller
  * @see com.foreach.across.modules.hibernate.business.AuditableEntity
  */
-public abstract class AuditableSchemaInstaller extends AcrossLiquibaseInstaller
+@InstallerGroup(InstallerGroup.SCHEMA)
+public abstract class AuditableSchemaInstaller
 {
-	private final SchemaConfiguration schemaConfiguration = new SchemaConfiguration(
-			Collections.<SchemaObject>emptyList() );
+	private static final String CHANGELOG =
+			"classpath:com/foreach/across/modules/hibernate/installers/AuditableSchemaInstaller.xml";
 
-	protected AuditableSchemaInstaller() {
-		super( "classpath:com/foreach/across/modules/hibernate/installers/AuditableSchemaInstaller.xml" );
+	private static final Logger LOG = LoggerFactory.getLogger( AuditableSchemaInstaller.class );
 
-		setSchemaConfiguration( schemaConfiguration );
+	@Autowired
+	private AcrossContextInfo acrossContext;
+
+	@Autowired
+	@Qualifier(AcrossContext.INSTALLER_DATASOURCE)
+	private DataSource dataSource;
+
+	private SchemaConfiguration schemaConfiguration;
+
+	public AuditableSchemaInstaller() {
 	}
 
-	protected abstract String getTableName();
+	protected AuditableSchemaInstaller( SchemaConfiguration schemaConfiguration ) {
+		this.schemaConfiguration = schemaConfiguration;
+	}
 
-	@Override
+	protected abstract Collection<String> getTableNames();
+
+	protected SchemaConfiguration getSchemaConfiguration() {
+		return schemaConfiguration;
+	}
+
+	protected void setSchemaConfiguration( SchemaConfiguration schemaConfiguration ) {
+		this.schemaConfiguration = schemaConfiguration;
+	}
+
+	protected DataSource getDataSource() {
+		return dataSource;
+	}
+
+	/**
+	 * Override the dataSource this installer should use (defaults to the installer datasource otherwise).
+	 *
+	 * @param dataSource instance
+	 */
+	protected void setDataSource( DataSource dataSource ) {
+		this.dataSource = dataSource;
+	}
+
+	@InstallerMethod
 	public void install() {
-		schemaConfiguration.setProperty( "table.auditable_table", getTableName() );
+		AutowireCapableBeanFactory beanFactory = AcrossContextUtils.getBeanFactory( acrossContext.getContext() );
 
-		super.install();
+		for ( String tableName : getTableNames() ) {
+			String tableNameToUse = schemaConfiguration != null
+					? schemaConfiguration.getCurrentTableName( tableName ) : tableName;
+
+			SpringLiquibase liquibase = new SpringLiquibase();
+			liquibase.setChangeLog( CHANGELOG );
+			liquibase.setDataSource( dataSource );
+			liquibase.setChangeLogParameters( Collections.singletonMap( "table.auditable_table", tableNameToUse ) );
+
+			LOG.debug( "Installing auditable columns for table {}", tableNameToUse );
+
+			beanFactory.autowireBeanProperties( liquibase, AutowireCapableBeanFactory.AUTOWIRE_NO, false );
+			beanFactory.initializeBean( liquibase, "" );
+		}
 	}
 }
