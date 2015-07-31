@@ -141,6 +141,28 @@ public class TestCurrentSecurityPrincipalProxy
 		assertTrue( currentPrincipal.hasAuthority( new NamedGrantedAuthority( "some authority" ) ) );
 	}
 
+	@Test
+	public void typedPrincipalIsOnlyReturnedIfTypeMatches() {
+		SecurityPrincipal principal = mock( SecurityPrincipal.class );
+		when( principal.getPrincipalName() ).thenReturn( "principal" );
+
+		Authentication auth = mock( Authentication.class );
+		when( auth.getPrincipal() ).thenReturn( principal );
+		when( auth.getName() ).thenReturn( "principal" );
+		when( auth.isAuthenticated() ).thenReturn( true );
+
+		SecurityContextHolder.getContext().setAuthentication( auth );
+
+		assertSame( principal, currentPrincipal.getPrincipal() );
+		assertSame( principal, currentPrincipal.getPrincipal( SecurityPrincipal.class ) );
+		assertNull( currentPrincipal.getPrincipal( SpecificPrincipal.class ) );
+	}
+
+	interface SpecificPrincipal extends SecurityPrincipal
+	{
+
+	}
+
 	// Has authority
 
 	@Configuration

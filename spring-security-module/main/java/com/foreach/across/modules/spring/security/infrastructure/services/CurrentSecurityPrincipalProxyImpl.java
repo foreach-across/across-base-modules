@@ -68,9 +68,14 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends SecurityPrincipal> T getPrincipal() {
-		return (T) loadPrincipal();
+	public SecurityPrincipal getPrincipal() {
+		return loadPrincipal();
+	}
+
+	@Override
+	public <V extends SecurityPrincipal> V getPrincipal( Class<V> principalType ) {
+		SecurityPrincipal securityPrincipal = loadPrincipal();
+		return principalType.isInstance( securityPrincipal ) ? (V) securityPrincipal : null;
 	}
 
 	@Override

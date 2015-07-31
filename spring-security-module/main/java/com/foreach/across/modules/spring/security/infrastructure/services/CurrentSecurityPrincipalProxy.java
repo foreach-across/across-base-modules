@@ -29,5 +29,18 @@ public interface CurrentSecurityPrincipalProxy extends SecurityPrincipal
 
 	boolean hasAuthority( GrantedAuthority authority );
 
-	<T extends SecurityPrincipal> T getPrincipal();
+	/**
+	 * @return the backing SecurityPrincipal instance
+	 */
+	SecurityPrincipal getPrincipal();
+
+	/**
+	 * Return the {@link SecurityPrincipal} instance that is being proxied if and only if it is of the required type.
+	 * In case there is a principal that does not match the type, {@code null} will be returned.
+	 *
+	 * @param principalType expected type of the principal
+	 * @param <V> type of the principal
+	 * @return instance of available and of the required type, null otherwise
+	 */
+	<V extends SecurityPrincipal> V getPrincipal( Class<V> principalType );
 }
