@@ -20,23 +20,29 @@
 </head>
 <body th:fragment="content">
 <div class="debug-ehcache row">
-	<h3>Cache list</h3>
+	<ul class="nav nav-pills">
+		<li th:each="manager : ${cacheManagers}" th:classappend="${cacheManager.name eq manager.name} ? 'active'">
+			<a th:href="|?managerName=${manager.name}|" th:text="${manager.name}"></a>
+		</li>
+	</ul>
+
+	<h3>Cache list: <span th:text="${cacheManager.name}"></span></h3>
 
 	<div class="feedback" th:if="${param.flushed}">
 		<span th:text="${param.flushed[0]}">0</span> cache(s) have been flushed.
 	</div>
 
 	<div>
-		<a th:href="@{${@debugWeb.path('/ehcache/flush')}}" onclick="return confirm('Are you sure you want to flush all caches?');">flush</a> -
-		<a th:href="@{${@debugWeb.path('/ehcache/flush')}(replicate=true)}" onclick="return confirm('Are you sure you want to flush all caches?');">flush and replicate</a> -
-		<a th:href="@{${@debugWeb.path('/ehcache')}}">refresh</a>
+		<a th:href="@{${@debugWeb.path('/ehcache/flush')}(managerName=${cacheManager.name})}" onclick="return confirm('Are you sure you want to flush all caches?');">flush</a> -
+		<a th:href="@{${@debugWeb.path('/ehcache/flush')}(managerName=${cacheManager.name},replicate=true)}" onclick="return confirm('Are you sure you want to flush all caches?');">flush and replicate</a> -
+		<a th:href="@{${@debugWeb.path('/ehcache')}(managerName=${cacheManager.name})}">refresh</a>
 	</div>
 
 	<div class="cache" th:each="cache : ${cacheList}">
 		<table class="cache-details" th:object="${cache}">
 			<tr>
 				<th colspan="2" class="cache-name">
-					<a href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(cache=${cache.name})}" th:text="${cache.name}">cache
+					<a href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=${cache.name})}" th:text="${cache.name}">cache
 						name</a>
 				</th>
 			</tr>

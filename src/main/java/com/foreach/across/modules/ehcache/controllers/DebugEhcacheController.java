@@ -68,8 +68,22 @@ public class DebugEhcacheController
 		registry.addWithKey( WebResource.CSS, "EhcacheModule", "/css/ehcache/ehcache.css", WebResource.VIEWS );
 	}
 
+	@ModelAttribute
+	public CacheManager cacheManager( @RequestParam(required = false, defaultValue = "") String managerName,
+	                                  Model model ) {
+		model.addAttribute( "cacheManagers", CacheManager.ALL_CACHE_MANAGERS );
+
+		for ( CacheManager cacheManager : CacheManager.ALL_CACHE_MANAGERS ) {
+			if ( StringUtils.equals( managerName, cacheManager.getName() ) ) {
+				return cacheManager;
+			}
+		}
+
+		return CacheManager.ALL_CACHE_MANAGERS.get( 0 );
+	}
+
 	@RequestMapping(value = "/ehcache", method = RequestMethod.GET)
-	public String listCaches( Model model ) {
+	public String listCaches( @ModelAttribute("cacheManager") CacheManager cacheManager, Model model ) {
 		Collection<Ehcache> caches = new LinkedList<Ehcache>();
 
 		Map<String, Number> heapSizes = new HashMap<>();
@@ -98,7 +112,8 @@ public class DebugEhcacheController
 	}
 
 	@RequestMapping(value = "/ehcache/flush", method = RequestMethod.GET)
-	public String flushCache( @RequestParam(value = "cache", required = false) String cacheName,
+	public String flushCache( @ModelAttribute("cacheManager") CacheManager cacheManager,
+	                          @RequestParam(value = "cache", required = false) String cacheName,
 	                          @RequestParam(value = "from", required = false) String from,
 	                          @RequestParam(value = "replicate", required = false,
 			                          defaultValue = "false") String replicate ) {
@@ -113,11 +128,13 @@ public class DebugEhcacheController
 			}
 		}
 
-		return debugWeb.redirect( "/ehcache?flushed=" + cachesToFlush.length );
+		return debugWeb.redirect(
+				"/ehcache?flushed=" + cachesToFlush.length + "&managerName=" + cacheManager.getName() );
 	}
 
 	@RequestMapping(value = "/ehcache/view", method = RequestMethod.GET)
-	public String showCache( @RequestParam("cache") String cacheName,
+	public String showCache( @ModelAttribute("cacheManager") CacheManager cacheManager,
+	                         @RequestParam("cache") String cacheName,
 	                         @RequestParam(value = "listPeers", defaultValue = StringUtils.EMPTY) String listPeers,
 	                         Model model ) {
 		Cache cache = cacheManager.getCache( cacheName );
