@@ -56,9 +56,11 @@ public class AcrossHibernateModule extends AcrossModule
 	private DataSource dataSource;
 
 	public AcrossHibernateModule() {
+		setHibernateProperty( "hibernate.cache.use_second_level_cache", "false" );
 	}
 
 	public AcrossHibernateModule( DataSource dataSource ) {
+		this();
 		this.dataSource = dataSource;
 	}
 
