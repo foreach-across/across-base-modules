@@ -35,7 +35,7 @@
 </div>
 
     <div class="clearfix row">
-    Cache peers - <a th:href="@{${@debugWeb.path('/ehcache/view')}(cache=${cache.name},listPeers=true)}">show</a>:
+    Cache peers - <a th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=${cache.name},listPeers=true)}">show</a>:
         <div th:switch="${cachePeers}">
             <p th:case="'none'"><div>Click 'show' to list the peers</div></p>
             <p th:case="*">

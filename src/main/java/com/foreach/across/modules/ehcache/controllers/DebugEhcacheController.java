@@ -42,6 +42,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -105,10 +107,123 @@ public class DebugEhcacheController
 		model.addAttribute( "cacheList", caches );
 		model.addAttribute( "heapSizes", heapSizes );
 
+		//cacheManager.getCacheManagerEventListenerRegistry().getRegisteredListeners().iterator().next()
 		Map<String, CacheManagerPeerProvider> cacheManagerPeerProviders = cacheManager.getCacheManagerPeerProviders();
 		model.addAttribute( "cacheManagerProviders", cacheManagerPeerProviders.keySet() );
 
 		return "th/ehcache/cacheList";
+	}
+
+	private List<Cache> cacheList( CacheManager cacheManager ) {
+		List<String> names = Arrays.asList( cacheManager.getCacheNames() );
+		Collections.sort( names );
+
+		List<Cache> caches = new ArrayList<>( names.size() );
+
+		for ( String name : names ) {
+			caches.add( cacheManager.getCache( name ) );
+		}
+
+		return caches;
+	}
+
+	@RequestMapping(value = "/ehcache/heap", method = RequestMethod.GET)
+	public String cacheHeapSize( @ModelAttribute("cacheManager") CacheManager cacheManager, Model model ) {
+		List<CacheHeapInfo> heapInfoList = new ArrayList<>();
+
+		long totalHeap = 0, maxHeap = 0;
+		long totalItems = 0, maxItems = 0;
+
+		for ( Cache cache : cacheList( cacheManager ) ) {
+			totalItems += cache.getSize();
+			maxItems += cache.getCacheConfiguration().getMaxEntriesLocalHeap();
+
+			CacheHeapInfo heapInfo = new CacheHeapInfo();
+			heapInfo.setCache( cache );
+
+			heapInfoList.add( heapInfo );
+
+			try {
+				heapInfo.setSize( cache.getStatistics().getExtended().localHeapSizeInBytes().value() );
+				totalHeap += heapInfo.getSize().longValue();
+			}
+			catch ( Exception e ) {
+				// Exception calculating heap size (classloading exception)
+				LOG.warn( "Unable to calculate heap size for cache {}", cache.getName(), e );
+			}
+		}
+
+		for ( CacheHeapInfo info : heapInfoList ) {
+			if ( info.getSize() != null ) {
+				if ( info.getSize().longValue() == 0 ) {
+					info.setPercentageOfTotal( 0 );
+				}
+				else {
+					info.setPercentageOfTotal(
+							BigDecimal.valueOf( info.getSize().longValue() )
+							          .divide( BigDecimal.valueOf( totalHeap ), 4,
+							                   RoundingMode.HALF_UP )
+					);
+
+					info.setEstimatedMax(
+							BigDecimal.valueOf( info.getSize().longValue() )
+							          .divide( BigDecimal.valueOf( info.getCache().getSize() ), 4,
+							                   RoundingMode.HALF_UP )
+							          .multiply( BigDecimal.valueOf(
+									          info.getCache().getCacheConfiguration()
+									              .getMaxEntriesLocalHeap() ) )
+					);
+
+					maxHeap += info.getEstimatedMax().longValue();
+				}
+			}
+		}
+
+		model.addAttribute( "totalItems", totalItems );
+		model.addAttribute( "maxItems", maxItems );
+		model.addAttribute( "totalHeap", totalHeap );
+		model.addAttribute( "maxHeap", maxHeap );
+		model.addAttribute( "heapInfoList", heapInfoList );
+
+		return "th/ehcache/cacheHeapDetail";
+	}
+
+	private static class CacheHeapInfo
+	{
+		private Cache cache;
+		private Number size, percentageOfTotal, estimatedMax;
+
+		public void setCache( Cache cache ) {
+			this.cache = cache;
+		}
+
+		public void setSize( Number size ) {
+			this.size = size;
+		}
+
+		public void setPercentageOfTotal( Number percentageOfTotal ) {
+			this.percentageOfTotal = percentageOfTotal;
+		}
+
+		public void setEstimatedMax( Number estimatedMax ) {
+			this.estimatedMax = estimatedMax;
+		}
+
+		public Cache getCache() {
+			return cache;
+		}
+
+		public Number getSize() {
+			return size;
+		}
+
+		public Number getPercentageOfTotal() {
+			return percentageOfTotal;
+		}
+
+		public Number getEstimatedMax() {
+			return estimatedMax;
+		}
 	}
 
 	@RequestMapping(value = "/ehcache/flush", method = RequestMethod.GET)

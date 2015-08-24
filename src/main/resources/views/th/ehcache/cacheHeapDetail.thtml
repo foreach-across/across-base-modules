@@ -16,7 +16,7 @@
   -->
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-	<title>List ehcache caches</title>
+	<title>List detailed cache</title>
 </head>
 <body th:fragment="content">
 <div class="row">
@@ -32,7 +32,7 @@
 		</div>
 
 		<h2>
-			Cache list
+			Cache list: heap size
 			<small class="pull-right">
 				<a class="btn btn-default" th:href="@{${@debugWeb.path('/ehcache')}(managerName=${cacheManager.name})}"
 				   title="Refresh"><span class="glyphicon glyphicon-refresh"></span></a>
@@ -62,91 +62,46 @@
 				<th>Name</th>
 				<th>Items</th>
 				<th>Max</th>
-				<th>Hits</th>
-				<th>Misses</th>
-				<th>Ratio</th>
-				<th>Evictions</th>
+				<th>Heap size</th>
+				<th>% total</th>
+				<th>Max heap <sup>1</sup></th>
 				<th></th>
 			</tr>
 			</thead>
 			<tbody>
-			<tr th:each="cache : ${cacheList}" th:object="${cache}">
+			<tr th:each="heapInfo : ${heapInfoList}" th:object="${heapInfo}">
 				<td>
-					<a href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=${cache.name})}" th:text="${cache.name}">cache
+					<a href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=*{cache.name})}" th:text="*{cache.name}">cache
 						name</a>
 				</td>
-				<td th:text="*{size}">0</td>
-				<td th:text="*{cacheConfiguration.maxEntriesLocalHeap}">0</td>
-				<td th:text="*{statistics.cacheHitCount()}">0</td>
-				<td th:text="*{statistics.cacheMissCount()}">${stats.cacheMisses}</td>
-				<td th:text="*{#numbers.formatDecimal(((statistics.cacheHitCount() * 1.0) / (statistics.cacheHitCount() + statistics.cacheMissCount())) * 100, 1, 2)} + ' %'">
-					100 %
-				</td>
-				<td th:text="*{statistics.cacheEvictedCount()}">0</td>
+				<td th:text="*{cache.size}">0</td>
+				<td th:text="*{cache.cacheConfiguration.maxEntriesLocalHeap}">0</td>
+				<td th:text="*{#numbers.formatDecimal(size / 1024.0 / 1024.0,1,2)} + ' MB'">0</td>
+				<td th:if="*{percentageOfTotal eq 0}"></td>
+				<td th:unless="*{percentageOfTotal eq 0}" th:text="*{#numbers.formatDecimal(percentageOfTotal  *100,1,2)} + ' %'">0</td>
+				<td th:unless="*{estimatedMax}"></td>
+				<td th:if="*{estimatedMax}" th:text="*{#numbers.formatDecimal(estimatedMax / 1024.0 / 1024.0,1,2)} + ' MB'">0</td>
 				<td class="text-center">
-					<a class="btn btn-xs btn-link" href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=${cache.name})}">
+					<a class="btn btn-xs btn-link" href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=*{cache.name})}">
 						<span class="glyphicon glyphicon-search"></span></a>
 					<a class="btn btn-xs btn-link" href="#"><span class="glyphicon glyphicon-trash"></span></a>
 				</td>
 			</tr>
+			<tfoot>
+			<tr>
+				<th></th>
+				<th th:text="${totalItems}">total items</th>
+				<th th:text="${maxItems}">max items</th>
+				<th th:text="*{#numbers.formatDecimal(totalHeap / 1024.0 / 1024.0,1,2)} + ' MB'">total heap size</th>
+				<th></th>
+				<th th:text="*{#numbers.formatDecimal(maxHeap / 1024.0 / 1024.0,1,2)} + ' MB'">max heap size</th>
+				<th></th>
+			</tr>
+			</tfoot>
 			</tbody>
 		</table>
 		<p>Updated: <em th:text="${#dates.format(#dates.createNow(),'dd MMM yyyy - HH:mm:ss')}"></em></p>
-	</div>
-</div>
-<!--/*
-<div class="cache" th:each="cache : ${cacheList}">
-	<table class="cache-details" th:object="${cache}">
-		<tr>
-			<th colspan="2" class="cache-name">
-				<a href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=${cache.name})}" th:text="${cache.name}">cache
-					name</a>
-			</th>
-		</tr>
-		<tr>
-			<th>Items</th>
-			<td th:text="*{size}">0</td>
-		</tr>
-		<tr>
-			<th>Hits</th>
-			<td th:text="*{statistics.cacheHitCount()}">0</td>
-		</tr>
-		<tr>
-			<th>Misses</th>
-			<td th:text="*{statistics.cacheMissCount()}">${stats.cacheMisses}</td>
-		</tr>
-		<tr>
-			<th>Ratio</th>
-			<td th:text="*{#numbers.formatDecimal(((statistics.cacheHitCount() * 1.0) / (statistics.cacheHitCount() + statistics.cacheMissCount())) * 100, 1, 2)} + ' %'">
-				100 %
-			</td>
-		</tr>
-		<tr>
-			<th>Evictions</th>
-			<td th:text="*{statistics.cacheEvictedCount()}">0</td>
-		</tr>
-		<tr th:if="${heapSizes[cache.name] != null}">
-			<th>Heap size</th>
-			<td th:text="${#numbers.formatDecimal(heapSizes[cache.name] / 1024.0,1,2)} + ' KB'">
-				0 KB
-			</td>
-		</tr>
-	</table>
-</div>
-
-*/-->
-
-<div class="row">
-	<div class="col-md-12">
-		<h2>Cache manager providers</h2>
-		<ul>
-			<li class="cachePeer" th:each="cacheManagerProvider : ${cacheManagerProviders}">
-				<span th:text="${cacheManagerProvider}"></span></li>
-		</ul>
-
-		<ul>
-			<li th:each="a : ${cacheManager.cacheManagerEventListenerRegistry.registeredListeners}" th:text="${a.class.name}"></li>
-		</ul>
+		<p><sup>1</sup> linear calculation based on current heap size and max items</p>
 	</div>
 </div>
 </body>
