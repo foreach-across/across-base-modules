@@ -18,6 +18,7 @@ package com.foreach.across.modules.logging;
 import com.foreach.across.core.AcrossModuleSettings;
 import com.foreach.across.core.AcrossModuleSettingsRegistry;
 import com.foreach.across.modules.logging.config.RequestLogger;
+import com.foreach.across.modules.logging.method.MethodLogConfiguration;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
 
 /**
@@ -25,7 +26,8 @@ import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConf
  */
 public class LoggingModuleSettings extends AcrossModuleSettings
 {
-
+	public static final String METHOD_LOG_ENABLED = "logging.method.enabled";
+	public static final String METHOD_LOG_CONFIGURATION = "logging.method.configuration";
 	public static final String REQUEST_RESPONSE_LOG_ENABLED = "logging.requestResponse.enabled";
 	public static final String REQUEST_RESPONSE_LOG_PAUSED = "logging.requestResponse.paused";
 	public static final String REQUEST_RESPONSE_LOG_CONFIGURATION = "logging.requestResponse.configuration";
@@ -43,13 +45,27 @@ public class LoggingModuleSettings extends AcrossModuleSettings
 		                   "If enabled, should this logger be paused or not." );
 		registry.register( REQUEST_LOGGER, RequestLogger.class, RequestLogger.INTERCEPTOR,
 		                   "Configures how the requests will be logged" );
+		registry.register( METHOD_LOG_ENABLED, Boolean.class, false,
+		                   "Should method logging extensions in modules be loaded." );
+		registry.register( METHOD_LOG_CONFIGURATION, MethodLogConfiguration.class,
+		                   null,		                   "Configuration settings for method logging." );
 	}
 
 	public boolean isRequestResponseLogEnabled() {
 		return getProperty( REQUEST_RESPONSE_LOG_ENABLED, Boolean.class );
 	}
 
+	@SuppressWarnings( "unused" )
 	public RequestLogger getRequestLogger() {
 		return getProperty( REQUEST_LOGGER, RequestLogger.class );
+	}
+
+	@SuppressWarnings( "unused" )
+	public boolean isMethodLogEnabled() {
+		return getProperty( METHOD_LOG_ENABLED, Boolean.class );
+	}
+
+	public MethodLogConfiguration getMethodLogConfiguration() {
+		return getProperty( METHOD_LOG_CONFIGURATION, MethodLogConfiguration.class );
 	}
 }

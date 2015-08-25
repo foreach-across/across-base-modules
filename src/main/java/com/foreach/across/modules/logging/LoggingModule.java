@@ -17,15 +17,18 @@ package com.foreach.across.modules.logging;
 
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.AcrossRole;
+import com.foreach.across.core.context.AcrossModuleRole;
 import com.foreach.across.modules.web.AcrossWebModule;
+import org.springframework.core.Ordered;
 
 /**
  * @author Andy Somers
  */
 @AcrossDepends(
-		required = AcrossWebModule.NAME,
-		optional = { "DebugWebModule" }
+		optional = { AcrossWebModule.NAME, "DebugWebModule" }
 )
+@AcrossRole(value = AcrossModuleRole.APPLICATION, order = Ordered.HIGHEST_PRECEDENCE)
 public class LoggingModule extends AcrossModule
 {
 	public static final String NAME = "LoggingModule";
