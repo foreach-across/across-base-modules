@@ -107,6 +107,8 @@ public class RequestLogFilter extends OncePerRequestFilter
 
 		logger.debug( buf.toString() );
 
+		// TODO status code
+
 		// Remove the MDC
 		MDC.clear();
 	}
