@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.logging.config;
+package com.foreach.across.modules.logging.request;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Andy Somers
@@ -22,8 +25,10 @@ public enum RequestLogger
 {
 	// Do not log any requests
 	NONE,
-	// Log requests through the RequestLogFilter
+	// Log requests through the RequestLoggerFilter
 	FILTER,
 	// Log requests through the RequestLogInterceptor
-	INTERCEPTOR
+	INTERCEPTOR;
+
+	public static final Logger LOG = LoggerFactory.getLogger( RequestLogger.class );
 }

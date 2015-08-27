@@ -25,9 +25,7 @@ import org.springframework.core.Ordered;
 /**
  * @author Andy Somers
  */
-@AcrossDepends(
-		optional = { AcrossWebModule.NAME, "DebugWebModule" }
-)
+@AcrossDepends(optional = { AcrossWebModule.NAME, "ApplicationInfoModule", "DebugWebModule" })
 @AcrossRole(value = AcrossModuleRole.APPLICATION, order = Ordered.HIGHEST_PRECEDENCE)
 public class LoggingModule extends AcrossModule
 {

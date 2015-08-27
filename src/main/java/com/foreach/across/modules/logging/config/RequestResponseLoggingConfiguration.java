@@ -85,7 +85,7 @@ public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServlet
 
 	@Override
 	protected void dynamicConfigurationAllowed( ServletContext servletContext ) throws ServletException {
-		FilterRegistration.Dynamic filter = servletContext.addFilter( "loggingFilter", requestResponseLoggingFilter() );
+		FilterRegistration.Dynamic filter = servletContext.addFilter( "requestResponseLogFilter", requestResponseLoggingFilter() );
 
 		Collection<String> urlFilterMappings = logConfiguration().getUrlFilterMappings();
 		Collection<String> servletNameFilterMappings = logConfiguration().getServletNameFilterMappings();

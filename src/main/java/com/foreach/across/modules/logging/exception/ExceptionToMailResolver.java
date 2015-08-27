@@ -15,7 +15,8 @@
  */
 package com.foreach.across.modules.logging.exception;
 
-import com.foreach.across.modules.logging.filters.RequestLogFilter;
+import com.foreach.across.modules.logging.request.LogHandlerAndViewNameInterceptor;
+import com.foreach.across.modules.logging.request.RequestLoggerFilter;
 import com.foreach.common.spring.context.ApplicationContextInfo;
 import com.foreach.common.spring.mail.MailService;
 import com.foreach.common.web.util.WebUtils;
@@ -185,7 +186,7 @@ public class ExceptionToMailResolver extends SimpleMappingExceptionResolver
 		html.print( TABLE_START_TAG );
 
 		String uniqueId =
-				StringUtils.defaultIfBlank( (String) request.getAttribute( RequestLogFilter.ATTRIBUTE_UNIQUE_ID ),
+				StringUtils.defaultIfBlank( (String) request.getAttribute( RequestLoggerFilter.ATTRIBUTE_UNIQUE_ID ),
 				                            "unavailable" );
 
 		writeParam( html, "request id", uniqueId + " (duration: " + getRequestDuration( request ) + ")" );
@@ -208,7 +209,7 @@ public class ExceptionToMailResolver extends SimpleMappingExceptionResolver
 		writeParam( html, "controller", handler != null ? handler.getClass() : "-" );
 
 		String viewName =
-				StringUtils.defaultIfBlank( (String) request.getAttribute( RequestLogFilter.ATTRIBUTE_VIEW_NAME ),
+				StringUtils.defaultIfBlank( (String) request.getAttribute( LogHandlerAndViewNameInterceptor.ATTRIBUTE_VIEW_NAME ),
 				                            "-" );
 
 		writeParam( html, "view", viewName );
@@ -327,7 +328,7 @@ public class ExceptionToMailResolver extends SimpleMappingExceptionResolver
 	}
 
 	private String getRequestDuration( HttpServletRequest request ) {
-		Long startTime = (Long) request.getAttribute( RequestLogFilter.ATTRIBUTE_START_TIME );
+		Long startTime = (Long) request.getAttribute( RequestLoggerFilter.ATTRIBUTE_START_TIME );
 
 		if ( startTime == null ) {
 

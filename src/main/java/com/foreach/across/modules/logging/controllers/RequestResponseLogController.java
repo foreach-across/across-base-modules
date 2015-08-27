@@ -36,8 +36,10 @@ public class RequestResponseLogController
 {
 	@Autowired
 	private RequestResponseLogRegistry logRegistry;
+
 	@Autowired
 	private RequestResponseLoggingFilter logFilter;
+
 	@Autowired
 	private DebugWeb debugWeb;
 

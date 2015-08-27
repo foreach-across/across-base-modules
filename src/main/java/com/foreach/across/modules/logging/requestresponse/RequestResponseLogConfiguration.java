@@ -15,23 +15,16 @@
  */
 package com.foreach.across.modules.logging.requestresponse;
 
-import org.springframework.util.Assert;
-
-import java.util.Collection;
-import java.util.Collections;
+import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
 
 /**
  * Configuration instance for request/response debug logging.
  *
  * @author Arne Vandamme
  */
-public class RequestResponseLogConfiguration
+public class RequestResponseLogConfiguration extends RequestLoggerConfiguration
 {
 	private int maxEntries = 100;
-	private Collection<String> includedPathPatterns;
-	private Collection<String> excludedPathPatterns;
-	private Collection<String> urlFilterMappings = Collections.singleton( "/*" );
-	private Collection<String> servletNameFilterMappings = Collections.emptySet();
 	private boolean paused = false;
 
 	public int getMaxEntries() {
@@ -42,46 +35,16 @@ public class RequestResponseLogConfiguration
 		this.maxEntries = maxEntries;
 	}
 
-	public Collection<String> getIncludedPathPatterns() {
-		return includedPathPatterns;
-	}
-
-	public void setIncludedPathPatterns( Collection<String> includedPathPatterns ) {
-		this.includedPathPatterns = includedPathPatterns;
-	}
-
-	public Collection<String> getExcludedPathPatterns() {
-		return excludedPathPatterns;
-	}
-
-	public void setExcludedPathPatterns( Collection<String> excludedPathPatterns ) {
-		this.excludedPathPatterns = excludedPathPatterns;
-	}
-
-	public Collection<String> getUrlFilterMappings() {
-		return urlFilterMappings;
-	}
-
-	public void setUrlFilterMappings( Collection<String> urlFilterMappings ) {
-		Assert.notNull( urlFilterMappings );
-		this.urlFilterMappings = urlFilterMappings;
-	}
-
-	public Collection<String> getServletNameFilterMappings() {
-		return servletNameFilterMappings;
-	}
-
-	public void setServletNameFilterMappings( Collection<String> servletNameFilterMappings ) {
-		Assert.notNull( servletNameFilterMappings );
-		this.servletNameFilterMappings = servletNameFilterMappings;
-	}
-
 	public boolean isPaused() {
 		return paused;
 	}
 
 	public void setPaused( boolean paused ) {
 		this.paused = paused;
+	}
+
+	public static RequestResponseLogConfiguration allRequests() {
+		return new RequestResponseLogConfiguration();
 	}
 }
 
