@@ -20,6 +20,7 @@ import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.table.Table;
+import liquibase.util.StringUtils;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 import org.springframework.web.servlet.handler.AbstractHandlerMethodMapping;
+import org.springframework.web.servlet.handler.MappedInterceptor;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -45,7 +47,7 @@ public class SpringInfoController
 	private ApplicationContext applicationContext;
 
 	@Event
-	@SuppressWarnings( "unused" )
+	@SuppressWarnings("unused")
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder()
 		     .group( "/across/web", "AcrossWebModule" ).and()
@@ -61,19 +63,31 @@ public class SpringInfoController
 					(ListableBeanFactory) applicationContext.getAutowireCapableBeanFactory(),
 					AbstractHandlerMapping.class );
 
-			Field field = AbstractHandlerMapping.class.getDeclaredField( "interceptors" );
-			field.setAccessible( true );
+			Field interceptorsField = AbstractHandlerMapping.class.getDeclaredField( "interceptors" );
+			interceptorsField.setAccessible( true );
+
+			Field mappedInterceptorsField = AbstractHandlerMapping.class.getDeclaredField( "mappedInterceptors" );
+			mappedInterceptorsField.setAccessible( true );
 
 			List<Table> tables = new LinkedList<>();
 			for ( Map.Entry<String, AbstractHandlerMapping> handlerEntry : handlers.entrySet() ) {
 
 				Table table = new Table( handlerEntry.getKey() + " - " + handlerEntry.getValue().getClass().getName() );
 
-				List<Object> interceptors = (List<Object>) field.get( handlerEntry.getValue() );
+				List<Object> interceptors = (List<Object>) interceptorsField.get( handlerEntry.getValue() );
 				if ( interceptors != null ) {
 					int index = 0;
 					for ( Object interceptor : interceptors ) {
-						table.addRow( ++index, interceptor.getClass().getName() );
+						table.addRow( ++index, interceptor.getClass().getName(), "" );
+					}
+				}
+
+				List<MappedInterceptor> mappedInterceptors = (List<MappedInterceptor>) mappedInterceptorsField.get(
+						handlerEntry.getValue() );
+				if ( mappedInterceptors != null ) {
+					for ( MappedInterceptor interceptor : mappedInterceptors ) {
+						table.addRow( "mapped", interceptor.getInterceptor().getClass().getName(),
+						              StringUtils.join( interceptor.getPathPatterns(), ", " ) );
 					}
 				}
 
@@ -90,7 +104,7 @@ public class SpringInfoController
 	}
 
 	@RequestMapping("/spring/handlers")
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public String showHandlers( Model model ) {
 		Map<String, AbstractHandlerMethodMapping> handlers = BeanFactoryUtils.beansOfTypeIncludingAncestors(
 				(ListableBeanFactory) applicationContext.getAutowireCapableBeanFactory(),
