@@ -96,29 +96,38 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 			long startTime = System.currentTimeMillis();
 			request.setAttribute( ATTRIBUTE_START_TIME, startTime );
 
-			chain.doFilter( request, response );
+			boolean finished = false;
 
-			if ( REQUEST_LOG.isDebugEnabled() ) {
-				// Determine duration before sending the log
-				long duration = System.currentTimeMillis() - startTime;
+			try {
+				chain.doFilter( request, response );
 
-				String handlerName = (String) request.getAttribute(
-						LogHandlerAndViewNameInterceptor.ATTRIBUTE_HANDLER );
-				String viewName = (String) request.getAttribute( LogHandlerAndViewNameInterceptor.ATTRIBUTE_VIEW_NAME );
-				String requestMapping = (String) request.getAttribute( HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE );
+				finished = true;
+			}
+			finally {
+				if ( REQUEST_LOG.isDebugEnabled() ) {
+					// Determine duration before sending the log
+					long duration = System.currentTimeMillis() - startTime;
 
-				REQUEST_LOG.debug(
-						"{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
-						request.getRemoteAddr(),
-						request.getMethod(),
-						createUrlFromRequest( request ),
-						request.getServletPath(),
-						StringUtils.defaultString( requestMapping, "-" ),
-						StringUtils.defaultString( handlerName, "-" ),
-						StringUtils.defaultString( viewName, "-" ),
-						response.getStatus(),
-						duration
-				);
+					String handlerName = (String) request.getAttribute(
+							LogHandlerAndViewNameInterceptor.ATTRIBUTE_HANDLER );
+					String viewName = (String) request.getAttribute(
+							LogHandlerAndViewNameInterceptor.ATTRIBUTE_VIEW_NAME );
+					String requestMapping = (String) request.getAttribute(
+							HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE );
+
+					REQUEST_LOG.debug(
+							"{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
+							request.getRemoteAddr(),
+							request.getMethod(),
+							createUrlFromRequest( request ),
+							request.getServletPath(),
+							StringUtils.defaultString( requestMapping, "-" ),
+							StringUtils.defaultString( handlerName, "-" ),
+							StringUtils.defaultString( viewName, "-" ),
+							finished ? response.getStatus() : -1,
+							duration
+					);
+				}
 			}
 
 			// Remove the MDC
