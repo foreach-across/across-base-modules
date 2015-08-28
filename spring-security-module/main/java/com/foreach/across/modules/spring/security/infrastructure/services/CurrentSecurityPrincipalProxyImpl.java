@@ -15,13 +15,15 @@
  */
 package com.foreach.across.modules.spring.security.infrastructure.services;
 
+import com.foreach.across.modules.spring.security.authority.NamedGrantedAuthority;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalAuthenticationToken;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalHierarchy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +36,9 @@ import java.util.Collections;
  * {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal}.
  * <p>
  * The proxy will attempt to load the SecurityPrincipal if it is not yet available (for example
- * only the principal name is loaded on the Authentication object).  This will replace the entire
- * {@link org.springframework.security.core.Authentication} instance by a
- * {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalAuthenticationToken}
- * with the same credentials and authorities as the original authentication.
+ * only the principal name is loaded on the Authentication object).  Be aware that this will done
+ * every time if the implementing {@link org.springframework.security.core.Authentication} does not
+ * hold the {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal} instance.
  * </p>
  *
  * @author Arne Vandamme
@@ -45,17 +46,25 @@ import java.util.Collections;
 @Service
 public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincipalProxy, SecurityPrincipalHierarchy
 {
+	private static final Logger LOG = LoggerFactory.getLogger( CurrentSecurityPrincipalProxyImpl.class );
+
 	@Autowired
 	private SecurityPrincipalService securityPrincipalService;
 
 	@Override
 	public boolean isAuthenticated() {
-		return getPrincipal() != null;
+		Authentication currentAuthentication = currentAuthentication();
+		return currentAuthentication != null && currentAuthentication.isAuthenticated();
 	}
 
 	@Override
 	public boolean hasAuthority( String authority ) {
-		return isAuthenticated() && getPrincipal().getAuthorities().contains( new SimpleGrantedAuthority( authority ) );
+		return hasAuthority( new NamedGrantedAuthority( authority ) );
+	}
+
+	@Override
+	public boolean hasAuthority( GrantedAuthority authority ) {
+		return isAuthenticated() && currentAuthentication().getAuthorities().contains( authority );
 	}
 
 	@Override
@@ -66,12 +75,16 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 
 	@Override
 	public String getPrincipalName() {
-		return isAuthenticated() ? getPrincipal().getPrincipalName() : null;
+		return isAuthenticated() ? currentAuthentication().getName() : null;
 	}
 
 	@Override
-	public Collection<GrantedAuthority> getAuthorities() {
-		return isAuthenticated() ? getPrincipal().getAuthorities() : Collections.<GrantedAuthority>emptyList();
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return isAuthenticated() ? currentAuthentication().getAuthorities() : Collections.<GrantedAuthority>emptyList();
+	}
+
+	private Authentication currentAuthentication() {
+		return SecurityContextHolder.getContext().getAuthentication();
 	}
 
 	@Override
@@ -84,10 +97,9 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 	}
 
 	private SecurityPrincipal loadPrincipal() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Authentication authentication = currentAuthentication();
 
 		if ( authentication != null && authentication.isAuthenticated() ) {
-
 			if ( authentication instanceof SecurityPrincipalAuthenticationToken ) {
 				return ( (SecurityPrincipalAuthenticationToken) authentication ).getPrincipal();
 			}
@@ -98,22 +110,14 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 				return (SecurityPrincipal) authenticationPrincipal;
 			}
 
-			SecurityPrincipal fetchedPrincipal;
-
 			if ( authenticationPrincipal instanceof String ) {
-				fetchedPrincipal = securityPrincipalService.getPrincipalByName( (String) authenticationPrincipal );
-			}
-			else {
-				fetchedPrincipal = securityPrincipalService.getPrincipalByName( authentication.getName() );
+				LOG.debug( "Loading SecurityPrincipal with name {}", authenticationPrincipal );
+				return securityPrincipalService.getPrincipalByName( (String) authenticationPrincipal );
+
 			}
 
-			SecurityContextHolder.getContext().setAuthentication(
-					new SecurityPrincipalAuthenticationToken(
-							fetchedPrincipal, authentication.getCredentials(), authentication.getAuthorities()
-					)
-			);
-
-			return fetchedPrincipal;
+			LOG.debug( "Loading SecurityPrincipal with name {}", authentication.getName() );
+			return securityPrincipalService.getPrincipalByName( authentication.getName() );
 		}
 
 		return null;

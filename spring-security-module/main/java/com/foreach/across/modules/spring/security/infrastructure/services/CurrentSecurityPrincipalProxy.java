@@ -16,6 +16,7 @@
 package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import org.springframework.security.core.GrantedAuthority;
 
 /**
  * @author Arne Vandamme
@@ -25,6 +26,8 @@ public interface CurrentSecurityPrincipalProxy extends SecurityPrincipal
 	boolean isAuthenticated();
 
 	boolean hasAuthority( String authority );
+
+	boolean hasAuthority( GrantedAuthority authority );
 
 	<T extends SecurityPrincipal> T getPrincipal();
 }
