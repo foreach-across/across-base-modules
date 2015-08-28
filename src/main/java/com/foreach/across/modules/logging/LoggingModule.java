@@ -19,14 +19,12 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.AcrossRole;
 import com.foreach.across.core.context.AcrossModuleRole;
-import com.foreach.across.modules.web.AcrossWebModule;
-import org.springframework.core.Ordered;
 
 /**
  * @author Andy Somers
  */
-@AcrossDepends(optional = { AcrossWebModule.NAME, "ApplicationInfoModule", "DebugWebModule" })
-@AcrossRole(value = AcrossModuleRole.APPLICATION, order = Ordered.HIGHEST_PRECEDENCE)
+@AcrossDepends(optional = { "AcrossWebModule", "DebugWebModule" })
+@AcrossRole(value = AcrossModuleRole.INFRASTRUCTURE)
 public class LoggingModule extends AcrossModule
 {
 	public static final String NAME = "LoggingModule";

@@ -16,16 +16,17 @@
 package com.foreach.across.modules.logging.controllers;
 
 import com.foreach.across.core.annotations.Event;
-import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogRegistry;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLoggingFilter;
+import com.foreach.across.modules.web.resource.WebResourceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,9 +40,6 @@ public class RequestResponseLogController
 
 	@Autowired
 	private RequestResponseLoggingFilter logFilter;
-
-	@Autowired
-	private DebugWeb debugWeb;
 
 	@Event
 	public void buildMenu( DebugMenuEvent event ) {
@@ -71,7 +69,7 @@ public class RequestResponseLogController
 	public String settings( Model model,
 	                        @RequestParam(value = "excludedPathPatterns", required = false) String excludedPathPatterns,
 	                        @RequestParam(value = "includedPathPatterns",
-	                                      required = false) String includedPathPatterns ) {
+			                        required = false) String includedPathPatterns ) {
 		model.addAttribute( "logFilter", logFilter );
 		if ( excludedPathPatterns != null ) {
 			logFilter.setExcludedPathPatterns( fromTextArea( excludedPathPatterns ) );
@@ -83,15 +81,15 @@ public class RequestResponseLogController
 	}
 
 	@RequestMapping("/logging/requestResponse/pause")
-	public String pauseLogger() {
+	public String pauseLogger( HttpServletRequest request ) {
 		logFilter.setPaused( true );
-		return debugWeb.redirect( "/logging/requestResponse/list" );
+		return WebResourceUtils.getPathResolver( request ).redirect( "/logging/requestResponse/list" );
 	}
 
 	@RequestMapping("/logging/requestResponse/resume")
-	public String resumeLogger() {
+	public String resumeLogger( HttpServletRequest request ) {
 		logFilter.setPaused( false );
-		return debugWeb.redirect( "/logging/requestResponse/list" );
+		return WebResourceUtils.getPathResolver( request ).redirect( "/logging/requestResponse/list" );
 	}
 
 	private List<String> fromTextArea( String items ) {
