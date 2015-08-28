@@ -18,7 +18,7 @@ package com.foreach.across.modules.spring.security;
 /**
  * @author Arne Vandamme
  */
-public interface SpringSecurityCache
+public interface SpringSecurityModuleCache
 {
 	String SECURITY_PRINCIPAL = "securityPrincipalCache";
 }
