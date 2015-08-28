@@ -76,7 +76,8 @@
 				</td>
 				<td th:text="*{cache.size}">0</td>
 				<td th:text="*{cache.cacheConfiguration.maxEntriesLocalHeap}">0</td>
-				<td th:text="*{#numbers.formatDecimal(size / 1024.0 / 1024.0,1,2)} + ' MB'">0</td>
+				<td th:if="*{size}" th:text="*{#numbers.formatDecimal(size / 1024.0 / 1024.0,1,2)} + ' MB'">0</td>
+				<td th:unless="*{size}"></td>
 				<td th:if="*{percentageOfTotal eq 0}"></td>
 				<td th:unless="*{percentageOfTotal eq 0}" th:text="*{#numbers.formatDecimal(percentageOfTotal  *100,1,2)} + ' %'">0</td>
 				<td th:unless="*{estimatedMax}"></td>
