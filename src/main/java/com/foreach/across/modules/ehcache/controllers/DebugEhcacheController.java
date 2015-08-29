@@ -27,7 +27,6 @@ import com.foreach.across.modules.web.table.Table;
 import com.foreach.across.modules.web.table.TableHeader;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.distribution.CacheManagerPeerProvider;
 import net.sf.ehcache.distribution.CachePeer;
@@ -86,26 +85,7 @@ public class DebugEhcacheController
 
 	@RequestMapping(value = "/ehcache", method = RequestMethod.GET)
 	public String listCaches( @ModelAttribute("cacheManager") CacheManager cacheManager, Model model ) {
-		Collection<Ehcache> caches = new LinkedList<Ehcache>();
-
-		Map<String, Number> heapSizes = new HashMap<>();
-
-		for ( String cacheName : cacheManager.getCacheNames() ) {
-			Cache cache = cacheManager.getCache( cacheName );
-
-			try {
-				heapSizes.put( cache.getName(), cache.getStatistics().getExtended().localHeapSizeInBytes().value() );
-			}
-			catch ( Exception e ) {
-				// Exception calculating heap size (classloading exception)
-				LOG.warn( "Unable to calculate heap size for cache {}", cacheName, e );
-			}
-
-			caches.add( cache );
-		}
-
-		model.addAttribute( "cacheList", caches );
-		model.addAttribute( "heapSizes", heapSizes );
+		model.addAttribute( "cacheList", cacheList( cacheManager ) );
 
 		//cacheManager.getCacheManagerEventListenerRegistry().getRegisteredListeners().iterator().next()
 		Map<String, CacheManagerPeerProvider> cacheManagerPeerProviders = cacheManager.getCacheManagerPeerProviders();

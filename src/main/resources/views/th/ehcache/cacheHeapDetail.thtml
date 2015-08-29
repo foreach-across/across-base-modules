@@ -78,8 +78,8 @@
 				<td th:text="*{cache.cacheConfiguration.maxEntriesLocalHeap}">0</td>
 				<td th:if="*{size}" th:text="*{#numbers.formatDecimal(size / 1024.0 / 1024.0,1,2)} + ' MB'">0</td>
 				<td th:unless="*{size}"></td>
-				<td th:if="*{percentageOfTotal eq 0}"></td>
-				<td th:unless="*{percentageOfTotal eq 0}" th:text="*{#numbers.formatDecimal(percentageOfTotal  *100,1,2)} + ' %'">0</td>
+				<td th:unless="*{percentageOfTotal != null and percentageOfTotal != 0}">0</td>
+				<td th:if="*{percentageOfTotal != null and percentageOfTotal != 0}" th:text="*{#numbers.formatDecimal(percentageOfTotal * 100,1,2)} + ' %'">0</td>
 				<td th:unless="*{estimatedMax}"></td>
 				<td th:if="*{estimatedMax}" th:text="*{#numbers.formatDecimal(estimatedMax / 1024.0 / 1024.0,1,2)} + ' MB'">0</td>
 				<td class="text-center">
