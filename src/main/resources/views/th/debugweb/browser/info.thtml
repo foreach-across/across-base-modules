@@ -61,6 +61,15 @@
 			<td th:text="${selectedContext.name}"></td>
 		</tr>
 		<tr>
+			<th class="col-sm-2">Across core</th>
+			<td>
+				<span th:text="${selectedContext.contextInfo.versionInfo.version}">version</span>
+				<th:block th:if="${selectedContext.contextInfo.versionInfo.snapshot and selectedContext.contextInfo.versionInfo.buildTime != null}">
+					- <span th:text="${#dates.format(selectedContext.contextInfo.versionInfo.buildTime,'dd MMM yyyy HH:mm')}">build date</span>
+				</th:block>
+			</td>
+		</tr>
+		<tr>
 			<th class="col-sm-2">Description</th>
 			<td th:text="${selectedContext.applicationContext}"></td>
 		</tr>
@@ -82,14 +91,17 @@
 
 	<h5><strong>&nbsp; Modules</strong></h5>
 
-	<div class="col-sm-8">
+	<div class="col-sm-10">
 		<table class="moduleList table table-condensed table-bordered table-hover">
-			<tr th:each="moduleInfo : ${selectedContext.contextInfo.configuredModules}">
+			<tr th:each="moduleInfo : ${selectedContext.contextInfo.configuredModules}" th:classappend="${not moduleInfo.enabled} ? 'danger'">
 				<td>
 					<strong class="moduleIndex" th:text="${moduleInfoStat.count}"></strong>
 					<span th:text="${moduleInfo.name}"></span></td>
 				<td class="col-sm-3 text-center" th:text="${moduleInfo.moduleRole}"></td>
-				<td class="col-sm-2 text-center"><span th:unless="${moduleInfo.enabled}" class="label label-danger">disabled</span>
+				<td class="col-sm-2 text-center" th:text="${moduleInfo.versionInfo.version}"></td>
+				<td class="col-sm-2 text-center">
+					<span th:if="${moduleInfo.versionInfo.snapshot and moduleInfo.versionInfo.buildTime != null}"
+							th:text="${#dates.format(moduleInfo.versionInfo.buildTime,'dd MMM yyyy HH:mm')}">build date</span>
 				</td>
 			</tr>
 		</table>
