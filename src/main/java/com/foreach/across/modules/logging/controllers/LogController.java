@@ -49,23 +49,36 @@ public class LogController
 		List<Level> levels = Arrays.asList( Level.OFF, Level.TRACE, Level.ERROR, Level.WARN, Level.INFO, Level.DEBUG );
 
 		Map<String, Level> loggerMap = new TreeMap<>();
-		Map<String, String> appenderMap = new TreeMap<>();
+
+		Set<Appender> appenderSet = new HashSet<>();
 
 		for ( Logger logger : loggers ) {
 			loggerMap.put( logger.getName(), logger.getEffectiveLevel() );
 
 			Iterator<Appender<ILoggingEvent>> appenders = logger.iteratorForAppenders();
 			while ( appenders.hasNext() ) {
-				Appender appender = appenders.next();
-				if ( appender instanceof FileAppender ) {
-					FileAppender fileAppender = (FileAppender) appender;
-					String filename = fileAppender.getFile();
-					appenderMap.put( appender.getName(), filename );
-				}
-				else {
-					appenderMap.put( appender.getName(), appender.toString() );
-				}
+				appenderSet.add( appenders.next() );
+			}
+		}
 
+		Map<String, String> appenderMap = new TreeMap<>();
+
+		int unnamedAppenders = 0;
+
+		for ( Appender appender : appenderSet ) {
+			String appenderName = appender.getName();
+
+			if ( appenderName == null ) {
+				appenderName = "<unnamed-" + ++unnamedAppenders + ">";
+			}
+
+			if ( appender instanceof FileAppender ) {
+				FileAppender fileAppender = (FileAppender) appender;
+				String filename = fileAppender.getFile();
+				appenderMap.put( appenderName, filename );
+			}
+			else {
+				appenderMap.put( appenderName, appender.toString() );
 			}
 		}
 
@@ -76,7 +89,7 @@ public class LogController
 		return "th/logging/listLoggers";
 	}
 
-	@RequestMapping(value = "/loggers", method = RequestMethod.POST)
+	@RequestMapping(value = "/logging/loggers", method = RequestMethod.POST)
 	public String updateLoggers( Model model, HttpServletRequest request ) {
 		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		List<Logger> loggers = loggerContext.getLoggerList();
