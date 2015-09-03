@@ -55,7 +55,12 @@ public class SecurityPrincipalServiceImpl implements SecurityPrincipalService
 		SecurityContextHolder.clearContext();
 	}
 
-	@Cacheable(value = SpringSecurityModuleCache.SECURITY_PRINCIPAL, unless = SpringSecurityModuleCache.UNLESS_NULLS_ONLY)
+	@Cacheable(
+			value = SpringSecurityModuleCache.SECURITY_PRINCIPAL,
+			key = "#principalName.toLowerCase()",
+			condition = "#principalName != null",
+			unless = SpringSecurityModuleCache.UNLESS_NULLS_ONLY
+	)
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends SecurityPrincipal> T getPrincipalByName( String principalName ) {
