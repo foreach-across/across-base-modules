@@ -20,5 +20,11 @@ package com.foreach.across.modules.spring.security;
  */
 public interface SpringSecurityModuleCache
 {
+	/**
+	 * Unless property for {@link org.springframework.cache.annotation.Cacheable} that will ensure only null
+	 * values are cached and otherwise assumes that caching has been performed by a repository.
+	 */
+	String UNLESS_NULLS_ONLY = "true && #result != null";
+
 	String SECURITY_PRINCIPAL = "securityPrincipalCache";
 }
