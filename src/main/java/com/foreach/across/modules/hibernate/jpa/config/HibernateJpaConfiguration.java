@@ -78,7 +78,7 @@ public class HibernateJpaConfiguration
 	@Autowired
 	private HibernatePackage hibernatePackage;
 
-	@Bean
+	@Bean(name = "entityManagerFactory")
 	@Exposed
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();

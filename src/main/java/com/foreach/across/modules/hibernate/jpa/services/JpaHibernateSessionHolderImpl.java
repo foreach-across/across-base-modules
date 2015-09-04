@@ -18,6 +18,7 @@ package com.foreach.across.modules.hibernate.jpa.services;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -31,6 +32,7 @@ import javax.persistence.PersistenceContext;
 public class JpaHibernateSessionHolderImpl implements HibernateSessionHolder
 {
 	@Autowired
+	@Qualifier("entityManagerFactory")
 	private EntityManagerFactory entityManagerFactory;
 
 	@PersistenceContext
