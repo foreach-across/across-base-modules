@@ -38,7 +38,6 @@ public class AcrossHibernateModuleSettings extends AcrossModuleSettings
 
 	@Override
 	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
-
 		registry.register( CREATE_TRANSACTION_MANAGER, Boolean.class, true,
 		                   "Should a TransactionManager bean be created.  If true this will also enable support for " +
 				                   "@Transaction in all modules bootstrapping later." );

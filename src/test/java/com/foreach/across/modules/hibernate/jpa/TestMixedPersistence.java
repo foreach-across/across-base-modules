@@ -55,7 +55,6 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestMixedPersistence.Config.class)
 public class TestMixedPersistence
 {
-
 	@Autowired
 	private AcrossContextBeanRegistry beanRegistry;
 
