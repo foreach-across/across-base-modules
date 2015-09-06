@@ -49,4 +49,9 @@ public class DebugWebControllersConfiguration
 	public ThreadsController threadsController() {
 		return new ThreadsController();
 	}
+
+	@Bean
+	public DataSourcesController dataSourcesController() {
+		return new DataSourcesController();
+	}
 }

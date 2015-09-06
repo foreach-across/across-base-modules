@@ -19,6 +19,8 @@ import com.foreach.across.modules.web.context.PrefixingPathContext;
 
 public final class DebugWeb extends PrefixingPathContext
 {
+	public static final String NAME = "debugWeb";
+
 	public static final String MODULE = DebugWebModule.NAME;
 	public static final String VIEWS = "debugweb";
 
@@ -39,6 +41,7 @@ public final class DebugWeb extends PrefixingPathContext
 	public static final String VIEW_APPLICATION_PROPERTIES = "th/debugweb/listApplicationProperties";
 	public static final String VIEW_THREADS = "th/debugweb/listThreads";
 	public static final String VIEW_MODULES = "th/debugweb/listAcrossModules";
+	public static final String VIEW_DATASOURCES = "th/debugweb/listDataSources";
 
 	public static final String VIEW_SERVLET_FILTERS = "th/debugweb/servlet/filters";
 	public static final String VIEW_SERVLET_SERVLETS = "th/debugweb/servlet/servlets";
