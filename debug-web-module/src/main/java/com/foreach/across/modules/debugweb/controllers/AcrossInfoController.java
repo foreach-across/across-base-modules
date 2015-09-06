@@ -15,17 +15,14 @@
  */
 package com.foreach.across.modules.debugweb.controllers;
 
-import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.context.ExposedBeanDefinition;
 import com.foreach.across.core.context.info.AcrossContextInfo;
-import com.foreach.across.core.events.AcrossEvent;
 import com.foreach.across.core.events.AcrossEventPublisher;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.debugweb.util.ContextDebugInfo;
-import gigadot.rebound.Rebound;
 import net.engio.mbassy.listener.Handler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -263,37 +260,6 @@ public class AcrossInfoController
 		}
 
 		return sources;
-	}
-
-	@RequestMapping("/across/browser/events/{index}")
-	public String showContextEvents( @ModelAttribute("contexts") List<ContextDebugInfo> contexts,
-	                                 @PathVariable("index") int index,
-	                                 Model model ) {
-		ContextDebugInfo selected = contexts.get( index );
-
-		String modulePackage = null;
-
-		if ( selected.isModule() ) {
-			modulePackage = selected.getModuleInfo().getModule().getClass().getPackage().getName();
-		}
-		else if ( selected.isAcrossContext() ) {
-			modulePackage = AcrossContext.class.getPackage().getName();
-		}
-
-		if ( modulePackage != null ) {
-			Rebound rebound = new Rebound( modulePackage );
-			Set<Class<? extends AcrossEvent>> eventTypes = rebound.getSubClassesOf( AcrossEvent.class );
-
-			model.addAttribute( "modulePackage", modulePackage );
-			model.addAttribute( "eventTypes", eventTypes );
-		}
-
-		model.addAttribute( "selectedContextIndex", contexts.indexOf( selected ) );
-		model.addAttribute( "selectedContext", selected );
-		model.addAttribute( "section", "events" );
-		model.addAttribute( "sectionTemplate", DebugWeb.VIEW_BROWSER_EVENTS );
-
-		return DebugWeb.LAYOUT_BROWSER;
 	}
 
 	@RequestMapping("/across/browser/handlers/{index}")

@@ -33,7 +33,6 @@ public final class DebugWeb extends PrefixingPathContext
 	public static final String VIEW_BROWSER_BEANS = "th/debugweb/browser/beans";
 	public static final String VIEW_BROWSER_PROPERTIES = "th/debugweb/browser/properties";
 	public static final String VIEW_BROWSER_HANDLERS = "th/debugweb/browser/handlers";
-	public static final String VIEW_BROWSER_EVENTS = "th/debugweb/browser/events";
 
 	public static final String VIEW_SPRING_BEANS = "th/debugweb/listBeans";
 	public static final String VIEW_SPRING_INTERCEPTORS = "th/debugweb/listInterceptors";

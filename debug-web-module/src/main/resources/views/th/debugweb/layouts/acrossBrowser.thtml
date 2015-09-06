@@ -58,8 +58,6 @@
 			<li th:classappend="${section == 'properties'} ? 'active'">
 				<a th:href="@{${@debugWeb.path('/across/browser/properties/' + selectedContextIndex)}}">Properties</a>
 			</li>
-			<li th:classappend="${section == 'events'} ? 'active'">
-				<a th:href="@{${@debugWeb.path('/across/browser/events/' + selectedContextIndex)}}">Events</a></li>
 			<li th:classappend="${section == 'handlers'} ? 'active'">
 				<a th:href="@{${@debugWeb.path('/across/browser/handlers/' + selectedContextIndex)}}">Event handlers</a>
 			</li>
