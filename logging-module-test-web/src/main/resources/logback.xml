@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+	<appender name="pages" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="methods" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%logger{0}\t%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="com.foreach.across.modules.logging.request.RequestLogger" level="debug" additivity="false">
+		<appender-ref ref="pages"/>
+	</logger>
+
+	<logger name="com.foreach.across.modules.logging.method.MethodLogger" level="info" additivity="false">
+		<appender-ref ref="methods"/>
+	</logger>
+
+	<root level="warn"/>
+</configuration>
