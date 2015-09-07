@@ -103,7 +103,7 @@
 	</build>
 
 	<scm>
-		<connection>scm:git:https://bitbucket.org/beforeach/logging--module.git</connection>
+		<connection>scm:git:https://bitbucket.org/beforeach/logging-module.git</connection>
 		<developerConnection>scm:git:https://bitbucket.org/beforeach/logging-module.git</developerConnection>
 	</scm>
 
