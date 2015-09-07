@@ -29,6 +29,28 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>
+		DebugWebModule provides support for @DebugWebControllers in other modules.  The purpose is mainly for
+		technical configuration and debugging.
+	</description>
+	<url>https://foreach.atlassian.net/wiki/display/AX/DebugWebModule</url>
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Arne Vandamme</name>
+			<email>arne@foreach.be</email>
+			<organization>Foreach</organization>
+			<organizationUrl>http://www.foreach.be</organizationUrl>
+		</developer>
+	</developers>
+
 	<repositories>
 		<repository>
 			<id>foreach-nexus</id>
@@ -37,9 +59,19 @@
 		</repository>
 	</repositories>
 
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
 	<modules>
 		<module>debug-web-module</module>
 		<module>debug-web-test-web</module>
 	</modules>
+
+	<scm>
+		<connection>scm:git:https://bitbucket.org/beforeach/debug-web-module.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/beforeach/debug-web-module.git</developerConnection>
+	</scm>
 
 </project>
