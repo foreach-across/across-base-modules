@@ -21,6 +21,8 @@ import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.table.Table;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -120,6 +122,16 @@ public class DataSourcesController
 			}
 			catch ( IllegalAccessException | NoClassDefFoundError | InvocationTargetException e ) {
 				table.addRow( m.getName(), "-" );
+			}
+		}
+
+		String fieldsString = ReflectionToStringBuilder.reflectionToString( object, ToStringStyle.MULTI_LINE_STYLE,
+		                                                                    true );
+		if ( StringUtils.isNotBlank( fieldsString ) ) {
+			for ( String keyValue : StringUtils.split( fieldsString, System.lineSeparator() ) ) {
+				if ( StringUtils.contains( keyValue, "=" ) ) {
+					table.addRow( StringUtils.split( keyValue, "=", 2 ) );
+				}
 			}
 		}
 	}
