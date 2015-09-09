@@ -14,49 +14,87 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<parent>
-		<groupId>across-standard-modules</groupId>
-		<artifactId>across-standard-modules</artifactId>
-		<version>1.0.6-SNAPSHOT</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.foreach.across</groupId>
+        <artifactId>standard-module-bom</artifactId>
+        <version>1.0.6-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>across-hibernate</artifactId>
+    <groupId>com.foreach.across.modules</groupId>
+    <artifactId>across-hibernate-module-project</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-	<dependencies>
-		<dependency>
-			<groupId>across</groupId>
-			<artifactId>across-web</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-orm</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.logging</groupId>
-			<artifactId>jboss-logging</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-		</dependency>
-	</dependencies>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        Contains 2 modules: AcrossHibernateModule and AcrossHibernateJpaModule. Both build a Hibernate persistence layer
+        that other modules can provide entities for.
+    </description>
+    <url>https://foreach.atlassian.net/wiki/display/AX/AcrossHibernateModule</url>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>com.mysema.maven</groupId>
-				<artifactId>apt-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+    <developers>
+        <developer>
+            <name>Arne Vandamme</name>
+            <email>arne@foreach.be</email>
+            <organization>Foreach</organization>
+            <organizationUrl>http://www.foreach.be</organizationUrl>
+        </developer>
+    </developers>
+
+    <repositories>
+        <repository>
+            <id>foreach-nexus</id>
+            <name>Foreach repository</name>
+            <url>http://repository.foreach.be/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <modules>
+        <module>across-hibernate-module</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.5</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <finalName>${project.artifactId}</finalName>
+                    <descriptors>
+                        <descriptor>site.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <scm>
+        <connection>scm:git:https://bitbucket.org/beforeach/across-hibernate-module.git</connection>
+        <developerConnection>scm:git:https://bitbucket.org/beforeach/across-hibernate-module.git</developerConnection>
+    </scm>
 
 </project>
