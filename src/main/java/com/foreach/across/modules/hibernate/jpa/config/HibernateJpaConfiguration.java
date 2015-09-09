@@ -78,7 +78,7 @@ public class HibernateJpaConfiguration
 	@Autowired
 	private HibernatePackage hibernatePackage;
 
-	@Bean
+	@Bean(name = "entityManagerFactory")
 	@Exposed
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
@@ -87,6 +87,7 @@ public class HibernateJpaConfiguration
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter( vendorAdapter );
 		factory.setDataSource( module.getDataSource() );
+		factory.setPersistenceUnitName( settings.getPersistenceUnitName() );
 
 		String[] mappingResources = hibernatePackage.getMappingResources();
 		if ( mappingResources.length > 0 ) {

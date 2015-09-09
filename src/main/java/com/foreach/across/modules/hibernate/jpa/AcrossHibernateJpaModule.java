@@ -21,9 +21,11 @@ public class AcrossHibernateJpaModule extends AbstractHibernatePackageModule
 	public static final String NAME = "AcrossHibernateJpaModule";
 
 	public AcrossHibernateJpaModule() {
+		setPersistenceUnitName( getName() );
 	}
 
 	public AcrossHibernateJpaModule( DataSource dataSource ) {
+		this();
 		setDataSource( dataSource );
 	}
 
@@ -35,5 +37,9 @@ public class AcrossHibernateJpaModule extends AbstractHibernatePackageModule
 	@Override
 	public String getDescription() {
 		return "Enables JPA support on the Across context using Hibernate as the vendor implementation.";
+	}
+
+	protected void setPersistenceUnitName( String persistenceUnitName ) {
+		setProperty( AcrossHibernateJpaModuleSettings.PERSISTENCE_UNIT_NAME, persistenceUnitName );
 	}
 }

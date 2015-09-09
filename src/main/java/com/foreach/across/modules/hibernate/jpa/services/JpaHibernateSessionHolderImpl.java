@@ -18,11 +18,11 @@ package com.foreach.across.modules.hibernate.jpa.services;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.jpa.SharedEntityManagerCreator;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
 
 /**
  * @author Andy Somers
@@ -30,11 +30,18 @@ import javax.persistence.PersistenceContext;
 @Component
 public class JpaHibernateSessionHolderImpl implements HibernateSessionHolder
 {
-	@Autowired
 	private EntityManagerFactory entityManagerFactory;
-
-	@PersistenceContext
 	private EntityManager entityManager;
+
+	@Autowired
+	public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory ) {
+		this.entityManagerFactory = entityManagerFactory;
+
+		// Create a shared entity manager, based on behavior of PersistenceAnnotationBeanPostProcessor
+		// does not use a @PersistenceContext annotation as to ensure use of the local entity manager from the module,
+		// where the persistence unit name can be configured
+		this.entityManager = SharedEntityManagerCreator.createSharedEntityManager( entityManagerFactory, null, true );
+	}
 
 	@Override
 	public Session getCurrentSession() {

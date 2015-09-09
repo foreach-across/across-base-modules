@@ -16,6 +16,7 @@
 package com.foreach.across.modules.hibernate.testmodules.jpa;
 
 import com.foreach.across.core.annotations.Exposed;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,7 @@ import java.util.List;
 @Transactional(value = HibernateJpaConfiguration.TRANSACTION_MANAGER, readOnly = true)
 public class CustomerRepository
 {
-	@PersistenceContext
+	@PersistenceContext(unitName = AcrossHibernateJpaModule.NAME)
 	private EntityManager em;
 
 	@Transactional(HibernateJpaConfiguration.TRANSACTION_MANAGER)

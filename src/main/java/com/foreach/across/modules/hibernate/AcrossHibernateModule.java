@@ -32,9 +32,11 @@ public class AcrossHibernateModule extends AbstractHibernatePackageModule
 	public static final String NAME = "AcrossHibernateModule";
 
 	public AcrossHibernateModule() {
+		setHibernateProperty( "hibernate.cache.use_second_level_cache", "false" );
 	}
 
 	public AcrossHibernateModule( DataSource dataSource ) {
+		this();
 		setDataSource( dataSource );
 	}
 
