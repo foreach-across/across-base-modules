@@ -17,15 +17,23 @@ package com.foreach.across.modules.spring.security.infrastructure.config;
 
 import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
+import com.foreach.across.core.annotations.PostRefresh;
 import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
+import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
+import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.modules.spring.security.config.ModuleGlobalMethodSecurityConfiguration;
 import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * The security infrastructure bean is exposed and provides other modules easy access
@@ -37,9 +45,43 @@ import org.springframework.security.authentication.AuthenticationTrustResolverIm
 @AcrossEventHandler
 public class SecurityInfrastructure
 {
+	@Autowired
+	private AcrossContextBeanRegistry contextBeanRegistry;
+
 	@Bean
 	public AuthenticationTrustResolver authenticationTrustResolver() {
 		return new AuthenticationTrustResolverImpl();
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManager() {
+		return new DelegatingClientAuthenticationManager( contextBeanRegistry );
+	}
+
+	private static final class DelegatingClientAuthenticationManager implements AuthenticationManager
+	{
+		private final AcrossContextBeanRegistry contextBeanRegistry;
+		private AuthenticationManager delegate;
+
+		private DelegatingClientAuthenticationManager( AcrossContextBeanRegistry contextBeanRegistry ) {
+			this.contextBeanRegistry = contextBeanRegistry;
+		}
+
+		@Override
+		public Authentication authenticate( Authentication authentication ) throws AuthenticationException {
+			if ( delegate != null ) {
+				return delegate.authenticate( authentication );
+			}
+
+			return authentication;
+		}
+
+		@PostRefresh
+		public void refresh() {
+			delegate = contextBeanRegistry
+					.getBeanOfTypeFromModule( SpringSecurityModule.NAME, AuthenticationManagerBuilder.class )
+					.getOrBuild();
+		}
 	}
 
 	@Event
