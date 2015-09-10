@@ -24,11 +24,11 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
-			<directory>${project.basedir}/across-hibernate-module/target/apidocs</directory>
+			<directory>${project.basedir}/spring-security-module/target/apidocs</directory>
 			<outputDirectory>${project.version}/javadoc</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>${project.basedir}/across-hibernate-module/target/site</directory>
+			<directory>${project.basedir}/spring-security-module/target/site</directory>
 			<outputDirectory>.</outputDirectory>
 		</fileSet>
 	</fileSets>
