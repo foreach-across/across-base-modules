@@ -44,92 +44,92 @@ import java.util.Collections;
  * @author Arne Vandamme
  */
 @Service
-public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincipalProxy, SecurityPrincipalHierarchy
-{
-	private static final Logger LOG = LoggerFactory.getLogger( CurrentSecurityPrincipalProxyImpl.class );
+public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincipalProxy, SecurityPrincipalHierarchy {
+    private static final Logger LOG = LoggerFactory.getLogger(CurrentSecurityPrincipalProxyImpl.class);
 
-	@Autowired
-	private SecurityPrincipalService securityPrincipalService;
+    @Autowired
+    private SecurityPrincipalService securityPrincipalService;
 
-	@Override
-	public boolean isAuthenticated() {
-		Authentication currentAuthentication = currentAuthentication();
-		return currentAuthentication != null && currentAuthentication.isAuthenticated();
-	}
+    @Override
+    public boolean isAuthenticated() {
+        Authentication currentAuthentication = currentAuthentication();
+        return currentAuthentication != null && currentAuthentication.isAuthenticated();
+    }
 
-	@Override
-	public boolean hasAuthority( String authority ) {
-		return hasAuthority( new NamedGrantedAuthority( authority ) );
-	}
+    @Override
+    public boolean hasAuthority(String authority) {
+        return hasAuthority(new NamedGrantedAuthority(authority));
+    }
 
-	@Override
-	public boolean hasAuthority( GrantedAuthority authority ) {
-		return isAuthenticated() && currentAuthentication().getAuthorities().contains( authority );
-	}
+    @Override
+    public boolean hasAuthority(GrantedAuthority authority) {
+        return isAuthenticated() && currentAuthentication().getAuthorities().contains(authority);
+    }
 
-	@Override
-	public SecurityPrincipal getPrincipal() {
-		return loadPrincipal();
-	}
+    @Override
+    public SecurityPrincipal getPrincipal() {
+        return loadPrincipal();
+    }
 
-	@Override
-	public <V extends SecurityPrincipal> V getPrincipal( Class<V> principalType ) {
-		SecurityPrincipal securityPrincipal = loadPrincipal();
-		return principalType.isInstance( securityPrincipal ) ? (V) securityPrincipal : null;
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public <V extends SecurityPrincipal> V getPrincipal(Class<V> principalType) {
+        SecurityPrincipal securityPrincipal = loadPrincipal();
+        return principalType.isInstance(securityPrincipal) ? (V) securityPrincipal : null;
+    }
 
-	@Override
-	public String getPrincipalName() {
-		return isAuthenticated() ? currentAuthentication().getName() : null;
-	}
+    @Override
+    public String getPrincipalName() {
+        return isAuthenticated() ? currentAuthentication().getName() : null;
+    }
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return isAuthenticated() ? currentAuthentication().getAuthorities() : Collections.<GrantedAuthority>emptyList();
-	}
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return isAuthenticated() ? currentAuthentication().getAuthorities() : Collections.<GrantedAuthority>emptyList();
+    }
 
-	private Authentication currentAuthentication() {
-		return SecurityContextHolder.getContext().getAuthentication();
-	}
+    private Authentication currentAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
 
-	@Override
-	public Collection<SecurityPrincipal> getParentPrincipals() {
-		SecurityPrincipal principal = getPrincipal();
+    @Override
+    public Collection<SecurityPrincipal> getParentPrincipals() {
+        SecurityPrincipal principal = getPrincipal();
 
-		return principal instanceof SecurityPrincipalHierarchy
-				? ( (SecurityPrincipalHierarchy) principal ).getParentPrincipals()
-				: Collections.<SecurityPrincipal>emptyList();
-	}
+        return principal instanceof SecurityPrincipalHierarchy
+                ? ((SecurityPrincipalHierarchy) principal).getParentPrincipals()
+                : Collections.<SecurityPrincipal>emptyList();
+    }
 
-	private SecurityPrincipal loadPrincipal() {
-		Authentication authentication = currentAuthentication();
+    private SecurityPrincipal loadPrincipal() {
+        Authentication authentication = currentAuthentication();
 
-		if ( authentication != null && authentication.isAuthenticated() ) {
-			if ( authentication instanceof SecurityPrincipalAuthenticationToken ) {
-				return ( (SecurityPrincipalAuthenticationToken) authentication ).getPrincipal();
-			}
+        if (authentication != null && authentication.isAuthenticated()) {
+            if (authentication instanceof SecurityPrincipalAuthenticationToken) {
+                return ((SecurityPrincipalAuthenticationToken) authentication).getPrincipal();
+            }
 
-			Object authenticationPrincipal = authentication.getPrincipal();
+            Object authenticationPrincipal = authentication.getPrincipal();
 
-			if ( authenticationPrincipal instanceof SecurityPrincipal ) {
-				return (SecurityPrincipal) authenticationPrincipal;
-			}
+            if (authenticationPrincipal instanceof SecurityPrincipal) {
+                return (SecurityPrincipal) authenticationPrincipal;
+            }
 
-			if ( authenticationPrincipal instanceof String ) {
-				LOG.debug( "Loading SecurityPrincipal with name {}", authenticationPrincipal );
-				return securityPrincipalService.getPrincipalByName( (String) authenticationPrincipal );
+            if (authenticationPrincipal instanceof String) {
+                LOG.debug("Loading SecurityPrincipal with name {}", authenticationPrincipal);
+                return securityPrincipalService.getPrincipalByName((String) authenticationPrincipal);
 
-			}
+            }
 
-			LOG.debug( "Loading SecurityPrincipal with name {}", authentication.getName() );
-			return securityPrincipalService.getPrincipalByName( authentication.getName() );
-		}
+            LOG.debug("Loading SecurityPrincipal with name {}", authentication.getName());
+            return securityPrincipalService.getPrincipalByName(authentication.getName());
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public String toString() {
-		return isAuthenticated() ? getPrincipal().toString() : "not-authenticated";
-	}
+    @Override
+    public String toString() {
+        return isAuthenticated() ? getPrincipal().toString() : "not-authenticated";
+    }
 }
