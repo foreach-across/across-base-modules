@@ -16,10 +16,12 @@
 package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.core.events.AcrossEventPublisher;
+import com.foreach.across.modules.spring.security.SpringSecurityModuleCache;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalAuthenticationToken;
 import com.foreach.across.modules.spring.security.infrastructure.events.SecurityPrincipalRenamedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +55,12 @@ public class SecurityPrincipalServiceImpl implements SecurityPrincipalService
 		SecurityContextHolder.clearContext();
 	}
 
+	@Cacheable(
+			value = SpringSecurityModuleCache.SECURITY_PRINCIPAL,
+			key = "#principalName.toLowerCase()",
+			condition = "#principalName != null",
+			unless = SpringSecurityModuleCache.UNLESS_NULLS_ONLY
+	)
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends SecurityPrincipal> T getPrincipalByName( String principalName ) {

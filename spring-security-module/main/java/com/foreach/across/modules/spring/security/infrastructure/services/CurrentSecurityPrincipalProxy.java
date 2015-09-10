@@ -29,6 +29,8 @@ public interface CurrentSecurityPrincipalProxy extends SecurityPrincipal
 
 	boolean hasAuthority( GrantedAuthority authority );
 
+	boolean hasAuthority( GrantedAuthority authority );
+
 	/**
 	 * @return the backing SecurityPrincipal instance
 	 */
