@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.foreach.across.modules:across-hibernate-module:1.0.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/foreach/across/modules/across-hibernate-module/1.0.0-SNAPSHOT/across-hibernate-module-1.0.0-20150910.064528-1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/foreach/across/modules/across-hibernate-module/1.0.0-SNAPSHOT/across-hibernate-module-1.0.0-20150910.064528-1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/foreach/across/modules/across-hibernate-module/1.0.0-SNAPSHOT/across-hibernate-module-1.0.0-20150910.064528-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
