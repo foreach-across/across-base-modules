@@ -70,9 +70,11 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 	private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
 	private String instanceId;
+	private static final String LOG_FORMAT = "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}";
 
 	private Collection<String> includedPathPatterns = Collections.emptyList();
 	private Collection<String> excludedPathPatterns = Collections.emptyList();
+	private LoggerLevelThreshold loggerLevelThreshold;
 
 	public void setInstanceId( String instanceId ) {
 		this.instanceId = instanceId;
@@ -104,29 +106,36 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 				finished = true;
 			}
 			finally {
-				if ( REQUEST_LOG.isDebugEnabled() ) {
-					// Determine duration before sending the log
+				if( loggerLevelThreshold != null ) {
 					long duration = System.currentTimeMillis() - startTime;
-
-					String handlerName = (String) request.getAttribute(
-							LogHandlerAndViewNameInterceptor.ATTRIBUTE_HANDLER );
-					String viewName = (String) request.getAttribute(
-							LogHandlerAndViewNameInterceptor.ATTRIBUTE_VIEW_NAME );
-					String requestMapping = (String) request.getAttribute(
-							HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE );
-
-					REQUEST_LOG.debug(
-							"{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
-							request.getRemoteAddr(),
-							request.getMethod(),
-							createUrlFromRequest( request ),
-							request.getServletPath(),
-							StringUtils.defaultString( requestMapping, "-" ),
-							StringUtils.defaultString( handlerName, "-" ),
-							StringUtils.defaultString( viewName, "-" ),
-							finished ? response.getStatus() : -1,
-							duration
-					);
+					LoggerLevelThreshold.LoggerLevel loggerLevel = loggerLevelThreshold.getLogLevelForDuration( duration );
+					switch ( loggerLevel ) {
+						case DEBUG:
+							if( REQUEST_LOG.isDebugEnabled() ) {
+								REQUEST_LOG.debug( LOG_FORMAT, loggingArguments( request, response, startTime, finished ) );
+							}
+							break;
+						case INFO:
+							if( REQUEST_LOG.isInfoEnabled() ) {
+								REQUEST_LOG.info( LOG_FORMAT, loggingArguments( request, response, startTime,
+								                                                finished ) );
+							}
+							break;
+						case WARN:
+							if( REQUEST_LOG.isWarnEnabled() ) {
+								REQUEST_LOG.warn( LOG_FORMAT, loggingArguments( request, response, startTime, finished ) );
+							}
+							break;
+						case ERROR:
+							if( REQUEST_LOG.isErrorEnabled() ) {
+								REQUEST_LOG.error( LOG_FORMAT, loggingArguments( request, response, startTime, finished ) );
+							}
+							break;
+					}
+				} else {
+					if ( REQUEST_LOG.isDebugEnabled() ) {
+						REQUEST_LOG.debug( LOG_FORMAT, loggingArguments( request, response, startTime, finished ) );
+					}
 				}
 			}
 
@@ -136,6 +145,31 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 		else {
 			chain.doFilter( request, response );
 		}
+	}
+
+	private Object[] loggingArguments( HttpServletRequest request,
+	                               HttpServletResponse response,
+	                               long startTime,
+	                               boolean finished ) {
+		long duration = System.currentTimeMillis() - startTime;
+
+		String handlerName = (String) request.getAttribute(
+				LogHandlerAndViewNameInterceptor.ATTRIBUTE_HANDLER );
+		String viewName = (String) request.getAttribute(
+				LogHandlerAndViewNameInterceptor.ATTRIBUTE_VIEW_NAME );
+		String requestMapping = (String) request.getAttribute(
+				HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE );
+
+		return new Object[] {
+				request.getRemoteAddr(),
+				request.getMethod(),
+				createUrlFromRequest( request ),
+				request.getServletPath(),
+				StringUtils.defaultString( requestMapping, "-" ),
+				StringUtils.defaultString( handlerName, "-" ),
+				StringUtils.defaultString( viewName, "-" ),
+				finished ? response.getStatus() : -1,
+				duration };
 	}
 
 	public Collection<String> getIncludedPathPatterns() {
@@ -187,5 +221,9 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 		}
 
 		return buf.toString();
+	}
+
+	public void setLoggerLevelThreshold( LoggerLevelThreshold loggerLevelThreshold ) {
+		this.loggerLevelThreshold = loggerLevelThreshold;
 	}
 }
