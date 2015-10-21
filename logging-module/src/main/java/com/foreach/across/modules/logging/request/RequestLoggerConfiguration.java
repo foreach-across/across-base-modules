@@ -29,6 +29,7 @@ public class RequestLoggerConfiguration
 	private Collection<String> excludedPathPatterns;
 	private Collection<String> urlFilterMappings = Collections.singleton( "/*" );
 	private Collection<String> servletNameFilterMappings = Collections.emptySet();
+	private LoggerLevelThreshold loggerLevelThreshold;
 
 	public Collection<String> getIncludedPathPatterns() {
 		return includedPathPatterns;
@@ -62,6 +63,14 @@ public class RequestLoggerConfiguration
 	public void setServletNameFilterMappings( Collection<String> servletNameFilterMappings ) {
 		Assert.notNull( servletNameFilterMappings );
 		this.servletNameFilterMappings = servletNameFilterMappings;
+	}
+
+	public void setLoggerLevelThreshold( LoggerLevelThreshold loggerLevelThreshold ) {
+		this.loggerLevelThreshold = loggerLevelThreshold;
+	}
+
+	public LoggerLevelThreshold getLoggerLevelThreshold() {
+		return loggerLevelThreshold;
 	}
 
 	public static RequestLoggerConfiguration allRequests() {

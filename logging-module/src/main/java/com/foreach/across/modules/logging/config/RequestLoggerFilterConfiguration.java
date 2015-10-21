@@ -67,6 +67,10 @@ public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletCon
 			filter.setExcludedPathPatterns( logConfiguration.getExcludedPathPatterns() );
 		}
 
+		if( logConfiguration.getLoggerLevelThreshold() != null ) {
+			filter.setLoggerLevelThreshold( logConfiguration.getLoggerLevelThreshold() );
+		}
+
 		return filter;
 	}
 
