@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   ~ Copyright 2014 the original author or authors
   ~
@@ -29,7 +30,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>across</groupId>
+			<groupId>com.foreach.across</groupId>
 			<artifactId>across-web</artifactId>
 			<optional>true</optional>
 		</dependency>
@@ -56,7 +57,7 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>across</groupId>
+			<groupId>com.foreach.across</groupId>
 			<artifactId>across-test</artifactId>
 			<scope>test</scope>
 		</dependency>
