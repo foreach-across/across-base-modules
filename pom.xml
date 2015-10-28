@@ -95,6 +95,7 @@
     <scm>
         <connection>scm:git:https://bitbucket.org/beforeach/across-hibernate-module.git</connection>
         <developerConnection>scm:git:https://bitbucket.org/beforeach/across-hibernate-module.git</developerConnection>
+        <url>https://bitbucket.org/beforeach/across-hibernate-module</url>
     </scm>
 
 </project>
