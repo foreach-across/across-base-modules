@@ -1,2 +1,301 @@
+= DebugWebModule
+Arne Vandamme
+1.0.0.RELEASE
+:toc: left
+:sectanchors:
+:module-version: 1.0.0.RELEASE
+:module-name: DebugWebModule
+:module-artifact: debug-web-module
+:module-url: https://foreach.atlassian.net/wiki/display/AX/DebugWebModule
+:application-info-url: https://foreach.atlassian.net/wiki/display/AX/ApplicationInfoModule
+:spring-security-module-url: https://foreach.atlassian.net/wiki/display/AX/SpringSecurityModule
 
-use DebugWebConfigurerAdapter to add interceptors only to debug web
+[copyright,verbatim]
+--
+Copyright (C) 2014-2015 +
+[small]#Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically.#
+--
+
+[abstract]
+== About
+{module-name} provides a <<configure-root-path,configurable endpoint>> for developer related web resources from other modules.  It allows other modules to <<creating-your-own, register
+one or more debug web controllers>> upon the presence of the {module-name}.  A typical example of a debug web controller
+would be a controller to introspect and manage the cache.  Out of the box {module-name} comes with a <<default-debug-controllers,set of default controllers>>
+that allow you to introspect the running `AcrossContext`.
+
+Module website: {module-url}
+
+:numbered:
+== General information
+
+=== Artifact
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+	<dependencies>
+		<dependency>
+			<groupId>com.foreach.across.modules</groupId>
+			<artifactId>{module-artifact}</artifactId>
+			<version>{module-version}</version>
+		</dependency>
+	</dependencies>
+----
+
+=== Module dependencies
+
+{module-name} only has a required dependency on AcrossWebModule.
+
+=== Module settings
+
+|===
+|Property |Description |Default
+
+|debugWeb.dashboard
+|Relative path (within debug web) for the landing page of debug web.
+|/
+|===
+
+== What's new in this version?
+:numbered!:
+=== 1.0.0.RELEASE
+Initial public release available on http://search.maven.org/[Maven central].
+
+:numbered:
+== How {module-name} works
+
+{module-name} creates a new `RequestMappingHandlerMapping` endpoint that serves all `@RequestMapping` methods from
+beans annotated with `@DebugWebController`.  All mappings will be prefixed with the configured root path (eg: _/debug_) ensuring
+that all web controllers are behind a base path.  Under the hood, {module-name} achieves this by creating a specific `PrefixingRequestMappingHandlerMapping`
+ instance named _{module-name}_.
+
+All `@DebugWebController` instances are automatically mapped on the default debug web layout template.  The template takes
+  care of dynamically building a top menu where controllers can position themselves.  For output rendering a http://www.thymeleaf.org[Thymeleaf]
+  template based on http://www.getbootstrap.com[Bootstrap] and http://www.jquery.com[JQuery] is used.
+
+== Configuring {module-name}
+
+[[configure-root-path]]
+=== Root path
+
+The root path is configured by setting the `rootPath` property on the `DebugWebModule` instance.  This can only be done
+when configuring the `AcrossContext`, before it has bootstrapped.  If no custom root path is configured, the default
+is */debug*.
+
+=== Dashboard (landing page)
+
+Pointing your web browser at the root path within your application will open {module-name} on the dashboard.  By default
+  the dashboard has no content other than the top menu.  If you would like a particular controller to open you can set
+  another relative path on the *debugWeb.dashboard* property.  The path should not contain the root path prefix.
+
+== Securing debug web
+By default the {module-name} takes no care of securing the debug endpoints.  This is considered the responsibility of
+the application itself.  Securing can
+easily be done on a webserver level or through {spring-security-module-url}[Spring security].
+
+.Example securing debug web with Spring security
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@Configuration
+public class DebugWebSecurityConfiguration extends SpringSecurityWebConfigurerAdapter
+{
+	@Autowired
+	private DebugWeb debugWeb;
+
+	@Override
+	public void configure( AuthenticationManagerBuilder auth ) throws Exception {
+		auth.inMemoryAuthentication()
+			.withUser( "debug" )
+			.password( "debug" )
+			.roles( "DEBUG_USER" );
+	}
+
+	@Override
+	public void configure( HttpSecurity http ) throws Exception {
+		http.antMatcher( debugWeb.path( "/**" ) )
+		    .authorizeRequests().anyRequest().hasRole( "DEBUG_USER" )
+		    .and()
+		    .formLogin().disable()
+		    .httpBasic()
+		    .and()
+		    .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS )
+		    .and()
+		    .csrf().disable();
+	}
+}
+----
+
+[[default-debug-controllers]]
+== Default debug controllers
+Out of the box {module-name} provides some default debug controllers.  These are all available through the top menu.
+
+=== Section: Servlet context
+Lists the servlets and filters registered on the servlet context.
+
+=== Section: Across
+.Context browser
+Allows you to introspect the running `AcrossContext`.  You can navigate the entire `ApplicationContext` hierarchy,
+ see the modules registered in the Across context along with the beans they created (and expose) as well as the
+ configuration properties visible within each module.
+
+.AcrossWebModule: Handlers and Interceptors
+_Handlers_ lists the different request mapping endoints grouped by their handler mappings.  _Interceptors_ lists the
+mapped and unmapped interceptors that apply to a particular handler mapping.
+
+=== Section: DataSources
+Lists database drivers and registered datasources with some datasource statistics.
+
+=== Section: Threads and stack
+Lists the current threads with their stack trace.
+
+[[creating-your-own]]
+== Creating your own debug controller
+
+=== @DebugWebController
+Debug web controllers are just like any other controller bean with `RequestMapping` methods, except they are annotated
+with `@DebugWebController` instead of the standard `@Controller`.  Any bean annotated with `@DebugWebController`
+will be picked up by the {module-name} and will have its mappings prefixed with the debug web root path.
+
+.Simple custom debug web controller mapped on /ROOT_PATH/test
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@DebugWebController
+@AcrossDepends(required = "DebugWebModule")
+public class DebugEhcacheController
+{
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	public String test() {
+		return "th/mymodule/debug/test";
+	}
+}
+----
+
+=== Thymeleaf template
+Unless a named template is specified, the default Thymeleaf template from debug web will be applied to the output.
+The default template will add a top menu for all registered debug web controllers.  Like any Across web Thymeleaf template,
+this implementation requires you to put the actual output in a _content_ fragment.
+
+.A Thymeleaf view file for my controller
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>My test debug controller</title>
+</head>
+<body th:fragment="content">
+	This is a test debug controller.
+</body>
+</html>
+----
+
+If you need additional javascript or custom CSS, you can register it using the `WebResourceRegistry` and it will
+automatically be added to the output by the layout template.
+
+.Adding custom CSS with the WebResourceRegistry
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@DebugWebController
+@AcrossDepends(required = "DebugWebModule")
+public class DebugEhcacheController
+{
+	@ModelAttribute
+	public void registerCss( WebResourceRegistry registry ) {
+		registry.addWithKey( WebResource.CSS, "MyModule", "/css/mymodule/debug.css", WebResource.VIEWS );
+	}
+
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	public String test() {
+		return "th/mymodule/debug/test";
+	}
+}
+----
+
+=== Customizing the top menu
+The default layout template builds and renders a top menu.  This menu is built by publishing a `DebugMenuEvent`. Any
+`AcrossEventHandler` - and all controllers are event handlers by default - can listen for this event and modify the menu.
+The menu is built using a `PathBasedMenuBuilder`, allowing the entire menu hierarchy to be specified using a path structure.
+
+NOTE: By default the menu item path is also used as the url for the menu endpoint.  All menu item urls will be processed by
+the debug web `WebAppPathResolver` and any relative path will be prefixed with the configured root path.
+
+.Example of registering a new top-level menu item pointing to /ROOT_PATH/test
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@DebugWebController
+@AcrossDepends(required = "DebugWebModule")
+public class DebugEhcacheController
+{
+	@Event
+	public void registerMenuItem( DebugMenuEvent event ) {
+		event.builder().item( "/test", "Test controller" );
+	}
+
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	public String test() {
+		return "th/mymodule/debug/test";
+	}
+}
+----
+
+=== Linking to debug web controllers
+The actual URL endpoint of debug web controllers depends on the application-specific configured root path.  When implementing
+ custom debug web controllers you can ensure your relative links point to the correct controller by running them through
+ the `PrefixingPathContext`.  {module-name} has registered a prefixer named _debugWeb_, this prefixer can be used to
+ correctly point to a debug web controller from any other controller.
+
+.Relative links from Thymeleaf views
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>My test debug controller</title>
+</head>
+<body th:fragment="content">
+	Relative to debug web root path:
+	* <a th:href="@{#webapp.path('/test')}">when rendered from a debug web controller</a>
+	* <a th:href="@{#webapp.path('@debugWeb:/test')}">always</a>
+</body>
+</html>
+----
+
+In code the `DebugWeb` bean - implementation of the `PrefixingPathContext` - can be used to generate the correct URL.
+
+.Example of generating a debug controller redirect
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@DebugWebController
+@AcrossDepends(required = "DebugWebModule")
+public class DebugEhcacheController
+{
+	@Autowired
+	private DebugWeb debugWeb;
+
+	@RequestMapping(value = "/redirect", method = RequestMethod.GET)
+	public String test() {
+		return debugWeb.redirect( "/test" );
+	}
+}
+----
+
+=== Adding custom interceptors
+If you want to add interceptors only to debug web controllers, you can register them using an instance of
+  `DebugWebConfigurerAdapter` or any custom `PrefixingHandlerMappingConfigurer` that supports the _{module-name}_ mapper.
+
+== Customizing debug web template
+{module-name} uses a default Thymeleaf layout template that builds the top menu and renders HTML for Bootstrap CSS and
+JQuery.  If you wish to replace the default layout, you can wire the `debugWebTemplateRegistry`, register
+your own `WebTemplateProcessor` and set it as the default template for all debug web controllers.
+Alternatively you can specify any registered `WebTemplateProcessor` by name, using the `@Template` annotation on specific debug web controllers.
+
+NOTE: Because {module-name} uses its own `WebTemplateRegistry`, only templates registered explicitly on the `debugWebTemplateRegistry` bean will be available.
+
+For more details, please see the source code of `com.foreach.across.modules.debugweb.config.DebugWebInterceptorsConfiguration`.
+
