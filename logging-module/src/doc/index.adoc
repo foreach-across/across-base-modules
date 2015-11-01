@@ -1,6 +1,261 @@
+= LoggingModule
+Arne Vandamme
+1.0.0.RELEASE
+:toc: left
+:sectanchors:
+:module-version: 1.0.0.RELEASE
+:module-name: LoggingModule
+:module-artifact: logging-module
+:module-url: https://foreach.atlassian.net/wiki/display/AX/LoggingModule
+:debug-web-module-url: https://foreach.atlassian.net/wiki/display/AX/DebugWebModule
+:application-info-module-url: https://foreach.atlassian.net/wiki/display/AX/ApplicationInfoModule
+:logback-url: http://logback.qos.ch/
 
-pages logging
+[copyright,verbatim]
+--
+Copyright (C) 2014-2015 +
+[small]#Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically.#
+--
 
-request response detail log
+[abstract]
+== About
+{module-name} provides a <<configure-root-path,configurable endpoint>> for developer related web resources from other modules.  It allows other modules to <<creating-your-own, register
+one or more debug web controllers>> upon the presence of the {module-name}.  A typical example of a debug web controller
+would be a controller to introspect and manage the cache.  Out of the box {module-name} comes with a <<default-debug-controllers,set of default controllers>>
+that allow you to introspect the running `AcrossContext`.
 
-method logging
+Module website: {module-url}
+
+:numbered:
+== General information
+
+=== Artifact
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+	<dependencies>
+		<dependency>
+			<groupId>com.foreach.across.modules</groupId>
+			<artifactId>{module-artifact}</artifactId>
+			<version>{module-version}</version>
+		</dependency>
+	</dependencies>
+----
+
+=== Module dependencies
+
+|===
+|Module |Type |Description
+
+|AcrossWebModule
+|optional
+|Activates support for request logging and request/response debug logging.
+
+|{debug-web-module-url}[DebugWebModule]
+|optional
+|Enables the debug controllers for logger management and request/response logging.
+
+|{application-info-module-url}[ApplicationInfoModule]
+|extension
+|Will use the configured application instance id as _applicationInstanceId_.
+
+|===
+
+=== Module settings
+
+|===
+|Property |Type |Description |Default
+
+|logging.method.enabled
+|`boolean`
+|Should method logging extensions in modules be loaded? +
+|_false_
+
+|logging.method.configuration
+|`MethodLogConfiguration.class`
+|Configuration settings for method logging.
+|_null_
+
+|logging.request.logger
+|`RequestLogger.class`
+|Should request logging be disabled, or enabled as filter or servlet?
+|_RequestLogger.FILTER_
+
+|logging.request.configuration
+|`RequestLoggerConfiguration.class`
+|Configuration settings for request logging.
+|All requests will be logged.
+
+|logging.requestResponse.enabled
+|`boolean`
+|Should request/response debug logging be possible?
+|_false_
+
+|logging.requestResponse.paused
+|`boolean`
+|Should request/response debug logging be active?
+|_false_
+
+|logging.requestResponse.configuration
+|`RequestResponseLogConfiguration.class`
+|Configuration settings for request/response debug logging.
+|All requests will be logged.
+
+|===
+
+== What's new in this version?
+:numbered!:
+=== 1.0.0.RELEASE
+Initial public release available on http://search.maven.org/[Maven central].
+
+:numbered:
+== Logger management
+NOTE: Only available if {debug-web-module-url}[DebugWebModule] is present.
+
+{module-name} adds a debug controller giving an overview of all {logback-url}[Logback] configured loggers and appenders.
+ The log level for any logger can be changed at runtime.  The controller can be accessed through debug web menu
+ item *Logging -> Logger overview*.
+
+== Method logging
+
+
+=== Configuration
+
+=== Logging output
+
+.Example logback configuration for method logging with request logging enabled
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="methods" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%logger{0}\t%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="com.foreach.across.modules.logging.method.MethodLogger" level="info" additivity="false">
+		<appender-ref ref="methods"/>
+	</logger>
+</configuration>
+----
+
+tab separated
+
+.Example log statement
+[source,text,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+2015-08-29 16:47:53,662	[3b0d69cb-9e99-4c02-ae44-65a192f0e0d9]	http-apr-8079-exec-6	MyModule	1	mymodule.services.SomeService.createItem	163
+----
+
+.Anatomy of the log statement
+|===
+|meh |moeh
+
+|*Timestamp*
+|2015-08-29 16:47:53,662
+
+|*Request id*
+|3b0d69cb-9e99-4c02-ae44-65a192f0e0d9
+
+|*Thread*
+|http-apr-8079-exec-6
+
+|*Logger*
+|MyModule
+
+|*Method level*
+|1
+
+|*Method*
+|mymodule.services.SomeService.createItem
+
+|*Duration*
+|163
+
+|===
+
+=== Method level
+experimental feature
+value 1 = first method to go past the minimum duration (in most cases this the most useful optimization target)
+
+=== Adding a method logger in an existing module
+add a MethodLoggingConfiguration class, in extensions
+
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@Configuration
+@EnableAspectJAutoProxy(proxyTargetClass = true)
+@SuppressWarnings("unused")
+public class MethodLoggingConfiguration
+{
+	@Bean
+	public MethodExecutionLogger methodExecutionLogger() {
+		return new MethodExecutionLogger();
+	}
+
+	@Aspect
+	class MethodExecutionLogger extends MethodLoggerAdapter
+	{
+		public MethodExecutionLogger() {
+			super( MyModule.NAME );
+		}
+
+		@Around("serviceMethod() || repositoryMethod()")
+		@Override
+		protected Object proceedAndLogExecutionTime( ProceedingJoinPoint point ) throws Throwable {
+			return super.proceedAndLogExecutionTime( point );
+		}
+
+		@Pointcut("execution(* com.mymodule.services..*.*(..))")
+		public void serviceMethod() {
+		}
+
+		@Pointcut("execution(* com.mymodule.repositories..*.*(..))")
+		public void repositoryMethod() {
+		}
+	}
+}
+----
+
+== Request logging
+NOTE: Only available if AcrossWebModule is present.
+
+in a web context by default the module will add a servlet filter for logging requests
+every request will get assigned a unique id and some information will be logged
+
+=== Configuration
+
+interceptor instead of servlet filter
+filter is by far preferred
+
+filter mappings (servlet name or url)
+
+included/excluded patterns, log level threshold based on request duration
+
+=== MDC attributes
+on the http://logback.qos.ch/manual/mdc.html[MDC] for logging.
+requestId
+applicationInstanceId
+
+=== Request-Reference
+added to the response header
+
+=== Logging output
+tab separated
+
+logback config
+
+example log statement
+
+
+== Request/response debug logging
+NOTE: Only available if AcrossWebModule is present.
+
+=== Configuration
+
+=== Debug controller
+NOTE: Only available if {debug-web-module-url}[DebugWebModule] is present.

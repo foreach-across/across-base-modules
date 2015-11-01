@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="Maven: com.foreach.across.modules:debug-web-module:1.0.0-SNAPSHOT">
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/foreach/across/modules/debug-web-module/1.0.0-SNAPSHOT/debug-web-module-1.0.0-SNAPSHOT.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/foreach/across/modules/debug-web-module/1.0.0-SNAPSHOT/debug-web-module-1.0.0-20151030.143557-8.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$MAVEN_REPOSITORY$/com/foreach/across/modules/debug-web-module/1.0.0-SNAPSHOT/debug-web-module-1.0.0-SNAPSHOT-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/foreach/across/modules/debug-web-module/1.0.0-SNAPSHOT/debug-web-module-1.0.0-20151030.143557-8-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/foreach/across/modules/debug-web-module/1.0.0-SNAPSHOT/debug-web-module-1.0.0-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/foreach/across/modules/debug-web-module/1.0.0-SNAPSHOT/debug-web-module-1.0.0-20151030.143557-8-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

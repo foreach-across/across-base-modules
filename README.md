@@ -1,12 +1,16 @@
-# Logging module
+## LoggingModule
+Please refer to the [module wiki][] for all information regarding documentation, issue tracking and support.
 
-This module enables different kinds of logging for your Across project.
+### Contributing
+Contributions in the form of pull requests are greatly appreciated.  Please add feature requests to our issue
+tracker if you are unable to contribute yourself.  See the [module wiki][] for the issue tracker coordinates.
 
-## Automatic logging
+### Building from source
+The source can be built using [Maven][] with JDK 8.
 
-The RequestLogFilter will log all web requests with their attributes, including duration.
+### License
+Licensed under version 2.0 of the [Apache License][].
 
-## Dependencies
-### Required
-
-The logging module requires the Across Web Module in order to log web requests.
+[module wiki]: https://foreach.atlassian.net/wiki/display/AX/LoggingModule
+[Maven]: http://maven.apache.org
+[Apache License]: http://www.apache.org/licenses/LICENSE-2.0

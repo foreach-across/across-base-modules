@@ -31,7 +31,12 @@
     <dependencies>
         <dependency>
             <groupId>com.foreach.across</groupId>
+            <artifactId>across-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.foreach.across</groupId>
             <artifactId>across-web</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.foreach.across</groupId>

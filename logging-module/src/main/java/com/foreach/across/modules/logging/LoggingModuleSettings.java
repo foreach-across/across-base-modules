@@ -34,7 +34,7 @@ public class LoggingModuleSettings extends AcrossModuleSettings
 	public static final String REQUEST_RESPONSE_LOG_CONFIGURATION = "logging.requestResponse.configuration";
 
 	public static final String REQUEST_LOGGER = "logging.request.logger";
-	public static final String REQUEST_LOGGER_CONFIGURATION = "logging.request.logger.configuration";
+	public static final String REQUEST_LOGGER_CONFIGURATION = "logging.request.configuration";
 
 	@Override
 	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {

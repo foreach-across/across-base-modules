@@ -23,7 +23,6 @@ import com.foreach.across.modules.logging.controllers.RequestResponseLogControll
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogRegistry;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLoggingFilter;
-import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ import java.util.EnumSet;
  * @author Andy Somers
  */
 @Configuration
-@AcrossDepends(required = AcrossWebModule.NAME)
+@AcrossDepends(required = "AcrossWebModule")
 @AcrossCondition("settings.requestResponseLogEnabled")
 public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServletConfigurer
 {

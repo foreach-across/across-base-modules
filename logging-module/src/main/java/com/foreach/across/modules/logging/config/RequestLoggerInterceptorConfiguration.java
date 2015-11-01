@@ -17,7 +17,6 @@ package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.modules.web.config.support.PrefixingHandlerMappingConfigurer;
 import com.foreach.across.modules.web.mvc.InterceptorRegistry;
 import com.foreach.common.web.logging.RequestLogInterceptor;
@@ -27,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Andy Somers
  */
 @Configuration
-@AcrossDepends(required = AcrossWebModule.NAME)
+@AcrossDepends(required = "AcrossWebModule")
 @AcrossCondition("settings.requestLogger == T(com.foreach.across.modules.logging.request.RequestLogger).INTERCEPTOR")
 public class RequestLoggerInterceptorConfiguration implements PrefixingHandlerMappingConfigurer
 {

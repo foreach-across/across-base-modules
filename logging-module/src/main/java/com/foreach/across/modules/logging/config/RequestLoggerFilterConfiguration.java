@@ -24,7 +24,6 @@ import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.request.LogHandlerAndViewNameInterceptor;
 import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
 import com.foreach.across.modules.logging.request.RequestLoggerFilter;
-import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import com.foreach.common.spring.context.ApplicationInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ import java.util.EnumSet;
  * Configures the RequestLoggerFilter to be first in the filter chain
  */
 @Configuration
-@AcrossDepends(required = AcrossWebModule.NAME)
+@AcrossDepends(required = "AcrossWebModule")
 @AcrossCondition("settings.requestLogger == T(com.foreach.across.modules.logging.request.RequestLogger).FILTER")
 public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletConfigurer
 {
