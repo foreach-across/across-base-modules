@@ -34,7 +34,7 @@
           <element id="library" level="project" name="Maven: javax.activation:activation:1.1.1" />
           <element id="library" level="project" name="Maven: org.aspectj:aspectjrt:1.8.5" />
           <element id="library" level="project" name="Maven: com.foreach.libs:common-web:0.12" />
-          <element id="library" level="project" name="Maven: com.foreach.across.modules:debug-web-module:1.0.0-SNAPSHOT" />
+          <element id="library" level="project" name="Maven: com.foreach.across.modules:debug-web-module:1.0.0.RELEASE" />
           <element id="library" level="project" name="Maven: com.foreach.across:across-web:1.0.6.RELEASE" />
           <element id="library" level="project" name="Maven: org.javassist:javassist:3.18.1-GA" />
           <element id="library" level="project" name="Maven: org.thymeleaf:thymeleaf-spring4:2.1.4.RELEASE" />
