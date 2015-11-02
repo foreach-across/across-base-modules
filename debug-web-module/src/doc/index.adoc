@@ -1,9 +1,9 @@
 = DebugWebModule
 Arne Vandamme
-1.0.0.RELEASE
+1.0.1-SNAPSHOT
 :toc: left
 :sectanchors:
-:module-version: 1.0.0.RELEASE
+:module-version: 1.0.1-SNAPSHOT
 :module-name: DebugWebModule
 :module-artifact: debug-web-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/DebugWebModule
@@ -57,6 +57,9 @@ Module website: {module-url}
 
 == What's new in this version?
 :numbered!:
+=== 1.0.1-SNAPSHOT
+tbd
+
 === 1.0.0.RELEASE
 Initial public release available on http://search.maven.org/[Maven central].
 
