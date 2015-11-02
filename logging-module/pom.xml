@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.foreach.across.modules</groupId>
         <artifactId>logging-module-project</artifactId>
-        <version>1.0.0.RELEASE</version>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>logging-module</artifactId>
