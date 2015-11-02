@@ -3,7 +3,7 @@
 
 	<appender name="pages" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%m%n</pattern>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%level\t%m%n</pattern>
 		</encoder>
 	</appender>
 

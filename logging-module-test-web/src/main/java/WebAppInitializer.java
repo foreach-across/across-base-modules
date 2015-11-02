@@ -78,7 +78,7 @@ public class WebAppInitializer extends AbstractAcrossServletInitializer
 			LoggingModule loggingModule = new LoggingModule();
 			loggingModule.setProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_ENABLED, true );
 
-//			RequestResponseLogConfiguration logConfiguration = new RequestResponseLogConfiguration();
+			//RequestResponseLogConfiguration logConfiguration = new RequestResponseLogConfiguration();
 //			logConfiguration.setExcludedPathPatterns(
 //					Arrays.asList( "/static/**", "/debug/**", "/resources/images/**", "/admin/**" )
 //			);

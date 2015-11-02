@@ -19,10 +19,12 @@ Copyright (C) 2014-2015 +
 
 [abstract]
 == About
-{module-name} provides a <<configure-root-path,configurable endpoint>> for developer related web resources from other modules.  It allows other modules to <<creating-your-own, register
-one or more debug web controllers>> upon the presence of the {module-name}.  A typical example of a debug web controller
-would be a controller to introspect and manage the cache.  Out of the box {module-name} comes with a <<default-debug-controllers,set of default controllers>>
-that allow you to introspect the running `AcrossContext`.
+{module-name} provides the following infrastructure:
+
+ * a <<logger-management,debug controller for configuring Logback loggers>> at runtime
+ * supporting infrastructure to enable <<method-logging,method call logging>> of beans
+ * general purpose web <<request-logging,request logging>>
+ * detailed web <<request-response-logging,request/response logging>> for debugging purposes
 
 Module website: {module-url}
 
@@ -49,11 +51,11 @@ Module website: {module-url}
 
 |AcrossWebModule
 |optional
-|Activates support for request logging and request/response debug logging.
+|Activates support for <<request-logging,request logging>> and <<request-response-logging,request/response debug logging>>.
 
 |{debug-web-module-url}[DebugWebModule]
 |optional
-|Enables the debug controllers for logger management and request/response logging.
+|Enables the debug controllers for <<logger-management,logger management>> and <<request-response-debug-controllers,request/response logging>>.
 
 |{application-info-module-url}[ApplicationInfoModule]
 |extension
@@ -93,7 +95,7 @@ Module website: {module-url}
 
 |logging.requestResponse.paused
 |`boolean`
-|Should request/response debug logging be active?
+|Should request/response debug logging be paused?
 |_false_
 
 |logging.requestResponse.configuration
@@ -109,6 +111,7 @@ Module website: {module-url}
 Initial public release available on http://search.maven.org/[Maven central].
 
 :numbered:
+[[logger-management]]
 == Logger management
 NOTE: Only available if {debug-web-module-url}[DebugWebModule] is present.
 
@@ -116,12 +119,66 @@ NOTE: Only available if {debug-web-module-url}[DebugWebModule] is present.
  The log level for any logger can be changed at runtime.  The controller can be accessed through debug web menu
  item *Logging -> Logger overview*.
 
+[[method-logging]]
 == Method logging
 
+{module-name} provides some basic infrastructure that allows other Across modules to enable method logging.  All method
+ calls with a duration longer than a configured minimum will be logged.  Method logging is achieved by enhancing
+ the beans using http://docs.spring.io/spring/docs/current/spring-framework-reference/html/aop.html[AOP].
+
+If method logging is enabled, {module-name} will scan all other modules for an extension configuration class called
+ `MethodLoggingConfiguration`.  This configuration class should be located in the *extensions* package relative to the module class.
+ The configuration will usually provide a `MethodLogger` bean that extends `MethodLoggerAdapter`.
+ Due to possible limitations of the proxying mechanism, it is the responsibility of the modules to define support
+  for method logging.
+
+Using method logging can be a useful alternative for finding performance bottlenecks if more specialized
+ profiling tools are not available.
 
 === Configuration
 
+Method logging must be activated when configuring the {module-name}.  This should be done by setting a valid
+ configuration (*logging.method.configuration* property) and enabling method logging (*logging.method.enabled* property).
+ The `MethodLogConfiguration` allows you to configure the minimum duration for method calls on a global or per-`MethodLogger`
+ level.  Most modules create a single `MethodLogger` with the same name as the module itself.
+
+.Enabling method logging for all methods exceeding 15ms
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+LoggingModule loggingModule = new LoggingModule();
+loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_ENABLED, true );
+MethodLogConfiguration methodLogConfiguration = MethodLogConfiguration.all( 15 );
+loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_CONFIGURATION, methodLogConfiguration );
+----
+
+WARNING: Enabling global method logging with a very small minimum duration can result in huge log files on a busy system.
+
 === Logging output
+
+A method log entry is a simple tab-separated log message sent to a http://www.slf4j.org/[SLF4J] logger.  The logger name
+  is _com.foreach.across.modules.logging.method.MethodLogger_ suffixed with the method logger name (eg: _com.foreach.across.modules.logging.method.MethodLogger.MyModule_).
+
+A tab-separated log message contains the following fields:
+
+* Method level
+* Method being executed
+* Duration (ms)
+
+NOTE: Using tab-separated output makes it very easy to import log-files for analysis in external tools like Microsoft Excel.
+
+==== Method level
+
+Method level attempts to give an indication about possible optimization targets.  A method level of 1 means this
+is the first logged method to exceed the minimum duration.  In other words: the method call is not composed of other
+methods that match the logging rules and have exceeded the minimum duration.  When investigating performance, the lowest
+method level calls are usually a good place to start.
+
+The method level calculation is considered experimental.
+
+==== Logback configuration
+
+The following section provides a common {logback-url}[Logback] example for configuration of method logging, and the resulting output.
 
 .Example logback configuration for method logging with request logging enabled
 [source,xml,indent=0]
@@ -141,8 +198,6 @@ NOTE: Only available if {debug-web-module-url}[DebugWebModule] is present.
 </configuration>
 ----
 
-tab separated
-
 .Example log statement
 [source,text,indent=0]
 [subs="verbatim,quotes,attributes"]
@@ -151,8 +206,8 @@ tab separated
 ----
 
 .Anatomy of the log statement
+[cols="2*"]
 |===
-|meh |moeh
 
 |*Timestamp*
 |2015-08-29 16:47:53,662
@@ -177,13 +232,16 @@ tab separated
 
 |===
 
-=== Method level
-experimental feature
-value 1 = first method to go past the minimum duration (in most cases this the most useful optimization target)
+=== Creating a method logger
+A module can support method logging by providing an extension configuration
+ called `MethodLoggingConfiguration`.  The configuration will only be loaded if method logging on the {module-name}
+ is enabled.
 
-=== Adding a method logger in an existing module
-add a MethodLoggingConfiguration class, in extensions
+Most often it is enough for a module to define a single `MethodLoggerAdapter` bean that defines all methods to be intercepted
+for logging.  The adapter class ensures that the {module-name} configuration features are supported and the log messages
+are in the right format.
 
+.com.mymodule.extensions.MethodLoggingConfiguration
 [source,java,indent=0]
 [subs="verbatim,quotes,attributes"]
 ----
@@ -198,7 +256,7 @@ public class MethodLoggingConfiguration
 	}
 
 	@Aspect
-	class MethodExecutionLogger extends MethodLoggerAdapter
+	static class MethodExecutionLogger extends MethodLoggerAdapter
 	{
 		public MethodExecutionLogger() {
 			super( MyModule.NAME );
@@ -221,41 +279,185 @@ public class MethodLoggingConfiguration
 }
 ----
 
+[[request-logging]]
 == Request logging
 NOTE: Only available if AcrossWebModule is present.
 
-in a web context by default the module will add a servlet filter for logging requests
-every request will get assigned a unique id and some information will be logged
+In a web context the {module-name} will register a servlet filter that logs request information.  Every request will
+get a unique id assigned and attributes like the handler name, request url and request mapping will be logged if they
+can be determined.
 
 === Configuration
 
-interceptor instead of servlet filter
-filter is by far preferred
+By default request logging for all requests is enabled.  This can be altered by setting the *logging.request.logger* property.
+Additionally you can finetune the request logging through a `RequestLoggerConfiguration` instance (*logging.request.configuration* property).
+Through the configuration instance you can configure:
 
-filter mappings (servlet name or url)
+* to which servlets the filter should apply (defaults to all)
+* the path patterns that requests should match before they are logged
+* the log level threshold that allows you to configure different log levels to be used when requests exceed certain durations
 
-included/excluded patterns, log level threshold based on request duration
+.Enabling request logging for all requests except static resources
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+LoggingModule loggingModule = new LoggingModule();
+RequestLoggerConfiguration requestLoggerConfiguration = RequestLoggerConfiguration.allRequests();
+requestLoggerConfiguration.setExcludedPathPatterns( Arrays.asList( "/across/**" ) );
+loggingModule.setProperty( LoggingModuleSettings.REQUEST_LOGGER_CONFIGURATION, requestLoggerConfiguration );
+----
+
+WARNING: The `RequestLogger.INTERCEPTOR` option can be used to enable request logging without the use of the servlet filter.
+  Though it still works, this option is no longer actively supported.
 
 === MDC attributes
-on the http://logback.qos.ch/manual/mdc.html[MDC] for logging.
-requestId
-applicationInstanceId
+The `RequestLoggerFilter` adds two attributes to the http://logback.qos.ch/manual/mdc.html[MDC]:
+
+requestId::
+A generated id that uniquely identifies the request.  By adding the _requestId_ to every log appender, log statements can be traced back to a specific request.
+
+applicationInstanceId::
+A configured value identifying the application instance.  Only if the {application-info-module-url}[ApplicationInfoModule] is active.
 
 === Request-Reference
-added to the response header
+The unique _requestId_ is added to every response as a *Request-Reference* header.
 
 === Logging output
-tab separated
 
-logback config
+A request log entry is a tab-separated log message sent to the http://www.slf4j.org/[SLF4J] logger named `com.foreach.across.modules.logging.request.RequestLogger`.
+The tab-separated log message contains the following fields:
 
-example log statement
+ * Remote address
+ * HTTP method
+ * URL
+ * Servlet path
+ * Best matching request mapping
+ * Handler name
+ * View name
+ * HTTP status code
+ * Duration (ms)
 
+Depending on the application configuration or type of request, certain fields might not be available.  In that case
+a field-dependent default value (either empty, _0_ or _null_) will be output, but the position of the field will always
+exist so tab-based parsing does not fail.
 
+==== Logback configuration
+
+The following section provides a common {logback-url}[Logback] example for configuration of request logging, and the resulting output.
+
+.Example logback configuration for request logging
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="pages" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%level\t%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="com.foreach.across.modules.logging.request.RequestLogger" level="debug" additivity="false">
+		<appender-ref ref="pages"/>
+	</logger>
+</configuration>
+----
+
+.Example log statement
+[source,text,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+2015-11-02 12:58:15,212	[5f18be5e-5b64-4c3a-9843-740f16c32641]	http-apr-8080-exec-4	DEBUG	127.0.0.1	GET	http://localhost:8080/logging/debug/across/browser/info/0	/debug/across/browser/info/0	/debug/across/browser/info/{index}	AcrossInfoController.showContextInfo(List,int,Model)	th/debugweb/layouts/acrossBrowser	200	784
+----
+
+.Anatomy of the log statement
+[cols="2*"]
+|===
+
+|*Timestamp*
+|2015-11-02 12:58:15,212
+
+|*Request id*
+|5f18be5e-5b64-4c3a-9843-740f16c32641
+
+|*Thread*
+|http-apr-8080-exec-4
+
+|*Log level*
+|DEBUG
+
+|*Remote address*
+|127.0.0.1
+
+|*HTTP method*
+|GET
+
+|*Request URL*
+|http://localhost:8080/logging/debug/across/browser/info/0
+
+|*Servlet path*
+|/debug/across/browser/info/0
+
+|*Request mapping*
+|/debug/across/browser/info/{index}
+
+|*Handler name*
+|AcrossInfoController.showContextInfo(List,int,Model)
+
+|*View name*
+|th/debugweb/layouts/acrossBrowser
+
+|*HTTP status code*
+|200
+
+|*Duration*
+|784
+
+|===
+
+[[request-response-logging]]
 == Request/response debug logging
 NOTE: Only available if AcrossWebModule is present.
 
+{module-name} also supports a detailed request/response logging for debugging purposes.  It can be used to log
+the full request and response, including body and headers.  Request/response debug logging will wrap the incoming request and outgoing response.
+Be aware this could cause side effects in some rare cases.
+
+The purpose of request/response logging is mainly for temporary debugging of specific requests, preferably in a non-production environment.
+{module-name} comes with a set of debug controllers that allow you to view the logs and change the logging settings for specific request paths.
+
 === Configuration
 
-=== Debug controller
+Before request/response logging is possible, it should first be enabled (*logging.requestResponse.enabled* property).
+
+If request/response logging is enabled, it can still be either _active_ or _paused_.  If logging
+is not active, no data will be stored and requests/responses will not be wrapped.  The active state
+can be controlled through the *logging.requestResponse.paused* property or at runtime via the <<request-response-debug-controllers,debug controllers>>.
+
+Advanced configuration is done through a `RequestResponseLogConfiguration` instance (*logging.requestResponse.configuration* property).
+Log entries are only kept in memory and the configuration allows you to set the maximum to be kept (defaults to 100).  Additionally you
+have the following configuration options:
+
+* to which servlets the filter should apply (defaults to all)
+* the path patterns that requests should match before they are logged
+
+If {debug-web-module-url}[DebugWebModule] is present, the <<request-response-debug-controllers,debug controllers>> allow runtime modifications of the path patterns as well.
+
+.Enabling request/response logging for all api requests
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+LoggingModule loggingModule = new LoggingModule();
+loggingModule.setProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_ENABLED, true );
+RequestResponseLogConfiguration logConfiguration = new RequestResponseLogConfiguration();
+logConfiguration.setIncludedPathPatterns( Arrays.asList( "/api/**" ) );
+loggingModule.setProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_CONFIGURATION, logConfiguration );
+----
+
+[[request-response-debug-controllers]]
+=== Debug controllers
 NOTE: Only available if {debug-web-module-url}[DebugWebModule] is present.
+
+If request/response debug logging is enabled, {module-name} adds a subsection *Request - response* to the *Logging* section.  The *Settings* controller allows you to
+update the path settings that requests should match before their details are logged.  The *Overview* controller allows you
+to pause/activate the logging, as well as browse all log entries.
