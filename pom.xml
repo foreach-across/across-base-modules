@@ -26,7 +26,7 @@
 
 	<groupId>com.foreach.across.modules</groupId>
 	<artifactId>debug-web</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0.RELEASE</version>
 	<packaging>pom</packaging>
 
 	<name>${project.groupId}:${project.artifactId}</name>
@@ -95,6 +95,7 @@
 	<scm>
 		<connection>scm:git:https://bitbucket.org/beforeach/debug-web-module.git</connection>
 		<developerConnection>scm:git:https://bitbucket.org/beforeach/debug-web-module.git</developerConnection>
+		<url>https://bitbucket.org/beforeach/debug-web-module</url>
 	</scm>
 
 </project>
