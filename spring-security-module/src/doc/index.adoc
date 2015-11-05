@@ -1,5 +1,6 @@
 = SpringSecurityModule
 :toc:
+:spring-security-url: http://projects.spring.io/spring-security/
 
 == General information
 
@@ -11,7 +12,6 @@
 		<dependency>
 			<groupId>across-standard-modules</groupId>
 			<artifactId>spring-security</artifactId>
-			<version>{across-version}</version>
 		</dependency>
 	</dependencies>
 ----
@@ -30,6 +30,25 @@ The `SpringSecurityModule` registers 2 separate modules: the `SpringSecurityInfr
  infrastructure as early as possible during the bootstrap phase, whereas the `SpringSecurityModule` itself is responsible
  for registering the security filters.  Only the `SpringSecurityModule` should be manually added to the `AcrossContext`, the
  infrastructure module will be added automatically.
+
+=== Configuring web security
+The `SpringSecurityModule` enables support for `SpringSecurityWebConfigurer` implementations to be provided by different modules.
+Usually this is done by implementing your own `SpringSecurityWebConfigurerAdapter`.  Every `SpringSecurityWebConfigurerAdapter`
+results in a separate request filter to be added to the Spring security filter chain.  Once a request has been handled by
+a filter, all remaining filters will be skipped.
+
+For this reason *it is vital that `SpringSecurityWebConfigurerAdapter` instances are added in the correct order and are
+correctly scoped to the subset of requests they are meant for*.  The `SpringSecurityModule` respects all bean ordering
+rules that Across provides: using the module order by default and allowing the use of `@Order`, `@OrderInModule` or
+their respective interfaces.
+
+NOTE: Spring security itself allows very advanced configuration and customization.
+Please refer to the official {spring-security-url}[Spring security documentation] for more details.
+
+.Debugging `SpringSecurityWebConfigurer` ordering
+If you want to trace the different configurers that are being applied, you should enable `DEBUG` logging for class
+`com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration`.  This will output the different
+configurer beans in the order they will be applied, along with their type, bean and module name (if available).
 
 === SecurityPrincipal abstraction
 The `SpringSecurityModule` provides an additional abstraction layer on top of the standard `Authentication` in the form
@@ -68,6 +87,41 @@ to check for ACL permissions.
         // do something
     }
 ----
+
+=== AllowableActions
+`SpringSecurityModule` also provides an `AllowableActions` construct that can easily be used to define a set
+of actions that can be performed on an item.  The purpose is for code to check if an action is present in the `AllowableActions`
+collection, meaning that the action can be performed.  This helps decoupling your business code from the specifics
+of the security layer and can be supported in both an ACL and non-ACL context.
+
+A single `AllowableAction` is identified by a unique string, making it very easy to extend.  Useful implementations
+can be found in the `com.foreach.across.modules.spring.security.actions` package.  The `AuthorityMatchingAllowableActions`
+maps `AllowableAction` on `AuthorityMatcher` and provides concrete implementation supporting both `Authentication` and
+`SecurityPrincipal`.
+
+Actions can be mapped against anything (most likely authorities or ACL permissions) and can also be completely different
+ depending on the target they need to be applied to.  This allows for as much granularity you might want, without having
+ to change your permission model.
+
+.Example of mapping AllowableActions against GrantedAuthorities
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+    @Autowired
+    private CurrentSecurityPrincipalProxy currentPrincipal;
+
+    public AllowableActions createAllowableActionsForCurrentSecurityPrincipal() {
+        Map<AllowableAction, AuthorityMatcher> actionAuthorityMatcherMap = new HashMap<>();
+        actionAuthorityMatcherMap.put( AllowableAction.READ, AuthorityMatcher.allOf( "read items" ) );
+        actionAuthorityMatcherMap.put( AllowableAction.UPDATE, AuthorityMatcher.allOf( "write items" ) );
+
+        return AuthorityMatchingAllowableActions.forSecurityPrincipal( currentPrincipal, actionAuthorityMatcherMap )
+    }
+----
+
+TIP: Use the `AllowableAction` concept to hide specifics of the security permission layer.
+
+
 
 
 
