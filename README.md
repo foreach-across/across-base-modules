@@ -1,4 +1,4 @@
-## EhcacheModul
+## EhcacheModule
 Please refer to the [module wiki][] for all information regarding documentation, issue tracking and support.
 
 ### Contributing
