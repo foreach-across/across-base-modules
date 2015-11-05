@@ -27,7 +27,7 @@ import com.foreach.across.modules.ehcache.config.EhcacheModuleConfig;
 import java.util.Set;
 
 @AcrossRole(AcrossModuleRole.INFRASTRUCTURE)
-@AcrossDepends(optional = { "DebugWebModule", "AcrossInfoModule" })
+@AcrossDepends(optional = { "DebugWebModule" })
 public class EhcacheModule extends AcrossModule
 {
 	public static final String NAME = "EhcacheModule";
