@@ -1,14 +1,34 @@
 = AcrossHibernateJpaModule
-:toc:
+Arne Vandamme
+1.1.0.RELEASE
+:toc: left
+:sectanchors:
+:module-version: 1.1.0.RELEASE
+:module-name: AcrossHibernateJpaModule
+:module-artifact: across-hibernate-module
+:module-url: https://foreach.atlassian.net/wiki/display/AX/AcrossHibernateModule
 
+[copyright,verbatim]
+--
+Copyright (C) 2014-2015 +
+[small]#Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically.#
+--
+
+[abstract]
+== About
+The {module-artifact} artifact contains 2 Across modules: `AcrossHibernateModule` and `AcrossHibernateJpaModule`.
+
+`AcrossHibernateModule` activates Hibernate support in other modules using a traditional `SessionFactory`.
+While fully supported and providing some useful infrastructure, the `AcrossHibernateJpaModule` should be favoured instead.
+
+`AcrossHibernateJpaModule` activates JPA support for other modules.
+The JPA implementation is built on top of Hibernate.
+The module also activates support for Spring Data `JpaRepository` implementations and comes with a set of <<base-classes,helpers>> to facilitate repository implementations.
+
+Module website: {module-url}
+
+:numbered:
 == General information
-`AcrossHibernateJpaModule` activates JPA support for other modules.  The JPA implementation is built on top of Hibernate.
-The module also activates support for Spring Data `JpaRepository` implementations and comes with a set of common constructs
-to facilitate repository implementations.
-
-WARNING: `AcrossHibernateJpaModule` is also the replacement of the legacy `AcrossHibernateModule`.  The current version
-is still fully compatible with the constructs from the legacy module (eg. `BasicRepository`).  This support will be
-removed at some point in the future, please adapt your code to use `EntityManager` or Spring Data repositories where possible.
 
 === Artifact
 [source,xml,indent=0]
@@ -16,51 +36,135 @@ removed at some point in the future, please adapt your code to use `EntityManage
 ----
 	<dependencies>
 		<dependency>
-			<groupId>across-standard-modules</groupId>
-			<artifactId>across-hibernate</artifactId>
+			<groupId>com.foreach.across.modules</groupId>
+			<artifactId>{module-artifact}</artifactId>
+			<version>{module-version}</version>
 		</dependency>
 	</dependencies>
 ----
 
+=== Module dependencies
+{module-name} does not have any dependencies on other modules.
+
 === Module settings
-`AcrossHibernateJpaModule` shares the same properties as the legacy `AcrossHibernateModule`.
 
 |===
-|Property |Description |Default
+|Property |Type |Description |Default
 
 |acrossHibernate.transactionManager
+|`Boolean`
 |Should a TransactionManager bean be created.  If true this will also enable support for @Transaction in all modules bootstrapping later.
-|true
+|_true_
 
 |acrossHibernate.unitOfWorkFactory
-|Should a UnitOfWorkFactory bean be created.
-|false
+|`Boolean`
+|Should a <<unitofworkfactory,UnitOfWorkFactory bean>> be created.
+|_false_
 
 |acrossHibernate.persistenceContextInView.handler
+|`PersistenceContextInView`
 |If a view layer is enabled, should an open session/entity manager be created for the entire request by using either a filter or an interceptor.
-|`PersistenceContextInView.NONE`
+|_PersistenceContextInView.NONE_
 
 |acrossHibernate.persistenceContextInView.order
+|`Integer`
 |Configure the order of the persistence context view handler (if created).
-|`Ordered.HIGHEST_PRECEDENCE + 1`
+|_Ordered.HIGHEST_PRECEDENCE + 1_
 
 |acrossHibernate.registerRepositoryInterceptor
+|`Boolean`
 |Should common Repository implementations in modules automatically be intercepted. Currently `JpaRepository` and the legacy
 `BasicRepository` interfaces are intercepted.  See chapter <<EntityInterceptor>> for more information.
-|true
+|_true_
 
+|acrossHibernate.jpa.persistenceUnitName
+|`String`
+|Name of the persistence unit that is being managed by this module.
+|Module name
+
+|
 |===
 
-== About the AcrossHibernateJpaModule
+== What's new in this version?
+:numbered!:
+=== 1.1.0.RELEASE
+Major addition of the new `AcrossHibernateJpaModule` as a replacement for the legacy `AcrossHibernateModule`.
+
+* JPA and Spring Data repositories support
+* `AuditableSchemaInstaller` refactored to support multiple tables
+* Addition of a `HibernateSessionHolder` bean to facilitate migration to the JPA module
+
+=== 1.0.0.RELEASE
+Initial public release available on http://search.maven.org/[Maven central].
+
+:numbered:
+== Basic configuration
+The {module-name} builds a JPA `EntityManager` for a Persistence Unit with the same name, using Hibernate as the implementation engine.
+Other modules can configure mappings in the `EntityManager` by adding them to the <<HibernatePackage,HibernatePackage>> that this module handles.
+Unless otherwise specified, the {module-name} will create its own `PlatformTransactionManager` and enable transaction management support in other modules.
+If Spring Data JPA repositories are being used, this module also allows the possibility of <<EntityInterceptor,intercepting CRUD operations>>.
+
+NOTE: Configuring default Hibernate configuration properties can be done on the {module-name} instance.
 
 === Activating Spring Data JPA Repositories
-Use *`@EnableAcrossJpaRepositories`* in your modules to generate JPA repositories based on the `AcrossHibernateJpaModule`.
-The `AcrossHibernateJpaModule` defines its own `PlatformTransactionManager` and requires a custom `JpaRepositoryFactoryBean` to
-be used for entity intercepting to work.  Using the custom annotation provides the correct default values and still allows
-customizing all attributes of the default `@EnableJpaRepositories` from Spring Data.
+Use *`@EnableAcrossJpaRepositories`* in your modules to generate JPA repositories based on the {module-name}.
+The custom annotation provides useful default values that will link to the right `PlatformTransactionManager` and will enable <<EntityInterceptor,entity intercepting>>.
 
-=== Base constructs and utilities
-==== AcrossSequenceGenerator
+See the annotation source code for the custom defaults that are being used.
+
+[[HibernatePackage]]
+=== Configuring a HibernatePackage
+{module-name} creates a `HibernatePackage` with the same name as the module itself - also the name of the JPA Persistence Unit.
+This package determines the mapping context that is available in the `EntityManager`.
+When bootstrapping, the {module-name} will scan all other packages to see if they implement the `HibernatePackageConfiguringModule` interface.
+This interface allows other modules to receive all hibernate packages being configured (in case of <<multiple-modules,multiple>>) and extending their mappings.
+
+.Example code extending a HibernatePackage
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+public class UserModule extends AcrossModule implements HibernatePackageConfiguringModule
+{
+	...
+
+	@Override
+	public void configureHibernatePackage( HibernatePackageRegistry hibernatePackage ) {
+		if ( StringUtils.equals( AcrossHibernateJpaModule.NAME, hibernatePackage.getName() ) ) {
+			hibernatePackage.addPackageToScan( "com.foreach.across.modules.user.business" );
+			hibernatePackage.add( new TableAliasProvider( schemaConfiguration.getTables() ) );
+		}
+	}
+}
+----
+
+=== Transaction management
+By default the {module-name} will create a new `PlatformTransactionManager` and will enable transaction management support in other modules.
+The `PlatformTransactionManager` bean created and exposed is named *jpaTransactionManager* (available as `HibernateJpaConfiguration.TRANSACTION_MANAGER`).
+
+Transaction manager creation can be controlled by setting the *acrossHibernate.transactionManager* property.
+
+=== Open EntityManager in View pattern
+If AcrossWebModule is present and the *acrossHibernate.persistenceContextInView.handler* property is set, the {module-name} will automatically register either a `OpenEntityManagerInViewFilter` or a `OpenEntityManagerInViewInterceptor` bean for the `EntityManager`.
+In case of a `HandlerInterceptor` the order can be modified through the *acrossHibernate.persistenceContextInView.order* property.
+
+[[unitofworkfactory]]
+=== UnitOfWorkFactory
+Usually the use of the Open EntityManager in View pattern and `@Transaction` annotations will suffice for simple use cases.
+If however you want to manually demarcate `EntityManager` scope in your code, you can also expose a `UnitOfWorkFactory` bean.
+A `UnitOfWorkFactory` allows you to easily execute a Unit of Work, code that should run in a single session.
+
+The creation of a `UnitOfWorkFactory` is controlled through the *acrossHibernate.unitOfWorkFactory* property.
+The default `UnitOfWorkFactory` only manages the `EntityManager` of the module itself.
+In case of a <<multiple-modules,multi-module>> setup, you can manually create a composite using the `CompositeUnitOfWorkFactory`.
+
+== Accessing the Hibernate Session directly
+Accessing the Hibernate `Session` directly can be done through the utility methods of the exposed `HibernateSessionHolder` bean.
+
+[[base-classes]]
+== Base classes and utilities
+In addition to the bean infrastructure, this module also provides a set of base classes and general helpers to build a persistent domain model.
+
+=== AcrossSequenceGenerator
 This is a `TableGenerator` that works cross-database and can be used to work with preset, negative id values.
 Uses the `ACROSS_SEQUENCES` table created by the `AcrossSequencesInstaller` from Across core package.
 
@@ -80,13 +184,13 @@ Uses the `ACROSS_SEQUENCES` table created by the `AcrossSequencesInstaller` from
 	private Long id;
 ----
 
-==== SettableIdBasedEntity, SettableIdAuditableEntity
-Base entity classes allowing an id to be set before persisting, using the `newEntityId` property.  The `SettableIdAuditableEntity` extension
- will automatically have auditing information updated when `SpringSecurityModule` is active and entity intercepting is enabled (default).
+=== SettableIdBasedEntity, SettableIdAuditableEntity
+Base entity classes allowing an id to be set before persisting, using the `newEntityId` property.
+The `SettableIdAuditableEntity` extension will automatically have auditing information updated when `SpringSecurityModule` is active and entity intercepting is enabled (default).
 
 The `SettableIdBasedEntity` also implements common interfaces like `IdBasedEntity`, `Persistable` and `EntityWithDto`.
-These are used by many other standard modules to automatically hookup functionality.  The base implementation is
-sufficient for many common use cases.
+These are used by many other standard modules to automatically hookup functionality.
+The base implementation is sufficient for many common use cases.
 
 .Minimal implementation of SettableIdAuditableEntity
 [source,java,indent=0]
@@ -121,22 +225,21 @@ sufficient for many common use cases.
 ----
 
 === CommonJpaRepository and IdBasedEntityJpaRepository
-Shortcut interfaces to reduce code repetition.  `CommonJpaRepository` extends the basic `JpaRepository` with the
-`JpaSpecificationExecutor` interface.  `IdBasedEntityJpaRepository` is the extension tailored to `SettableIdBasedEntity`
-implementations that use a `Long` as id type.
+Shortcut interfaces to reduce code repetition.
+`CommonJpaRepository` extends the basic `JpaRepository` with the `JpaSpecificationExecutor` interface.
+`IdBasedEntityJpaRepository` is the extension tailored to `SettableIdBasedEntity` implementations that use a `Long` as id type.
 
 Using these interfaces will ensure repository integration with other modules (for example `EntityModule`).
 
 [[EntityInterceptor]]
 == EntityInterceptor
-By default `JpaRepository` and `BasicRepository` interfaces have their `save` and `delete` methods intercepted.  Any
-module can then provide an `EntityInterceptor` bean that executes code before or after the entity state is being updated.
-Note that the `EntityInterceptor` listens to the repository calls and does not take into account when the actual session
-flushing happens (which might be at a later point in time).
+By default `JpaRepository` and `BasicRepository` interfaces have their `save` and `delete` methods intercepted.
+Any module can then provide an `EntityInterceptor` bean that executes code before or after the entity state is being updated.
+Note that the `EntityInterceptor` listens to the repository calls and does not take into account when the actual session flushing happens (which might be at a later point in time).
 
-All beans implementing `EntityInterceptor` will automatically be detected after their owning module has bootstrapped. All
-regular Across bean ordering options apply to entity interceptors.  If you are interested in only implementing part of
-the `EntityInterceptor` interface you can use the `EntityInterceptorAdapter`.
+All beans implementing `EntityInterceptor` will automatically be detected after their owning module has bootstrapped.
+All regular Across bean ordering options apply to entity interceptors.
+If you are interested in only implementing part of the `EntityInterceptor` interface you can use the `EntityInterceptorAdapter`.
 
 .Example EntityInterceptor implementation
 [source,java,indent=0]
@@ -156,27 +259,59 @@ the `EntityInterceptor` interface you can use the `EntityInterceptorAdapter`.
     }
 ----
 
-WARNING: Entity intercepting of Spring data JPA Repositories is only activated if they were created using the custom
-`EntityInterceptingJpaRepositoryFactoryBean`.  If you did not activate JPA repositories using the specific
-`@EnableAcrossJpaRepositories`, you might have to specify the factory bean class manually.
+WARNING: Entity intercepting of Spring data JPA Repositories is only activated if they were created using the custom `EntityInterceptingJpaRepositoryFactoryBean`.
+If you did not activate JPA repositories using the specific `@EnableAcrossJpaRepositories`, you might have to specify the factory bean class manually.
 
 === Known limitations
 ==== Persistable entities only
-Currently `JpaRepository` methods are only intercepted if they manage a `Persistable` entity.  Reason for this is
-the use of the `isNew` method to determine a create or update event.  Entities extending `SettableIdBasedEntity`
-automatically implement the required interface.
+Currently `JpaRepository` methods are only intercepted if they manage a `Persistable` entity.
+Reason for this is the use of the `isNew` method to determine a create or update event.
+Entities extending `SettableIdBasedEntity` automatically implement the required interface.
 
 ==== Transactional behaviour
-The `EntityInterceptor` calls happen outside the repository specific transaction.  If no outer transaction is busy
-yet, calls like `beforeCreate` and `afterCreate` will execute before the transaction is created.  If you want those
-calls to participate in the same transaction as the actual repository method you must ensure there is an outer
-transaction declared.
+The `EntityInterceptor` calls happen outside the repository specific transaction.
+If no outer transaction is busy yet, calls like `beforeCreate` and `afterCreate` will execute before the transaction is created.
+If you want those calls to participate in the same transaction as the actual repository method you must ensure there is an outer transaction declared.
 
 ==== Custom save/delete methods and recursive calls
-The `JpaRepositoryInterceptor` implementation used intercepts only the known `JpaRepository` methods.  If for some
-reason you decide to create your own save or delete methods, these will not be intercepted.
+The `JpaRepositoryInterceptor` implementation used intercepts only the known `JpaRepository` methods.
+If for some reason you decide to create your own save or delete methods, these will not be intercepted.
 
 Likewise calling any `save` or `delete` method from within the repository will not trigger them to be intercepted.
 This is due to the standard proxy behaviour.
 
+[[multiple-modules]]
+== Working with multiple EntityManagers
+The {module-name} represents a single `EntityManager` attached to a single datasource.
+If you require multiple `EntityManager` instances you can use the {module-name} as the base for a new module.
+Things to consider when doing so:
 
+* replace the default `ApplicationContextConfigurer` so it loads the same configuration as the original {module-name}
+* the name of your module will be the name of the `HibernatePackage` it configures
+* transform the exposed beans to avoid conflicts (or make them primary)
+
+.Custom module building a JPA HibernatePackage
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+public class MyJpaEntityManagerModule extends AcrossHibernateJpaModule {
+    public MyJpaEntityManagerModule( DataSource mmeDataSource ) {
+        super( mmeDataSource );
+
+		// change some properties
+        setProperty( MmeCoreConnectorModuleSettings.REGISTER_REPOSITORY_INTERCEPTOR, false );
+        setProperty( MmeCoreConnectorModuleSettings.CREATE_UNITOFWORK_FACTORY, true );
+        setProperty( MmeCoreConnectorModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER, PersistenceContextInView.FILTER );
+
+        // ensure transaction manager is named myCustomJpaTransactionManager
+		setExposeTransformer( new BeanPrefixingTransformer( "myCustom" ) );
+    }
+
+    @Override
+    protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
+        contextConfigurers.add(
+                new ComponentScanConfigurer( AcrossHibernateJpaModule.class.getPackage().getName() + ".config" )
+        );
+    }
+}
+----
