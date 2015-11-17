@@ -1,9 +1,9 @@
 = AcrossHibernateJpaModule
 Arne Vandamme
-1.1.0.RELEASE
+1.1.1-SNAPSHOT
 :toc: left
 :sectanchors:
-:module-version: 1.1.0.RELEASE
+:module-version: 1.1.1-SNAPSHOT
 :module-name: AcrossHibernateJpaModule
 :module-artifact: across-hibernate-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/AcrossHibernateModule
