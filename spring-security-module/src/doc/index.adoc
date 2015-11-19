@@ -1,7 +1,32 @@
 = SpringSecurityModule
-:toc:
+Arne Vandamme
+1.1.0.RELEASE
+:toc: left
+:sectanchors:
+:module-version: 1.1.0.RELEASE
+:module-name: SpringSecurityModule
+:module-artifact: spring-security-module
+:module-url: https://foreach.atlassian.net/wiki/display/AX/SpringSecurityModule
+:across-hibernate-module-url: https://foreach.atlassian.net/wiki/display/AX/AcrossHibernateModule
+:user-module-url: https://foreach.atlassian.net/wiki/display/AX/UserModule
+:oauth2-module-url: https://foreach.atlassian.net/wiki/display/AX/OAuth2Module
+:spring-security-acl-module-url: https://foreach.atlassian.net/wiki/display/AX/SpringSecurityAclModule
 :spring-security-url: http://projects.spring.io/spring-security/
 
+[copyright,verbatim]
+--
+Copyright (C) 2014-2015 +
+[small]#Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically.#
+--
+
+[abstract]
+== About
+This module enables support for {spring-security-url}[Spring security] for the Across based application.
+The standard Spring security filter chain and method security annotation processors will be registered automatically if this module is present.
+
+Module website: {module-url}
+
+:numbered:
 == General information
 
 === Artifact
@@ -10,54 +35,64 @@
 ----
 	<dependencies>
 		<dependency>
-			<groupId>across-standard-modules</groupId>
-			<artifactId>spring-security</artifactId>
+			<groupId>com.foreach.across.modules</groupId>
+			<artifactId>{module-artifact}</artifactId>
+			<version>{module-version}</version>
 		</dependency>
 	</dependencies>
 ----
 
 === Module dependencies
-none
 
+|===
+|Module |Type |Description
+
+|{across-hibernate-module-url}[AcrossHibernateJpaModule]
+|extension
+|Creates the <<auditable-entity-interceptor,AuditableEntityInterceptor>> bean.
+
+|===
 === Module settings
-none
+{module-name} does not have any settings.
 
-== About the SpringSecurityModule
-This module enables support for Spring security throughout the Across application.  Both the standard Spring security
-filter chain and method security annotation processors will be registered automatically if this module is present.
+== What's new in this version?
+:numbered!:
+=== 1.1.0.RELEASE
+`SecurityPrincipalService#authenticate()` now returns a `Closeable` instance.
 
-The `SpringSecurityModule` registers 2 separate modules: the `SpringSecurityInfrastructureModule` provides the `SecurityPrincipal`
- infrastructure as early as possible during the bootstrap phase, whereas the `SpringSecurityModule` itself is responsible
- for registering the security filters.  Only the `SpringSecurityModule` should be manually added to the `AcrossContext`, the
- infrastructure module will be added automatically.
+=== 1.0.0.RELEASE
+Initial public release available on http://search.maven.org/[Maven central].
 
-=== Configuring web security
+:numbered:
+== Module configuration
+The `SpringSecurityModule` registers 2 separate modules.
+The `SpringSecurityInfrastructureModule` provides the <<security-principal,SecurityPrincipal infrastructure>> as early as possible during the bootstrap phase.
+The `SpringSecurityModule` itself is responsible for registering the security filters.
+Only the `SpringSecurityModule` should be manually added to the `AcrossContext`, the infrastructure module will be added automatically.
+
+== Configuring web security
 The `SpringSecurityModule` enables support for `SpringSecurityWebConfigurer` implementations to be provided by different modules.
-Usually this is done by implementing your own `SpringSecurityWebConfigurerAdapter`.  Every `SpringSecurityWebConfigurerAdapter`
-results in a separate request filter to be added to the Spring security filter chain.  Once a request has been handled by
-a filter, all remaining filters will be skipped.
+Usually this is done by implementing your own `SpringSecurityWebConfigurerAdapter`.
+Every `SpringSecurityWebConfigurerAdapter` results in a separate request filter to be added to the Spring security filter chain.
+Once a request has been handled by a filter, all remaining filters will be skipped.
 
-For this reason *it is vital that `SpringSecurityWebConfigurerAdapter` instances are added in the correct order and are
-correctly scoped to the subset of requests they are meant for*.  The `SpringSecurityModule` respects all bean ordering
-rules that Across provides: using the module order by default and allowing the use of `@Order`, `@OrderInModule` or
-their respective interfaces.
+For this reason *it is vital that `SpringSecurityWebConfigurerAdapter` instances are added in the correct order and are correctly scoped to the subset of requests they are meant for*.
+The `SpringSecurityModule` respects all bean ordering rules that Across provides: using the module order by default and allowing the use of `@Order`, `@OrderInModule` or their respective interfaces.
 
 NOTE: Spring security itself allows very advanced configuration and customization.
-Please refer to the official {spring-security-url}[Spring security documentation] for more details.
+Please refer to the official {spring-security-url}[Spring security] documentation for more details.
 
-.Debugging `SpringSecurityWebConfigurer` ordering
-If you want to trace the different configurers that are being applied, you should enable `DEBUG` logging for class
-`com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration`.  This will output the different
-configurer beans in the order they will be applied, along with their type, bean and module name (if available).
+=== Debugging SpringSecurityWebConfigurer ordering
+If you want to trace the different configurers that are being applied, you should enable `DEBUG` logging for class `com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration`.
+This will output the different configurer beans in the order they will be applied, along with their type, bean and module name (if available).
 
-=== SecurityPrincipal abstraction
-The `SpringSecurityModule` provides an additional abstraction layer on top of the standard `Authentication` in the form
-of the `SecurityPrincipal` interface.  Other modules like the `UserModule` and `OAuth2Module` provide an implementation
- of  the `SecurityPrincipal` concept.
+[[security-principal]]
+== SecurityPrincipal abstraction
+The `SpringSecurityModule` provides an additional abstraction layer on top of the standard `Authentication` in the form of the `SecurityPrincipal` interface.
+Other modules like the {user-module-url}[UserModule] and {oauth2-module-url}[OAuth2Module] provide an implementation of  the `SecurityPrincipal` concept.
 
-Since `SecurityPrincipal` is a relatively straightforward interface, a principal can be pretty much anything
-(user, group, machine...).  The only requirement is that every `SecurityPrincipal` has a *unique principal name* that
-identifies it.
+Since `SecurityPrincipal` is a relatively straightforward interface, a principal can be pretty much anything (user, group, machine...).
+The only requirement is that every `SecurityPrincipal` has a *unique principal name* that identifies it.
 
 Several beans are available for interacting with the current security principal:
 
@@ -69,9 +104,10 @@ Several beans are available for interacting with the current security principal:
 Also provides some helper methods to quickly authenticate or de-authenticate a principal.
 
 | `CurrentSecurityPrincipalProxy`
-| Proxies the current security principal (if there is one).  Allows authority checking from anywhere in your code using the `hasAuthority(String)` method.
+| Proxies the current security principal (if there is one).
+Allows authority checking from anywhere in your code using the `hasAuthority(String)` method.
 
-The `SpringSecurityAclModule` wires a `CurrentAclSecurityPrincipalProxy` instead that provides additional methods
+The {spring-security-acl-module-url}[SpringSecurityAclModule] wires a `CurrentAclSecurityPrincipalProxy` instead that provides additional methods
 to check for ACL permissions.
 
 |===
@@ -88,20 +124,17 @@ to check for ACL permissions.
     }
 ----
 
-=== AllowableActions
-`SpringSecurityModule` also provides an `AllowableActions` construct that can easily be used to define a set
-of actions that can be performed on an item.  The purpose is for code to check if an action is present in the `AllowableActions`
-collection, meaning that the action can be performed.  This helps decoupling your business code from the specifics
-of the security layer and can be supported in both an ACL and non-ACL context.
+== AllowableActions
+`SpringSecurityModule` also provides an `AllowableActions` construct that can easily be used to define a set of actions that can be performed on an item.
+The purpose is for code to check if an action is present in the `AllowableActions` collection, meaning that the action can be performed.
+This helps decoupling your business code from the specifics of the security layer and can be supported in both an ACL and non-ACL context.
 
-A single `AllowableAction` is identified by a unique string, making it very easy to extend.  Useful implementations
-can be found in the `com.foreach.across.modules.spring.security.actions` package.  The `AuthorityMatchingAllowableActions`
-maps `AllowableAction` on `AuthorityMatcher` and provides concrete implementation supporting both `Authentication` and
-`SecurityPrincipal`.
+A single `AllowableAction` is identified by a unique string, making it very easy to extend.
+Useful implementations can be found in the `com.foreach.across.modules.spring.security.actions` package.
+The `AuthorityMatchingAllowableActions` maps `AllowableAction` on `AuthorityMatcher` and provides concrete implementation supporting both `Authentication` and `SecurityPrincipal`.
 
-Actions can be mapped against anything (most likely authorities or ACL permissions) and can also be completely different
- depending on the target they need to be applied to.  This allows for as much granularity you might want, without having
- to change your permission model.
+Actions can be mapped against anything (most likely authorities or ACL permissions) and can also be completely different depending on the target they need to be applied to.
+This allows for as much granularity you might want, without having to change your permission model.
 
 .Example of mapping AllowableActions against GrantedAuthorities
 [source,java,indent=0]
@@ -121,8 +154,11 @@ Actions can be mapped against anything (most likely authorities or ACL permissio
 
 TIP: Use the `AllowableAction` concept to hide specifics of the security permission layer.
 
+[[auditable-entity-interceptor]]
 
-
+== AuditableEntityInterceptor
+If the {across-hibernate-module-url}[AcrossHibernateJpaModule] is present in the Across context, an `AuditableEntityInterceptor` bean will be created.
+Any entity implementing the `com.foreach.across.modules.hibernate.business.Auditable` interface will get its auditing properties updated before it is persisted.
 
 
 
