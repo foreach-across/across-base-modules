@@ -48,66 +48,70 @@ public class ServletContextInfoController
 
 		model.addAttribute( "filtersTable", table );
 
-        Table filterMapsTable = new Table("Order of registered servlet filters");
-        List<String> filterMaps = getFilterMaps();
-        if (filterMaps != null) {
-            model.addAttribute("filterMaps", filterMapsTable);
-            int index = 0;
-            for (String filterMap : filterMaps) {
-                filterMapsTable.addRow(index++, filterMap);
-            }
-        }
+		Table filterMapsTable = new Table( "Order of registered servlet filters" );
+		List<String> filterMaps = getFilterMaps();
+		if ( filterMaps != null ) {
+			model.addAttribute( "filterMaps", filterMapsTable );
+			int index = 0;
+			for ( String filterMap : filterMaps ) {
+				filterMapsTable.addRow( index++, filterMap );
+			}
+		}
 
 		return DebugWeb.VIEW_SERVLET_FILTERS;
 	}
 
-    public List<String> getFilterMaps() {
-        Object applicationContext = getField(servletContext, "context");
-        if (applicationContext != null) {
-            Object standardContext = getField(applicationContext, "context");
-            if (servletContext != null) {
-                Object filterMapsObject = getField(standardContext, "filterMaps");
-                if( filterMapsObject != null ) {
-                    Object filterMapArray = getField(filterMapsObject, "array");
-                    if ( filterMapArray == null) {
-                        // Jboss holds a FilterMap[] inside the StandardContext
-                        return getFieldMapList( filterMapsObject );
-                    } else {
-                        // Tomcat uses an internal object to represent the filter maps
-                        return getFieldMapList( filterMapArray );
-                    }
-                }
-            }
-        }
-        return null;
-    }
+	public List<String> getFilterMaps() {
+		Object applicationContext = getField( servletContext, "context" );
+		if ( applicationContext != null ) {
+			Object standardContext = getField( applicationContext, "context" );
+			if ( servletContext != null ) {
+				Object filterMapsObject = getField( standardContext, "filterMaps" );
+				if ( filterMapsObject != null ) {
+					Object filterMapArray = getField( filterMapsObject, "array" );
+					if ( filterMapArray == null ) {
+						// Jboss holds a FilterMap[] inside the StandardContext
+						return getFieldMapList( filterMapsObject );
+					}
+					else {
+						// Tomcat uses an internal object to represent the filter maps
+						return getFieldMapList( filterMapArray );
+					}
+				}
+			}
+		}
+		return null;
+	}
 
-    private List<String> getFieldMapList(Object filterMapArray) {
-        if( filterMapArray.getClass().isArray() ) {
-            List<String> filterMaps;
-            filterMaps = new LinkedList<>();
-            for (Object item : (Object[] )filterMapArray) {
-                filterMaps.add(item.toString());
-            }
-            return filterMaps;
-        } else {
-            return null;
-        }
-    }
+	private List<String> getFieldMapList( Object filterMapArray ) {
+		if ( filterMapArray.getClass().isArray() ) {
+			List<String> filterMaps;
+			filterMaps = new LinkedList<>();
+			for ( Object item : (Object[]) filterMapArray ) {
+				filterMaps.add( item.toString() );
+			}
+			return filterMaps;
+		}
+		else {
+			return null;
+		}
+	}
 
-    public Object getField(Object object, String fieldName) {
-        Field f = ReflectionUtils.findField(object.getClass(), fieldName);
-        if (f != null) {
-            try {
-                ReflectionUtils.makeAccessible(f);
-                return ReflectionUtils.getField(f, object);
-            } catch ( Exception e) {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
+	public Object getField( Object object, String fieldName ) {
+		Field f = ReflectionUtils.findField( object.getClass(), fieldName );
+		if ( f != null ) {
+			try {
+				ReflectionUtils.makeAccessible( f );
+				return ReflectionUtils.getField( f, object );
+			}
+			catch ( Exception e ) {
+				return null;
+			}
+		}
+		else {
+			return null;
+		}
+	}
 
 	@RequestMapping("/servlet/servlets")
 	public String showServlets( Model model ) {
