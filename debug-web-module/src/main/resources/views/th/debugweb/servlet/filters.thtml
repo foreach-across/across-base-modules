@@ -20,5 +20,13 @@
 </head>
 <body th:fragment="content">
 	<div class="row" th:replace="th/across :: table (${filtersTable})"></div>
+    <th:block th:if="${filterMaps != null}">
+      <div class="row" th:replace="th/across :: table (${filterMaps})"></div>
+    </th:block>
+    <th:block th:if="${filterMaps == null}">
+      <div class="alert alert-danger">
+        This application container is not supported.
+      </div>
+    </th:block>
 </body>
 </html>
