@@ -17,6 +17,7 @@ package com.foreach.across.modules.hibernate.jpa.unitofwork;
 
 import com.foreach.across.modules.hibernate.unitofwork.CallableUnitOfWork;
 import com.foreach.across.modules.hibernate.unitofwork.RunnableUnitOfWork;
+import com.foreach.across.modules.hibernate.unitofwork.UnitOfWork;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.orm.jpa.EntityManagerHolder;
@@ -73,7 +74,7 @@ public class JpaUnitOfWorkFactoryImpl implements UnitOfWorkFactory
 	/**
 	 * Starts a new unit of work: opens all Sessions.
 	 */
-	public UnitOfWorkFactory start() {
+	public UnitOfWork start() {
 		for ( EntityManagerFactory emf : entityManagerFactories ) {
 			try {
 				if ( !TransactionSynchronizationManager.hasResource( emf ) ) {
@@ -90,7 +91,7 @@ public class JpaUnitOfWorkFactoryImpl implements UnitOfWorkFactory
 				LOG.error( "Exception starting unit of work for {}", emf, e );
 			}
 		}
-		return this;
+		return new UnitOfWork( this );
 	}
 
 	/**
@@ -118,14 +119,5 @@ public class JpaUnitOfWorkFactoryImpl implements UnitOfWorkFactory
 				LOG.error( "Exception stopping unit of work for {}", emf, e );
 			}
 		}
-	}
-
-	/**
-	 * Stops the unit of work: closes all Sessions.
-	 * delegates to {@link JpaUnitOfWorkFactoryImpl#stop()}.
-	 */
-	@Override
-	public void close() {
-		stop();
 	}
 }

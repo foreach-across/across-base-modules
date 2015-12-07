@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
  * @see org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor
  * @see org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor
  */
-public interface UnitOfWorkFactory extends Closeable
+public interface UnitOfWorkFactory
 {
 	static final Logger LOG = LoggerFactory.getLogger( UnitOfWorkFactory.class );
 
@@ -53,7 +53,7 @@ public interface UnitOfWorkFactory extends Closeable
 	/**
 	 * Starts a new unit of work: opens all Sessions.
 	 */
-	UnitOfWorkFactory start();
+	UnitOfWork start();
 
 	/**
 	 * Stops the unit of work: closes all Sessions.
@@ -65,10 +65,4 @@ public interface UnitOfWorkFactory extends Closeable
 	 * to the current thread.
 	 */
 	void restart();
-
-	/**
-	 * Stops the unit of work: closes all Sessions.
-	 * delegates to {@link UnitOfWorkFactory#stop()}.
-	 */
-	void close();
 }

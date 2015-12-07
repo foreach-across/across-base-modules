@@ -68,13 +68,13 @@ public class CompositeUnitOfWorkFactory implements UnitOfWorkFactory
 	 * Starts a new unit of work.
 	 */
 	@Override
-	public UnitOfWorkFactory start() {
+	public UnitOfWork start() {
 		for ( UnitOfWorkFactory unitOfWorkFactory : members ) {
 			if ( unitOfWorkFactory != this ) {
 				unitOfWorkFactory.start();
 			}
 		}
-		return this;
+		return new UnitOfWork( this );
 	}
 
 	/**
@@ -87,15 +87,6 @@ public class CompositeUnitOfWorkFactory implements UnitOfWorkFactory
 				unitOfWorkFactory.stop();
 			}
 		}
-	}
-
-	/**
-	 * Stop the unit of work.
-	 * delegates to {@link CompositeUnitOfWorkFactory#stop()}.
-	 */
-	@Override
-	public void close() {
-		stop();
 	}
 }
 
