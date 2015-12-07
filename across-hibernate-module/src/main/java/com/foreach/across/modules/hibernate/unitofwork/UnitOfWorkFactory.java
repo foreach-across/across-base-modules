@@ -18,6 +18,7 @@ package com.foreach.across.modules.hibernate.unitofwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.util.concurrent.Callable;
 
 /**
@@ -52,7 +53,7 @@ public interface UnitOfWorkFactory
 	/**
 	 * Starts a new unit of work: opens all Sessions.
 	 */
-	void start();
+	UnitOfWork start();
 
 	/**
 	 * Stops the unit of work: closes all Sessions.

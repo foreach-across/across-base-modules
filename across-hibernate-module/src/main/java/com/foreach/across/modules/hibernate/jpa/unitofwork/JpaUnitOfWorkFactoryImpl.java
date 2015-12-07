@@ -17,6 +17,7 @@ package com.foreach.across.modules.hibernate.jpa.unitofwork;
 
 import com.foreach.across.modules.hibernate.unitofwork.CallableUnitOfWork;
 import com.foreach.across.modules.hibernate.unitofwork.RunnableUnitOfWork;
+import com.foreach.across.modules.hibernate.unitofwork.UnitOfWork;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.orm.jpa.EntityManagerHolder;
@@ -73,7 +74,7 @@ public class JpaUnitOfWorkFactoryImpl implements UnitOfWorkFactory
 	/**
 	 * Starts a new unit of work: opens all Sessions.
 	 */
-	public void start() {
+	public UnitOfWork start() {
 		for ( EntityManagerFactory emf : entityManagerFactories ) {
 			try {
 				if ( !TransactionSynchronizationManager.hasResource( emf ) ) {
@@ -90,6 +91,7 @@ public class JpaUnitOfWorkFactoryImpl implements UnitOfWorkFactory
 				LOG.error( "Exception starting unit of work for {}", emf, e );
 			}
 		}
+		return new UnitOfWork( this );
 	}
 
 	/**

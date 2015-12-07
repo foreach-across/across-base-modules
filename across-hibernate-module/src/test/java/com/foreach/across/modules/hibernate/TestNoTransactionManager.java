@@ -22,6 +22,7 @@ import com.foreach.across.modules.hibernate.testmodules.hibernate1.Hibernate1Mod
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Product;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.ProductRepository;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Module;
+import com.foreach.across.modules.hibernate.unitofwork.UnitOfWork;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
@@ -70,13 +71,8 @@ public class TestNoTransactionManager
 
 	@Test
 	public void unitOfWorkShouldWork() {
-		unitOfWork.start();
-
-		try {
+		try( UnitOfWork ignore = unitOfWork.start() ) {
 			createAndGetProduct();
-		}
-		finally {
-			unitOfWork.stop();
 		}
 	}
 

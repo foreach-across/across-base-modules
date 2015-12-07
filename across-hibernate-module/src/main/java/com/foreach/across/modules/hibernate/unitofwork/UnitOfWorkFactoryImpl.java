@@ -61,8 +61,9 @@ public class UnitOfWorkFactoryImpl implements UnitOfWorkFactory
 	/**
 	 * Starts a new unit of work: opens all Sessions.
 	 */
-	public void start() {
+	public UnitOfWork start() {
 		start( false );
+		return new UnitOfWork( this );
 	}
 
 	/**

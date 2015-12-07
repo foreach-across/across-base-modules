@@ -13,24 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.hibernate.unitofwork;
 
-import java.util.concurrent.Callable;
+import java.io.Closeable;
 
-public class CallableUnitOfWork<V> implements Callable<V>
+public class UnitOfWork implements Closeable
 {
 	private final UnitOfWorkFactory unitOfWorkFactory;
-	private final Callable<V> callable;
 
-	public CallableUnitOfWork( UnitOfWorkFactory unitOfWorkFactory, Callable<V> callable ) {
+	public UnitOfWork( UnitOfWorkFactory unitOfWorkFactory ) {
 		this.unitOfWorkFactory = unitOfWorkFactory;
-		this.callable = callable;
 	}
 
-	@SuppressWarnings("SignatureDeclareThrowsException")
-	public V call() throws Exception {
-		try( UnitOfWork ignore = unitOfWorkFactory.start() ) {
-			return callable.call();
-		}
+	/**
+	 * Stop the unit of work, delegates to {@link UnitOfWorkFactory#stop()}.
+	 */
+	@Override
+	public void close() {
+		unitOfWorkFactory.stop();
+	}
+
+	/**
+	 * Restart the unit of work, delegates to {@link UnitOfWorkFactory#restart()}.
+	 */
+	public void restart() {
+		unitOfWorkFactory.restart();
 	}
 }
