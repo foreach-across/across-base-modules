@@ -61,8 +61,9 @@ public class UnitOfWorkFactoryImpl implements UnitOfWorkFactory
 	/**
 	 * Starts a new unit of work: opens all Sessions.
 	 */
-	public void start() {
+	public UnitOfWorkFactory start() {
 		start( false );
+		return this;
 	}
 
 	/**
@@ -123,5 +124,14 @@ public class UnitOfWorkFactoryImpl implements UnitOfWorkFactory
 				LOG.error( "Exception stopping unit of work for {}", sessionFactory, e );
 			}
 		}
+	}
+
+	/**
+	 * Stops the unit of work: closes all Sessions.
+	 * delegates to {@link UnitOfWorkFactoryImpl#stop()}.
+	 */
+	@Override
+	public void close() {
+		stop();
 	}
 }

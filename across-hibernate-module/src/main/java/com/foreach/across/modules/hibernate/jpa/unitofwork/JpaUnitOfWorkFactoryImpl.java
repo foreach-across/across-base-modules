@@ -73,7 +73,7 @@ public class JpaUnitOfWorkFactoryImpl implements UnitOfWorkFactory
 	/**
 	 * Starts a new unit of work: opens all Sessions.
 	 */
-	public void start() {
+	public UnitOfWorkFactory start() {
 		for ( EntityManagerFactory emf : entityManagerFactories ) {
 			try {
 				if ( !TransactionSynchronizationManager.hasResource( emf ) ) {
@@ -90,6 +90,7 @@ public class JpaUnitOfWorkFactoryImpl implements UnitOfWorkFactory
 				LOG.error( "Exception starting unit of work for {}", emf, e );
 			}
 		}
+		return this;
 	}
 
 	/**
@@ -117,5 +118,14 @@ public class JpaUnitOfWorkFactoryImpl implements UnitOfWorkFactory
 				LOG.error( "Exception stopping unit of work for {}", emf, e );
 			}
 		}
+	}
+
+	/**
+	 * Stops the unit of work: closes all Sessions.
+	 * delegates to {@link JpaUnitOfWorkFactoryImpl#stop()}.
+	 */
+	@Override
+	public void close() {
+		stop();
 	}
 }

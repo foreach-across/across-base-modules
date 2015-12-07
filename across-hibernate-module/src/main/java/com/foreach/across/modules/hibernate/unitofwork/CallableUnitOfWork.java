@@ -29,13 +29,8 @@ public class CallableUnitOfWork<V> implements Callable<V>
 
 	@SuppressWarnings("SignatureDeclareThrowsException")
 	public V call() throws Exception {
-		try {
-			unitOfWorkFactory.start();
-
+		try( UnitOfWorkFactory ignore = unitOfWorkFactory.start() ) {
 			return callable.call();
-		}
-		finally {
-			unitOfWorkFactory.stop();
 		}
 	}
 }

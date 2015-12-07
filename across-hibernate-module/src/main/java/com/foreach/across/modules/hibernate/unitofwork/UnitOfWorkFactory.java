@@ -18,6 +18,7 @@ package com.foreach.across.modules.hibernate.unitofwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.util.concurrent.Callable;
 
 /**
@@ -28,7 +29,7 @@ import java.util.concurrent.Callable;
  * @see org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor
  * @see org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor
  */
-public interface UnitOfWorkFactory
+public interface UnitOfWorkFactory extends Closeable
 {
 	static final Logger LOG = LoggerFactory.getLogger( UnitOfWorkFactory.class );
 
@@ -52,7 +53,7 @@ public interface UnitOfWorkFactory
 	/**
 	 * Starts a new unit of work: opens all Sessions.
 	 */
-	void start();
+	UnitOfWorkFactory start();
 
 	/**
 	 * Stops the unit of work: closes all Sessions.
@@ -64,4 +65,10 @@ public interface UnitOfWorkFactory
 	 * to the current thread.
 	 */
 	void restart();
+
+	/**
+	 * Stops the unit of work: closes all Sessions.
+	 * delegates to {@link UnitOfWorkFactory#stop()}.
+	 */
+	void close();
 }

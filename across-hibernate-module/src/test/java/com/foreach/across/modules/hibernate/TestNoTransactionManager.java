@@ -70,13 +70,8 @@ public class TestNoTransactionManager
 
 	@Test
 	public void unitOfWorkShouldWork() {
-		unitOfWork.start();
-
-		try {
+		try( UnitOfWorkFactory ignore = unitOfWork.start() ) {
 			createAndGetProduct();
-		}
-		finally {
-			unitOfWork.stop();
 		}
 	}
 

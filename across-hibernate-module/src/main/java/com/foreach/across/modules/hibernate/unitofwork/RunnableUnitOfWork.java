@@ -26,13 +26,8 @@ public class RunnableUnitOfWork implements Runnable
 	}
 
 	public void run() {
-		try {
-			unitOfWorkFactory.start();
-
+		try( UnitOfWorkFactory ignore = unitOfWorkFactory.start() ) {
 			runnable.run();
-		}
-		finally {
-			unitOfWorkFactory.stop();
 		}
 	}
 }
