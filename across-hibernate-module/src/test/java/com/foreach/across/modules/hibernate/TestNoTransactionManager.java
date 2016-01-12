@@ -24,7 +24,6 @@ import com.foreach.across.modules.hibernate.testmodules.hibernate1.ProductReposi
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Module;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWork;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
-import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.junit.Test;
