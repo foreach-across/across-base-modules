@@ -1,11 +1,6 @@
 package com.foreach.across.modules.hibernate;
 
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.context.bootstrap.AcrossBootstrapConfig;
-import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
-import com.foreach.across.core.context.configurer.SingletonBeanConfigurer;
-import com.foreach.across.modules.hibernate.provider.HibernatePackage;
-import com.foreach.across.modules.hibernate.provider.HibernatePackageConfiguringModule;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageProvider;
 
 import javax.sql.DataSource;
@@ -58,7 +53,7 @@ public abstract class AbstractHibernatePackageModule extends AcrossModule
 	 * interface.
 	 *
 	 * @return True if modules will be scanned and activated automatically.
-	 * @see com.foreach.across.modules.hibernate.provider.HibernatePackageConfiguringModule
+	 * @see com.foreach.across.modules.hibernate.provider.HibernatePackageConfigurer
 	 */
 	public boolean isScanForHibernatePackages() {
 		return scanForHibernatePackages;
@@ -90,29 +85,5 @@ public abstract class AbstractHibernatePackageModule extends AcrossModule
 
 	public void setHibernateProperty( String name, String value ) {
 		getHibernateProperties().put( name, value );
-	}
-
-	@Override
-	public void prepareForBootstrap( ModuleBootstrapConfig currentModule, AcrossBootstrapConfig contextConfig ) {
-		HibernatePackage hibernatePackage = new HibernatePackage( getName() );
-
-		for ( HibernatePackageProvider provider : getHibernatePackageProviders() ) {
-			hibernatePackage.add( provider );
-		}
-
-		if ( isScanForHibernatePackages() ) {
-			for ( ModuleBootstrapConfig config : contextConfig.getModules() ) {
-				AcrossModule module = config.getModule();
-
-				if ( module instanceof HibernatePackageConfiguringModule ) {
-					( (HibernatePackageConfiguringModule) module ).configureHibernatePackage( hibernatePackage );
-				}
-			}
-		}
-
-		currentModule.addApplicationContextConfigurer(
-				new SingletonBeanConfigurer( "hibernatePackage", hibernatePackage, true )
-		);
-
 	}
 }

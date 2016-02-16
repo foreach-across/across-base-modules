@@ -23,6 +23,7 @@ import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.database.DatabaseInfo;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
+import com.foreach.across.modules.hibernate.config.HibernatePackageBuilder;
 import com.foreach.across.modules.hibernate.config.InterceptorRegistryConfiguration;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
@@ -60,7 +61,7 @@ import java.util.Map;
  * @see com.foreach.across.modules.hibernate.config.TransactionManagerConfiguration
  */
 @Configuration
-@Import(InterceptorRegistryConfiguration.class)
+@Import({ InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class })
 @AcrossEventHandler
 public class HibernateJpaConfiguration
 {

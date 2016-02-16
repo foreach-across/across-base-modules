@@ -18,12 +18,10 @@ package com.foreach.across.modules.hibernate.testmodules.hibernate2;
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
 import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
-import com.foreach.across.modules.hibernate.provider.HibernatePackageConfiguringModule;
-import com.foreach.across.modules.hibernate.provider.HibernatePackageRegistry;
 
 import java.util.Set;
 
-public class Hibernate2Module extends AcrossModule implements HibernatePackageConfiguringModule
+public class Hibernate2Module extends AcrossModule
 {
 	@Override
 	public String getName() {
@@ -38,10 +36,5 @@ public class Hibernate2Module extends AcrossModule implements HibernatePackageCo
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
 		contextConfigurers.add( new ComponentScanConfigurer( getClass().getPackage().getName() ) );
-	}
-
-	@Override
-	public void configureHibernatePackage( HibernatePackageRegistry hibernatePackage ) {
-		hibernatePackage.addPackageToScan( getClass() );
 	}
 }
