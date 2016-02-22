@@ -1,4 +1,4 @@
-/*
+package com.foreach.across.modules.debugweb.test;/*
  * Copyright 2014 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.test.modules.debugweb;
 
-import com.foreach.across.core.AcrossModule;
+import com.foreach.across.config.AcrossApplication;
 import com.foreach.across.modules.debugweb.DebugWebModule;
-import com.foreach.across.test.AbstractAcrossModuleConventionsTest;
+import org.springframework.boot.SpringApplication;
 
 /**
  * @author Arne Vandamme
  */
-public class TestDebugWebModuleConventions extends AbstractAcrossModuleConventionsTest
+@AcrossApplication(modules = DebugWebModule.NAME)
+public class DebugWebRootPathApplication
 {
-	@Override
-	protected AcrossModule createModule() {
-		return new DebugWebModule();
+	public static void main( String[] args ) {
+		SpringApplication app = new SpringApplication( DebugWebRootPathApplication.class );
+		app.setAdditionalProfiles( "root" );
+		app.run( args );
 	}
 }

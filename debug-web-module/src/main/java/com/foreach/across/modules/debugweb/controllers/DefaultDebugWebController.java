@@ -33,9 +33,9 @@ public class DefaultDebugWebController
 
 	@RequestMapping({ "", "/" })
 	public String landingPage() {
-		String path = settings.getDashboardPath();
+		String path = settings.getDashboard();
 
-		if ( !StringUtils.equals( path, "/" ) ) {
+		if ( !StringUtils.equals( path, DebugWebModuleSettings.DEFAULT_DASHBOARD ) ) {
 			return debugWeb.redirect( path );
 		}
 

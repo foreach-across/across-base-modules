@@ -20,6 +20,7 @@ import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.DebugWebModule;
+import com.foreach.across.modules.debugweb.DebugWebModuleSettings;
 import com.foreach.across.modules.debugweb.config.support.DebugWebConfigurerAdapter;
 import com.foreach.across.modules.debugweb.mvc.DebugMenu;
 import com.foreach.across.modules.web.context.PrefixingPathRegistry;
@@ -54,6 +55,9 @@ public class DebugWebInterceptorsConfiguration extends DebugWebConfigurerAdapter
 	@Autowired
 	private PrefixingPathRegistry prefixingPathRegistry;
 
+	@Autowired
+	private DebugWebModuleSettings debugWebModuleSettings;
+
 	@Override
 	public void addInterceptors( InterceptorRegistry interceptorRegistry ) {
 		interceptorRegistry.addInterceptor( new WebAppPathResolverExposingInterceptor( debugWeb() ) );
@@ -64,7 +68,7 @@ public class DebugWebInterceptorsConfiguration extends DebugWebConfigurerAdapter
 	@Bean(name = DebugWeb.NAME)
 	@Exposed
 	public DebugWeb debugWeb() {
-		DebugWeb debugWeb = new DebugWeb( debugWebModule.getRootPath() );
+		DebugWeb debugWeb = new DebugWeb( debugWebModuleSettings.getRootPath() );
 		prefixingPathRegistry.add( DebugWeb.NAME, debugWeb );
 
 		return debugWeb;

@@ -24,14 +24,13 @@ public class DebugWebModule extends AcrossModule
 	public static final String NAME = "DebugWebModule";
 	public static final String RESOURCES = "debugweb";
 
-	private String rootPath = "/debug";
-
 	public void setRootPath( String rootPath ) {
-		this.rootPath = rootPath;
+		setProperty( "debugWebModule.root-path", rootPath );
 	}
 
+	@Deprecated
 	public String getRootPath() {
-		return rootPath;
+		return getProperties().getProperty( "debugWebModule.root-path", "/debug" );
 	}
 
 	/**

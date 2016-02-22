@@ -33,9 +33,9 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="debug-web" target="1.7" />
-      <module name="debug-web-module" target="1.7" />
-      <module name="debug-web-test-web" target="1.7" />
+      <module name="debug-web" target="1.8" />
+      <module name="debug-web-module" target="1.8" />
+      <module name="debug-web-test-web" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

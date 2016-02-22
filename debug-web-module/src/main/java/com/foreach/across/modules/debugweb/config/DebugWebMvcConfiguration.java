@@ -16,7 +16,7 @@
 package com.foreach.across.modules.debugweb.config;
 
 import com.foreach.across.core.annotations.Exposed;
-import com.foreach.across.modules.debugweb.DebugWebModule;
+import com.foreach.across.modules.debugweb.DebugWebModuleSettings;
 import com.foreach.across.modules.debugweb.mvc.DebugMenu;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuBuilder;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
@@ -41,17 +41,17 @@ public class DebugWebMvcConfiguration extends PrefixingHandlerMappingConfigurati
 	private MenuFactory menuFactory;
 
 	@Autowired
-	private DebugWebModule debugWebModule;
+	private DebugWebModuleSettings debugWebModuleSettings;
 
 	@PostConstruct
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public void initialize() {
 		menuFactory.addMenuBuilder( debugMenuBuilder(), DebugMenu.class );
 	}
 
 	@Override
 	protected String getPrefixPath() {
-		return debugWebModule.getRootPath();
+		return debugWebModuleSettings.getRootPath();
 	}
 
 	@Override

@@ -15,41 +15,42 @@
  */
 package com.foreach.across.modules.debugweb;
 
-import com.foreach.across.core.AcrossModuleSettings;
-import com.foreach.across.core.AcrossModuleSettingsRegistry;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Arne Vandamme
  */
-public class DebugWebModuleSettings extends AcrossModuleSettings
+@ConfigurationProperties(prefix = "debugWebModule")
+public class DebugWebModuleSettings
 {
-	public static final String DASHBOARD_PATH = "debugWeb.dashboard";
+	public static final String DEFAULT_DASHBOARD = "/";
 
-	private String dashboardPath = null;
-
-	@Override
-	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
-		registry.register( DASHBOARD_PATH, String.class, null,
-		                   "Relative path (within debug web) for the landing page of debug web." );
-	}
+	@SuppressWarnings( "unused" )
+	public static final String DASHBOARD_PATH = "debugWebModule.dashboard-path";
 
 	/**
-	 * Allows changing the debug web dashboard path at runtime.
-	 *
-	 * @param dashboardPath Path within the debug web context to the dashboard.
+	 * Path within the debug web context for the initial dashboard.
 	 */
-	public void setDashboardPath( String dashboardPath ) {
-		this.dashboardPath = dashboardPath;
+	private String dashboard = DEFAULT_DASHBOARD;
+
+	/**
+	 * Root path for all debug web controllers.  All mappings will be relative to this path.
+	 */
+	private String rootPath = "/debug";
+
+	public String getDashboard() {
+		return dashboard;
 	}
 
-	public String getDashboardPath() {
-		if ( dashboardPath == null ) {
-			String path = getProperty( DASHBOARD_PATH );
+	public void setDashboard( String dashboard ) {
+		this.dashboard = dashboard;
+	}
 
-			return StringUtils.isEmpty( path ) ? "/" : path;
-		}
+	public String getRootPath() {
+		return rootPath;
+	}
 
-		return dashboardPath;
+	public void setRootPath( String rootPath ) {
+		this.rootPath = rootPath;
 	}
 }
