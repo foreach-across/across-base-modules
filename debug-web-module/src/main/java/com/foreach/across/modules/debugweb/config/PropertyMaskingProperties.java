@@ -37,18 +37,18 @@ public class PropertyMaskingProperties
 	private String[] maskedProperties = new String[0];
 
 	public String[] getMasks() {
-		return masks;
+		return masks.clone();
 	}
 
 	public void setMasks( String[] masks ) {
-		this.masks = masks;
+		this.masks = masks.clone();
 	}
 
 	public String[] getMaskedProperties() {
-		return maskedProperties;
+		return maskedProperties.clone();
 	}
 
 	public void setMaskedProperties( String[] maskedProperties ) {
-		this.maskedProperties = maskedProperties;
+		this.maskedProperties = maskedProperties.clone();
 	}
 }
