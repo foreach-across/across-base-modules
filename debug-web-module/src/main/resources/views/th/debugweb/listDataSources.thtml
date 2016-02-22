@@ -19,8 +19,11 @@
 	<title>List information about drivers/datasources</title>
 </head>
 <body th:fragment="content">
+<div th:if="${#lists.isEmpty(drivers)}" class="alert alert-warning">
+	No datasources or drivers have been registered.
+</div>
 
-<div class="row debug-web-handlers" th:each="driver : ${drivers}">
+<div th:unless="${#lists.isEmpty(drivers)}" class="row debug-web-handlers" th:each="driver : ${drivers}">
 	<div th:replace="th/across :: table (${driver})"></div>
 </div>
 </body>

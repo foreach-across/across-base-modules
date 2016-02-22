@@ -80,20 +80,22 @@ public class DataSourcesController
 		if ( !CollectionUtils.isEmpty( dataSources ) ) {
 			int i = 1;
 			for ( DataSource dataSource : dataSources ) {
-				Table table = new Table( "Datasource " + i );
-				interestingFields( dataSource, table );
-				tables.add( table );
+				if ( dataSource != null ) {
+					Table table = new Table( "Datasource " + i );
+					interestingFields( dataSource, table );
+					tables.add( table );
 
-				Table metadata = new Table( "Datasource metadata " + i );
-				try (Connection conn = dataSource.getConnection()) {
-					interestingFields( conn.getMetaData(), metadata, true );
-				}
-				catch ( SQLException e ) {
-					// Do nothing
-				}
+					Table metadata = new Table( "Datasource metadata " + i );
+					try (Connection conn = dataSource.getConnection()) {
+						interestingFields( conn.getMetaData(), metadata, true );
+					}
+					catch ( SQLException e ) {
+						// Do nothing
+					}
 
-				tables.add( metadata );
-				i++;
+					tables.add( metadata );
+					i++;
+				}
 			}
 		}
 		model.addAttribute( "drivers", tables );
