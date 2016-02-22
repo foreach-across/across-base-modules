@@ -20,12 +20,12 @@ import com.foreach.across.core.context.ExposedBeanDefinition;
 import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.events.AcrossEventPublisher;
 import com.foreach.across.modules.debugweb.DebugWeb;
+import com.foreach.across.modules.debugweb.config.PropertyMaskingProperties;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.debugweb.util.ContextDebugInfo;
 import net.engio.mbassy.listener.Handler;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.BeanFactory;
@@ -53,6 +53,9 @@ public class AcrossInfoController
 
 	@Autowired
 	private AcrossEventPublisher publisher;
+
+	@Autowired
+	private PropertyMaskingProperties propertyMaskingProperties;
 
 	@Event
 	public void buildMenu( DebugMenuEvent event ) {
@@ -124,6 +127,34 @@ public class AcrossInfoController
 		return DebugWeb.LAYOUT_BROWSER;
 	}
 
+	static class PropertyValueMasker
+	{
+		public static final String MASK = "******";
+
+		private final String[] masks, maskedProperties;
+
+		public PropertyValueMasker( String[] masks, String[] maskedProperties ) {
+			this.masks = masks;
+			this.maskedProperties = maskedProperties;
+		}
+
+		public Object maskIfNecessary( String name, Object value ) {
+			if ( name != null ) {
+				if ( ArrayUtils.contains( maskedProperties, name ) ) {
+					return MASK;
+				}
+
+				for ( String mask : masks ) {
+					if ( name.matches( mask ) ) {
+						return MASK;
+					}
+				}
+			}
+
+			return value;
+		}
+	}
+
 	static class PropertySourceInfo
 	{
 		private PropertySource propertySource;
@@ -173,11 +204,16 @@ public class AcrossInfoController
 		private String name;
 		private Environment environment;
 		private PropertySource propertySource;
+		private PropertyValueMasker valueMasker;
 
-		PropertyInfo( String name, Environment environment, PropertySource propertySource ) {
+		PropertyInfo( String name,
+		              Environment environment,
+		              PropertySource propertySource,
+		              PropertyValueMasker valueMasker ) {
 			this.name = name;
 			this.environment = environment;
 			this.propertySource = propertySource;
+			this.valueMasker = valueMasker;
 		}
 
 		public String getName() {
@@ -185,15 +221,15 @@ public class AcrossInfoController
 		}
 
 		public Object getValue() {
-			return propertySource.getProperty( name );
+			return valueMasker.maskIfNecessary( name, propertySource.getProperty( name ) );
 		}
 
 		public Object getEnvironmentValue() {
-			return environment.getProperty( name, Object.class );
+			return valueMasker.maskIfNecessary( name, environment.getProperty( name, Object.class ) );
 		}
 
 		public boolean isActualValue() {
-			return ObjectUtils.equals( getValue(), getEnvironmentValue() );
+			return Objects.equals( getValue(), getEnvironmentValue() );
 		}
 
 		public boolean isSystemProperty() {
@@ -239,6 +275,9 @@ public class AcrossInfoController
 		LinkedList<PropertySourceInfo> sources = new LinkedList<>();
 
 		if ( environment instanceof ConfigurableEnvironment ) {
+			PropertyValueMasker valueMasker = new PropertyValueMasker(
+					propertyMaskingProperties.getMasks(), propertyMaskingProperties.getMaskedProperties()
+			);
 			MutablePropertySources propertySources = ( (ConfigurableEnvironment) environment ).getPropertySources();
 			for ( PropertySource<?> propertySource : propertySources ) {
 				PropertySourceInfo sourceInfo = new PropertySourceInfo( propertySource );
@@ -248,7 +287,9 @@ public class AcrossInfoController
 					List<PropertyInfo> properties = new ArrayList<>();
 
 					for ( String propertyName : enumerablePropertySource.getPropertyNames() ) {
-						properties.add( new PropertyInfo( propertyName, environment, enumerablePropertySource ) );
+						properties.add(
+								new PropertyInfo( propertyName, environment, enumerablePropertySource, valueMasker )
+						);
 					}
 
 					Collections.sort( properties );

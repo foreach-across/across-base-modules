@@ -47,18 +47,39 @@ Module website: {module-url}
 
 === Module settings
 
-|===
-|Property |Description |Default
+All properties start with the *debugWebModule.* prefix.
 
-|debugWeb.dashboard
-|Relative path (within debug web) for the landing page of debug web.
+|===
+|Property |Type |Description |Default
+
+|root-path
+|`String`
+|Root path for all debug web controllers.  All mappings will be relative to this path.
+|/debug
+
+|dashboard
+|`String`
+|Path within the debug web context for the initial dashboard.
 |/
+
+|properties.masks
+|`String[]`
+|Set regular expressions for all property names that should be masked.
+|`.\*password.*`, `.\*secret.*`
+
+|properties.masked-properties
+|`String[]`
+|Set explicit property names that should be masked.
+|
+
 |===
 
 == What's new in this version?
 :numbered!:
 === 1.0.1-SNAPSHOT
-tbd
+
+* both root path and dashboard path are now configurable through properties
+* the context browser debug controller can now mask sensitive property values
 
 === 1.0.0.RELEASE
 Initial public release available on http://search.maven.org/[Maven central].
@@ -80,15 +101,16 @@ All `@DebugWebController` instances are automatically mapped on the default debu
 [[configure-root-path]]
 === Root path
 
-The root path is configured by setting the `rootPath` property on the `DebugWebModule` instance.  This can only be done
-when configuring the `AcrossContext`, before it has bootstrapped.  If no custom root path is configured, the default
-is */debug*.
+The root path is configured by setting the `debugWebModule.root-path` property.
+This can only be done when configuring the `AcrossContext`, before it has bootstrapped.
+If no custom root path is configured, the default is */debug*.
 
 === Dashboard (landing page)
 
-Pointing your web browser at the root path within your application will open {module-name} on the dashboard.  By default
-  the dashboard has no content other than the top menu.  If you would like a particular controller to open you can set
-  another relative path on the *debugWeb.dashboard* property.  The path should not contain the root path prefix.
+Pointing your web browser at the root path within your application will open {module-name} on the dashboard.
+By default the dashboard has no content other than the top menu.
+If you would like a particular controller to open you can set another relative path on the *debugWebModule.dashboard* property.
+The path should not contain the root path prefix.
 
 == Securing debug web
 By default the {module-name} takes no care of securing the debug endpoints.  This is considered the responsibility of
@@ -137,9 +159,12 @@ Lists the servlets and filters registered on the servlet context.
 
 === Section: Across
 .Context browser
-Allows you to introspect the running `AcrossContext`.  You can navigate the entire `ApplicationContext` hierarchy,
- see the modules registered in the Across context along with the beans they created (and expose) as well as the
- configuration properties visible within each module.
+Allows you to introspect the running `AcrossContext`.
+You can navigate the entire `ApplicationContext` hierarchy, see the modules registered in the Across context along with the beans they created (and expose) as well as the configuration properties visible within each module.
+
+As some properties contain sensitive data (for example passwords), it is possible to mask property values based on the property name.
+By default all property names containing *password* or *secret* will have their values masked.
+Additional rules can be configured with *debugWebModule.properties.masks* or *debugWebModule.properties.masked-properties*.
 
 .AcrossWebModule: Handlers and Interceptors
 _Handlers_ lists the different request mapping endoints grouped by their handler mappings.  _Interceptors_ lists the
