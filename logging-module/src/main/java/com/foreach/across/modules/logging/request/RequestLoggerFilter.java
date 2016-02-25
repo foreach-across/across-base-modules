@@ -70,7 +70,7 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 	private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
 	private String instanceId;
-	private static final String LOG_FORMAT = "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}";
+	private static final String LOG_FORMAT = "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}";
 
 	private Collection<String> includedPathPatterns = Collections.emptyList();
 	private Collection<String> excludedPathPatterns = Collections.emptyList();
@@ -81,10 +81,16 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 	}
 
 	@Override
+	protected void initFilterBean() throws ServletException {
+		DatabaseConnectionCounter.injectThreadLocalLogger();
+	}
+
+	@Override
 	protected void doFilterInternal( HttpServletRequest request,
 	                                 HttpServletResponse response,
 	                                 FilterChain chain ) throws ServletException, IOException {
 		if ( shouldLog( request ) ) {
+			DatabaseConnectionCounter.startRequest();
 			// Create a unique id for this request
 			String requestId = UUID.randomUUID().toString();
 
@@ -139,6 +145,7 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 				}
 			}
 
+			DatabaseConnectionCounter.stopRequest();
 			// Remove the MDC
 			MDC.clear();
 		}
@@ -169,7 +176,8 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 				StringUtils.defaultString( handlerName, "-" ),
 				StringUtils.defaultString( viewName, "-" ),
 				finished ? response.getStatus() : -1,
-				duration };
+				duration,
+				DatabaseConnectionCounter.getTotalConnectionCount() };
 	}
 
 	public Collection<String> getIncludedPathPatterns() {
