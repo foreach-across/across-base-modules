@@ -16,68 +16,31 @@
 
 package com.foreach.across.modules.logging.request;
 
+import org.springframework.jdbc.datasource.DelegatingDataSource;
+
 import javax.sql.DataSource;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
-import java.util.logging.Logger;
 
 /**
  * @author Marc Vanbrabant
  */
-public class ConnectionLoggingDataSource implements DataSource
+public class ConnectionLoggingDataSource extends DelegatingDataSource
 {
-	private final DataSource delegate;
-
 	public ConnectionLoggingDataSource( DataSource delegate ) {
-		this.delegate = delegate;
+		super( delegate );
 	}
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		DatabaseConnectionCounter.logConnection( delegate );
-		return delegate.getConnection();
+		DatabaseConnectionCounter.logConnection( getTargetDataSource() );
+		return super.getConnection();
 	}
 
 	@Override
 	public Connection getConnection( String username, String password ) throws SQLException {
-		DatabaseConnectionCounter.logConnection( delegate );
-		return delegate.getConnection( username, password );
+		DatabaseConnectionCounter.logConnection( getTargetDataSource() );
+		return super.getConnection( username, password );
 	}
 
-	@Override
-	public PrintWriter getLogWriter() throws SQLException {
-		return delegate.getLogWriter();
-	}
-
-	@Override
-	public void setLogWriter( PrintWriter out ) throws SQLException {
-		delegate.setLogWriter( out );
-	}
-
-	@Override
-	public void setLoginTimeout( int seconds ) throws SQLException {
-		delegate.setLoginTimeout( seconds );
-	}
-
-	@Override
-	public int getLoginTimeout() throws SQLException {
-		return delegate.getLoginTimeout();
-	}
-
-	@Override
-	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-		return delegate.getParentLogger();
-	}
-
-	@Override
-	public <T> T unwrap( Class<T> iface ) throws SQLException {
-		return delegate.unwrap( iface );
-	}
-
-	@Override
-	public boolean isWrapperFor( Class<?> iface ) throws SQLException {
-		return delegate.isWrapperFor( iface );
-	}
 }

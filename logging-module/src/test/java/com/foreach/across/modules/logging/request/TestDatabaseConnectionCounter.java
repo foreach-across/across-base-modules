@@ -53,7 +53,7 @@ public class TestDatabaseConnectionCounter
 			public void run() {
 				try {
 					dataSource.getConnection();
-					dataSource.getConnection();
+					dataSource.getConnection( "username", "password" );
 					count.set( DatabaseConnectionCounter.getTotalConnectionCount() );
 					countDownLatch.countDown();
 				}

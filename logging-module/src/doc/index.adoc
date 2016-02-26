@@ -108,7 +108,7 @@ Module website: {module-url}
 == What's new in this version?
 :numbered!:
 === 1.0.1-SNAPSHOT
-tbd
+* Log database connection count on the <<request-logging,request logging>> output
 
 === 1.0.0.RELEASE
 Initial public release available on http://search.maven.org/[Maven central].
@@ -313,6 +313,24 @@ loggingModule.setProperty( LoggingModuleSettings.REQUEST_LOGGER_CONFIGURATION, r
 WARNING: The `RequestLogger.INTERCEPTOR` option can be used to enable request logging without the use of the servlet filter.
   Though it still works, this option is no longer actively supported.
 
+If you wish to use the "database connection count" from the <<request-logging,request logging>>, you need to wrap your DataSource inside a `ConnectionLoggingDataSource`.
+
+.Enabling database connection count on a datasource
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@Configuration
+public class MyConfiguration
+{
+	@Bean
+	public DataSource dataSource() {
+		return new ConnectionLoggingDataSource( new HikariDataSource() );
+	}
+}
+----
+
+When you wrap multiple datasources with `ConnectionLoggingDataSource`, the connection count for all these datasources will be aggregated in the log output.
+
 === MDC attributes
 The `RequestLoggerFilter` adds two attributes to the http://logback.qos.ch/manual/mdc.html[MDC]:
 
@@ -339,6 +357,7 @@ The tab-separated log message contains the following fields:
  * View name
  * HTTP status code
  * Duration (ms)
+ * Database connections used
 
 Depending on the application configuration or type of request, certain fields might not be available.  In that case
 a field-dependent default value (either empty, _0_ or _null_) will be output, but the position of the field will always
@@ -370,7 +389,7 @@ The following section provides a common {logback-url}[Logback] example for confi
 [source,text,indent=0]
 [subs="verbatim,quotes,attributes"]
 ----
-2015-11-02 12:58:15,212	[5f18be5e-5b64-4c3a-9843-740f16c32641]	http-apr-8080-exec-4	DEBUG	127.0.0.1	GET	http://localhost:8080/logging/debug/across/browser/info/0	/debug/across/browser/info/0	/debug/across/browser/info/{index}	AcrossInfoController.showContextInfo(List,int,Model)	th/debugweb/layouts/acrossBrowser	200	784
+2015-11-02 12:58:15,212	[5f18be5e-5b64-4c3a-9843-740f16c32641]	http-apr-8080-exec-4	DEBUG	127.0.0.1	GET	http://localhost:8080/logging/debug/across/browser/info/0	/debug/across/browser/info/0	/debug/across/browser/info/{index}	AcrossInfoController.showContextInfo(List,int,Model)	th/debugweb/layouts/acrossBrowser	200	784 14
 ----
 
 .Anatomy of the log statement
@@ -415,6 +434,9 @@ The following section provides a common {logback-url}[Logback] example for confi
 
 |*Duration*
 |784
+
+|*Database connections used*
+|14
 
 |===
 
