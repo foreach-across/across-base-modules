@@ -26,7 +26,7 @@ public class DebugWebModuleSettings
 	public static final String DEFAULT_DASHBOARD = "/";
 
 	@SuppressWarnings( "unused" )
-	public static final String DASHBOARD_PATH = "debugWebModule.dashboard-path";
+	public static final String DASHBOARD_PATH = "debugWebModule.dashboard";
 
 	/**
 	 * Path within the debug web context for the initial dashboard.
