@@ -55,7 +55,7 @@ public class SpringInfoController
 		     .item( "/across/web/handlers", "Handlers", "/spring/handlers" );
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "findbugs:REC_CATCH_EXCEPTION" })
 	@RequestMapping("/spring/interceptors")
 	public String showInterceptors( Model model ) {
 		try {
@@ -96,7 +96,7 @@ public class SpringInfoController
 
 			model.addAttribute( "handlerTables", tables );
 		}
-		catch ( Exception e ) {
+		catch ( Exception ignore ) {
 			// Do nothing
 		}
 
