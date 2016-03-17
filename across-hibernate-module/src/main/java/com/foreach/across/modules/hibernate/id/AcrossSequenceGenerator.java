@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.hibernate.id;
 
 import com.foreach.across.core.database.AcrossSchemaConfiguration;
@@ -118,7 +119,7 @@ public class AcrossSequenceGenerator extends TableGenerator
 
 	private int determineInitialValue( Properties params, int defaultInitialValue ) {
 		if ( params.containsKey( "initialValue" ) ) {
-			int initialValue = Integer.valueOf( params.getProperty( "allocationSize" ) );
+			int initialValue = Integer.valueOf( params.getProperty( "initialValue" ) );
 
 			return initialValue < defaultInitialValue ? defaultInitialValue : initialValue;
 		}
