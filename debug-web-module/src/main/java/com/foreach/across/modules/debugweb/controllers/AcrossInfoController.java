@@ -16,6 +16,7 @@
 package com.foreach.across.modules.debugweb.controllers;
 
 import com.foreach.across.core.annotations.Event;
+import com.foreach.across.core.context.AcrossContextUtils;
 import com.foreach.across.core.context.ExposedBeanDefinition;
 import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.events.AcrossEventPublisher;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.*;
@@ -61,7 +63,7 @@ public class AcrossInfoController
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder()
 		     .group( "/across", "Across" ).and()
-		     .item( "/across/browser", "Context browser", "/across/browser/info/0" ).order(
+		     .item( "/across/browser", "Context browser", "/across/browser/info/-1" ).order(
 				Ordered.HIGHEST_PRECEDENCE );
 	}
 
@@ -74,7 +76,7 @@ public class AcrossInfoController
 	public String showContextInfo( @ModelAttribute("contexts") List<ContextDebugInfo> contexts,
 	                               @PathVariable("index") int index,
 	                               Model model ) {
-		ContextDebugInfo selected = contexts.get( index );
+		ContextDebugInfo selected = selectContext( contexts, index );
 
 		model.addAttribute( "selectedContextIndex", contexts.indexOf( selected ) );
 		model.addAttribute( "selectedContext", selected );
@@ -88,7 +90,7 @@ public class AcrossInfoController
 	public String showContextBeans( @ModelAttribute("contexts") List<ContextDebugInfo> contexts,
 	                                @PathVariable("index") int index,
 	                                Model model ) {
-		ContextDebugInfo selected = contexts.get( index );
+		ContextDebugInfo selected = selectContext( contexts, index );
 
 		Collection<BeanInfo> beans = buildBeanSet( selected );
 
@@ -115,7 +117,7 @@ public class AcrossInfoController
 	public String showContextProperties( @ModelAttribute("contexts") List<ContextDebugInfo> contexts,
 	                                     @PathVariable("index") int index,
 	                                     Model model ) {
-		ContextDebugInfo selected = contexts.get( index );
+		ContextDebugInfo selected = selectContext( contexts, index );
 
 		model.addAttribute( "propertySources", getPropertySources( selected.getEnvironment() ) );
 
@@ -125,6 +127,19 @@ public class AcrossInfoController
 		model.addAttribute( "sectionTemplate", DebugWeb.VIEW_BROWSER_PROPERTIES );
 
 		return DebugWeb.LAYOUT_BROWSER;
+	}
+
+	private ContextDebugInfo selectContext( List<ContextDebugInfo> contexts, int index ) {
+		if ( index < 0 ) {
+			ApplicationContext applicationContext = AcrossContextUtils.getApplicationContext( acrossContext );
+			for ( ContextDebugInfo context : contexts ) {
+				if ( context.getApplicationContext() == applicationContext ) {
+					return context;
+				}
+			}
+		}
+
+		return contexts.get( index );
 	}
 
 	static class PropertyValueMasker
