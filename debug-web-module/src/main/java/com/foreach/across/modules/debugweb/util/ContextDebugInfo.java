@@ -85,7 +85,6 @@ public class ContextDebugInfo
 	 * Gathers all debug info for an entire AcrossContext.
 	 */
 	public static List<ContextDebugInfo> create( AcrossContextInfo context ) {
-
 		LinkedList<ContextDebugInfo> list = new LinkedList<>();
 
 		for ( AcrossModuleInfo moduleInfo : context.getConfiguredModules() ) {

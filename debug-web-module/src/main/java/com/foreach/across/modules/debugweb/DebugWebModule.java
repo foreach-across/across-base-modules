@@ -17,25 +17,25 @@ package com.foreach.across.modules.debugweb;
 
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.modules.web.AcrossWebModule;
 
-@AcrossDepends(required = "AcrossWebModule")
+@AcrossDepends(required = AcrossWebModule.NAME)
 public class DebugWebModule extends AcrossModule
 {
 	public static final String NAME = "DebugWebModule";
 	public static final String RESOURCES = "debugweb";
 
+	/**
+	 * Set the root path that all {@link com.foreach.across.modules.debugweb.mvc.DebugWebController} instances should use.
+	 * All request mappings will be prefixed with the path specified here.
+	 *
+	 * @param rootPath The root path for all DebugWebControllers.
+	 * @see org.springframework.web.bind.annotation.RequestMapping
+	 */
 	public void setRootPath( String rootPath ) {
 		setProperty( "debugWebModule.root-path", rootPath );
 	}
 
-	@Deprecated
-	public String getRootPath() {
-		return getProperties().getProperty( "debugWebModule.root-path", "/debug" );
-	}
-
-	/**
-	 * @return Name of this module.  The spring bean should also be using this name.
-	 */
 	@Override
 	public String getName() {
 		return NAME;
