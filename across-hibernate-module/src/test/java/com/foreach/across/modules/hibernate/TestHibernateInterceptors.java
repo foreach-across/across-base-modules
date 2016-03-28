@@ -32,8 +32,6 @@ import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -146,22 +144,14 @@ public class TestHibernateInterceptors
 	public void allInterceptorShouldBeCalledBeforeUserInterceptor() {
 		final List<EntityInterceptor<?>> called = new ArrayList<>();
 
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				called.add( allInterceptor );
-				return null;
-			}
+		doAnswer( invocation -> {
+			called.add( allInterceptor );
+			return null;
 		} ).when( allInterceptor ).afterCreate( any() );
 
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				called.add( userInterceptor );
-				return null;
-			}
+		doAnswer( invocation -> {
+			called.add( userInterceptor );
+			return null;
 		} ).when( userInterceptor ).afterCreate( any( User.class ) );
 
 		userRepository.create( new User( 1010, "another user" ) );
@@ -171,14 +161,10 @@ public class TestHibernateInterceptors
 
 	@Test
 	public void createProductBeforeSavingUser() {
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				Product product = new Product( 999, "nested product" );
-				productRepository.save( product );
-				return null;
-			}
+		doAnswer( invocation -> {
+			Product product = new Product( 999, "nested product" );
+			productRepository.save( product );
+			return null;
 		} ).when( userInterceptor ).beforeCreate( any( User.class ) );
 
 		User user = new User( 999, "my user" );
@@ -195,16 +181,12 @@ public class TestHibernateInterceptors
 
 	@Test
 	public void nestedCreationHappensInItsOwnTransaction() {
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				Product product = new Product( 1000, "nested product 2" );
-				productRepository.save( product );
-				return null;
-			}
+		doAnswer( invocation -> {
+			Product product = new Product( 1000, "nested product 2" );
+			productRepository.save( product );
+			return null;
 		} ).when( userInterceptor )
-		   .beforeCreate( any( User.class ) );
+		       .beforeCreate( any( User.class ) );
 
 		doThrow( new RuntimeException( "exception thrown" ) )
 				.when( userInterceptor )

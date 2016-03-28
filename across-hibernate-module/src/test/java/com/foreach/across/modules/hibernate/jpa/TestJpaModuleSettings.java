@@ -1,7 +1,5 @@
 package com.foreach.across.modules.hibernate.jpa;
 
-import com.foreach.across.config.AcrossContextConfigurer;
-import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.EmptyAcrossModule;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
@@ -9,8 +7,8 @@ import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
 import com.foreach.across.modules.hibernate.jpa.services.JpaHibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
+import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.test.AcrossTestContext;
-import com.foreach.across.test.AcrossTestWebContext;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
@@ -19,25 +17,23 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
 
+import static com.foreach.across.test.support.AcrossTestBuilders.standard;
+import static com.foreach.across.test.support.AcrossTestBuilders.web;
 import static org.junit.Assert.*;
 
 public class TestJpaModuleSettings
 {
 	@Test
 	public void defaultSettings() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				context.addModule( new AcrossHibernateJpaModule() );
-				context.addModule( new EmptyAcrossModule( "client" ) );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
-			assertNotNull( ctx.beanRegistry().getBeanOfType( EntityManagerFactory.class ) );
-			assertNotNull( ctx.beanRegistry().getBeanOfType( PlatformTransactionManager.class ) );
-			assertEquals( 0, ctx.beanRegistry().getBeansOfType( UnitOfWorkFactory.class ).size() );
+		try (
+				AcrossTestContext ctx = standard()
+						.modules( AcrossHibernateJpaModule.NAME )
+						.modules( new EmptyAcrossModule( "client" ) )
+						.build()
+		) {
+			assertNotNull( ctx.getBeanOfType( EntityManagerFactory.class ) );
+			assertNotNull( ctx.getBeanOfType( PlatformTransactionManager.class ) );
+			assertEquals( 0, ctx.getBeansOfType( UnitOfWorkFactory.class ).size() );
 			assertEquals(
 					1,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
@@ -49,22 +45,16 @@ public class TestJpaModuleSettings
 
 	@Test
 	public void noTransactions() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateJpaModule module = new AcrossHibernateJpaModule();
-				module.setProperty( AcrossHibernateModuleSettings.CREATE_TRANSACTION_MANAGER, false );
-
-				context.addModule( module );
-				context.addModule( new EmptyAcrossModule( "client" ) );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
-			assertNotNull( ctx.beanRegistry().getBeanOfType( EntityManagerFactory.class ) );
-			assertTrue( ctx.beanRegistry().getBeansOfType( PlatformTransactionManager.class ).isEmpty() );
-			assertEquals( 0, ctx.beanRegistry().getBeansOfType( UnitOfWorkFactory.class ).size() );
+		try (
+				AcrossTestContext ctx = standard()
+						.property( AcrossHibernateModuleSettings.CREATE_TRANSACTION_MANAGER, false )
+						.modules( AcrossHibernateJpaModule.NAME )
+						.modules( new EmptyAcrossModule( "client" ) )
+						.build()
+		) {
+			assertNotNull( ctx.getBeanOfType( EntityManagerFactory.class ) );
+			assertTrue( ctx.getBeansOfType( PlatformTransactionManager.class ).isEmpty() );
+			assertEquals( 0, ctx.getBeansOfType( UnitOfWorkFactory.class ).size() );
 			assertEquals(
 					0,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
@@ -76,39 +66,28 @@ public class TestJpaModuleSettings
 
 	@Test
 	public void unitOfWorkFactory() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateJpaModule module = new AcrossHibernateJpaModule();
-				module.setProperty( AcrossHibernateModuleSettings.CREATE_UNITOFWORK_FACTORY, true );
-
-				context.addModule( module );
-				context.addModule( new EmptyAcrossModule( "client" ) );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
-			assertNotNull( ctx.beanRegistry().getBeanOfType( EntityManagerFactory.class ) );
-			assertNotNull( ctx.beanRegistry().getBeanOfType( PlatformTransactionManager.class ) );
-			assertNotNull( ctx.beanRegistry().getBeanOfType( UnitOfWorkFactory.class ) );
+		try (
+				AcrossTestContext ctx = standard()
+						.property( AcrossHibernateModuleSettings.CREATE_UNITOFWORK_FACTORY, true )
+						.modules( AcrossHibernateJpaModule.NAME )
+						.modules( new EmptyAcrossModule( "client" ) )
+						.build()
+		) {
+			assertNotNull( ctx.getBeanOfType( EntityManagerFactory.class ) );
+			assertNotNull( ctx.getBeanOfType( PlatformTransactionManager.class ) );
+			assertNotNull( ctx.getBeanOfType( UnitOfWorkFactory.class ) );
 		}
 	}
 
 	@Test
-	public void noInterceptorOrFilterIfWebContextButNotEnabled() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				context.setProperty( AcrossHibernateJpaModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER, PersistenceContextInView.NONE );
-
-				AcrossHibernateJpaModule module = new AcrossHibernateJpaModule();
-				context.addModule( module );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestWebContext( config )) {
+	public void noInterceptorOrFilterIfWebModuleButHandlerIsNone() {
+		try (
+				AcrossTestContext ctx = web()
+						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+						           PersistenceContextInView.NONE )
+						.modules( AcrossWebModule.NAME, AcrossHibernateJpaModule.NAME )
+						.build()
+		) {
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateJpaModule.NAME )
 			                               .getApplicationContext();
 
@@ -118,19 +97,14 @@ public class TestJpaModuleSettings
 	}
 
 	@Test
-	public void noInterceptorIfNoWebContext() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateJpaModule module = new AcrossHibernateJpaModule();
-				module.setProperty( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
-				                    PersistenceContextInView.INTERCEPTOR );
-				context.addModule( module );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
+	public void noInterceptorIfNoAcrossWebModule() {
+		try (
+				AcrossTestContext ctx = web()
+						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+						           PersistenceContextInView.INTERCEPTOR )
+						.modules( AcrossHibernateJpaModule.NAME )
+						.build()
+		) {
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateJpaModule.NAME )
 			                               .getApplicationContext();
 
@@ -140,19 +114,14 @@ public class TestJpaModuleSettings
 	}
 
 	@Test
-	public void noFilterIfNoWebContext() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateJpaModule module = new AcrossHibernateJpaModule();
-				module.setProperty( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
-				                    PersistenceContextInView.FILTER );
-				context.addModule( module );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
+	public void noFilterIfNoAcrossWebModule() {
+		try (
+				AcrossTestContext ctx = web()
+						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+						           PersistenceContextInView.FILTER )
+						.modules( AcrossHibernateJpaModule.NAME )
+						.build()
+		) {
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateJpaModule.NAME )
 			                               .getApplicationContext();
 
@@ -163,18 +132,13 @@ public class TestJpaModuleSettings
 
 	@Test
 	public void interceptorIfWebContext() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateJpaModule module = new AcrossHibernateJpaModule();
-				module.setProperty( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
-				                    PersistenceContextInView.INTERCEPTOR );
-				context.addModule( module );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestWebContext( config )) {
+		try (
+				AcrossTestContext ctx = web()
+						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+						           PersistenceContextInView.INTERCEPTOR )
+						.modules( AcrossWebModule.NAME, AcrossHibernateJpaModule.NAME )
+						.build()
+		) {
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateJpaModule.NAME )
 			                               .getApplicationContext();
 
@@ -185,18 +149,13 @@ public class TestJpaModuleSettings
 
 	@Test
 	public void filterIfWebContext() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateJpaModule module = new AcrossHibernateJpaModule();
-				module.setProperty( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
-				                    PersistenceContextInView.FILTER );
-				context.addModule( module );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestWebContext( config )) {
+		try (
+				AcrossTestContext ctx = web()
+						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+						           PersistenceContextInView.FILTER )
+						.modules( AcrossWebModule.NAME, AcrossHibernateJpaModule.NAME )
+						.build()
+		) {
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateJpaModule.NAME )
 			                               .getApplicationContext();
 
@@ -207,17 +166,13 @@ public class TestJpaModuleSettings
 
 	@Test
 	public void hibernateSessionHolderIsJpaImplementation() throws Exception {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				context.addModule( new AcrossHibernateJpaModule() );
-				context.addModule( new EmptyAcrossModule( "client" ) );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
-			HibernateSessionHolder sessionHolder = ctx.beanRegistry().getBeanOfType( HibernateSessionHolder.class );
+		try (
+				AcrossTestContext ctx = standard()
+						.modules( AcrossHibernateJpaModule.NAME )
+						.modules( new EmptyAcrossModule( "client" ) )
+						.build()
+		) {
+			HibernateSessionHolder sessionHolder = ctx.getBeanOfType( HibernateSessionHolder.class );
 			assertTrue( sessionHolder instanceof JpaHibernateSessionHolderImpl );
 		}
 	}

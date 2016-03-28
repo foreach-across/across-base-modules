@@ -53,103 +53,91 @@ public class TestUnitOfWorkInThread
 
 	@Test
 	public void singleModuleTransactional() throws Exception {
-		execute( new Runnable()
-		{
-			public void run() {
-				try {
-					assertNull( productRepository.getProductWithId( 1 ) );
+		execute( () -> {
+			try {
+				assertNull( productRepository.getProductWithId( 1 ) );
 
-					Product product = new Product( 1, "product 1" );
-					productRepository.save( product );
+				Product product = new Product( 1, "product 1" );
+				productRepository.save( product );
 
-					Product other = productRepository.getProductWithId( 1 );
-					assertNotNull( other );
-					assertEquals( product, other );
-				}
-				catch ( Exception e ) {
-					thrown = e;
-				}
+				Product other = productRepository.getProductWithId( 1 );
+				assertNotNull( other );
+				assertEquals( product, other );
+			}
+			catch ( Exception e ) {
+				thrown = e;
 			}
 		} );
 	}
 
 	@Test
 	public void otherModuleTransactional() throws Exception {
-		execute( new Runnable()
-		{
-			public void run() {
-				try {
-					assertNull( userRepository.getById( 1 ) );
+		execute( () -> {
+			try {
+				assertNull( userRepository.getById( 1 ) );
 
-					User user = new User( 1, "user 1" );
-					userRepository.update( user );
+				User user = new User( 1, "user 1" );
+				userRepository.update( user );
 
-					unitOfWork.restart();
+				unitOfWork.restart();
 
-					User other = userRepository.getById( 1 );
-					assertNotNull( other );
-					assertEquals( user, other );
-				}
-				catch ( Exception e ) {
-					thrown = e;
-				}
+				User other = userRepository.getById( 1 );
+				assertNotNull( other );
+				assertEquals( user, other );
+			}
+			catch ( Exception e ) {
+				thrown = e;
 			}
 		} );
 	}
 
 	@Test
 	public void combinedSave() throws Exception {
-		execute( new Runnable()
-		{
-			public void run() {
-				try {
-					Product product = new Product( 2, "product 2" );
-					User user = new User( 2, "user 2" );
+		execute( () -> {
+			try {
+				Product product = new Product( 2, "product 2" );
+				User user = new User( 2, "user 2" );
 
-					userRepository.save( user, product );
+				userRepository.save( user, product );
 
-					unitOfWork.restart();
+				unitOfWork.restart();
 
-					User otherUser = userRepository.getById( 2 );
-					assertNotNull( otherUser );
-					assertEquals( user, otherUser );
+				User otherUser = userRepository.getById( 2 );
+				assertNotNull( otherUser );
+				assertEquals( user, otherUser );
 
-					Product otherProduct = productRepository.getProductWithId( 2 );
-					assertNotNull( otherProduct );
-					assertEquals( product, otherProduct );
-				}
-				catch ( Exception e ) {
-					thrown = e;
-				}
+				Product otherProduct = productRepository.getProductWithId( 2 );
+				assertNotNull( otherProduct );
+				assertEquals( product, otherProduct );
+			}
+			catch ( Exception e ) {
+				thrown = e;
 			}
 		} );
 	}
 
 	@Test
 	public void combinedRollback() throws Exception {
-		execute( new Runnable()
-		{
-			public void run() {
+		execute( () -> {
+			try {
+				Product product = new Product( 3, "product 3" );
+
+				boolean failed = false;
+
 				try {
-					Product product = new Product( 3, "product 3" );
-
-					boolean failed = false;
-
-					try {
-						userRepository.save( null, product );
-					}
-					catch ( Exception e ) {
-						failed = true;
-					}
-
-					assertTrue( failed );
-
-					Product otherProduct = productRepository.getProductWithId( 3 );
-					assertNull( otherProduct );
+					userRepository.save( null, product );
 				}
 				catch ( Exception e ) {
-					thrown = e;
+					failed = true;
 				}
+
+				assertTrue( failed );
+
+				Product otherProduct = productRepository.getProductWithId( 3 );
+				assertNull( otherProduct );
+			}
+			catch ( Exception e ) {
+				thrown = e;
 			}
 		} );
 	}

@@ -16,11 +16,13 @@
 package com.foreach.across.modules.hibernate.testmodules.hibernate2;
 
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
 import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
 
 import java.util.Set;
 
+@AcrossDepends(optional = "Hibernate1Module")
 public class Hibernate2Module extends AcrossModule
 {
 	@Override

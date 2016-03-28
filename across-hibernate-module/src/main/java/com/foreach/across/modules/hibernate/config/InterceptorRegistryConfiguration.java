@@ -32,7 +32,7 @@ public class InterceptorRegistryConfiguration
 {
 	@Bean
 	@Exposed
-	@ConditionalOnMissingBean(name = "entityInterceptors", search = SearchStrategy.CURRENT)
+	@ConditionalOnMissingBean(name = "entityInterceptors", search = SearchStrategy.ALL)
 	public RefreshableRegistry<EntityInterceptor> entityInterceptors() {
 		return new IncrementalRefreshableRegistry<>( EntityInterceptor.class, true );
 	}

@@ -15,8 +15,6 @@
  */
 package com.foreach.across.modules.hibernate;
 
-import com.foreach.across.config.AcrossContextConfigurer;
-import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.EmptyAcrossModule;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
@@ -24,8 +22,8 @@ import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepository
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
+import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.test.AcrossTestContext;
-import com.foreach.across.test.AcrossTestWebContext;
 import org.hibernate.SessionFactory;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -33,25 +31,23 @@ import org.springframework.orm.hibernate4.support.OpenSessionInViewFilter;
 import org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import static com.foreach.across.test.support.AcrossTestBuilders.standard;
+import static com.foreach.across.test.support.AcrossTestBuilders.web;
 import static org.junit.Assert.*;
 
 public class TestModuleSettings
 {
 	@Test
 	public void defaultSettings() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				context.addModule( new AcrossHibernateModule() );
-				context.addModule( new EmptyAcrossModule( "client" ) );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
-			assertNotNull( ctx.beanRegistry().getBeanOfType( SessionFactory.class ) );
-			assertNotNull( ctx.beanRegistry().getBeanOfType( PlatformTransactionManager.class ) );
-			assertEquals( 0, ctx.beanRegistry().getBeansOfType( UnitOfWorkFactory.class ).size() );
+		try (
+				AcrossTestContext ctx = standard()
+						.modules( AcrossHibernateModule.NAME )
+						.modules( new EmptyAcrossModule( "client" ) )
+						.build()
+		) {
+			assertNotNull( ctx.getBeanOfType( SessionFactory.class ) );
+			assertNotNull( ctx.getBeanOfType( PlatformTransactionManager.class ) );
+			assertEquals( 0, ctx.getBeansOfType( UnitOfWorkFactory.class ).size() );
 			assertEquals(
 					1,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
@@ -69,22 +65,16 @@ public class TestModuleSettings
 
 	@Test
 	public void noTransactions() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateModule module = new AcrossHibernateModule();
-				module.setProperty( AcrossHibernateModuleSettings.CREATE_TRANSACTION_MANAGER, false );
-
-				context.addModule( module );
-				context.addModule( new EmptyAcrossModule( "client" ) );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
-			assertNotNull( ctx.beanRegistry().getBeanOfType( SessionFactory.class ) );
-			assertTrue( ctx.beanRegistry().getBeansOfType( PlatformTransactionManager.class ).isEmpty() );
-			assertEquals( 0, ctx.beanRegistry().getBeansOfType( UnitOfWorkFactory.class ).size() );
+		try (
+				AcrossTestContext ctx = standard()
+						.property( AcrossHibernateModuleSettings.CREATE_TRANSACTION_MANAGER, false )
+						.modules( AcrossHibernateModule.NAME )
+						.modules( new EmptyAcrossModule( "client" ) )
+						.build()
+		) {
+			assertNotNull( ctx.getBeanOfType( SessionFactory.class ) );
+			assertTrue( ctx.getBeansOfType( PlatformTransactionManager.class ).isEmpty() );
+			assertEquals( 0, ctx.getBeansOfType( UnitOfWorkFactory.class ).size() );
 			assertEquals(
 					0,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
@@ -96,22 +86,16 @@ public class TestModuleSettings
 
 	@Test
 	public void noRepositoryInterceptor() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateModule module = new AcrossHibernateModule();
-				module.setProperty( AcrossHibernateModuleSettings.REGISTER_REPOSITORY_INTERCEPTOR, false );
-
-				context.addModule( module );
-				context.addModule( new EmptyAcrossModule( "client" ) );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
-			assertNotNull( ctx.beanRegistry().getBeanOfType( SessionFactory.class ) );
-			assertNotNull( ctx.beanRegistry().getBeanOfType( PlatformTransactionManager.class ) );
-			assertEquals( 0, ctx.beanRegistry().getBeansOfType( UnitOfWorkFactory.class ).size() );
+		try (
+				AcrossTestContext ctx = standard()
+						.property( AcrossHibernateModuleSettings.REGISTER_REPOSITORY_INTERCEPTOR, false )
+						.modules( AcrossHibernateModule.NAME )
+						.modules( new EmptyAcrossModule( "client" ) )
+						.build()
+		) {
+			assertNotNull( ctx.getBeanOfType( SessionFactory.class ) );
+			assertNotNull( ctx.getBeanOfType( PlatformTransactionManager.class ) );
+			assertEquals( 0, ctx.getBeansOfType( UnitOfWorkFactory.class ).size() );
 			assertEquals(
 					0,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
@@ -123,39 +107,28 @@ public class TestModuleSettings
 
 	@Test
 	public void unitOfWorkFactory() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateModule module = new AcrossHibernateModule();
-				module.setProperty( AcrossHibernateModuleSettings.CREATE_UNITOFWORK_FACTORY, true );
-
-				context.addModule( module );
-				context.addModule( new EmptyAcrossModule( "client" ) );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
-			assertNotNull( ctx.beanRegistry().getBeanOfType( SessionFactory.class ) );
-			assertNotNull( ctx.beanRegistry().getBeanOfType( PlatformTransactionManager.class ) );
-			assertNotNull( ctx.beanRegistry().getBeanOfType( UnitOfWorkFactory.class ) );
+		try (
+				AcrossTestContext ctx = standard()
+						.property( AcrossHibernateModuleSettings.CREATE_UNITOFWORK_FACTORY, true )
+						.modules( AcrossHibernateModule.NAME )
+						.modules( new EmptyAcrossModule( "client" ) )
+						.build()
+		) {
+			assertNotNull( ctx.getBeanOfType( SessionFactory.class ) );
+			assertNotNull( ctx.getBeanOfType( PlatformTransactionManager.class ) );
+			assertNotNull( ctx.getBeanOfType( UnitOfWorkFactory.class ) );
 		}
 	}
 
 	@Test
-	public void noInterceptorOrFilterIfWebContextButNotEnabled() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				context.setProperty( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
-				                     PersistenceContextInView.NONE );
-				AcrossHibernateModule module = new AcrossHibernateModule();
-				context.addModule( module );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestWebContext( config )) {
+	public void noInterceptorOrFilterIfWebModuleButHandlerIsNone() {
+		try (
+				AcrossTestContext ctx = web()
+						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+						           PersistenceContextInView.NONE )
+						.modules( AcrossWebModule.NAME, AcrossHibernateModule.NAME )
+						.build()
+		) {
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateModule.NAME )
 			                               .getApplicationContext();
 
@@ -165,19 +138,14 @@ public class TestModuleSettings
 	}
 
 	@Test
-	public void noInterceptorIfNoWebContext() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateModule module = new AcrossHibernateModule();
-				module.setProperty( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
-				                    PersistenceContextInView.INTERCEPTOR );
-				context.addModule( module );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
+	public void noInterceptorIfNoAcrossWebModule() {
+		try (
+				AcrossTestContext ctx = web()
+						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+						           PersistenceContextInView.INTERCEPTOR )
+						.modules( AcrossHibernateModule.NAME )
+						.build()
+		) {
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateModule.NAME )
 			                               .getApplicationContext();
 
@@ -187,19 +155,14 @@ public class TestModuleSettings
 	}
 
 	@Test
-	public void noFilterIfNoWebContext() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateModule module = new AcrossHibernateModule();
-				module.setProperty( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
-				                    PersistenceContextInView.FILTER );
-				context.addModule( module );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
+	public void noFilterIfNoAcrossWebModule() {
+		try (
+				AcrossTestContext ctx = web()
+						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+						           PersistenceContextInView.FILTER )
+						.modules( AcrossHibernateModule.NAME )
+						.build()
+		) {
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateModule.NAME )
 			                               .getApplicationContext();
 
@@ -210,18 +173,13 @@ public class TestModuleSettings
 
 	@Test
 	public void interceptorIfWebContext() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateModule module = new AcrossHibernateModule();
-				module.setProperty( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
-				                    PersistenceContextInView.INTERCEPTOR );
-				context.addModule( module );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestWebContext( config )) {
+		try (
+				AcrossTestContext ctx = web()
+						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+						           PersistenceContextInView.INTERCEPTOR )
+						.modules( AcrossWebModule.NAME, AcrossHibernateModule.NAME )
+						.build()
+		) {
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateModule.NAME )
 			                               .getApplicationContext();
 
@@ -232,18 +190,13 @@ public class TestModuleSettings
 
 	@Test
 	public void filterIfWebContext() {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				AcrossHibernateModule module = new AcrossHibernateModule();
-				module.setProperty( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
-				                    PersistenceContextInView.FILTER );
-				context.addModule( module );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestWebContext( config )) {
+		try (
+				AcrossTestContext ctx = web()
+						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+						           PersistenceContextInView.FILTER )
+						.modules( AcrossWebModule.NAME, AcrossHibernateModule.NAME )
+						.build()
+		) {
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateModule.NAME )
 			                               .getApplicationContext();
 
@@ -254,17 +207,13 @@ public class TestModuleSettings
 
 	@Test
 	public void hibernateSessionHolderIsNormalImplementation() throws Exception {
-		AcrossContextConfigurer config = new AcrossContextConfigurer()
-		{
-			@Override
-			public void configure( AcrossContext context ) {
-				context.addModule( new AcrossHibernateModule() );
-				context.addModule( new EmptyAcrossModule( "client" ) );
-			}
-		};
-
-		try (AcrossTestContext ctx = new AcrossTestContext( config )) {
-			HibernateSessionHolder sessionHolder = ctx.beanRegistry().getBeanOfType( HibernateSessionHolder.class );
+		try (
+				AcrossTestContext ctx = standard()
+						.modules( AcrossHibernateModule.NAME )
+						.modules( new EmptyAcrossModule( "client" ) )
+						.build()
+		) {
+			HibernateSessionHolder sessionHolder = ctx.getBeanOfType( HibernateSessionHolder.class );
 			assertTrue( sessionHolder instanceof HibernateSessionHolderImpl );
 		}
 	}

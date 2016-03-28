@@ -51,7 +51,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration(classes = TestMultipleEntityManagerFactories.Config.class)
+@ContextConfiguration
 public class TestMultipleEntityManagerFactories
 {
 	@Autowired
@@ -70,7 +70,8 @@ public class TestMultipleEntityManagerFactories
 	}
 
 	@Entity
-	public static class MyEntity {
+	public static class MyEntity
+	{
 		@Id
 		private Long id;
 	}

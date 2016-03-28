@@ -32,8 +32,6 @@ import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -179,22 +177,14 @@ public class TestJpaInterceptors
 	public void allInterceptorShouldBeCalledBeforeClientInterceptor() {
 		final List<EntityInterceptor<?>> called = new ArrayList<>();
 
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				called.add( allInterceptor );
-				return null;
-			}
+		doAnswer( invocation -> {
+			called.add( allInterceptor );
+			return null;
 		} ).when( allInterceptor ).afterCreate( any() );
 
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				called.add( clientInterceptor );
-				return null;
-			}
+		doAnswer( invocation -> {
+			called.add( clientInterceptor );
+			return null;
 		} ).when( clientInterceptor ).afterCreate( any( Client.class ) );
 
 		clientRepository.saveAndFlush( new Client( "another client" ) );
@@ -204,14 +194,10 @@ public class TestJpaInterceptors
 
 	@Test
 	public void createCustomerBeforeSavingClient() {
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				Customer customer = new Customer( "nested customer" );
-				customerRepository.save( customer );
-				return null;
-			}
+		doAnswer( invocation -> {
+			Customer customer = new Customer( "nested customer" );
+			customerRepository.save( customer );
+			return null;
 		} ).when( clientInterceptor ).beforeCreate( any( Client.class ) );
 
 		Client client = new Client( "client triggering customer" );
@@ -225,14 +211,10 @@ public class TestJpaInterceptors
 
 	@Test
 	public void nestedCreationHappensInSeparateTransaction() {
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				Customer customer = new Customer( "nested customer 2" );
-				customerRepository.save( customer );
-				return null;
-			}
+		doAnswer( invocation -> {
+			Customer customer = new Customer( "nested customer 2" );
+			customerRepository.save( customer );
+			return null;
 		} ).when( clientInterceptor ).beforeCreate( any( Client.class ) );
 
 		doThrow( new RuntimeException( "after create fail" ) )

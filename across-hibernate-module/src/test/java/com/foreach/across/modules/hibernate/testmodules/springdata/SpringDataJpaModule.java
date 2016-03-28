@@ -10,7 +10,7 @@ import com.foreach.across.modules.hibernate.provider.HibernatePackageRegistry;
 
 import java.util.Set;
 
-@AcrossDepends(required = AcrossHibernateJpaModule.NAME)
+@AcrossDepends(required = AcrossHibernateJpaModule.NAME, optional = { "Hibernate2Module", "SimpleJpaModule" })
 public class SpringDataJpaModule extends AcrossModule implements HibernatePackageConfiguringModule
 {
 	public SpringDataJpaModule() {

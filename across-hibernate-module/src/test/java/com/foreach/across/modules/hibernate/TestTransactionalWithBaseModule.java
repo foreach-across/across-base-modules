@@ -15,15 +15,13 @@
  */
 package com.foreach.across.modules.hibernate;
 
-import com.foreach.across.core.AcrossContext;
-import com.foreach.across.database.support.HikariDataSourceHelper;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Hibernate1Module;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.Product;
 import com.foreach.across.modules.hibernate.testmodules.hibernate1.ProductRepository;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Module;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.User;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.UserRepository;
-import org.apache.commons.lang3.StringUtils;
+import com.foreach.across.test.AcrossTestConfiguration;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.After;
@@ -31,9 +29,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.orm.hibernate4.SessionFactoryUtils;
 import org.springframework.orm.hibernate4.SessionHolder;
 import org.springframework.test.annotation.DirtiesContext;
@@ -143,25 +141,12 @@ public class TestTransactionalWithBaseModule
 	}
 
 	@Configuration
+	@AcrossTestConfiguration
 	static class Config
 	{
 		@Bean
-		public DataSource dataSource() throws Exception {
-			return HikariDataSourceHelper.create( "org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:mem:acrosscore", "sa",
-			                                      StringUtils.EMPTY );
-		}
-
-		@Bean
-		public AcrossContext acrossContext( ConfigurableApplicationContext applicationContext ) throws Exception {
-			AcrossContext acrossContext = new AcrossContext( applicationContext );
-			acrossContext.setDataSource( dataSource() );
-			acrossContext.addModule( acrossHibernateModule() );
-			acrossContext.addModule( hibernate1Module() );
-			acrossContext.addModule( hibernate2Module() );
-
-			acrossContext.bootstrap();
-
-			return acrossContext;
+		public DataSource acrossDataSource() throws Exception {
+			return new EmbeddedDatabaseBuilder().build();
 		}
 
 		@Bean

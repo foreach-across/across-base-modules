@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration(classes = TestSettableIdEntityEquality.Config.class)
+@ContextConfiguration
 public class TestSettableIdEntityEquality
 {
 	@Autowired

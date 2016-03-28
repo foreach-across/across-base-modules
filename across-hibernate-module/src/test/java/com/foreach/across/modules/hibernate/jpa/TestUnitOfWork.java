@@ -20,7 +20,7 @@ import static org.junit.Assert.assertSame;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration(classes = TestUnitOfWork.Config.class)
+@ContextConfiguration
 public class TestUnitOfWork
 {
 	@Autowired

@@ -29,8 +29,6 @@ import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -90,22 +88,14 @@ public class TestJpaAndHibernateInterceptors
 	public void allInterceptorShouldBeCalledBeforeUserInterceptor() {
 		final List<EntityInterceptor<?>> called = new ArrayList<>();
 
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				called.add( allInterceptor );
-				return null;
-			}
+		doAnswer( invocation -> {
+			called.add( allInterceptor );
+			return null;
 		} ).when( allInterceptor ).afterCreate( any() );
 
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				called.add( userInterceptor );
-				return null;
-			}
+		doAnswer( invocation -> {
+			called.add( userInterceptor );
+			return null;
 		} ).when( userInterceptor ).afterCreate( any( User.class ) );
 
 		userRepository.create( new User( 1010, "another user" ) );
@@ -117,22 +107,14 @@ public class TestJpaAndHibernateInterceptors
 	public void allInterceptorShouldBeCalledBeforeClientInterceptor() {
 		final List<EntityInterceptor<?>> called = new ArrayList<>();
 
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				called.add( allInterceptor );
-				return null;
-			}
+		doAnswer( invocation -> {
+			called.add( allInterceptor );
+			return null;
 		} ).when( allInterceptor ).afterCreate( any() );
 
-		doAnswer( new Answer<Void>()
-		{
-			@Override
-			public Void answer( InvocationOnMock invocation ) throws Throwable {
-				called.add( clientInterceptor );
-				return null;
-			}
+		doAnswer( invocation -> {
+			called.add( clientInterceptor );
+			return null;
 		} ).when( clientInterceptor ).afterCreate( any( Client.class ) );
 
 		clientRepository.save( new Client( "another client" ) );
@@ -141,7 +123,7 @@ public class TestJpaAndHibernateInterceptors
 	}
 
 	@Configuration
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("all")
 	@AcrossTestConfiguration
 	protected static class Config implements AcrossContextConfigurer
 	{
