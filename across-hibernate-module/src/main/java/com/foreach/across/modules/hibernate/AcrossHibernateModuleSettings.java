@@ -15,9 +15,8 @@
  */
 package com.foreach.across.modules.hibernate;
 
-import com.foreach.across.core.AcrossModuleSettings;
-import com.foreach.across.core.AcrossModuleSettingsRegistry;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.Ordered;
 
 import java.util.HashMap;
@@ -26,56 +25,105 @@ import java.util.Map;
 /**
  * @author Arne Vandamme
  */
-public class AcrossHibernateModuleSettings extends AcrossModuleSettings
+@SuppressWarnings("all")
+@ConfigurationProperties(prefix = "acrossHibernate")
+public class AcrossHibernateModuleSettings
 {
 	public static final String HIBERNATE_PROPERTIES = "acrossHibernate.hibernateProperties";
 	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER = "acrossHibernate.persistenceContextInView.handler";
 	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER =
 			"acrossHibernate.persistenceContextInView.order";
-	public static final String CREATE_TRANSACTION_MANAGER = "acrossHibernate.transactionManager";
-	public static final String CREATE_UNITOFWORK_FACTORY = "acrossHibernate.unitOfWorkFactory";
+	public static final String CREATE_TRANSACTION_MANAGER = "acrossHibernate.createTransactionManager";
+	public static final String CREATE_UNITOFWORK_FACTORY = "acrossHibernate.createUnitOfWorkFactory";
 	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "acrossHibernate.registerRepositoryInterceptor";
 
-	@Override
-	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
-		registry.register( CREATE_TRANSACTION_MANAGER, Boolean.class, true,
-		                   "Should a TransactionManager bean be created.  If true this will also enable support for " +
-				                   "@Transaction in all modules bootstrapping later." );
-		registry.register( CREATE_UNITOFWORK_FACTORY, Boolean.class, false,
-		                   "Should a UnitOfWorkFactory bean be created." );
+	private final PersistenceContextInViewProperties persistenceContextInView =
+			new PersistenceContextInViewProperties();
 
-		registry.register( PERSISTENCE_CONTEXT_VIEW_HANDLER, PersistenceContextInView.class,
-		                   PersistenceContextInView.NONE,
-		                   "If a view layer is enabled, should an open session/entity manager be created for the entire " +
-				                   "request by using either a filter or an interceptor." );
-		registry.register( PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER, Integer.class, Ordered.HIGHEST_PRECEDENCE + 1,
-		                   "Configure the order of the persistence context view handler (if created)." );
-		registry.register( REGISTER_REPOSITORY_INTERCEPTOR, Boolean.class, true,
-		                   "Should common Repository implementations in modules automatically be intercepted.");
+	/**
+	 * Map of Hibernate specific properties.
+	 */
+	private Map<String, String> hibernateProperties = new HashMap<>();
+
+	/**
+	 * Should a TransactionManager bean be created.  If true this will also enable support for
+	 * {@link org.springframework.transaction.annotation.Transactional} in all modules bootstrapping later.
+	 */
+	private boolean createTransactionManager = true;
+
+	/**
+	 * Should a UnitOfWorkFactory be created.
+	 */
+	private boolean createUnitOfWorkFactory = false;
+
+	/**
+	 * Should common Repository implementations in modules automatically be intercepted.
+	 */
+	private boolean registerRepositoryInterceptor = true;
+
+	public void setHibernateProperties( Map<String, String> hibernateProperties ) {
+		this.hibernateProperties = hibernateProperties;
+	}
+
+	public void setCreateTransactionManager( boolean createTransactionManager ) {
+		this.createTransactionManager = createTransactionManager;
+	}
+
+	public void setCreateUnitOfWorkFactory( boolean createUnitOfWorkFactory ) {
+		this.createUnitOfWorkFactory = createUnitOfWorkFactory;
+	}
+
+	public void setRegisterRepositoryInterceptor( boolean registerRepositoryInterceptor ) {
+		this.registerRepositoryInterceptor = registerRepositoryInterceptor;
+	}
+
+	public PersistenceContextInViewProperties getPersistenceContextInView() {
+		return persistenceContextInView;
+	}
+
+	public Map<String, String> getHibernateProperties() {
+		return hibernateProperties;
 	}
 
 	public boolean isCreateTransactionManager() {
-		return getProperty( CREATE_TRANSACTION_MANAGER, Boolean.class );
+		return createTransactionManager;
 	}
 
 	public boolean isCreateUnitOfWorkFactory() {
-		return getProperty( CREATE_UNITOFWORK_FACTORY, Boolean.class );
+		return createUnitOfWorkFactory;
 	}
 
 	public boolean isRegisterRepositoryInterceptor() {
-		return getProperty( REGISTER_REPOSITORY_INTERCEPTOR, Boolean.class );
+		return registerRepositoryInterceptor;
 	}
 
-	public PersistenceContextInView getPersistenceContextInView() {
-		return getProperty( PERSISTENCE_CONTEXT_VIEW_HANDLER, PersistenceContextInView.class );
-	}
+	public static class PersistenceContextInViewProperties
+	{
+		/**
+		 * If a view layer is enabled, should an open session/entity manager be created for the entire
+		 * request by using either a filter or an interceptor.
+		 */
+		private PersistenceContextInView handler = PersistenceContextInView.FILTER;
 
-	public int getPersistenceContextInViewOrder() {
-		return getProperty( PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER, Integer.class );
-	}
+		/**
+		 * Configure the order of the persistence context view handler (if created).
+		 */
+		private int order = Ordered.HIGHEST_PRECEDENCE + 1;
 
-	@SuppressWarnings("unchecked")
-	public Map<String, Object> getHibernateProperties() {
-		return getProperty( HIBERNATE_PROPERTIES, Map.class, new HashMap<String, Object>() );
+		public PersistenceContextInView getHandler() {
+			return handler;
+		}
+
+		public void setHandler( PersistenceContextInView handler ) {
+			this.handler = handler;
+		}
+
+		public int getOrder() {
+			return order;
+		}
+
+		public void setOrder( int order ) {
+			this.order = order;
+		}
 	}
 }

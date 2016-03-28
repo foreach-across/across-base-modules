@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.hibernate.config;
 
-import com.foreach.across.core.annotations.AcrossCondition;
+package com.foreach.across.modules.hibernate.config.dynamic;
+
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactoryImpl;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
 
 /**
  * Configures a UnitOfWorkFactory for the current SessionFactory.
  */
-@AcrossCondition( "settings.createUnitOfWorkFactory" )
-@Configuration
 public class UnitOfWorkConfiguration
 {
 	@Bean

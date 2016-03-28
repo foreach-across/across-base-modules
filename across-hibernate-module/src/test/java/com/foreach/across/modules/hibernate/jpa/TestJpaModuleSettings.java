@@ -101,6 +101,8 @@ public class TestJpaModuleSettings
 		{
 			@Override
 			public void configure( AcrossContext context ) {
+				context.setProperty( AcrossHibernateJpaModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER, PersistenceContextInView.NONE );
+
 				AcrossHibernateJpaModule module = new AcrossHibernateJpaModule();
 				context.addModule( module );
 			}

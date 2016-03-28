@@ -148,6 +148,8 @@ public class TestModuleSettings
 		{
 			@Override
 			public void configure( AcrossContext context ) {
+				context.setProperty( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
+				                     PersistenceContextInView.NONE );
 				AcrossHibernateModule module = new AcrossHibernateModule();
 				context.addModule( module );
 			}

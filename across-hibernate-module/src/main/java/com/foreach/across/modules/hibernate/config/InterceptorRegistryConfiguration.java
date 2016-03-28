@@ -15,11 +15,12 @@
  */
 package com.foreach.across.modules.hibernate.config;
 
-import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.registry.IncrementalRefreshableRegistry;
 import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,7 +32,7 @@ public class InterceptorRegistryConfiguration
 {
 	@Bean
 	@Exposed
-	@AcrossCondition("not hasBean('entityInterceptors')")
+	@ConditionalOnMissingBean(name = "entityInterceptors", search = SearchStrategy.CURRENT)
 	public RefreshableRegistry<EntityInterceptor> entityInterceptors() {
 		return new IncrementalRefreshableRegistry<>( EntityInterceptor.class, true );
 	}

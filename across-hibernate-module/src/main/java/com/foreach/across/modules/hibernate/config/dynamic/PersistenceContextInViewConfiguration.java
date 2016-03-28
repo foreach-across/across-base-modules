@@ -1,23 +1,37 @@
-package com.foreach.across.modules.hibernate.jpa.config;
+/*
+ * Copyright 2014 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.foreach.across.modules.hibernate.config.dynamic;
 
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
-import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
+import org.springframework.orm.hibernate4.support.OpenSessionInViewFilter;
+import org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import javax.persistence.EntityManagerFactory;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
@@ -28,25 +42,23 @@ public class PersistenceContextInViewConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger( PersistenceContextInViewConfiguration.class );
 
-	@Configuration
 	@AcrossDepends(required = "AcrossWebModule")
-	@AcrossCondition("settings.persistenceContextInView.toString() == 'FILTER'")
-	public static class OpenEntityManagerInViewFilterConfiguration extends AcrossWebDynamicServletConfigurer
+	public static class OpenSessionFactoryInViewFilterConfiguration extends AcrossWebDynamicServletConfigurer
 	{
 		@Autowired
-		private EntityManagerFactory entityManagerFactory;
+		private SessionFactory sessionFactory;
 
 		@Autowired
 		@Module(AcrossModule.CURRENT_MODULE)
 		private AcrossModule currentModule;
 
 		@Bean
-		public OpenEntityManagerInViewFilter openEntityManagerInViewFilter() {
-			return new OpenEntityManagerInViewFilter()
+		public OpenSessionInViewFilter openSessionInViewFilter() {
+			return new OpenSessionInViewFilter()
 			{
 				@Override
-				protected EntityManagerFactory lookupEntityManagerFactory() {
-					return entityManagerFactory;
+				protected SessionFactory lookupSessionFactory() {
+					return sessionFactory;
 				}
 			};
 		}
@@ -54,14 +66,14 @@ public class PersistenceContextInViewConfiguration
 		@Override
 		protected void dynamicConfigurationAllowed( ServletContext servletContext ) throws ServletException {
 			FilterRegistration.Dynamic registration = servletContext.addFilter(
-					currentModule.getName() + ".OpenEntityManagerInViewFilter", openEntityManagerInViewFilter()
+					currentModule.getName() + ".OpenSessionInViewFilter", openSessionInViewFilter()
 			);
 			registration.setAsyncSupported( true );
 
 			registration.addMappingForUrlPatterns( EnumSet.of(
-					                                       DispatcherType.REQUEST,
-					                                       DispatcherType.ERROR,
-					                                       DispatcherType.ASYNC
+					DispatcherType.REQUEST,
+					DispatcherType.ERROR,
+					DispatcherType.ASYNC
 			                                       ),
 			                                       false,
 			                                       "/*" );
@@ -74,13 +86,11 @@ public class PersistenceContextInViewConfiguration
 		}
 	}
 
-	@Configuration
 	@AcrossDepends(required = "AcrossWebModule")
-	@AcrossCondition("settings.persistenceContextInView.toString() == 'INTERCEPTOR'")
-	public static class OpenEntityManagerInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
+	public static class OpenSessionFactoryInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
 	{
 		@Autowired
-		private EntityManagerFactory entityManagerFactory;
+		private SessionFactory sessionFactory;
 
 		@Autowired
 		@Module(AcrossModule.CURRENT_MODULE)
@@ -88,18 +98,18 @@ public class PersistenceContextInViewConfiguration
 
 		@Override
 		public int getOrder() {
-			return settings.getPersistenceContextInViewOrder();
+			return settings.getPersistenceContextInView().getOrder();
 		}
 
 		@Override
 		public void addInterceptors( InterceptorRegistry registry ) {
-			registry.addWebRequestInterceptor( openEntityManagerInViewInterceptor() );
+			registry.addWebRequestInterceptor( openSessionInViewInterceptor() );
 		}
 
 		@Bean
-		public OpenEntityManagerInViewInterceptor openEntityManagerInViewInterceptor() {
-			OpenEntityManagerInViewInterceptor interceptor = new OpenEntityManagerInViewInterceptor();
-			interceptor.setEntityManagerFactory( entityManagerFactory );
+		public OpenSessionInViewInterceptor openSessionInViewInterceptor() {
+			OpenSessionInViewInterceptor interceptor = new OpenSessionInViewInterceptor();
+			interceptor.setSessionFactory( sessionFactory );
 
 			return interceptor;
 		}

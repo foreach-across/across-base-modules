@@ -19,6 +19,7 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
+import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.hibernate.AcrossHibernateModule;
@@ -35,9 +36,9 @@ import org.hibernate.engine.jdbc.batch.internal.FixedBatchBuilderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 
@@ -48,10 +49,11 @@ import java.util.Properties;
  * Configures a standard SessionFactory.
  *
  * @see com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration
- * @see com.foreach.across.modules.hibernate.config.TransactionManagerConfiguration
+ * @see com.foreach.across.modules.hibernate.config.DynamicConfigurationRegistrar
  */
 @Configuration
 @AcrossEventHandler
+@Import(DynamicConfigurationRegistrar.class)
 public class HibernateConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "transactionManager";
@@ -60,10 +62,11 @@ public class HibernateConfiguration
 	private static final Logger LOG = LoggerFactory.getLogger( HibernateConfiguration.class );
 
 	@Autowired
-	@Qualifier(AcrossModule.CURRENT_MODULE)
+	@Module(AcrossModule.CURRENT_MODULE)
 	private AcrossHibernateModule module;
 
 	@Autowired
+	@Module(AcrossModule.CURRENT_MODULE)
 	private AcrossHibernateModuleSettings settings;
 
 	@Autowired
@@ -73,7 +76,7 @@ public class HibernateConfiguration
 	@Exposed
 	public LocalSessionFactoryBean sessionFactory( HibernatePackage hibernatePackage ) {
 		String version = org.hibernate.Version.getVersionString();
-		Map<String, Object> hibernateProperties = settings.getHibernateProperties();
+		Map hibernateProperties = settings.getHibernateProperties();
 
 		if ( StringUtils.startsWith( version, "4.2" ) ) {
 			if ( hibernateProperties.get( BatchBuilderInitiator.BUILDER ) != null

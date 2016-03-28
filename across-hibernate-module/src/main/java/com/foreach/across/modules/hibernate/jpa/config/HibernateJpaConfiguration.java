@@ -58,10 +58,11 @@ import java.util.Map;
  * Configures a JPA EntityManagerFactory.
  *
  * @see com.foreach.across.modules.hibernate.config.HibernateConfiguration
- * @see com.foreach.across.modules.hibernate.config.TransactionManagerConfiguration
+ * @see com.foreach.across.modules.hibernate.config.DynamicConfigurationRegistrar
  */
 @Configuration
-@Import({ InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class })
+@Import({ InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class,
+          DynamicConfigurationRegistrar.class })
 @AcrossEventHandler
 public class HibernateJpaConfiguration
 {
@@ -109,14 +110,13 @@ public class HibernateJpaConfiguration
 		return factory;
 	}
 
-	private Map<String, Object> hibernateProperties() {
+	private Map<String, String> hibernateProperties() {
 		String version = org.hibernate.Version.getVersionString();
-		Map<String, Object> hibernateProperties = new HashMap<>();
+		Map<String, String> hibernateProperties = new HashMap<>();
 		hibernateProperties.putAll( settings.getHibernateProperties() );
 
 		if ( StringUtils.startsWith( version, "4.2" ) ) {
-			if ( hibernateProperties.get( BatchBuilderInitiator.BUILDER ) != null
-					|| settings.getProperty( BatchBuilderInitiator.BUILDER ) != null ) {
+			if ( hibernateProperties.get( BatchBuilderInitiator.BUILDER ) != null ) {
 				LOG.info(
 						"Skipping workaround for https://hibernate.atlassian.net/browse/HHH-8853 because you have a custom builder" );
 			}
@@ -126,9 +126,7 @@ public class HibernateJpaConfiguration
 
 				int batchSize = 0;
 				if ( hibernateJdbcBatchSize != null ) {
-					batchSize = hibernateJdbcBatchSize instanceof Number
-							? ( (Number) hibernateJdbcBatchSize ).intValue()
-							: Integer.valueOf( hibernateJdbcBatchSize.toString() );
+					batchSize = Integer.valueOf( hibernateJdbcBatchSize.toString() );
 				}
 
 				LOG.info( "Enabling workaround for https://hibernate.atlassian.net/browse/HHH-8853 with batchsize: {}",

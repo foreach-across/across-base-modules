@@ -64,8 +64,8 @@ public abstract class AbstractHibernatePackageModule extends AcrossModule
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> getHibernateProperties() {
-		Map<String, Object> props = (Map<String, Object>) getProperties().get(
+	public Map<String, String> getHibernateProperties() {
+		Map<String, String> props = (Map<String, String>) getProperties().get(
 				AcrossHibernateModuleSettings.HIBERNATE_PROPERTIES );
 
 		if ( props == null ) {
@@ -76,8 +76,8 @@ public abstract class AbstractHibernatePackageModule extends AcrossModule
 		return props;
 	}
 
-	public void setHibernateProperties( Map<String, Object> hibernateProperties ) {
-		Map<String, Object> current = getHibernateProperties();
+	public void setHibernateProperties( Map<String, String> hibernateProperties ) {
+		Map<String, String> current = getHibernateProperties();
 
 		current.clear();
 		current.putAll( hibernateProperties );

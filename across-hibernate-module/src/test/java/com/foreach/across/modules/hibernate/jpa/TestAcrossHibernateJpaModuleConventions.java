@@ -24,11 +24,6 @@ import com.foreach.across.test.AbstractAcrossModuleConventionsTest;
 public class TestAcrossHibernateJpaModuleConventions extends AbstractAcrossModuleConventionsTest
 {
 	@Override
-	protected boolean hasSettings() {
-		return true;
-	}
-
-	@Override
 	protected AcrossModule createModule() {
 		return new AcrossHibernateJpaModule();
 	}
