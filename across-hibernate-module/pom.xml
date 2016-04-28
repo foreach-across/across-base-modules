@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>com.foreach.across.modules</groupId>
 		<artifactId>across-hibernate-module-project</artifactId>
-		<version>1.1.1-SNAPSHOT</version>
+		<version>1.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>across-hibernate-module</artifactId>

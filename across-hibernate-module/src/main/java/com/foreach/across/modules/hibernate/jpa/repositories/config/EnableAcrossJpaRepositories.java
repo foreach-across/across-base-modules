@@ -20,6 +20,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
+import org.springframework.data.repository.config.DefaultRepositoryBaseClass;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -129,4 +130,21 @@ public @interface EnableAcrossJpaRepositories
 	 * repositories infrastructure.
 	 */
 	boolean considerNestedRepositories() default false;
+
+	/**
+	 * Configure the repository base class to be used to create repository proxies for this particular configuration.
+	 *
+	 * @return
+	 * @since 1.9
+	 */
+	Class<?> repositoryBaseClass() default DefaultRepositoryBaseClass.class;
+
+	/**
+	 * Configures whether to enable default transactions for Spring Data JPA repositories. Defaults to {@literal true}. If
+	 * disabled, repositories must be used behind a facade that's configuring transactions (e.g. using Spring's annotation
+	 * driven transaction facilities) or repository methods have to be used to demarcate transactions.
+	 *
+	 * @return whether to enable default transactions, defaults to {@literal true}.
+	 */
+	boolean enableDefaultTransactions() default true;
 }
