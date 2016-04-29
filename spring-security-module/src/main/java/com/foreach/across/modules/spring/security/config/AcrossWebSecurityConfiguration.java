@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
-import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.util.ClassUtils;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
@@ -41,7 +41,7 @@ import java.util.*;
  * Configures Spring security support in an AcrossWeb enabled context.
  */
 @Configuration
-@EnableWebMvcSecurity
+@EnableWebSecurity
 @AcrossDepends(required = "AcrossWebModule")
 public class AcrossWebSecurityConfiguration
 {
