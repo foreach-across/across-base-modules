@@ -31,7 +31,7 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.util.ClassUtils;
-import org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect;
+import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import javax.annotation.PostConstruct;
@@ -49,7 +49,7 @@ public class AcrossWebSecurityConfiguration
 
 	private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring4.SpringTemplateEngine";
 	private static final String CLASS_SPRING_SECURITY_DIALECT =
-			"org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect";
+			"org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect";
 
 	@Autowired
 	private ApplicationContext applicationContext;
