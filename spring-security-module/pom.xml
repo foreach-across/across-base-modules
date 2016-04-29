@@ -95,7 +95,7 @@
                         <id>output-html</id>
                         <phase>prepare-package</phase>
                         <goals>
-                            <goal>process-asciiadoc</goal>
+                            <goal>process-asciidoc</goal>
                         </goals>
                     </execution>
                 </executions>
