@@ -87,6 +87,10 @@ Module website: {module-url}
 
 == What's new in this version?
 :numbered!:
+
+=== 1.2.0-SNAPSHOT
+* Compatibility update with Spring 4.2 which adds two new attributes to `@EnableAcrossJpaRepositories`.
+
 === 1.1.0.RELEASE
 Major addition of the new `AcrossHibernateJpaModule` as a replacement for the legacy `AcrossHibernateModule`.
 
