@@ -47,37 +47,38 @@ Module website: {module-url}
 {module-name} does not have any dependencies on other modules.
 
 === Module settings
+All properties start with the acrossHibernate. prefix
 
 |===
 |Property |Type |Description |Default
 
-|acrossHibernate.transactionManager
+|createTransactionManager
 |`Boolean`
 |Should a TransactionManager bean be created.  If true this will also enable support for @Transaction in all modules bootstrapping later.
 |_true_
 
-|acrossHibernate.unitOfWorkFactory
+|createUnitOfWorkFactory
 |`Boolean`
 |Should a <<unitofworkfactory,UnitOfWorkFactory bean>> be created.
 |_false_
 
-|acrossHibernate.persistenceContextInView.handler
+|persistenceContextInView.handler
 |`PersistenceContextInView`
 |If a view layer is enabled, should an open session/entity manager be created for the entire request by using either a filter or an interceptor.
 |_PersistenceContextInView.NONE_
 
-|acrossHibernate.persistenceContextInView.order
+|persistenceContextInView.order
 |`Integer`
 |Configure the order of the persistence context view handler (if created).
 |_Ordered.HIGHEST_PRECEDENCE + 1_
 
-|acrossHibernate.registerRepositoryInterceptor
+|registerRepositoryInterceptor
 |`Boolean`
 |Should common Repository implementations in modules automatically be intercepted. Currently `JpaRepository` and the legacy
 `BasicRepository` interfaces are intercepted.  See chapter <<EntityInterceptor>> for more information.
 |_true_
 
-|acrossHibernate.jpa.persistenceUnitName
+|persistenceUnitName
 |`String`
 |Name of the persistence unit that is being managed by this module.
 |Module name
@@ -87,6 +88,10 @@ Module website: {module-url}
 
 == What's new in this version?
 :numbered!:
+=== 1.1.1.RELEASE
+* most settings are now configurable through properties with Spring configuration metadata support
+* the <<HibernatePackage,hibernate package>> can now be configured adding a `HibernatePackageConfigurer` via `@ModuleConfiguration`
+
 === 1.1.0.RELEASE
 Major addition of the new `AcrossHibernateJpaModule` as a replacement for the legacy `AcrossHibernateModule`.
 
@@ -116,23 +121,21 @@ See the annotation source code for the custom defaults that are being used.
 === Configuring a HibernatePackage
 {module-name} creates a `HibernatePackage` with the same name as the module itself - also the name of the JPA Persistence Unit.
 This package determines the mapping context that is available in the `EntityManager`.
-When bootstrapping, the {module-name} will scan all other packages to see if they implement the `HibernatePackageConfiguringModule` interface.
-This interface allows other modules to receive all hibernate packages being configured (in case of <<multiple-modules,multiple>>) and extending their mappings.
+When bootstrapping, the {module-name} will delegate configuration to all `HibernatePackageConfigurer` beans found.
+Consuming modules should inject an implementation into the Hibernate module using `@ModuleConfiguration`.
 
-.Example code extending a HibernatePackage
+NOTE: If the same configurer class is injected into multiple modules, the package name can be used as a discriminator.
+
+.Example code implementing a HibernatePackageConfigurer
 [source,java,indent=0]
 [subs="verbatim,quotes,attributes"]
 ----
-public class UserModule extends AcrossModule implements HibernatePackageConfiguringModule
+@ModuleConfiguration(AcrossHibernateJpaModule.NAME)
+public class UserEntitiesConfiguration implements HibernatePackageConfigurer
 {
-	...
-
 	@Override
 	public void configureHibernatePackage( HibernatePackageRegistry hibernatePackage ) {
-		if ( StringUtils.equals( AcrossHibernateJpaModule.NAME, hibernatePackage.getName() ) ) {
-			hibernatePackage.addPackageToScan( "com.foreach.across.modules.user.business" );
-			hibernatePackage.add( new TableAliasProvider( schemaConfiguration.getTables() ) );
-		}
+		hibernatePackage.addPackageToScan( "com.foreach.across.modules.user.business" );
 	}
 }
 ----
@@ -183,6 +186,12 @@ Uses the `ACROSS_SEQUENCES` table created by the `AcrossSequencesInstaller` from
 	)
 	private Long id;
 ----
+
+=== AuditableEntity and AuditableSchemaInstaller
+`AuditableEntity` is a `@MappedSuperClass` that implements the `Auditable<String>` interface.
+It adds auditing related columns: creation and last modification information (timestamp and principal).
+
+The `AuditableSchemaInstaller` is a base installer class that can easily be used to add the relevant auditing columns to multiple tables.
 
 === SettableIdBasedEntity, SettableIdAuditableEntity
 Base entity classes allowing an id to be set before persisting, using the `newEntityId` property.
