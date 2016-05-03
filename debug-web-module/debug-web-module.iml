@@ -56,8 +56,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.hsqldb:hsqldb:2.3.2" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:log4j-over-slf4j:1.7.11" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.11" level="project" />
-    <orderEntry type="library" name="Maven: com.foreach.across:across-web:1.1.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.foreach.across:across-core:1.1.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.foreach.across:across-web:1.1.2.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.foreach.across:across-core:1.1.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.foreach.libs:common-concurrent:0.12" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context:4.1.9.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aop:4.1.9.RELEASE" level="project" />
@@ -82,7 +82,7 @@
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-autoconfigure:1.2.8.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:1.2.8.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.14" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.foreach.across:across-test:1.1.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.foreach.across:across-test:1.1.2.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.zaxxer:HikariCP-java6:2.3.9" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:4.1.9.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-orm:4.1.9.RELEASE" level="project" />

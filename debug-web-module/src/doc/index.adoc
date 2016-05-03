@@ -1,9 +1,9 @@
 = DebugWebModule
 Arne Vandamme
-1.0.1-SNAPSHOT
+1.0.1.RELEASE
 :toc: left
 :sectanchors:
-:module-version: 1.0.1-SNAPSHOT
+:module-version: 1.0.1.RELEASE
 :module-name: DebugWebModule
 :module-artifact: debug-web-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/DebugWebModule
@@ -76,7 +76,7 @@ All properties start with the *debugWebModule.* prefix.
 
 == What's new in this version?
 :numbered!:
-=== 1.0.1-SNAPSHOT
+=== 1.0.1.RELEASE
 
 * both root path and dashboard path are now configurable through properties
 * the context browser debug controller can now mask sensitive property values

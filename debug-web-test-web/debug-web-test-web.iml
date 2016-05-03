@@ -12,8 +12,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="debug-web-module" />
-    <orderEntry type="library" name="Maven: com.foreach.across:across-web:1.1.2-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.foreach.across:across-core:1.1.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.foreach.across:across-web:1.1.2.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.foreach.across:across-core:1.1.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.foreach.libs:common-concurrent:0.12" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context:4.1.9.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aop:4.1.9.RELEASE" level="project" />
