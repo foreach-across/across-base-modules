@@ -88,6 +88,10 @@ All properties start with the acrossHibernate. prefix
 
 == What's new in this version?
 :numbered!:
+
+=== 1.2.0-SNAPSHOT
+* Compatibility update with Spring 4.2 which adds two new attributes to `@EnableAcrossJpaRepositories`.
+
 === 1.1.1.RELEASE
 * most settings are now configurable through properties with Spring configuration metadata support
 * the <<HibernatePackage,hibernate package>> can now be configured adding a `HibernatePackageConfigurer` via `@ModuleConfiguration`
