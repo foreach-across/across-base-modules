@@ -56,18 +56,17 @@
 
 	<script th:inline="javascript" type="text/javascript">
 		/*<![CDATA[*/
-		function markDirty( event )
-		{
-			var target = event.srcElement, isOriginalValue = function ( target )
-			{
+		function markDirty( event ) {
+			var target = event.target;
+			function isOriginalValue( target ) {
 				for ( var i = 0; i < target.options.length; i++ ) {
 					var option = target.options[i];
 					if ( option.attributes['selected'] ) {
 						return option.value === target.value;
 					}
 				}
-			};
-			if ( !isOriginalValue( target ) && target.className.indexOf( 'dirty' ) === -1 ) {
+			}
+			if ( target && !isOriginalValue( target ) && target.className.indexOf( 'dirty' ) === -1 ) {
 				if ( target.className.length > 0 ) {
 					target.className += ' ';
 				}
@@ -77,8 +76,7 @@
 				target.className = target.className.replace( / ?\bdirty\b/, '' );
 			}
 		}
-		function disableNonDirty( form )
-		{
+		function disableNonDirty( form ) {
 			var selectNodes = document.getElementsByTagName( 'select' );
 			for ( var i = 0; i < selectNodes.length; i++ ) {
 				var node = selectNodes[i];
