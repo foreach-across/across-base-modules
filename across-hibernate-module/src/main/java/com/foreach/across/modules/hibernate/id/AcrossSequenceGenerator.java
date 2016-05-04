@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.id.enhanced.OptimizerFactory;
+import org.hibernate.id.enhanced.StandardOptimizerDescriptor;
 import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.type.Type;
 
@@ -91,7 +91,7 @@ public class AcrossSequenceGenerator extends TableGenerator
 		props.put( VALUE_COLUMN_PARAM, AcrossSchemaConfiguration.SEQUENCE_VALUE );
 
 		// Unless explicitly overruled, we use a pooled optimizer
-		props.put( OPT_PARAM, OptimizerFactory.StandardOptimizerDescriptor.POOLED_LO.getExternalName() );
+		props.put( OPT_PARAM, StandardOptimizerDescriptor.POOLED_LO.getExternalName() );
 
 		// Extend with params
 		if ( params.containsKey( OPT_PARAM ) ) {

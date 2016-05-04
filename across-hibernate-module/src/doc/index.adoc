@@ -89,7 +89,7 @@ All properties start with the acrossHibernate. prefix
 == What's new in this version?
 :numbered!:
 
-=== 1.2.0-SNAPSHOT
+=== 2.0.0-SNAPSHOT
 * Compatibility update with Spring 4.2 which adds two new attributes to `@EnableAcrossJpaRepositories`.
 
 === 1.1.1.RELEASE
