@@ -1,9 +1,9 @@
 = SpringSecurityModule
 Arne Vandamme
-1.2.0-SNAPSHOT
+2.0.0-SNAPSHOT
 :toc: left
 :sectanchors:
-:module-version: 1.2.0-SNAPSHOT
+:module-version: 2.0.0-SNAPSHOT
 :module-name: SpringSecurityModule
 :module-artifact: spring-security-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/SpringSecurityModule
@@ -57,7 +57,7 @@ Module website: {module-url}
 
 == What's new in this version?
 :numbered!:
-=== 1.2.0-SNAPSHOT
+=== 2.0.0-SNAPSHOT
 Compatibility release for Spring 4.2 (upgrades to Spring Security 4 and Spring )
 
 === 1.1.0.RELEASE
