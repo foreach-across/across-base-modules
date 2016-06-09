@@ -1,9 +1,9 @@
 = DebugWebModule
 Arne Vandamme
-1.0.2-SNAPSHOT
+2.0.0-SNAPSHOT
 :toc: left
 :sectanchors:
-:module-version: 1.0.2-SNAPSHOT
+:module-version: 2.0.0-SNAPSHOT
 :module-name: DebugWebModule
 :module-artifact: debug-web-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/DebugWebModule
@@ -76,6 +76,11 @@ All properties start with the *debugWebModule.* prefix.
 
 == What's new in this version?
 :numbered!:
+=== 2.0.0-SNAPSHOT
+
+* *Requires Across 2.0.0.*
+* Context browser now shows event handler methods grouped by event instead of bean instance.
+
 === 1.0.1.RELEASE
 
 * both root path and dashboard path are now configurable through properties
