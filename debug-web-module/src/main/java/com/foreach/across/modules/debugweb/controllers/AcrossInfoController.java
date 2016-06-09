@@ -325,7 +325,6 @@ public class AcrossInfoController
 		ContextDebugInfo selected = contexts.get( index );
 
 		Collection<BeanInfo> beans = buildBeanSet( selected );
-		Collection<BeanInfo> handlers = new LinkedList<>();
 
 		model.addAttribute( "handlerMethodsByEvent",
 		                    beans.stream()
@@ -337,14 +336,6 @@ public class AcrossInfoController
 				                         TreeMap::new,
 				                         Collectors.mapping( m -> m, Collectors.toList() ) ) )
 		);
-
-		for ( BeanInfo beanInfo : beans ) {
-			if ( beanInfo.isEventHandler() ) {
-				handlers.add( beanInfo );
-			}
-		}
-
-		model.addAttribute( "eventHandlers", handlers );
 
 		model.addAttribute( "selectedContextIndex", contexts.indexOf( selected ) );
 		model.addAttribute( "selectedContext", selected );
