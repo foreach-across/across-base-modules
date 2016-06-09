@@ -25,7 +25,6 @@ import com.foreach.across.modules.debugweb.config.PropertyMaskingProperties;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.debugweb.util.ContextDebugInfo;
-import net.engio.mbassy.listener.Handler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.AopProxyUtils;
@@ -46,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @DebugWebController
 public class AcrossInfoController
@@ -327,6 +327,17 @@ public class AcrossInfoController
 		Collection<BeanInfo> beans = buildBeanSet( selected );
 		Collection<BeanInfo> handlers = new LinkedList<>();
 
+		model.addAttribute( "handlerMethodsByEvent",
+		                    beans.stream()
+		                         .filter( BeanInfo::isEventHandler )
+		                         .map( BeanInfo::getHandlerMethods )
+		                         .flatMap( Collection::stream )
+		                         .collect( Collectors.groupingBy(
+				                         method -> method.getParameterTypes()[0].getName(),
+				                         TreeMap::new,
+				                         Collectors.mapping( m -> m, Collectors.toList() ) ) )
+		);
+
 		for ( BeanInfo beanInfo : beans ) {
 			if ( beanInfo.isEventHandler() ) {
 				handlers.add( beanInfo );
@@ -453,7 +464,7 @@ public class AcrossInfoController
 	private void detectEventHandlers( BeanInfo beanInfo ) {
 		Object value = beanInfo.getInstance();
 
-		if ( value != null && publisher.isListener( value ) ) {
+		if ( value != null ) {
 			Collection<Method> handlerMethods = detectHandlerMethods( value );
 
 			if ( !handlerMethods.isEmpty() ) {
@@ -487,7 +498,7 @@ public class AcrossInfoController
 			Method[] declaredMethods = ReflectionUtils.getUniqueDeclaredMethods( value.getClass() );
 
 			for ( Method method : declaredMethods ) {
-				if ( AnnotationUtils.findAnnotation( method, Handler.class ) != null ) {
+				if ( AnnotationUtils.findAnnotation( method, Event.class ) != null ) {
 					methods.add( method );
 				}
 			}
