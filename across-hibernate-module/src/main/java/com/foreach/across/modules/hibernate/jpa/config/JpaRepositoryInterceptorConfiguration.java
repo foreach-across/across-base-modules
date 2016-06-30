@@ -15,15 +15,14 @@
  */
 package com.foreach.across.modules.hibernate.jpa.config;
 
+import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
 import com.foreach.across.modules.hibernate.config.BasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.jpa.aop.JpaRepositoryInterceptor;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Role;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.*;
 
 /**
  * Configures intercepting the {@link org.springframework.data.repository.CrudRepository} methods when an entity gets inserted/updated/deleted.
@@ -35,6 +34,8 @@ import org.springframework.context.annotation.Role;
 public class JpaRepositoryInterceptorConfiguration
 {
 	@Bean
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Exposed
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	public JpaRepositoryInterceptor jpaRepositoryInterceptor( RefreshableRegistry<EntityInterceptor> entityInterceptors ) {
 		return new JpaRepositoryInterceptor( entityInterceptors );

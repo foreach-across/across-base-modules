@@ -180,13 +180,13 @@ public class TestHibernateInterceptors
 	}
 
 	@Test
-	public void nestedCreationHappensInItsOwnTransaction() {
+	public void nestedCreationHappensInSameTransaction() {
 		doAnswer( invocation -> {
 			Product product = new Product( 1000, "nested product 2" );
 			productRepository.save( product );
 			return null;
 		} ).when( userInterceptor )
-		       .beforeCreate( any( User.class ) );
+		   .beforeCreate( any( User.class ) );
 
 		doThrow( new RuntimeException( "exception thrown" ) )
 				.when( userInterceptor )
@@ -205,8 +205,8 @@ public class TestHibernateInterceptors
 		}
 
 		assertTrue( failed );
-		assertNotNull( userRepository.getById( 1000 ) );
-		assertNotNull( productRepository.getProductWithId( 1000 ) );
+		assertNull( userRepository.getById( 1000 ) );
+		assertNull( productRepository.getProductWithId( 1000 ) );
 	}
 
 	@Test

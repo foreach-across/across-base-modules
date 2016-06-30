@@ -26,6 +26,7 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.data.repository.core.support.RepositoryProxyPostProcessor;
+import org.springframework.data.repository.util.TxUtils;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -39,6 +40,7 @@ import java.util.List;
  */
 public class EntityInterceptingJpaRepositoryFactoryBean extends JpaRepositoryFactoryBean
 {
+	private String transactionManagerName = TxUtils.DEFAULT_TRANSACTION_MANAGER;
 	private AcrossContextBeanRegistry acrossContextBeanRegistry;
 
 	@Autowired
@@ -47,10 +49,17 @@ public class EntityInterceptingJpaRepositoryFactoryBean extends JpaRepositoryFac
 	}
 
 	@Override
+	public void setTransactionManager( String transactionManager ) {
+		this.transactionManagerName
+				= transactionManager == null ? TxUtils.DEFAULT_TRANSACTION_MANAGER : transactionManager;
+		super.setTransactionManager( transactionManager );
+	}
+
+	@Override
 	protected RepositoryFactorySupport createRepositoryFactory( EntityManager entityManager ) {
 		RepositoryFactorySupport repositoryFactory = super.createRepositoryFactory( entityManager );
 		repositoryFactory.addRepositoryProxyPostProcessor(
-				new EntityInterceptorProxyPostProcessor( acrossContextBeanRegistry )
+				new EntityInterceptorProxyPostProcessor( acrossContextBeanRegistry, transactionManagerName )
 		);
 		return repositoryFactory;
 	}
@@ -60,15 +69,19 @@ public class EntityInterceptingJpaRepositoryFactoryBean extends JpaRepositoryFac
 		public static final Logger LOG = LoggerFactory.getLogger( EntityInterceptorProxyPostProcessor.class );
 
 		private final AcrossContextBeanRegistry contextBeanRegistry;
+		private final String transactionManagerName;
 
-		public EntityInterceptorProxyPostProcessor( AcrossContextBeanRegistry beanRegistry ) {
+		public EntityInterceptorProxyPostProcessor( AcrossContextBeanRegistry beanRegistry,
+		                                            String transactionManagerName ) {
 			this.contextBeanRegistry = beanRegistry;
+			this.transactionManagerName = transactionManagerName;
 		}
 
 		@Override
 		public void postProcess( ProxyFactory factory, RepositoryInformation repositoryInformation ) {
+			// request as map (so ordering applies) but ignore internals
 			List<JpaRepositoryInterceptor> interceptors
-					= contextBeanRegistry.getBeansOfType( JpaRepositoryInterceptor.class, true );
+					= contextBeanRegistry.getBeansOfType( JpaRepositoryInterceptor.class, false );
 
 			if ( !interceptors.isEmpty() ) {
 				if ( interceptors.size() > 1 ) {
@@ -82,7 +95,10 @@ public class EntityInterceptingJpaRepositoryFactoryBean extends JpaRepositoryFac
 							repositoryInformation.getRepositoryInterface() );
 				}
 
-				factory.addAdvice( interceptors.get( 0 ) );
+				JpaRepositoryInterceptor jpaRepositoryInterceptor = interceptors.get( 0 );
+				jpaRepositoryInterceptor.setTransactionManagerName( transactionManagerName );
+
+				factory.addAdvice( jpaRepositoryInterceptor );
 			}
 			else {
 				LOG.info( "No JpaRepositoryInterceptor found - repository intercepting was possibly disabled." );

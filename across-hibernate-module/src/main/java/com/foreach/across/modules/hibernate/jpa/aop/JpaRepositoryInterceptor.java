@@ -15,8 +15,8 @@
  */
 package com.foreach.across.modules.hibernate.jpa.aop;
 
-import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
+import com.foreach.across.modules.hibernate.support.TransactionWrapper.InvocationCallback;
 import org.aopalliance.intercept.MethodInvocation;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Persistable;
@@ -30,7 +30,6 @@ import java.util.Collection;
  *
  * @author Andy Somers
  */
-@Exposed
 public class JpaRepositoryInterceptor extends AbstractCrudRepositoryInterceptor
 {
 	static final String SAVE_AND_FLUSH = "saveAndFlush";
@@ -42,62 +41,70 @@ public class JpaRepositoryInterceptor extends AbstractCrudRepositoryInterceptor
 	}
 
 	@Override
-	public Object handleRepositoryMethods( MethodInvocation invocation ) throws Throwable {
-		Method method = invocation.getMethod();
-		if ( JpaRepositoryPointcut.isEntityMethod( method ) ) {
+	protected InvocationCallback<Object> determineCallbackMethod( MethodInvocation invocation ) {
+		InvocationCallback<Object> handler = super.determineCallbackMethod( invocation );
+
+		if ( handler == null ) {
+			Method method = invocation.getMethod();
 			Object[] arguments = invocation.getArguments();
 			String methodName = method.getName();
 			if ( DELETE_ALL_IN_BATCH.equalsIgnoreCase( methodName ) ) {
-				Class<?> entityClass = getEntityClass( invocation );
-				Collection<EntityInterceptor> interceptors = findInterceptorsToApply( entityClass, getInterceptors() );
-				callBeforeDeleteAll( interceptors, entityClass );
+				handler = () -> {
+					Class<?> entityClass = getEntityClass( invocation );
+					Collection<EntityInterceptor> interceptors = findInterceptorsToApply( entityClass,
+					                                                                      getInterceptors() );
+					callBeforeDeleteAll( interceptors, entityClass );
 
-				Object returnValue = invocation.proceed();
-				callAfterDeleteAll( interceptors, entityClass );
-				return returnValue;
+					Object returnValue = invocation.proceed();
+					callAfterDeleteAll( interceptors, entityClass );
+					return returnValue;
+				};
 			}
 			else if ( DELETE_IN_BATCH.equalsIgnoreCase( methodName ) ) {
-				Class<?> entityClassForDelete = getEntityClass( invocation );
-				Collection<EntityInterceptor> interceptorsForDelete = findInterceptorsToApply( entityClassForDelete,
-				                                                                               getInterceptors() );
+				handler = () -> {
+					Class<?> entityClassForDelete = getEntityClass( invocation );
+					Collection<EntityInterceptor> interceptorsForDelete = findInterceptorsToApply( entityClassForDelete,
+					                                                                               getInterceptors() );
 
-				for ( Object o : (Iterable) arguments[0] ) {
-					callBeforeDelete( interceptorsForDelete, o );
-				}
-				Object returnValueForDelete = invocation.proceed();
-				for ( Object o : (Iterable) arguments[0] ) {
-					callAfterDelete( interceptorsForDelete, o );
-				}
-				return returnValueForDelete;
-
+					for ( Object o : (Iterable) arguments[0] ) {
+						callBeforeDelete( interceptorsForDelete, o );
+					}
+					Object returnValueForDelete = invocation.proceed();
+					for ( Object o : (Iterable) arguments[0] ) {
+						callAfterDelete( interceptorsForDelete, o );
+					}
+					return returnValueForDelete;
+				};
 			}
 			else if ( SAVE_AND_FLUSH.equalsIgnoreCase( methodName ) ) {
-				Object objectToSave = arguments[0];
-				Class<?> entityClassForSave = ClassUtils.getUserClass( Hibernate.getClass( objectToSave ) );
-				Collection<EntityInterceptor> interceptorsForSave = findInterceptorsToApply( entityClassForSave,
-				                                                                             getInterceptors() );
+				handler = () -> {
+					Object objectToSave = arguments[0];
+					Class<?> entityClassForSave = ClassUtils.getUserClass( Hibernate.getClass( objectToSave ) );
+					Collection<EntityInterceptor> interceptorsForSave = findInterceptorsToApply( entityClassForSave,
+					                                                                             getInterceptors() );
 
-				boolean isNew = ( (Persistable) objectToSave ).isNew();
-				if ( isNew ) {
-					callBeforeCreate( interceptorsForSave, objectToSave );
-				}
-				else {
-					callBeforeUpdate( interceptorsForSave, objectToSave );
-				}
+					boolean isNew = ( (Persistable) objectToSave ).isNew();
+					if ( isNew ) {
+						callBeforeCreate( interceptorsForSave, objectToSave );
+					}
+					else {
+						callBeforeUpdate( interceptorsForSave, objectToSave );
+					}
 
-				Object returnValueForSave = invocation.proceed();
+					Object returnValueForSave = invocation.proceed();
 
-				if ( isNew ) {
-					callAfterCreate( interceptorsForSave, objectToSave );
-				}
-				else {
-					callAfterUpdate( interceptorsForSave, objectToSave );
-				}
+					if ( isNew ) {
+						callAfterCreate( interceptorsForSave, objectToSave );
+					}
+					else {
+						callAfterUpdate( interceptorsForSave, objectToSave );
+					}
 
-				return returnValueForSave;
-
+					return returnValueForSave;
+				};
 			}
 		}
-		return invocation.proceed();
+
+		return handler;
 	}
 }

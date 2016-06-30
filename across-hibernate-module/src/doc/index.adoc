@@ -91,6 +91,7 @@ All properties start with the acrossHibernate. prefix
 
 === 2.0.0-SNAPSHOT
 * Compatibility update with Spring 4.2 which adds two new attributes to `@EnableAcrossJpaRepositories`.
+* `<<EntityInterceptor>>` calls will now run in the same transaction as the repository methods, if no outer transaction is active yet, a new one will be created
 
 === 1.1.1.RELEASE
 * most settings are now configurable through properties with Spring configuration metadata support
@@ -282,9 +283,9 @@ Reason for this is the use of the `isNew` method to determine a create or update
 Entities extending `SettableIdBasedEntity` automatically implement the required interface.
 
 ==== Transactional behaviour
-The `EntityInterceptor` calls happen outside the repository specific transaction.
-If no outer transaction is busy yet, calls like `beforeCreate` and `afterCreate` will execute before the transaction is created.
-If you want those calls to participate in the same transaction as the actual repository method you must ensure there is an outer transaction declared.
+The `EntityInterceptor` calls happen in the same transaction as the repository method.
+If no outer transaction is busy yet, a new one will be created that wraps calls like `beforeCreate`, `afterCreate` and the repository method.
+The transaction manager used is the transaction manager declared in the `@EnableAcrossJpaRepositories` definition.
 
 ==== Custom save/delete methods and recursive calls
 The `JpaRepositoryInterceptor` implementation used intercepts only the known `JpaRepository` methods.
