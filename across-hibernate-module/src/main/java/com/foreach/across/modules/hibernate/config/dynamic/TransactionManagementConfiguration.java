@@ -16,7 +16,6 @@
 
 package com.foreach.across.modules.hibernate.config.dynamic;
 
-import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
@@ -32,7 +31,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * @author arne
  */
-@AcrossEventHandler
 @EnableTransactionManagement
 public class TransactionManagementConfiguration
 {

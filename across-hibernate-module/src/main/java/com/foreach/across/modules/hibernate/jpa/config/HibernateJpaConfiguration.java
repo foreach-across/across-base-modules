@@ -16,7 +16,6 @@
 package com.foreach.across.modules.hibernate.jpa.config;
 
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
@@ -63,7 +62,6 @@ import java.util.Map;
 @Configuration
 @Import({ InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class,
           DynamicConfigurationRegistrar.class })
-@AcrossEventHandler
 public class HibernateJpaConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "jpaTransactionManager";
