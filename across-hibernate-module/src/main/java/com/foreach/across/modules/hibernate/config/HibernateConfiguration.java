@@ -16,7 +16,6 @@
 package com.foreach.across.modules.hibernate.config;
 
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
@@ -52,7 +51,6 @@ import java.util.Properties;
  * @see com.foreach.across.modules.hibernate.config.DynamicConfigurationRegistrar
  */
 @Configuration
-@AcrossEventHandler
 @Import(DynamicConfigurationRegistrar.class)
 public class HibernateConfiguration
 {
