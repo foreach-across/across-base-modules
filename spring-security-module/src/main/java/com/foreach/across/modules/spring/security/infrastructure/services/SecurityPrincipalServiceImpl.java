@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Arne Vandamme
+ * @see SecurityPrincipalRetrievalStrategy
  */
 @Service
 public class SecurityPrincipalServiceImpl implements SecurityPrincipalService

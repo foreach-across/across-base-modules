@@ -16,6 +16,7 @@
 package com.foreach.across.modules.spring.security.infrastructure.config;
 
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
+import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.modules.spring.security.infrastructure.services.*;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.AbstractLazyCreationTargetSource;
@@ -61,6 +62,20 @@ public class SecurityPrincipalServiceConfiguration
 		                                                                     targetSource );
 
 		return new SecurityPrincipalServiceImpl( strategy );
+	}
+
+	@Bean
+	public SecurityPrincipalLabelResolverStrategy securityPrincipalLabelResolverStrategy() {
+		SecurityPrincipalLabelResolverStrategy strategy = new SecurityPrincipalLabelResolverStrategy();
+		strategy.setSecurityPrincipalService( securityPrincipalService() );
+		strategy.setResolvers( securityPrincipalLabelResolvers() );
+
+		return strategy;
+	}
+
+	@Bean
+	public RefreshableRegistry<SecurityPrincipalLabelResolver> securityPrincipalLabelResolvers() {
+		return new RefreshableRegistry<>( SecurityPrincipalLabelResolver.class, true );
 	}
 
 	static class FirstOrderedBeanTargetSource extends AbstractLazyCreationTargetSource
