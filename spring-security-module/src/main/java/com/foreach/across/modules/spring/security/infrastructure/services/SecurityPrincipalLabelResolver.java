@@ -33,7 +33,7 @@ public interface SecurityPrincipalLabelResolver
 	/**
 	 * Build the label for a security principal.
 	 *
-	 * @param principal to resolvePrincipalLabel
+	 * @param principal to resolve
 	 * @return label or empty value if unable to resolvePrincipalLabel this principal
 	 */
 	Optional<String> resolvePrincipalLabel( SecurityPrincipal principal );
