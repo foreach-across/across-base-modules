@@ -27,8 +27,8 @@ import com.foreach.across.test.AcrossTestContext;
 import org.hibernate.SessionFactory;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
-import org.springframework.orm.hibernate4.support.OpenSessionInViewFilter;
-import org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor;
+import org.springframework.orm.hibernate5.support.OpenSessionInViewFilter;
+import org.springframework.orm.hibernate5.support.OpenSessionInViewInterceptor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import static com.foreach.across.test.support.AcrossTestBuilders.standard;

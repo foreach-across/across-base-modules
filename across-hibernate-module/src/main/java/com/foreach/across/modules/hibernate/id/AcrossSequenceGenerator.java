@@ -20,10 +20,10 @@ import com.foreach.across.core.database.AcrossSchemaConfiguration;
 import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.MappingException;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.id.enhanced.StandardOptimizerDescriptor;
 import org.hibernate.id.enhanced.TableGenerator;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.Type;
 
 import java.io.Serializable;
@@ -68,7 +68,7 @@ public class AcrossSequenceGenerator extends TableGenerator
 	private boolean supportPredefinedIds = true;
 
 	@Override
-	public void configure( Type type, Properties params, Dialect dialect ) throws MappingException {
+	public void configure( Type type, Properties params, ServiceRegistry serviceRegistry ) throws MappingException {
 		entityName = params.getProperty( ENTITY_NAME );
 		if ( entityName == null ) {
 			throw new MappingException( "no entity name" );
@@ -106,7 +106,7 @@ public class AcrossSequenceGenerator extends TableGenerator
 			supportPredefinedIds = Boolean.valueOf( params.getProperty( "supportPredefinedIds" ) );
 		}
 
-		super.configure( type, props, dialect );
+		super.configure( type, props, serviceRegistry );
 	}
 
 	private int determineAllocationSize( Properties params, int defaultAllocationSize ) {
