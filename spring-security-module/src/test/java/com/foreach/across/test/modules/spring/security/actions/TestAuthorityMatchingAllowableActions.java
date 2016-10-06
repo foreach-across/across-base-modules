@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.test.modules.spring.security.actions;
 
 import com.foreach.across.modules.spring.security.actions.AllowableAction;
 import com.foreach.across.modules.spring.security.actions.AllowableActions;
 import com.foreach.across.modules.spring.security.actions.AuthorityMatchingAllowableActions;
 import com.foreach.across.modules.spring.security.authority.AuthorityMatcher;
-import com.foreach.across.modules.spring.security.authority.NamedGrantedAuthority;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.*;
 
@@ -43,8 +44,8 @@ public class TestAuthorityMatchingAllowableActions
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
 
 		Collection authorities = Arrays.asList(
-				new NamedGrantedAuthority( "view users" ),
-				new NamedGrantedAuthority( "delete stuff" )
+				new SimpleGrantedAuthority( "view users" ),
+				new SimpleGrantedAuthority( "delete stuff" )
 		);
 
 		when( principal.getAuthorities() ).thenReturn( authorities );

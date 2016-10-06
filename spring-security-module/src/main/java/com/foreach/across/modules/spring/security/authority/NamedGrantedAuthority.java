@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.spring.security.authority;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +33,7 @@ import org.springframework.security.core.SpringSecurityCoreVersion;
  * </p>
  * @author Arne Vandamme
  */
+@Deprecated
 public class NamedGrantedAuthority implements GrantedAuthority
 {
 	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;

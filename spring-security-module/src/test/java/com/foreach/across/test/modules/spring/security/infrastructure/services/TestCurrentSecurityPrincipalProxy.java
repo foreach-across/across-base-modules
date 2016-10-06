@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.test.modules.spring.security.infrastructure.services;
 
-import com.foreach.across.modules.spring.security.authority.NamedGrantedAuthority;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxyImpl;
@@ -138,7 +138,7 @@ public class TestCurrentSecurityPrincipalProxy
 
 		assertTrue( currentPrincipal.hasAuthority( "some authority" ) );
 		assertTrue( currentPrincipal.hasAuthority( new SimpleGrantedAuthority( "some authority" ) ) );
-		assertTrue( currentPrincipal.hasAuthority( new NamedGrantedAuthority( "some authority" ) ) );
+		assertTrue( currentPrincipal.hasAuthority( new SimpleGrantedAuthority( "some authority" ) ) );
 	}
 
 	@Test
