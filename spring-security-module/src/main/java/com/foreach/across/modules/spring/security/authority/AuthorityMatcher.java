@@ -34,7 +34,7 @@ public abstract class AuthorityMatcher
 	 * Creates a matcher for authorities represented by the simple string.
 	 *
 	 * @param authorities array of authority strings
-	 * @return matcher for the colleciton passed
+	 * @return matcher for the collection passed
 	 */
 	public static AuthorityMatcher anyOf( final String... authorities ) {
 		return new AuthorityMatcher()
@@ -52,11 +52,11 @@ public abstract class AuthorityMatcher
 	}
 
 	/**
-	 * Creates a matcher for authority instances.  Note that the {@code equals(Object)} methods will determine
-	 * if authority implementations match.  Usually its easier to use {@link #anyOf(String...)} instead.
+	 * Creates a matcher for authority instances.  Note that only the authority string -
+	 * the return value of {@link GrantedAuthority#getAuthority()} will be compared.
 	 *
 	 * @param authorities array of authority instances
-	 * @return
+	 * @return matcher for the collection passed
 	 */
 	public static AuthorityMatcher anyOf( final GrantedAuthority... authorities ) {
 		return new AuthorityMatcher()
@@ -64,7 +64,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( GrantedAuthority authority : authorities ) {
-					if ( actual.contains( authority ) ) {
+					if ( AuthenticationUtils.hasAuthority( actual, authority.getAuthority() ) ) {
 						return true;
 					}
 				}
@@ -115,7 +115,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( GrantedAuthority authority : authorities ) {
-					if ( !actual.contains( authority ) ) {
+					if ( !AuthenticationUtils.hasAuthority( actual, authority.getAuthority() ) ) {
 						return false;
 					}
 				}
@@ -143,7 +143,7 @@ public abstract class AuthorityMatcher
 	 * Creates a matcher for authorities represented by the simple string.
 	 *
 	 * @param authorities array of authority strings
-	 * @return matcher for the colleciton passed
+	 * @return matcher for the collection passed
 	 */
 	public static AuthorityMatcher noneOf( final String... authorities ) {
 		return new AuthorityMatcher()
@@ -166,7 +166,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( GrantedAuthority authority : authorities ) {
-					if ( actual.contains( authority ) ) {
+					if ( AuthenticationUtils.hasAuthority( actual, authority.getAuthority() ) ) {
 						return false;
 					}
 				}

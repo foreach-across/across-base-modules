@@ -31,7 +31,11 @@ import org.springframework.security.core.SpringSecurityCoreVersion;
  *     {@link org.springframework.security.core.GrantedAuthority} implementation equal if it returns the same
  *     value for {@link #getAuthority()}.
  * </p>
+ * <p>
+ *     Deprecated class, but kept because of possible serialization of authentication in for example OAuth2Module.
+ * </p>
  * @author Arne Vandamme
+ * @deprecated use {@link org.springframework.security.core.authority.SimpleGrantedAuthority} instead
  */
 @Deprecated
 public class NamedGrantedAuthority implements GrantedAuthority

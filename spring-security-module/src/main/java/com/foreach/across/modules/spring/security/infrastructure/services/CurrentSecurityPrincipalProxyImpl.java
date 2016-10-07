@@ -65,7 +65,7 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 
 	@Override
 	public boolean hasAuthority( GrantedAuthority authority ) {
-		return isAuthenticated() && currentAuthentication().getAuthorities().contains( authority );
+		return isAuthenticated() && AuthenticationUtils.hasAuthority( currentAuthentication(), authority.getAuthority() );
 	}
 
 	@Override
