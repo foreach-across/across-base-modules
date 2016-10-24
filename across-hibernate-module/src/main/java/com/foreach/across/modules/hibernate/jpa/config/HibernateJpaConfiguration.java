@@ -31,11 +31,7 @@ import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepository
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
-import org.hibernate.engine.jdbc.batch.internal.BatchBuilderInitiator;
-import org.hibernate.engine.jdbc.batch.internal.FixedBatchBuilderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,31 +105,8 @@ public class HibernateJpaConfiguration
 	}
 
 	private Map<String, String> hibernateProperties() {
-		String version = org.hibernate.Version.getVersionString();
 		Map<String, String> hibernateProperties = new HashMap<>();
 		hibernateProperties.putAll( settings.getHibernateProperties() );
-
-		if ( StringUtils.startsWith( version, "4.2" ) ) {
-			if ( hibernateProperties.get( BatchBuilderInitiator.BUILDER ) != null ) {
-				LOG.info(
-						"Skipping workaround for https://hibernate.atlassian.net/browse/HHH-8853 because you have a custom builder" );
-			}
-			else {
-				// WORKAROUND bug: https://hibernate.atlassian.net/browse/HHH-8853
-				Object hibernateJdbcBatchSize = hibernateProperties.get( Environment.STATEMENT_BATCH_SIZE );
-
-				int batchSize = 0;
-				if ( hibernateJdbcBatchSize != null ) {
-					batchSize = Integer.valueOf( hibernateJdbcBatchSize.toString() );
-				}
-
-				LOG.info( "Enabling workaround for https://hibernate.atlassian.net/browse/HHH-8853 with batchsize: {}",
-				          batchSize );
-				FixedBatchBuilderImpl.setSize( batchSize );
-				hibernateProperties.put( "hibernate.jdbc.batch.builder", FixedBatchBuilderImpl.class.getName() );
-			}
-		}
-
 		return hibernateProperties;
 	}
 

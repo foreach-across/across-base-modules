@@ -27,11 +27,6 @@ import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepository
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
-import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.cfg.Environment;
-import org.hibernate.engine.jdbc.batch.internal.BatchBuilderInitiator;
-import org.hibernate.engine.jdbc.batch.internal.FixedBatchBuilderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +34,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 import java.util.Map;
 import java.util.Properties;
@@ -76,40 +71,10 @@ public class HibernateConfiguration
 		String version = org.hibernate.Version.getVersionString();
 		Map hibernateProperties = settings.getHibernateProperties();
 
-		if ( StringUtils.startsWith( version, "4.2" ) ) {
-			if ( hibernateProperties.get( BatchBuilderInitiator.BUILDER ) != null
-					|| environment.getProperty( BatchBuilderInitiator.BUILDER ) != null ) {
-				LOG.info(
-						"Skipping workaround for https://hibernate.atlassian.net/browse/HHH-8853 because you have a custom builder" );
-			}
-			else {
-				// WORKAROUND bug: https://hibernate.atlassian.net/browse/HHH-8853
-				Object hibernateJdbcBatchSize = hibernateProperties.get( Environment.STATEMENT_BATCH_SIZE );
-
-				int batchSize = 0;
-				if ( hibernateJdbcBatchSize != null ) {
-					batchSize = hibernateJdbcBatchSize instanceof Number
-							? ( (Number) hibernateJdbcBatchSize ).intValue()
-							: Integer.valueOf( hibernateJdbcBatchSize.toString() );
-				}
-
-				LOG.info( "Enabling workaround for https://hibernate.atlassian.net/browse/HHH-8853 with batchsize: {}",
-				          batchSize );
-				FixedBatchBuilderImpl.setSize( batchSize );
-				hibernateProperties.put( "hibernate.jdbc.batch.builder", FixedBatchBuilderImpl.class.getName() );
-			}
-		}
-
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
 		sessionFactory.setDataSource( module.getDataSource() );
 		sessionFactory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
 		sessionFactory.setMappingResources( hibernatePackage.getMappingResources() );
-
-		Map<String, String> tableAliases = hibernatePackage.getTableAliases();
-
-		if ( !tableAliases.isEmpty() ) {
-			sessionFactory.setNamingStrategy( new TableAliasNamingStrategy( tableAliases ) );
-		}
 
 		Properties propertiesToSet = new Properties();
 		propertiesToSet.putAll( hibernateProperties );
