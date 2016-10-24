@@ -31,7 +31,6 @@ import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepository
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
-import org.hibernate.ejb.AvailableSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +96,7 @@ public class HibernateJpaConfiguration
 
 		if ( !tableAliases.isEmpty() ) {
 			// Create a unique naming strategy class referring to the defined table aliases
-			factory.getJpaPropertyMap().put( AvailableSettings.NAMING_STRATEGY,
+			factory.getJpaPropertyMap().put( org.hibernate.cfg.AvailableSettings.PHYSICAL_NAMING_STRATEGY,
 			                                 createTableAliasNamingStrategyClass( tableAliases ).getName() );
 		}
 

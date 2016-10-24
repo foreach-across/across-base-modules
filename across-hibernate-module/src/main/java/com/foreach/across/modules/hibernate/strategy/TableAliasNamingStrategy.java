@@ -15,11 +15,13 @@
  */
 package com.foreach.across.modules.hibernate.strategy;
 
-import org.hibernate.cfg.ImprovedNamingStrategy;
+import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
 import java.util.Map;
 
-public class TableAliasNamingStrategy extends ImprovedNamingStrategy
+public class TableAliasNamingStrategy extends PhysicalNamingStrategyStandardImpl
 {
 	private final Map<String, String> aliasMap;
 
@@ -28,13 +30,8 @@ public class TableAliasNamingStrategy extends ImprovedNamingStrategy
 	}
 
 	@Override
-	public String classToTableName( String className ) {
-		return alias( super.classToTableName( className ) );
-	}
-
-	@Override
-	public String tableName( String tableName ) {
-		return alias( super.tableName( tableName ) );
+	public Identifier toPhysicalTableName( Identifier name, JdbcEnvironment context ) {
+		return new Identifier( alias( name.getText() ), name.isQuoted() );
 	}
 
 	private String alias( String tableName ) {
@@ -45,3 +42,4 @@ public class TableAliasNamingStrategy extends ImprovedNamingStrategy
 		return tableName;
 	}
 }
+

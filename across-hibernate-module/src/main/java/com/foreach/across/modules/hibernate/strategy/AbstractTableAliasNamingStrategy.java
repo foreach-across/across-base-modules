@@ -1,11 +1,13 @@
 package com.foreach.across.modules.hibernate.strategy;
 
-import org.hibernate.cfg.ImprovedNamingStrategy;
+import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractTableAliasNamingStrategy extends ImprovedNamingStrategy
+public abstract class AbstractTableAliasNamingStrategy extends PhysicalNamingStrategyStandardImpl
 {
 	private final static Map<Class, Map<String, String>> REGISTERED_ALIAS_MAPS = new HashMap<>();
 
@@ -16,13 +18,8 @@ public abstract class AbstractTableAliasNamingStrategy extends ImprovedNamingStr
 	}
 
 	@Override
-	public String classToTableName( String className ) {
-		return alias( super.classToTableName( className ) );
-	}
-
-	@Override
-	public String tableName( String tableName ) {
-		return alias( super.tableName( tableName ) );
+	public Identifier toPhysicalTableName( Identifier name, JdbcEnvironment context ) {
+		return new Identifier( alias( name.getText() ), name.isQuoted() );
 	}
 
 	private String alias( String tableName ) {

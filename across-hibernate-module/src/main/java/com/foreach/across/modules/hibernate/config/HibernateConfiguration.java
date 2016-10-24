@@ -27,6 +27,7 @@ import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepository
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
+import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +76,12 @@ public class HibernateConfiguration
 		sessionFactory.setDataSource( module.getDataSource() );
 		sessionFactory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
 		sessionFactory.setMappingResources( hibernatePackage.getMappingResources() );
+
+		Map<String, String> tableAliases = hibernatePackage.getTableAliases();
+
+		if ( !tableAliases.isEmpty() ) {
+			sessionFactory.setPhysicalNamingStrategy( new TableAliasNamingStrategy( tableAliases ) );
+		}
 
 		Properties propertiesToSet = new Properties();
 		propertiesToSet.putAll( hibernateProperties );
