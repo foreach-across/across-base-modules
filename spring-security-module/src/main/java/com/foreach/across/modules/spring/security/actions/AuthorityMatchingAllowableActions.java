@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.spring.security.actions;
 
 import com.foreach.across.modules.spring.security.authority.AuthorityMatcher;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -80,6 +83,11 @@ public abstract class AuthorityMatchingAllowableActions implements AllowableActi
 		return new CollectionAuthorityMatchingAllowableActions( actualAuthorities, actionAuthorityMap );
 	}
 
+	public static AuthorityMatchingAllowableActions forSecurityContext(
+			Map<AllowableAction, AuthorityMatcher> actionAuthorityMap ) {
+		return new SecurityContextMatchingAllowableActions( actionAuthorityMap );
+	}
+
 	public static class SecurityPrincipalAuthorityMatchingAllowableActions extends AuthorityMatchingAllowableActions
 	{
 		private final SecurityPrincipal securityPrincipal;
@@ -128,6 +136,28 @@ public abstract class AuthorityMatchingAllowableActions implements AllowableActi
 		@Override
 		protected Collection<? extends GrantedAuthority> actualAuthorities() {
 			return grantedAuthorities;
+		}
+	}
+
+	/**
+	 * Checks the current security context.
+	 */
+	private static class SecurityContextMatchingAllowableActions extends AuthorityMatchingAllowableActions
+	{
+		public SecurityContextMatchingAllowableActions( Map<AllowableAction, AuthorityMatcher> actionAuthorityMap ) {
+			super( actionAuthorityMap );
+		}
+
+		@Override
+		protected Collection<? extends GrantedAuthority> actualAuthorities() {
+			Authentication authentication = null;
+			SecurityContext ctx = SecurityContextHolder.getContext();
+
+			if ( ctx != null ) {
+				authentication = ctx.getAuthentication();
+			}
+
+			return authentication != null ? authentication.getAuthorities() : Collections.emptyList();
 		}
 	}
 }
