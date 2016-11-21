@@ -16,7 +16,6 @@
 package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.AcrossException;
-import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.controllers.RequestResponseLogController;
@@ -27,6 +26,7 @@ import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -43,7 +43,7 @@ import java.util.EnumSet;
  */
 @Configuration
 @AcrossDepends(required = "AcrossWebModule")
-@AcrossCondition("settings.requestResponseLogEnabled")
+@ConditionalOnProperty(LoggingModuleSettings.REQUEST_RESPONSE_LOG_ENABLED)
 public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServletConfigurer
 {
 	private static final Logger LOG = LoggerFactory.getLogger( RequestResponseLoggingConfiguration.class );
@@ -69,7 +69,8 @@ public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServlet
 	@Lazy
 	public RequestResponseLoggingFilter requestResponseLoggingFilter() {
 		RequestResponseLoggingFilter filter = new RequestResponseLoggingFilter( requestResponseLogRegistry(),
-		                                                                        logConfiguration().isPaused() );
+		                                                                        settings.getRequestResponse()
+		                                                                                .getPaused() );
 
 		if ( logConfiguration().getIncludedPathPatterns() != null ) {
 			filter.setIncludedPathPatterns( logConfiguration().getIncludedPathPatterns() );
@@ -113,8 +114,7 @@ public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServlet
 	}
 
 	private RequestResponseLogConfiguration logConfiguration() {
-		return settings.getProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_CONFIGURATION,
-		                             RequestResponseLogConfiguration.class );
+		return settings.getRequestResponse().getConfiguration();
 	}
 
 }

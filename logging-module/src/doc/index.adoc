@@ -1,9 +1,9 @@
 = LoggingModule
 Arne Vandamme
-1.0.1.RELEASE
+1.1.0-SNAPSHOT
 :toc: left
 :sectanchors:
-:module-version: 1.0.1.RELEASE
+:module-version: 1.1.0-SNAPSHOT
 :module-name: LoggingModule
 :module-artifact: logging-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/LoggingModule
@@ -107,6 +107,11 @@ Module website: {module-url}
 
 == What's new in this version?
 :numbered!:
+
+=== 1.1.0-SNAPSHOT
+* The request/response logger is now paused by default (it has a performance impact when enabled)
+* Switched to ConfigurationProperties
+
 === 1.0.0.RELEASE
 Initial public release available on http://search.maven.org/[Maven central].
 
@@ -290,6 +295,11 @@ can be determined.
 === Configuration
 
 By default request logging for all requests is enabled.  This can be altered by setting the *logging.request.logger* property.
+The request logger will be paused by default, this is to avoid the performance impact caused by wrapping the requests.
+This can be altered by settings the *logging.request.paused* property
+
+WARNING: Do not start a production environment with *logging.request.paused=true*, this will cause a significant performance impact.
+
 Additionally you can finetune the request logging through a `RequestLoggerConfiguration` instance (*logging.request.configuration* property).
 Through the configuration instance you can configure:
 

@@ -19,11 +19,13 @@ import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.logging.controllers.LogController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Andy Somers
  */
 @Configuration
+@Import(DynamicConfigurationRegistrar.class)
 public class LoggingModuleConfiguration
 {
 	@Bean

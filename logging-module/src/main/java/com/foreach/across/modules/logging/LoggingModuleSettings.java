@@ -15,17 +15,17 @@
  */
 package com.foreach.across.modules.logging;
 
-import com.foreach.across.core.AcrossModuleSettings;
-import com.foreach.across.core.AcrossModuleSettingsRegistry;
 import com.foreach.across.modules.logging.method.MethodLogConfiguration;
 import com.foreach.across.modules.logging.request.RequestLogger;
 import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Andy Somers
  */
-public class LoggingModuleSettings extends AcrossModuleSettings
+@ConfigurationProperties("logging")
+public class LoggingModuleSettings
 {
 	public static final String METHOD_LOG_ENABLED = "logging.method.enabled";
 	public static final String METHOD_LOG_CONFIGURATION = "logging.method.configuration";
@@ -36,41 +36,106 @@ public class LoggingModuleSettings extends AcrossModuleSettings
 	public static final String REQUEST_LOGGER = "logging.request.logger";
 	public static final String REQUEST_LOGGER_CONFIGURATION = "logging.request.configuration";
 
-	@Override
-	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
-		registry.register( REQUEST_RESPONSE_LOG_ENABLED, Boolean.class, false,
-		                   "Should request/response details be logged." );
-		registry.register( REQUEST_RESPONSE_LOG_CONFIGURATION, RequestResponseLogConfiguration.class,
-		                   new RequestResponseLogConfiguration(),
-		                   "Configuration settings for request/response details log." );
-		registry.register( REQUEST_RESPONSE_LOG_PAUSED, Boolean.class, false,
-		                   "If enabled, should this logger be paused or not." );
-		registry.register( REQUEST_LOGGER, RequestLogger.class, RequestLogger.FILTER,
-		                   "Configures how the requests will be logged." );
-		registry.register( REQUEST_LOGGER_CONFIGURATION, RequestLoggerConfiguration.class,
-		                   RequestLoggerConfiguration.allRequests(),
-		                   "Configuration for servlets and paths that should be logged." );
-		registry.register( METHOD_LOG_ENABLED, Boolean.class, false,
-		                   "Should method logging extensions in modules be loaded." );
-		registry.register( METHOD_LOG_CONFIGURATION, MethodLogConfiguration.class,
-		                   null, "Configuration settings for method logging." );
+	private MethodLoggingSettings method = new MethodLoggingSettings();
+	private RequestResponseSettings requestResponse = new RequestResponseSettings();
+	private RequestSettings request = new RequestSettings();
+
+	public MethodLoggingSettings getMethod() {
+		return method;
 	}
 
-	public boolean isRequestResponseLogEnabled() {
-		return getProperty( REQUEST_RESPONSE_LOG_ENABLED, Boolean.class );
+	public void setMethod( MethodLoggingSettings method ) {
+		this.method = method;
 	}
 
-	@SuppressWarnings("unused")
-	public RequestLogger getRequestLogger() {
-		return getProperty( REQUEST_LOGGER, RequestLogger.class );
+	public RequestResponseSettings getRequestResponse() {
+		return requestResponse;
 	}
 
-	@SuppressWarnings("unused")
-	public boolean isMethodLogEnabled() {
-		return getProperty( METHOD_LOG_ENABLED, Boolean.class );
+	public void setRequestResponse( RequestResponseSettings requestResponse ) {
+		this.requestResponse = requestResponse;
 	}
 
-	public MethodLogConfiguration getMethodLogConfiguration() {
-		return getProperty( METHOD_LOG_CONFIGURATION, MethodLogConfiguration.class );
+	public RequestSettings getRequest() {
+		return request;
+	}
+
+	public void setRequest( RequestSettings request ) {
+		this.request = request;
+	}
+
+	public static class MethodLoggingSettings
+	{
+		private Boolean enabled;
+		private MethodLogConfiguration configuration;
+
+		public Boolean getEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled( Boolean enabled ) {
+			this.enabled = enabled;
+		}
+
+		public MethodLogConfiguration getConfiguration() {
+			return configuration;
+		}
+
+		public void setConfiguration( MethodLogConfiguration configuration ) {
+			this.configuration = configuration;
+		}
+	}
+
+	public static class RequestResponseSettings
+	{
+		private boolean enabled;
+		private boolean paused = true;
+		private RequestResponseLogConfiguration configuration = new RequestResponseLogConfiguration();
+
+		public boolean getEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled( boolean enabled ) {
+			this.enabled = enabled;
+		}
+
+		public boolean getPaused() {
+			return paused;
+		}
+
+		public void setPaused( boolean paused ) {
+			this.paused = paused;
+		}
+
+		public RequestResponseLogConfiguration getConfiguration() {
+			return configuration;
+		}
+
+		public void setConfiguration( RequestResponseLogConfiguration configuration ) {
+			this.configuration = configuration;
+		}
+	}
+
+	public static class RequestSettings
+	{
+		private RequestLogger logger = RequestLogger.FILTER;
+		private RequestLoggerConfiguration configuration = RequestLoggerConfiguration.allRequests();
+
+		public RequestLogger getLogger() {
+			return logger;
+		}
+
+		public void setLogger( RequestLogger logger ) {
+			this.logger = logger;
+		}
+
+		public RequestLoggerConfiguration getConfiguration() {
+			return configuration;
+		}
+
+		public void setConfiguration( RequestLoggerConfiguration configuration ) {
+			this.configuration = configuration;
+		}
 	}
 }

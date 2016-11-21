@@ -20,15 +20,16 @@ import com.foreach.across.core.AcrossContext;
 import com.foreach.across.modules.debugweb.DebugWebModule;
 import com.foreach.across.modules.logging.LoggingModule;
 import com.foreach.across.modules.logging.LoggingModuleSettings;
-import com.foreach.across.modules.logging.config.RequestLoggerFilterConfiguration;
-import com.foreach.across.modules.logging.config.RequestLoggerInterceptorConfiguration;
 import com.foreach.across.modules.logging.config.RequestResponseLoggingConfiguration;
+import com.foreach.across.modules.logging.config.dynamic.RequestLoggerFilterConfiguration;
+import com.foreach.across.modules.logging.config.dynamic.RequestLoggerInterceptorConfiguration;
 import com.foreach.across.modules.logging.controllers.LogController;
 import com.foreach.across.modules.logging.controllers.RequestResponseLogController;
 import com.foreach.across.modules.logging.request.RequestLogger;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
 import com.foreach.across.test.AcrossTestContext;
 import com.foreach.across.test.AcrossTestWebContext;
+import com.foreach.across.test.support.AcrossTestBuilders;
 import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
@@ -45,26 +46,27 @@ public class ITLoggingModuleBuilding
 
 	@Test
 	public void moduleWithoutRequestResponseLogging() throws Exception {
-		try (AcrossTestContext ctx = new AcrossTestWebContext( new SimpleLoggingModuleConfig() )) {
-			LoggingModuleSettings settings = ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
+		try (AcrossTestContext ctx = AcrossTestBuilders.web().configurer( new SimpleLoggingModuleConfig() ).build()) {
+			LoggingModuleSettings settings = ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
 			                                                                             LoggingModuleSettings.class );
 
-			assertFalse( settings.isRequestResponseLogEnabled() );
+			assertFalse( settings.getRequestResponse().getEnabled() );
+			assertTrue( settings.getRequestResponse().getPaused() );
 
-			LogController logController = ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-			                                                                          LogController.class );
+			LogController logController = ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+			                                                           LogController.class );
 			assertNotNull( logController );
 
 			try {
-				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-				                                            RequestResponseLoggingConfiguration.class );
+				ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+				                             RequestResponseLoggingConfiguration.class );
 				fail( "There should not be a bean of type " + RequestResponseLoggingConfiguration.class.getName() );
 			}
 			catch ( NoSuchBeanDefinitionException e ) {
 				// expected
 			}
 			try {
-				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE, RequestResponseLogController.class );
+				ctx.getBeanOfTypeFromModule( LOGGING_MODULE, RequestResponseLogController.class );
 				fail( "There should not be a bean of type " + RequestResponseLogController.class.getName() );
 			}
 			catch ( NoSuchBeanDefinitionException e ) {
@@ -75,21 +77,23 @@ public class ITLoggingModuleBuilding
 
 	@Test
 	public void moduleWithRequestResponseEnabled() throws Exception {
-		try (AcrossTestContext ctx = new AcrossTestWebContext( new ComplexLoggingModuleConfig() )) {
-			LoggingModuleSettings settings = ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
+		try (AcrossTestContext ctx = AcrossTestBuilders.web().configurer( new ComplexLoggingModuleConfig() ).build()) {
+			LoggingModuleSettings settings = ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
 			                                                                             LoggingModuleSettings.class );
 
-			assertTrue( settings.isRequestResponseLogEnabled() );
+			assertTrue( settings.getRequestResponse().getEnabled() );
+			assertTrue( settings.getRequestResponse().getPaused() );
 
-			LogController logController = ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-			                                                                          LogController.class );
+			LogController logController = ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+			                                                           LogController.class );
 			assertNotNull( logController );
 
 			RequestResponseLoggingConfiguration requestResponseLoggingConfiguration =
-					ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-					                                            RequestResponseLoggingConfiguration.class );
+					ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+					                             RequestResponseLoggingConfiguration.class );
+
 			assertNotNull( requestResponseLoggingConfiguration );
-			RequestResponseLogController requestResponseLogController = ctx.beanRegistry().getBeanOfTypeFromModule(
+			RequestResponseLogController requestResponseLogController = ctx.getBeanOfTypeFromModule(
 					LOGGING_MODULE, RequestResponseLogController.class );
 			assertNotNull( requestResponseLogController );
 		}
@@ -97,14 +101,17 @@ public class ITLoggingModuleBuilding
 
 	@Test
 	public void moduleWithoutDebugWebWorks() throws Exception {
-		try (AcrossTestContext ctx = new AcrossTestWebContext( new LoggingModuleWithoutDebugWebConfig() )) {
-			LoggingModuleSettings settings = ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
+		try (AcrossTestContext ctx = AcrossTestBuilders.web().configurer( new LoggingModuleWithoutDebugWebConfig() )
+		                                               .build()) {
+			LoggingModuleSettings settings = ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
 			                                                                             LoggingModuleSettings.class );
 
-			assertFalse( settings.isRequestResponseLogEnabled() );
+			assertFalse( settings.getRequestResponse().getEnabled() );
+			assertTrue( settings.getRequestResponse().getPaused() );
+
 			try {
-				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-				                                            LogController.class );
+				ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+				                             LogController.class );
 				fail( "There should not be a bean of type " + LogController.class.getName() );
 			}
 			catch ( NoSuchBeanDefinitionException e ) {
@@ -112,15 +119,15 @@ public class ITLoggingModuleBuilding
 			}
 
 			try {
-				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-				                                            RequestResponseLoggingConfiguration.class );
+				ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+				                             RequestResponseLoggingConfiguration.class );
 				fail( "There should not be a bean of type " + RequestResponseLoggingConfiguration.class.getName() );
 			}
 			catch ( NoSuchBeanDefinitionException e ) {
 				// expected
 			}
 			try {
-				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE, RequestResponseLogController.class );
+				ctx.getBeanOfTypeFromModule( LOGGING_MODULE, RequestResponseLogController.class );
 				fail( "There should not be a bean of type " + RequestResponseLogController.class.getName() );
 			}
 			catch ( NoSuchBeanDefinitionException e ) {
@@ -131,19 +138,19 @@ public class ITLoggingModuleBuilding
 
 	@Test
 	public void moduleWithRequestLogFilter() throws Exception {
-		try (AcrossTestContext ctx = new AcrossTestWebContext( new SimpleLoggingModuleConfig() )) {
-			LoggingModuleSettings settings = ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
+		try (AcrossTestContext ctx = AcrossTestBuilders.web().configurer( new SimpleLoggingModuleConfig() ).build()) {
+			LoggingModuleSettings settings = ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
 			                                                                             LoggingModuleSettings.class );
-			RequestLogger requestLogger = settings.getProperty( LoggingModuleSettings.REQUEST_LOGGER,
-			                                                    RequestLogger.class );
+			assertTrue( settings.getRequestResponse().getPaused() );
+			RequestLogger requestLogger = settings.getRequest().getLogger();
 			assertEquals( RequestLogger.FILTER, requestLogger );
 
-			RequestLoggerFilterConfiguration filterConfiguration = ctx.beanRegistry().getBeanOfTypeFromModule(
+			RequestLoggerFilterConfiguration filterConfiguration = ctx.getBeanOfTypeFromModule(
 					LOGGING_MODULE, RequestLoggerFilterConfiguration.class );
 			assertNotNull( filterConfiguration );
 			try {
-				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-				                                            RequestLoggerInterceptorConfiguration.class );
+				ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+				                             RequestLoggerInterceptorConfiguration.class );
 				fail( "There should not be a bean of type " + RequestLoggerInterceptorConfiguration.class.getName() );
 			}
 			catch ( NoSuchBeanDefinitionException e ) {
@@ -155,18 +162,19 @@ public class ITLoggingModuleBuilding
 	@Test
 	public void moduleWithRequestInterceptorConfig() throws Exception {
 		try (AcrossTestContext ctx = new AcrossTestWebContext( new LoggingModuleWithRequestLogInterceptorConfig() )) {
-			LoggingModuleSettings settings = ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-			                                                                             LoggingModuleSettings.class );
-			RequestLogger requestLogger = settings.getProperty( LoggingModuleSettings.REQUEST_LOGGER,
-			                                                    RequestLogger.class );
+			LoggingModuleSettings settings = ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+			                                                              LoggingModuleSettings.class );
+
+			assertTrue( settings.getRequestResponse().getPaused() );
+			RequestLogger requestLogger = settings.getRequest().getLogger();
 			assertEquals( RequestLogger.INTERCEPTOR, requestLogger );
 
-			RequestLoggerInterceptorConfiguration logInterceptorConfiguration = ctx.beanRegistry().getBeanOfTypeFromModule(
+			RequestLoggerInterceptorConfiguration logInterceptorConfiguration = ctx.getBeanOfTypeFromModule(
 					LOGGING_MODULE, RequestLoggerInterceptorConfiguration.class );
 			assertNotNull( logInterceptorConfiguration );
 			try {
-				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-				                                            RequestLoggerFilterConfiguration.class );
+				ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+				                             RequestLoggerFilterConfiguration.class );
 				fail( "There should not be a bean of type " + RequestLoggerFilterConfiguration.class.getName() );
 			}
 			catch ( NoSuchBeanDefinitionException e ) {
@@ -177,24 +185,26 @@ public class ITLoggingModuleBuilding
 
 	@Test
 	public void moduleWithoutRequestLoggerConfig() throws Exception {
-		try (AcrossTestContext ctx = new AcrossTestWebContext( new LoggingModuleWithoutRequestLogConfig() )) {
-			LoggingModuleSettings settings = ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
+		try (AcrossTestContext ctx = AcrossTestBuilders.web().configurer( new LoggingModuleWithoutRequestLogConfig() )
+		                                               .build()) {
+			LoggingModuleSettings settings = ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
 			                                                                             LoggingModuleSettings.class );
-			RequestLogger requestLogger = settings.getProperty( LoggingModuleSettings.REQUEST_LOGGER,
-			                                                    RequestLogger.class );
+
+			assertTrue( settings.getRequestResponse().getPaused() );
+			RequestLogger requestLogger = settings.getRequest().getLogger();
 			assertEquals( RequestLogger.NONE, requestLogger );
 
 			try {
-				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-				                                            RequestLoggerFilterConfiguration.class );
+				ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+				                             RequestLoggerFilterConfiguration.class );
 				fail( "There should not be a bean of type " + RequestLoggerFilterConfiguration.class.getName() );
 			}
 			catch ( NoSuchBeanDefinitionException e ) {
 				// expected
 			}
 			try {
-				ctx.beanRegistry().getBeanOfTypeFromModule( LOGGING_MODULE,
-				                                            RequestLoggerInterceptorConfiguration.class );
+				ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
+				                             RequestLoggerInterceptorConfiguration.class );
 				fail( "There should not be a bean of type " + RequestLoggerInterceptorConfiguration.class.getName() );
 			}
 			catch ( NoSuchBeanDefinitionException e ) {

@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.logging.config;
 
-import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
@@ -28,6 +27,7 @@ import com.foreach.across.modules.logging.method.MethodLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ClassUtils;
@@ -38,8 +38,8 @@ import java.util.Map;
  * @author Arne Vandamme
  */
 @Configuration
+@ConditionalOnProperty(LoggingModuleSettings.METHOD_LOG_ENABLED)
 @AcrossEventHandler
-@AcrossCondition("settings.methodLogEnabled")
 public class MethodLoggingConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger( MethodLoggingConfiguration.class );
@@ -50,7 +50,7 @@ public class MethodLoggingConfiguration
 	@Bean
 	@Exposed
 	public MethodLogConfiguration methodLogConfiguration() {
-		MethodLogConfiguration provided = settings.getMethodLogConfiguration();
+		MethodLogConfiguration provided = settings.getMethod().getConfiguration();
 		return provided != null ? provided : MethodLogConfiguration.all( 75 );
 	}
 
@@ -85,7 +85,7 @@ public class MethodLoggingConfiguration
 		for ( MethodLogger methodLogger : methodLoggers.values() ) {
 			LOG.info( "Registering methodLogger {} from module {}", methodLogger.getName(),
 			          afterBootstrapEvent.getModule().getName() );
-			methodLogConfiguration().register( methodLogger );
+			settings.getMethod().getConfiguration().register( methodLogger );
 		}
 	}
 }

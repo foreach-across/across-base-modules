@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.logging.config;
+
+package com.foreach.across.modules.logging.config.dynamic;
 
 import com.foreach.across.core.AcrossException;
-import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
@@ -41,17 +41,14 @@ import java.util.EnumSet;
 /**
  * Configures the RequestLoggerFilter to be first in the filter chain
  */
-@Configuration
 @AcrossDepends(required = "AcrossWebModule")
-@AcrossCondition("settings.requestLogger == T(com.foreach.across.modules.logging.request.RequestLogger).FILTER")
 public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletConfigurer
 {
 	private RequestLoggerConfiguration logConfiguration;
 
 	@Autowired
 	public void configure( LoggingModuleSettings settings ) {
-		logConfiguration = settings.getProperty( LoggingModuleSettings.REQUEST_LOGGER_CONFIGURATION,
-		                                         RequestLoggerConfiguration.class );
+		logConfiguration = settings.getRequest().getConfiguration();
 	}
 
 	@Bean
