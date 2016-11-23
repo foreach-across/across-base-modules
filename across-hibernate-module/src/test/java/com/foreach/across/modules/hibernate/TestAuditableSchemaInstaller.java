@@ -28,14 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -56,18 +53,12 @@ public class TestAuditableSchemaInstaller
 	@Test
 	public void auditableInstallerRunsOnAcrossModulesTable() throws Exception {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate( dataSource );
-		List<String> items = jdbcTemplate.query( "SELECT * FROM ACROSSMODULES", new RowMapper<String>()
-		{
-			@Override
-			public String mapRow( ResultSet rs, int rowNum ) throws SQLException {
-				assertEquals( null, rs.getString( "created_by" ) );
-				assertEquals( null, rs.getDate( "created_date" ) );
-				assertEquals( null, rs.getString( "last_modified_by" ) );
-				assertEquals( null, rs.getDate( "last_modified_date" ) );
-				return rs.getString( "module_id" );
-			}
-
-			;
+		List<String> items = jdbcTemplate.query( "SELECT * FROM ACROSSMODULES", ( rs, rowNum ) -> {
+			assertEquals( null, rs.getString( "created_by" ) );
+			assertEquals( null, rs.getDate( "created_date" ) );
+			assertEquals( null, rs.getString( "last_modified_by" ) );
+			assertEquals( null, rs.getDate( "last_modified_date" ) );
+			return rs.getString( "module_id" );
 		} );
 		assertNotNull( items );
 		assertTrue( items.contains( "Across" ) );
@@ -88,6 +79,9 @@ public class TestAuditableSchemaInstaller
 	@Installer(description = "Adds auditable columns to all entities", version = 1, phase = InstallerPhase.BeforeModuleBootstrap)
 	public static class CustomAuditableInstaller extends AuditableSchemaInstaller
 	{
+		public CustomAuditableInstaller() {
+			setDefaultSchema( "PUBLIC" );
+		}
 
 		@Override
 		protected Collection<String> getTableNames() {
