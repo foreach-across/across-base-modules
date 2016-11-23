@@ -18,16 +18,15 @@ package com.foreach.across.modules.hibernate.installers;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.annotations.InstallerGroup;
 import com.foreach.across.core.annotations.InstallerMethod;
-import com.foreach.across.core.context.AcrossContextUtils;
-import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.database.SchemaConfiguration;
 import com.foreach.across.core.installers.AcrossLiquibaseInstaller;
+import liquibase.exception.LiquibaseException;
 import liquibase.integration.spring.SpringLiquibase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
 
 import javax.sql.DataSource;
 import java.util.Collection;
@@ -53,7 +52,7 @@ public abstract class AuditableSchemaInstaller
 	private static final Logger LOG = LoggerFactory.getLogger( AuditableSchemaInstaller.class );
 
 	@Autowired
-	private AcrossContextInfo acrossContext;
+	private ApplicationContext applicationContext;
 
 	@Autowired
 	@Qualifier(AcrossContext.INSTALLER_DATASOURCE)
@@ -92,22 +91,22 @@ public abstract class AuditableSchemaInstaller
 	}
 
 	@InstallerMethod
-	public void install() {
-		AutowireCapableBeanFactory beanFactory = AcrossContextUtils.getBeanFactory( acrossContext.getContext() );
-
+	public void install() throws LiquibaseException {
 		for ( String tableName : getTableNames() ) {
 			String tableNameToUse = schemaConfiguration != null
 					? schemaConfiguration.getCurrentTableName( tableName ) : tableName;
 
 			SpringLiquibase liquibase = new SpringLiquibase();
+			if ( liquibase.getResourceLoader() == null ) {
+				liquibase.setResourceLoader( applicationContext );
+			}
 			liquibase.setChangeLog( CHANGELOG );
 			liquibase.setDataSource( dataSource );
 			liquibase.setChangeLogParameters( Collections.singletonMap( "table.auditable_table", tableNameToUse ) );
 
 			LOG.debug( "Installing auditable columns for table {}", tableNameToUse );
 
-			beanFactory.autowireBeanProperties( liquibase, AutowireCapableBeanFactory.AUTOWIRE_NO, false );
-			beanFactory.initializeBean( liquibase, "" );
+			liquibase.afterPropertiesSet();
 		}
 	}
 }
