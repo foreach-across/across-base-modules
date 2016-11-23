@@ -79,7 +79,8 @@ All properties start with the *debugWebModule.* prefix.
 
 |security.username
 |`String`
-|The username to use for Basic Authentication to access the root path.
+|The username to use for Basic Authentication to access the root path. +
+Leave blank to disable the in-memory user.
 |debug
 
 |security.password
@@ -87,11 +88,16 @@ All properties start with the *debugWebModule.* prefix.
 |The password to use for Basic Authentication to access the root path.
 |
 
-|security.ipAddresses
+|security.ip-addresses
 |`String`
-|The semi colon seperated list of IP Address that will always have access to the root path, without needing Basic Authentication.
+|The comma separated list of IP addresses that will always have access to the root path, without needing Basic Authentication.
 |
 
+|security.authority
+|`String`
+|The authority that an authenticated principal should have for accessing debug web. +
+Useful if you want to share a global security configuration.
+|ROLE_DEBUG_USER
 
 |===
 
@@ -140,13 +146,14 @@ If you would like a particular controller to open you can set another relative p
 The path should not contain the root path prefix.
 
 == Securing debug web
-By default the {module-name} takes care of securing the debug endpoints. The username and password can be configured with the
- `debugWebModule.security.username` and `debugWebModule.security.password` property. A whilelist of IP addresses can be configured
- using the `debugWebModule.security.ipAddresses` property. This is a comma sepearated list of IP Addresses or subnets.
- These IP addresses will *always* have access to the root path.
+By default the {module-name} takes care of securing the debug endpoints if {spring-security-module-url}[SpringSecurityModule] is active.
+The username and password can be configured with the `debugWebModule.security.username` and `debugWebModule.security.password` property.
+A whiletist of IP addresses can be configured using the `debugWebModule.security.ip-addresses` property.
+This is a comma separated list of IP addresses or sub-nets.
+These IP addresses will *always* have access to the root path.
 
-Security can be disabled using the `debugWebModule.security.enabled=false`.
-Securing can then easily be done on a webserver level or through {spring-security-module-url}[Spring security].
+Default security can be disabled by setting `debugWebModule.security.enabled` to `false`.
+Securing can then easily be done on a web-server level or using custom Spring security configuration.
 
 .Example securing debug web with Spring security
 [source,java,indent=0]

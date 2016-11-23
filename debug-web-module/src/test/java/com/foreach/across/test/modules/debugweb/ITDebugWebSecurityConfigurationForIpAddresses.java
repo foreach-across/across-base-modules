@@ -46,7 +46,7 @@ import static org.junit.Assert.assertNotNull;
 	properties = {
 			"debugWebModule.security.username=foo",
 			"debugWebModule.security.password=bar",
-	        "debugWebModule.security.ipAddresses=  127.0.0.0/8  ;     ::1   "
+	        "debugWebModule.security.ipAddresses=127.0.0.0/8,::1"
 	})
 public class ITDebugWebSecurityConfigurationForIpAddresses
 {

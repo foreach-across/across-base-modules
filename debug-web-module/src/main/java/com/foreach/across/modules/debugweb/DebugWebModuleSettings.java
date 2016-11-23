@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.debugweb;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -26,7 +25,7 @@ public class DebugWebModuleSettings
 {
 	public static final String DEFAULT_DASHBOARD = "/";
 
-	@SuppressWarnings( "unused" )
+	@SuppressWarnings("unused")
 	public static final String DASHBOARD_PATH = "debugWebModule.dashboard";
 
 	public static final String SECURITY_ENABLED = "debugWebModule.security.enabled";
@@ -65,17 +64,11 @@ public class DebugWebModuleSettings
 		this.rootPath = rootPath;
 	}
 
-	public SecuritySettings getSecurity() {
-		return security;
-	}
-
-	public void setSecurity( SecuritySettings security ) {
-		this.security = security;
-	}
-
-	public static class SecuritySettings {
+	@ConfigurationProperties(prefix = "debugWebModule.security")
+	public static class SecuritySettings
+	{
 		/**
-		 * Is Basic Authentication enabled for the rootPath?
+		 * Enable Basic Authentication for debug web controllers
 		 */
 		private Boolean enabled = true;
 
@@ -90,9 +83,14 @@ public class DebugWebModuleSettings
 		private String password;
 
 		/**
-		 * A comma seperated list of IP Addresses to allow without Basic Authentication
+		 * A comma separated list of IP Addresses to allow without Basic Authentication
 		 */
-		private String ipAddresses;
+		private String[] ipAddresses = new String[] { "127.0.0.0/8", "::1" };
+
+		/**
+		 * Authority that the authenticated principal should have for accessing debug web controllers.
+		 */
+		private String authority = "ROLE_DEBUG_USER";
 
 		public Boolean getEnabled() {
 			return enabled;
@@ -118,12 +116,20 @@ public class DebugWebModuleSettings
 			this.password = password;
 		}
 
-		public String getIpAddresses() {
+		public String[] getIpAddresses() {
 			return ipAddresses;
 		}
 
-		public void setIpAddresses( String ipAddresses ) {
+		public void setIpAddresses( String[] ipAddresses ) {
 			this.ipAddresses = ipAddresses;
+		}
+
+		public String getAuthority() {
+			return authority;
+		}
+
+		public void setAuthority( String authority ) {
+			this.authority = authority;
 		}
 	}
 }
