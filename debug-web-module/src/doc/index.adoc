@@ -72,6 +72,27 @@ All properties start with the *debugWebModule.* prefix.
 |Set explicit property names that should be masked.
 |
 
+|security.enabled
+|`String`
+|Should the root path be secured with Basic Authentication.
+|`true`
+
+|security.username
+|`String`
+|The username to use for Basic Authentication to access the root path.
+|debug
+
+|security.password
+|`String`
+|The password to use for Basic Authentication to access the root path.
+|
+
+|security.ipAddresses
+|`String`
+|The semi colon seperated list of IP Address that will always have access to the root path, without needing Basic Authentication.
+|
+
+
 |===
 
 == What's new in this version?
@@ -80,6 +101,7 @@ All properties start with the *debugWebModule.* prefix.
 
 * *Requires Across 2.0.0.*
 * Context browser now shows event handler methods grouped by event instead of bean instance.
+* The root path is now by default secured, it can be disabled with the `debugWebModule.security.enabled=false` property.
 
 === 1.0.1.RELEASE
 
@@ -118,9 +140,13 @@ If you would like a particular controller to open you can set another relative p
 The path should not contain the root path prefix.
 
 == Securing debug web
-By default the {module-name} takes no care of securing the debug endpoints.  This is considered the responsibility of
-the application itself.  Securing can
-easily be done on a webserver level or through {spring-security-module-url}[Spring security].
+By default the {module-name} takes care of securing the debug endpoints. The username and password can be configured with the
+ `debugWebModule.security.username` and `debugWebModule.security.password` property. A whilelist of IP addresses can be configured
+ using the `debugWebModule.security.ipAddresses` property. This is a comma sepearated list of IP Addresses or subnets.
+ These IP addresses will *always* have access to the root path.
+
+Security can be disabled using the `debugWebModule.security.enabled=false`.
+Securing can then easily be done on a webserver level or through {spring-security-module-url}[Spring security].
 
 .Example securing debug web with Spring security
 [source,java,indent=0]

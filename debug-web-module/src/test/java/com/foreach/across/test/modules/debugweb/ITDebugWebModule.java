@@ -19,6 +19,7 @@ import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.DebugWebModule;
+import com.foreach.across.modules.debugweb.DebugWebModuleSettings;
 import com.foreach.across.modules.web.mvc.PrefixingRequestMappingHandlerMapping;
 import com.foreach.across.modules.web.resource.WebResourcePackageManager;
 import com.foreach.across.modules.web.resource.WebResourceRegistryInterceptor;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
@@ -82,6 +84,7 @@ public class ITDebugWebModule
 
 		private DebugWebModule debugWebModule() {
 			DebugWebModule module = new DebugWebModule();
+			module.setProperty( DebugWebModuleSettings.SECURITY_ENABLED, false   );
 			module.setRootPath( "/development/debug" );
 			return module;
 		}

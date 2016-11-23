@@ -16,12 +16,13 @@ package com.foreach.across.modules.debugweb.test;/*
 
 import com.foreach.across.config.AcrossApplication;
 import com.foreach.across.modules.debugweb.DebugWebModule;
+import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import org.springframework.boot.SpringApplication;
 
 /**
  * @author Arne Vandamme
  */
-@AcrossApplication(modules = DebugWebModule.NAME)
+@AcrossApplication(modules = { DebugWebModule.NAME, SpringSecurityModule.NAME})
 public class DebugWebRootPathApplication
 {
 	public static void main( String[] args ) {

@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.debugweb;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -28,10 +29,20 @@ public class DebugWebModuleSettings
 	@SuppressWarnings( "unused" )
 	public static final String DASHBOARD_PATH = "debugWebModule.dashboard";
 
+	public static final String SECURITY_ENABLED = "debugWebModule.security.enabled";
+	public static final String SECURITY_USERNAME = "debugWebModule.security.username";
+	public static final String SECURITY_PASSWORD = "debugWebModule.security.password";
+	public static final String SECURITY_IP_ADDRESSES = "debugWebModule.security.ipAddresses";
+
 	/**
 	 * Path within the debug web context for the initial dashboard.
 	 */
 	private String dashboard = DEFAULT_DASHBOARD;
+
+	/**
+	 * The Security settings of the rootPath
+	 */
+	private SecuritySettings security = new SecuritySettings();
 
 	/**
 	 * Root path for all debug web controllers.  All mappings will be relative to this path.
@@ -52,5 +63,67 @@ public class DebugWebModuleSettings
 
 	public void setRootPath( String rootPath ) {
 		this.rootPath = rootPath;
+	}
+
+	public SecuritySettings getSecurity() {
+		return security;
+	}
+
+	public void setSecurity( SecuritySettings security ) {
+		this.security = security;
+	}
+
+	public static class SecuritySettings {
+		/**
+		 * Is Basic Authentication enabled for the rootPath?
+		 */
+		private Boolean enabled = true;
+
+		/**
+		 * The username to use for Basic Authentication
+		 */
+		private String username = "debug";
+
+		/**
+		 * The password to use for Basic Authentication
+		 */
+		private String password;
+
+		/**
+		 * A comma seperated list of IP Addresses to allow without Basic Authentication
+		 */
+		private String ipAddresses;
+
+		public Boolean getEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled( Boolean enabled ) {
+			this.enabled = enabled;
+		}
+
+		public String getUsername() {
+			return username;
+		}
+
+		public void setUsername( String username ) {
+			this.username = username;
+		}
+
+		public String getPassword() {
+			return password;
+		}
+
+		public void setPassword( String password ) {
+			this.password = password;
+		}
+
+		public String getIpAddresses() {
+			return ipAddresses;
+		}
+
+		public void setIpAddresses( String ipAddresses ) {
+			this.ipAddresses = ipAddresses;
+		}
 	}
 }
