@@ -55,7 +55,7 @@ public class SpringInfoController
 		     .item( "/across/web/handlers", "Handlers", "/spring/handlers" );
 	}
 
-	@SuppressWarnings({ "unchecked", "findbugs:REC_CATCH_EXCEPTION" })
+	@SuppressWarnings("all")
 	@RequestMapping("/spring/interceptors")
 	public String showInterceptors( Model model ) {
 		try {

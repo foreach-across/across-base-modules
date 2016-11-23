@@ -39,11 +39,6 @@ public class DebugWebModuleSettings
 	private String dashboard = DEFAULT_DASHBOARD;
 
 	/**
-	 * The Security settings of the rootPath
-	 */
-	private SecuritySettings security = new SecuritySettings();
-
-	/**
 	 * Root path for all debug web controllers.  All mappings will be relative to this path.
 	 */
 	private String rootPath = "/debug";
@@ -117,11 +112,11 @@ public class DebugWebModuleSettings
 		}
 
 		public String[] getIpAddresses() {
-			return ipAddresses;
+			return ipAddresses.clone();
 		}
 
 		public void setIpAddresses( String[] ipAddresses ) {
-			this.ipAddresses = ipAddresses;
+			this.ipAddresses = ipAddresses.clone();
 		}
 
 		public String getAuthority() {
