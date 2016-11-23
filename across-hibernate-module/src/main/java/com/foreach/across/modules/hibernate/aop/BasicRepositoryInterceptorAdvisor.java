@@ -28,6 +28,7 @@ public class BasicRepositoryInterceptorAdvisor extends AbstractBeanFactoryPointc
 	 * The interceptor should run in the same transaction as the repository methods.
 	 */
 	public static final int INTERCEPT_ORDER = TransactionManagementConfigurer.INTERCEPT_ORDER + 1;
+	private static final long serialVersionUID = 2292806900645042113L;
 
 	private final transient Pointcut pointcut = new BasicRepositoryPointcut();
 
