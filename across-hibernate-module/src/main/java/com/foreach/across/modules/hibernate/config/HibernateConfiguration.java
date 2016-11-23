@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.hibernate.config;
 
+import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
@@ -31,12 +32,14 @@ import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
+import javax.sql.DataSource;
 import java.util.Map;
 import java.util.Properties;
 
@@ -63,17 +66,17 @@ public class HibernateConfiguration
 	@Module(AcrossModule.CURRENT_MODULE)
 	private AcrossHibernateModuleSettings settings;
 
-	@Autowired
-	private org.springframework.core.env.Environment environment;
+	@Autowired(required = false)
+	@Qualifier(AcrossContext.DATASOURCE)
+	private DataSource acrossDataSource;
 
 	@Bean
 	@Exposed
 	public LocalSessionFactoryBean sessionFactory( HibernatePackage hibernatePackage ) {
-		String version = org.hibernate.Version.getVersionString();
 		Map hibernateProperties = settings.getHibernateProperties();
 
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-		sessionFactory.setDataSource( module.getDataSource() );
+		sessionFactory.setDataSource( retrieveDataSource() );
 		sessionFactory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
 		sessionFactory.setMappingResources( hibernatePackage.getMappingResources() );
 
@@ -89,6 +92,17 @@ public class HibernateConfiguration
 		sessionFactory.setHibernateProperties( propertiesToSet );
 
 		return sessionFactory;
+	}
+
+	private DataSource retrieveDataSource() {
+		DataSource moduleDataSource = module.getDataSource();
+
+		if ( moduleDataSource == null ) {
+			LOG.debug( "No module datasource specified - falling back to default Across datasource" );
+			module.setDataSource( acrossDataSource );
+		}
+
+		return acrossDataSource;
 	}
 
 	@Bean(name = SESSION_HOLDER)

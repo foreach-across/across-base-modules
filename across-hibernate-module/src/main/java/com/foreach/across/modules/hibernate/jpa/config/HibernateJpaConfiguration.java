@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.hibernate.jpa.config;
 
+import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
@@ -34,6 +35,7 @@ import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStr
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
@@ -73,15 +75,21 @@ public class HibernateJpaConfiguration
 	@Autowired
 	private HibernatePackage hibernatePackage;
 
+	@Autowired(required = false)
+	@Qualifier(AcrossContext.DATASOURCE)
+	private DataSource acrossDataSource;
+
 	@Bean(name = "entityManagerFactory")
 	@Exposed
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-		vendorAdapter.setDatabase( determineDatabase( module.getDataSource() ) );
+
+		DataSource dataSource = retrieveDataSource();
+		vendorAdapter.setDatabase( determineDatabase( dataSource ) );
 
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter( vendorAdapter );
-		factory.setDataSource( module.getDataSource() );
+		factory.setDataSource( dataSource );
 		factory.setPersistenceUnitName( settings.getPersistenceUnitName() );
 
 		String[] mappingResources = hibernatePackage.getMappingResources();
@@ -101,6 +109,17 @@ public class HibernateJpaConfiguration
 		}
 
 		return factory;
+	}
+
+	private DataSource retrieveDataSource() {
+		DataSource moduleDataSource = module.getDataSource();
+
+		if ( moduleDataSource == null ) {
+			LOG.debug( "No module datasource specified - falling back to default Across datasource" );
+			module.setDataSource( acrossDataSource );
+		}
+
+		return acrossDataSource;
 	}
 
 	private Map<String, String> hibernateProperties() {
