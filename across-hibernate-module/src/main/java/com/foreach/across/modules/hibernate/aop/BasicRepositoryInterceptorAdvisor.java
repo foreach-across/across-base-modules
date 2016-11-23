@@ -29,7 +29,7 @@ public class BasicRepositoryInterceptorAdvisor extends AbstractBeanFactoryPointc
 	 */
 	public static final int INTERCEPT_ORDER = TransactionManagementConfigurer.INTERCEPT_ORDER + 1;
 
-	private final Pointcut pointcut = new BasicRepositoryPointcut();
+	private final transient Pointcut pointcut = new BasicRepositoryPointcut();
 
 	@Override
 	public Pointcut getPointcut() {
