@@ -88,17 +88,17 @@ Module website: {module-url}
 |Configuration settings for request logging.
 |All requests will be logged.
 
-|logging.requestResponse.enabled
+|logging.request-response.enabled
 |`boolean`
 |Should request/response debug logging be possible?
 |_false_
 
-|logging.requestResponse.paused
+|logging.request-response.paused
 |`boolean`
 |Should request/response debug logging be paused?
 |_false_
 
-|logging.requestResponse.configuration
+|logging.request-response.configuration
 |`RequestResponseLogConfiguration.class`
 |Configuration settings for request/response debug logging.
 |All requests will be logged.
@@ -109,8 +109,8 @@ Module website: {module-url}
 :numbered!:
 
 === 1.1.0-SNAPSHOT
-* The request/response logger is now paused by default (it has a performance impact when enabled)
-* Switched to ConfigurationProperties
+* the request/response logger is now paused by default (it has a performance impact when enabled)
+* switched to `@ConfigurationProperties` for settings - allow settings via application.properties
 
 === 1.0.0.RELEASE
 Initial public release available on http://search.maven.org/[Maven central].
