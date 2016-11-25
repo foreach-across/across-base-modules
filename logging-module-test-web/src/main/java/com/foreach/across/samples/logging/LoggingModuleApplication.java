@@ -39,7 +39,6 @@ import javax.sql.DataSource;
 })
 public class LoggingModuleApplication
 {
-
 	@Bean
 	public DataSource acrossDataSource() {
 		return new EmbeddedDatabaseBuilder().setType( EmbeddedDatabaseType.H2 ).build();
@@ -48,10 +47,9 @@ public class LoggingModuleApplication
 	@Bean
 	public LoggingModule loggingModule() {
 		LoggingModule loggingModule = new LoggingModule();
-		loggingModule.setProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_ENABLED, true );
 
 		// Enable agressive method logging
-		loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_ENABLED, true );
+		//loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_ENABLED, true );
 		MethodLogConfiguration methodLogConfiguration = MethodLogConfiguration.all( 15 );
 		loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_CONFIGURATION, methodLogConfiguration );
 

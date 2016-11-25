@@ -1,4 +1,14 @@
 {
+  "properties": [
+    {
+      "name": "logging.request.logger",
+      "type": "com.foreach.across.modules.logging.request.RequestLogger",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings",
+      "defaultValue": "filter"
+    }
+  ]
+}
+  /*
   "groups": [
     {
       "name": "logging",
@@ -50,7 +60,13 @@
       "name": "logging.request-response.paused",
       "type": "java.lang.Boolean",
       "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestResponseSettings",
-      "defaultValue": false
+      "defaultValue": true
+    },
+    {
+      "name": "logging.request-response.max-entries",
+      "type": "java.lang.Integer",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestResponseSettings",
+      "defaultValue": 100
     },
     {
       "name": "logging.request.configuration",
@@ -63,4 +79,4 @@
       "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestSettings"
     }
   ]
-}
+*/

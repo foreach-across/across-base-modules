@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.AcrossException;
@@ -25,11 +26,12 @@ import com.foreach.across.modules.logging.requestresponse.RequestResponseLogging
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
@@ -44,17 +46,28 @@ import java.util.EnumSet;
 @Configuration
 @AcrossDepends(required = "AcrossWebModule")
 @ConditionalOnProperty(LoggingModuleSettings.REQUEST_RESPONSE_LOG_ENABLED)
-public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServletConfigurer
+public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServletConfigurer implements EnvironmentAware
 {
 	private static final Logger LOG = LoggerFactory.getLogger( RequestResponseLoggingConfiguration.class );
 
-	@Autowired
-	private LoggingModuleSettings settings;
+	private Environment environment;
+
+	@Override
+	public void setEnvironment( Environment environment ) {
+		this.environment = environment;
+	}
+
+	@Bean
+	public RequestResponseLogConfiguration requestResponseLogConfiguration() {
+		return environment.getProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_CONFIGURATION,
+		                                RequestResponseLogConfiguration.class,
+		                                new RequestResponseLogConfiguration() );
+	}
 
 	@Bean
 	public RequestResponseLogRegistry requestResponseLogRegistry() {
 		RequestResponseLogRegistry registry = new RequestResponseLogRegistry();
-		registry.setMaxEntries( logConfiguration().getMaxEntries() );
+		registry.setMaxEntries( requestResponseLogConfiguration().getMaxEntries() );
 
 		return registry;
 	}
@@ -68,16 +81,16 @@ public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServlet
 	@Bean
 	@Lazy
 	public RequestResponseLoggingFilter requestResponseLoggingFilter() {
-		RequestResponseLoggingFilter filter = new RequestResponseLoggingFilter( requestResponseLogRegistry(),
-		                                                                        settings.getRequestResponse()
-		                                                                                .getPaused() );
+		RequestResponseLoggingFilter filter
+				= new RequestResponseLoggingFilter( requestResponseLogRegistry(),
+				                                    requestResponseLogConfiguration().isPaused() );
 
-		if ( logConfiguration().getIncludedPathPatterns() != null ) {
-			filter.setIncludedPathPatterns( logConfiguration().getIncludedPathPatterns() );
+		if ( requestResponseLogConfiguration().getIncludedPathPatterns() != null ) {
+			filter.setIncludedPathPatterns( requestResponseLogConfiguration().getIncludedPathPatterns() );
 		}
 
-		if ( logConfiguration().getExcludedPathPatterns() != null ) {
-			filter.setExcludedPathPatterns( logConfiguration().getExcludedPathPatterns() );
+		if ( requestResponseLogConfiguration().getExcludedPathPatterns() != null ) {
+			filter.setExcludedPathPatterns( requestResponseLogConfiguration().getExcludedPathPatterns() );
 		}
 
 		return filter;
@@ -88,8 +101,8 @@ public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServlet
 		FilterRegistration.Dynamic filter = servletContext.addFilter( "requestResponseLogFilter",
 		                                                              requestResponseLoggingFilter() );
 
-		Collection<String> urlFilterMappings = logConfiguration().getUrlFilterMappings();
-		Collection<String> servletNameFilterMappings = logConfiguration().getServletNameFilterMappings();
+		Collection<String> urlFilterMappings = requestResponseLogConfiguration().getUrlFilterMappings();
+		Collection<String> servletNameFilterMappings = requestResponseLogConfiguration().getServletNameFilterMappings();
 
 		if ( urlFilterMappings.isEmpty() && servletNameFilterMappings.isEmpty() ) {
 			throw new AcrossException(
@@ -112,9 +125,4 @@ public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServlet
 		LOG.warn(
 				"Request/response logging is configured, but I am unable to add RequestResponseLoggingFilter dynamically." );
 	}
-
-	private RequestResponseLogConfiguration logConfiguration() {
-		return settings.getRequestResponse().getConfiguration();
-	}
-
 }

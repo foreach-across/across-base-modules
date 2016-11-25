@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.annotations.AcrossEventHandler;
@@ -26,10 +27,11 @@ import com.foreach.across.modules.logging.method.MethodLogConfiguration;
 import com.foreach.across.modules.logging.method.MethodLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.util.ClassUtils;
 
 import java.util.Map;
@@ -40,18 +42,23 @@ import java.util.Map;
 @Configuration
 @ConditionalOnProperty(LoggingModuleSettings.METHOD_LOG_ENABLED)
 @AcrossEventHandler
-public class MethodLoggingConfiguration
+public class MethodLoggingConfiguration implements EnvironmentAware
 {
 	private static final Logger LOG = LoggerFactory.getLogger( MethodLoggingConfiguration.class );
 
-	@Autowired
-	private LoggingModuleSettings settings;
+	private Environment environment;
+
+	@Override
+	public void setEnvironment( Environment environment ) {
+		this.environment = environment;
+	}
 
 	@Bean
 	@Exposed
 	public MethodLogConfiguration methodLogConfiguration() {
-		MethodLogConfiguration provided = settings.getMethod().getConfiguration();
-		return provided != null ? provided : MethodLogConfiguration.all( 75 );
+		return environment.getProperty( LoggingModuleSettings.METHOD_LOG_CONFIGURATION,
+		                                MethodLogConfiguration.class,
+		                                MethodLogConfiguration.all( 75 ) );
 	}
 
 	@SuppressWarnings("unused")
@@ -85,7 +92,7 @@ public class MethodLoggingConfiguration
 		for ( MethodLogger methodLogger : methodLoggers.values() ) {
 			LOG.info( "Registering methodLogger {} from module {}", methodLogger.getName(),
 			          afterBootstrapEvent.getModule().getName() );
-			settings.getMethod().getConfiguration().register( methodLogger );
+			methodLogConfiguration().register( methodLogger );
 		}
 	}
 }

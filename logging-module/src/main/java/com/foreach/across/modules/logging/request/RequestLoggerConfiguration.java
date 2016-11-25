@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.logging.request;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
@@ -23,12 +25,32 @@ import java.util.Collections;
 /**
  * @author Arne Vandamme
  */
+@ConfigurationProperties("logging.request")
 public class RequestLoggerConfiguration
 {
+	/**
+	 * Paths to be included for logging.
+	 */
 	private Collection<String> includedPathPatterns;
+
+	/**
+	 * Paths to always be excluded from logging.
+	 */
 	private Collection<String> excludedPathPatterns;
+
+	/**
+	 * Servlet path patterns that should be logged.
+	 */
 	private Collection<String> urlFilterMappings = Collections.singleton( "/*" );
+
+	/**
+	 * Servlet names that should be included for logging.
+	 */
 	private Collection<String> servletNameFilterMappings = Collections.emptySet();
+
+	/**
+	 * Log levels to be used for request duration.
+	 */
 	private LoggerLevelThreshold loggerLevelThreshold;
 
 	public Collection<String> getIncludedPathPatterns() {
