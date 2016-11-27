@@ -1,0 +1,82 @@
+{
+  "properties": [
+    {
+      "name": "logging.request.logger",
+      "type": "com.foreach.across.modules.logging.request.RequestLogger",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings",
+      "defaultValue": "filter"
+    }
+  ]
+}
+  /*
+  "groups": [
+    {
+      "name": "logging",
+      "type": "com.foreach.across.modules.logging.LoggingModuleSettings",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings"
+    },
+    {
+      "name": "logging.method",
+      "type": "com.foreach.across.modules.logging.LoggingModuleSettings$MethodLoggingSettings",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings",
+      "sourceMethod": "getMethod()"
+    },
+    {
+      "name": "logging.request",
+      "type": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestSettings",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings",
+      "sourceMethod": "getRequest()"
+    },
+    {
+      "name": "logging.request-response",
+      "type": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestResponseSettings",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings",
+      "sourceMethod": "getRequestResponse()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "logging.method.configuration",
+      "type": "com.foreach.across.modules.logging.method.MethodLogConfiguration",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$MethodLoggingSettings"
+    },
+    {
+      "name": "logging.method.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$MethodLoggingSettings"
+    },
+    {
+      "name": "logging.request-response.configuration",
+      "type": "com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestResponseSettings"
+    },
+    {
+      "name": "logging.request-response.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestResponseSettings",
+      "defaultValue": false
+    },
+    {
+      "name": "logging.request-response.paused",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestResponseSettings",
+      "defaultValue": true
+    },
+    {
+      "name": "logging.request-response.max-entries",
+      "type": "java.lang.Integer",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestResponseSettings",
+      "defaultValue": 100
+    },
+    {
+      "name": "logging.request.configuration",
+      "type": "com.foreach.across.modules.logging.request.RequestLoggerConfiguration",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestSettings"
+    },
+    {
+      "name": "logging.request.logger",
+      "type": "com.foreach.across.modules.logging.request.RequestLogger",
+      "sourceType": "com.foreach.across.modules.logging.LoggingModuleSettings$RequestSettings"
+    }
+  ]
+*/

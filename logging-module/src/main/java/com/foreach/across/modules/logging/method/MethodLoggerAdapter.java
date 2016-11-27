@@ -117,7 +117,7 @@ public abstract class MethodLoggerAdapter implements MethodLogger, Ordered
 						LOG.info(
 								"{}\t{}.{}\t{}",
 								newId.intValue() + previousId.incrementAndGet(),
-								point.getSignature().getDeclaringType().getName(),
+								retrieveTypeName( point ),
 								point.getSignature().getName(),
 								duration
 						);
@@ -137,6 +137,17 @@ public abstract class MethodLoggerAdapter implements MethodLogger, Ordered
 		}
 
 		return point.proceed();
+	}
+
+	protected String retrieveTypeName( ProceedingJoinPoint point ) {
+		Class declaringType = point.getSignature().getDeclaringType();
+
+		if ( declaringType.isInterface() ) {
+			Class[] interfaces = point.getThis().getClass().getInterfaces();
+			return interfaces.length > 0 ? interfaces[0].getName() : declaringType.getName();
+		}
+
+		return declaringType.getName();
 	}
 
 	@Override
