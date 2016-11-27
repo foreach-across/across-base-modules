@@ -73,9 +73,14 @@ Module website: {module-url}
 |Should method logging extensions in modules be loaded? +
 |_false_
 
+|logging.method.default-minimum-duration
+|`int`
+|Number of milliseconds a method should take before it will be logged.
+|75
+
 |logging.method.configuration
 |`MethodLogConfiguration.class`
-|Configuration settings for method logging.
+|Advanced configuration settings for method logging.
 |_null_
 
 |logging.request.logger
@@ -83,10 +88,35 @@ Module website: {module-url}
 |Should request logging be disabled, or enabled as filter or servlet?
 |_RequestLogger.FILTER_
 
+|logging.request.excluded-path-patterns
+|`Collection<String>`
+|Path patterns that should be excluded from request logging.
+|
+
+|logging.request.included-path-patterns
+|`Collection<String>`
+|Path patterns that should be included for request logging.
+|_all_
+
+|logging.request.servlet-name-filter-mappings
+|`Collection<String>`
+|Servlet names to which the request logger should be applied (if filter).
+|
+
+|logging.request.url-filter-mappings
+|`Collection<String>`
+|Servlet URL patterns to which the request logger should be applied (if filter).
+|/*
+
+|logging.request.logger-level-threshold
+|`LoggerLevelThreshold.class`
+|Configure custom log levels depending on request duration.
+|_null_
+
 |logging.request.configuration
 |`RequestLoggerConfiguration.class`
-|Configuration settings for request logging.
-|All requests will be logged.
+|Advanced configuration settings for request logging.
+|_null_
 
 |logging.request-response.enabled
 |`boolean`
@@ -98,10 +128,35 @@ Module website: {module-url}
 |Should request/response debug logging be paused?
 |_false_
 
+|logging.request-response.max-entries
+|`int`
+|Number of request/response log entries that should be kept in memory.
+|100
+
+|logging.request-response.excluded-path-patterns
+|`Collection<String>`
+|Path patterns that should be excluded from request/response logging.
+| +++/debug/**+++,+++/across/**+++,+++/**/login+++
+
+|logging.request-response.included-path-patterns
+|`Collection<String>`
+|Path patterns that should be included for request/response logging.
+|_all_
+
+|logging.request-response.servlet-name-filter-mappings
+|`Collection<String>`
+|Servlet names to which the request/response logger should be applied (if filter).
+|
+
+|logging.request-response.url-filter-mappings
+|`Collection<String>`
+|Servlet URL patterns to which the request/response logger should be applied (if filter).
+|/*
+
 |logging.request-response.configuration
 |`RequestResponseLogConfiguration.class`
-|Configuration settings for request/response debug logging.
-|All requests will be logged.
+|Advanced configuration settings for request/response debug logging.
+|_null_
 
 |===
 
@@ -142,12 +197,23 @@ Using method logging can be a useful alternative for finding performance bottlen
 
 === Configuration
 
-Method logging must be activated when configuring the {module-name}.  This should be done by setting a valid
- configuration (*logging.method.configuration* property) and enabling method logging (*logging.method.enabled* property).
- The `MethodLogConfiguration` allows you to configure the minimum duration for method calls on a global or per-`MethodLogger`
- level.  Most modules create a single `MethodLogger` with the same name as the module itself.
+Method logging must be activated when configuring the {module-name}.
+Activating method logging will activate the module specific logging configurations.
+Modules can define one or more `MethodLogger` instances reponsible for logging certain types of method calls (eg. repository calls).
+Most modules create a single `MethodLogger` with the same name as the module itself.
 
-.Enabling method logging for all methods exceeding 15ms
+.Example logging all methods with a duration of 75ms or more
+[source,text,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+logging.method.enabled=true
+logging.method.default-minimum-duration=75
+----
+
+More advanced configuration can be done by manually setting an `MethodLogConfiguration` instance.
+The `MethodLogConfiguration` allows you to configure the minimum duration for method calls on a global or per-`MethodLogger` level.
+
+.Enabling method logging manually for all methods exceeding 15ms
 [source,java,indent=0]
 [subs="verbatim,quotes,attributes"]
 ----
@@ -157,12 +223,12 @@ MethodLogConfiguration methodLogConfiguration = MethodLogConfiguration.all( 15 )
 loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_CONFIGURATION, methodLogConfiguration );
 ----
 
-WARNING: Enabling global method logging with a very small minimum duration can result in huge log files on a busy system.
+WARNING: Method logging has a performance impact and enabling global method logging with a very small minimum duration can result in huge log files on a busy system.
 
 === Logging output
 
-A method log entry is a simple tab-separated log message sent to a http://www.slf4j.org/[SLF4J] logger.  The logger name
-  is _com.foreach.across.modules.logging.method.MethodLogger_ suffixed with the method logger name (eg: _com.foreach.across.modules.logging.method.MethodLogger.MyModule_).
+A method log entry is a simple tab-separated log message sent to a http://www.slf4j.org/[SLF4J] logger.
+The logger name is _com.foreach.across.modules.logging.method.MethodLogger_ suffixed with the method logger name (eg: _com.foreach.across.modules.logging.method.MethodLogger.MyModule_).
 
 A tab-separated log message contains the following fields:
 
@@ -174,10 +240,10 @@ NOTE: Using tab-separated output makes it very easy to import log-files for anal
 
 ==== Method level
 
-Method level attempts to give an indication about possible optimization targets.  A method level of 1 means this
-is the first logged method to exceed the minimum duration.  In other words: the method call is not composed of other
-methods that match the logging rules and have exceeded the minimum duration.  When investigating performance, the lowest
-method level calls are usually a good place to start.
+Method level attempts to give an indication about possible optimization targets.
+A method level of 1 means this is the first logged method to exceed the minimum duration.
+In other words: the method call is not composed of other methods that match the logging rules and have exceeded the minimum duration.
+When investigating performance, the lowest method level calls are usually a good place to start.
 
 The method level calculation is considered experimental.
 
@@ -238,13 +304,11 @@ The following section provides a common {logback-url}[Logback] example for confi
 |===
 
 === Creating a method logger
-A module can support method logging by providing an extension configuration
- called `MethodLoggingConfiguration`.  The configuration will only be loaded if method logging on the {module-name}
- is enabled.
+A module can support method logging by providing an extension configuration called `MethodLoggingConfiguration`.
+The configuration will only be loaded if method logging on the {module-name} is enabled.
 
-Most often it is enough for a module to define a single `MethodLoggerAdapter` bean that defines all methods to be intercepted
-for logging.  The adapter class ensures that the {module-name} configuration features are supported and the log messages
-are in the right format.
+Most often it is enough for a module to define a single `MethodLoggerAdapter` bean that defines all methods to be intercepted for logging.
+The adapter class ensures that the {module-name} configuration features are supported and the log messages are in the right format.
 
 .com.mymodule.extensions.MethodLoggingConfiguration
 [source,java,indent=0]
@@ -288,26 +352,29 @@ public class MethodLoggingConfiguration
 == Request logging
 NOTE: Only available if AcrossWebModule is present.
 
-In a web context the {module-name} will register a servlet filter that logs request information.  Every request will
-get a unique id assigned and attributes like the handler name, request url and request mapping will be logged if they
-can be determined.
+In a web context the {module-name} will register a servlet filter that logs request information.
+Every request will get a unique id assigned and attributes like the handler name, request url and request mapping will be logged if they can be determined.
 
 === Configuration
 
-By default request logging for all requests is enabled.  This can be altered by setting the *logging.request.logger* property.
-The request logger will be paused by default, this is to avoid the performance impact caused by wrapping the requests.
-This can be altered by settings the *logging.request.paused* property
+By default request logging for all requests is enabled through using a servlet filter.
+This can be altered by setting the *logging.request.logger* property.
 
-WARNING: Do not start a production environment with *logging.request.paused=true*, this will cause a significant performance impact.
-
-Additionally you can finetune the request logging through a `RequestLoggerConfiguration` instance (*logging.request.configuration* property).
-Through the configuration instance you can configure:
+Additionally there are some properties to finetune the request logging, or you can create your own `RequestLoggerConfiguration` instance.
+Advanced configuration can be used to specify:
 
 * to which servlets the filter should apply (defaults to all)
 * the path patterns that requests should match before they are logged
 * the log level threshold that allows you to configure different log levels to be used when requests exceed certain durations
 
-.Enabling request logging for all requests except static resources
+.Enabling request logging for all requests except static resources - through properties
+[source,text,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+logging.request.excluded-path-patterns=/across/**
+----
+
+.Enabling request logging for all requests except static resources - manually
 [source,java,indent=0]
 [subs="verbatim,quotes,attributes"]
 ----
@@ -347,9 +414,8 @@ The tab-separated log message contains the following fields:
  * HTTP status code
  * Duration (ms)
 
-Depending on the application configuration or type of request, certain fields might not be available.  In that case
-a field-dependent default value (either empty, _0_ or _null_) will be output, but the position of the field will always
-exist so tab-based parsing does not fail.
+Depending on the application configuration or type of request, certain fields might not be available.
+In that case a field-dependent default value (either empty, _0_ or _null_) will be output, but the position of the field will always exist so tab-based parsing does not fail.
 
 ==== Logback configuration
 
@@ -429,24 +495,36 @@ The following section provides a common {logback-url}[Logback] example for confi
 == Request/response debug logging
 NOTE: Only available if AcrossWebModule is present.
 
-{module-name} also supports a detailed request/response logging for debugging purposes.  It can be used to log
-the full request and response, including body and headers.  Request/response debug logging will wrap the incoming request and outgoing response.
-Be aware this could cause side effects in some rare cases.
+{module-name} also supports a detailed request/response logging for debugging purposes.
+It can be used to log the full request and response, including body and headers.
+Request/response debug logging will wrap the incoming request and outgoing response.
 
-The purpose of request/response logging is mainly for temporary debugging of specific requests, preferably in a non-production environment.
+WARNING: Using the request/response debug logging has a negative impact on performance and can cause side effects in rare cases.
+Use it only for temporary debugging of specific requests, preferably in a non-production environment.
+
 {module-name} comes with a set of debug controllers that allow you to view the logs and change the logging settings for specific request paths.
 
 === Configuration
 
 Before request/response logging is possible, it should first be enabled (*logging.requestResponse.enabled* property).
 
-If request/response logging is enabled, it can still be either _active_ or _paused_.  If logging
-is not active, no data will be stored and requests/responses will not be wrapped.  The active state
-can be controlled through the *logging.requestResponse.paused* property or at runtime via the <<request-response-debug-controllers,debug controllers>>.
+If request/response logging is enabled, it can still be either _active_ or _paused_.
+If logging is not active, no data will be stored and requests/responses will not be wrapped, performance impact will be negligable.
+The active state can be controlled through the *logging.requestResponse.paused* property or at runtime via the <<request-response-debug-controllers,debug controllers>>.
 
-Advanced configuration is done through a `RequestResponseLogConfiguration` instance (*logging.requestResponse.configuration* property).
-Log entries are only kept in memory and the configuration allows you to set the maximum to be kept (defaults to 100).  Additionally you
-have the following configuration options:
+Configuration of request/response logging can be done through properties.
+
+.Activating request/response logging
+[source,text,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+logging.request-response.enabled=true
+----
+
+Different properties allow you to customize parameters like maximum log entries to keep (defaults to 100), or the paths to include for logging.
+More advanced configuration can be done through specifying a `RequestResponseLogConfiguration` instance (*logging.requestResponse.configuration* property).
+
+Additional configuration options include:
 
 * to which servlets the filter should apply (defaults to all)
 * the path patterns that requests should match before they are logged
@@ -468,6 +546,6 @@ loggingModule.setProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_CONFIGURAT
 === Debug controllers
 NOTE: Only available if {debug-web-module-url}[DebugWebModule] is present.
 
-If request/response debug logging is enabled, {module-name} adds a subsection *Request - response* to the *Logging* section.  The *Settings* controller allows you to
-update the path settings that requests should match before their details are logged.  The *Overview* controller allows you
-to pause/activate the logging, as well as browse all log entries.
+If request/response debug logging is enabled, {module-name} adds a subsection *Request - response* to the *Logging* section.
+The *Settings* controller allows you to update the path settings that requests should match before their details are logged.
+The *Overview* controller allows you to pause/activate the logging, as well as browse all log entries.
