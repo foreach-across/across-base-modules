@@ -137,7 +137,7 @@ public class AcrossWebSecurityConfiguration
 	 * Wrapping class that exposes the property used in
 	 * {@link org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration}.
 	 */
-	class WebSecurityConfigurerSet extends HashSet<WebSecurityConfigurer>
+	private static class WebSecurityConfigurerSet extends HashSet<WebSecurityConfigurer>
 	{
 		public List<WebSecurityConfigurer> getWebSecurityConfigurers() {
 			return new ArrayList<>( this );

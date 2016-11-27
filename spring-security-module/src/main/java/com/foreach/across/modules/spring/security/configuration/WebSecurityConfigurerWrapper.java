@@ -100,7 +100,7 @@ public class WebSecurityConfigurerWrapper extends WebSecurityConfigurerAdapter i
 		configurer.configure( http );
 	}
 
-	class AuthenticationManagerBuilderDelegateInterceptor implements InvocationHandler
+	private static class AuthenticationManagerBuilderDelegateInterceptor implements InvocationHandler
 	{
 		private transient final AuthenticationManagerBuilder builder;
 		private transient boolean called = false;

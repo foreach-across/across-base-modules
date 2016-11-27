@@ -28,6 +28,7 @@ import java.util.Optional;
  * @see SecurityPrincipalLabelResolverStrategy
  * @since 2.0.0
  */
+@Deprecated
 public interface SecurityPrincipalLabelResolver
 {
 	/**
