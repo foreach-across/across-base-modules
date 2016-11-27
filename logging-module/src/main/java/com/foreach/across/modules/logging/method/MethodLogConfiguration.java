@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.logging.method;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,15 +29,31 @@ import java.util.Set;
 /**
  * @author Arne Vandamme
  */
+@ConfigurationProperties("logging.method")
 public class MethodLogConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger( MethodLogConfiguration.class );
 
 	public static final String WILDCARD = "*";
 
+	/**
+	 * Should method logging be enabled.  This will pickup method logging configurations from modules.
+	 */
 	private boolean enabled;
+
+	/**
+	 * Minimum duration of a method call before it should be logged.
+	 */
 	private int defaultMinimumDuration = 75;
+
+	/**
+	 * Individual method loggers that should be activated.
+	 */
 	private final Map<String, Boolean> loggerStatus = new HashMap<>();
+
+	/**
+	 * Minimum duration for individual loggers.
+	 */
 	private final Map<String, Integer> durationForLogger = new HashMap<>();
 
 	private Set<MethodLogger> loggers = new HashSet<>();
@@ -60,6 +78,8 @@ public class MethodLogConfiguration
 		this.defaultMinimumDuration = defaultMinimumDuration;
 		updateAllConfigurations();
 	}
+
+
 
 	/**
 	 * Set enabled status for a specific logger.  Only if the global {@link #isEnabled()} is {@code true} can

@@ -20,6 +20,7 @@ import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.config.dynamic.RequestLoggerFilterConfiguration;
 import com.foreach.across.modules.logging.config.dynamic.RequestLoggerInterceptorConfiguration;
 import com.foreach.across.modules.logging.request.RequestLogger;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.env.Environment;
@@ -30,8 +31,9 @@ import java.util.List;
 
 /**
  * @author Marc Vanbrabant
+ * @since 1.1.0
  */
-public class DynamicConfigurationRegistrar implements ImportSelector, EnvironmentAware
+public class RequestLoggerConfigurationRegistrar implements ImportSelector, EnvironmentAware
 {
 	private Environment environment;
 
@@ -44,16 +46,15 @@ public class DynamicConfigurationRegistrar implements ImportSelector, Environmen
 	public String[] selectImports( AnnotationMetadata importingClassMetadata ) {
 		List<String> imports = new ArrayList<>();
 
-		RequestLogger requestLogger = environment.getProperty( LoggingModuleSettings.REQUEST_LOGGER,
-		                                                       RequestLogger.class, RequestLogger.FILTER );
-		if ( requestLogger == RequestLogger.INTERCEPTOR ) {
+		String loggerType = environment.getProperty( LoggingModuleSettings.REQUEST_LOGGER, String.class, "FILTER" );
+		RequestLogger logger = RequestLogger.valueOf( StringUtils.upperCase( loggerType ) );
+		if ( logger == RequestLogger.INTERCEPTOR ) {
 			imports.add( RequestLoggerInterceptorConfiguration.class.getName() );
 		}
-		if ( requestLogger == RequestLogger.FILTER ) {
+		else if ( logger == RequestLogger.FILTER ) {
 			imports.add( RequestLoggerFilterConfiguration.class.getName() );
 		}
 
 		return imports.toArray( new String[imports.size()] );
 	}
-
 }
