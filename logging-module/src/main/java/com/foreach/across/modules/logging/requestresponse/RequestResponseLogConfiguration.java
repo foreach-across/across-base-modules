@@ -45,7 +45,7 @@ public class RequestResponseLogConfiguration extends RequestLoggerConfiguration
 	private boolean enabled = false;
 
 	public RequestResponseLogConfiguration() {
-		setExcludedPathPatterns( Arrays.asList( "/debug/**", "/across/**" ) );
+		setExcludedPathPatterns( Arrays.asList( "/debug/**", "/across/**", "/**/login" ) );
 	}
 
 	public int getMaxEntries() {
