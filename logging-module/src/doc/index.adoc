@@ -164,8 +164,10 @@ Module website: {module-url}
 :numbered!:
 
 === 1.1.0-SNAPSHOT
-* the request/response logger is now paused by default (it has a performance impact when enabled)
 * switched to `@ConfigurationProperties` for settings - allow settings via application.properties
+* request/response debug logging changes now also writes request parameters
+** the logger is now paused by default (it has a performance impact when enabled)
+** request parameters are now also returned (any parameter name containing _password_ will have its value masked)
 
 === 1.0.0.RELEASE
 Initial public release available on http://search.maven.org/[Maven central].
