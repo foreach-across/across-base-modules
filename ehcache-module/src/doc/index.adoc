@@ -53,22 +53,22 @@ Module website: {module-url}
 |===
 |Property |Type |Description |Default
 
-|ehcache.configuration.resource
+|ehcacheModule.configurationResource
 |`Resource.class`
 |Ehcache XML resource file.
 |_classpath:ehcache.xml_
 
-|ehcache.configuration
+|ehcacheModule.configurationObject
 |`net.sf.ehcache.config.Configuration.class` or `String.class`
 |Configuration class instance or class name.
 |_null_
 
-|ehcache.cacheManager.name
+|ehcacheModule.cacheManagerName
 |`String.class`
 |Name of the CacheManager instance.
 |_null_
 
-|ehcache.cacheManager.shared
+|ehcacheModule.cacheManagerIsShared
 |`boolean`
 |Should the created CacheManager be shared at the ClassLoader level.
 |_true_
@@ -78,7 +78,8 @@ Module website: {module-url}
 == What's new in this version?
 :numbered!:
 === 1.0.1-SNAPSHOT
-tbd
+
+* The properties prefix has been changed from *ehcache.* to *ehcacheModule.*
 
 === 1.0.0.RELEASE
 Initial public release available on http://search.maven.org/[Maven central].
@@ -86,8 +87,8 @@ Initial public release available on http://search.maven.org/[Maven central].
 :numbered:
 [[logger-management]]
 == Cache manager
-{module-name} requires a valid ehcache configuration to be specified, either via an xml resource (*ehcache.configuration.resource* property) or
-  a `net.sf.ehcache.config.Configuration` instance (*ehcache.configuration* property).  Upon bootstrapping the cache manager will be created and available
+{module-name} requires a valid ehcache configuration to be specified, either via an xml resource (*ehcacheModule.configurationResource* property) or
+  a `net.sf.ehcache.config.Configuration` instance (*ehcacheModule.configurationObject* property).  Upon bootstrapping the cache manager will be created and available
   as a Spring `CacheManager` implementation.
 
 {module-name} will also activate support for the http://docs.spring.io/spring/docs/current/spring-framework-reference/html/cache.html#cache-annotations[cache related annotations]

@@ -16,45 +16,68 @@
 
 package com.foreach.across.modules.ehcache;
 
-import com.foreach.across.core.AcrossModuleSettings;
-import com.foreach.across.core.AcrossModuleSettingsRegistry;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-public class EhcacheModuleSettings extends AcrossModuleSettings
+@ConfigurationProperties("ehcacheModule")
+public class EhcacheModuleSettings
 {
-	public static final String CONFIGURATION_RESOURCE = "ehcache.configuration.resource";
-	public static final String CONFIGURATION = "ehcache.configuration";
+	public static final String CONFIGURATION_RESOURCE = "ehcacheModule.configurationResource";
+	public static final String CONFIGURATION_OBJECT = "ehcacheModule.configurationObject";
 
-	public static final String CACHE_MANAGER_IS_SHARED = "ehcache.cacheManager.shared";
-	public static final String CACHE_MANAGER_NAME = "ehcache.cacheManager.name";
+	public static final String CACHE_MANAGER_IS_SHARED = "ehcacheModule.cacheManagerIsShared";
+	public static final String CACHE_MANAGER_NAME = "ehcacheModule.cacheManagerName";
 
-	@Override
-	protected void registerSettings( AcrossModuleSettingsRegistry registry ) {
-		registry.register( CONFIGURATION_RESOURCE, Resource.class, new ClassPathResource( "ehcache.xml" ),
-		                   "Resource representing the ehcache XML configuration file (defaults to: ehcache.xml)" );
-		registry.register( CONFIGURATION, Object.class,
-		                   null,
-		                   "Configuration class instance or class name" );
-		registry.register( CACHE_MANAGER_IS_SHARED, Boolean.class, true,
-		                   "Should the created CacheManager be shared at the ClassLoader level." );
-		registry.register( CACHE_MANAGER_NAME, String.class, null,
-		                   "Name of the CacheManager instance." );
-	}
+	/**
+	 * Resource representing the ehcache XML configuration file (defaults to: ehcache.xml).
+	 */
+	private Resource configurationResource = new ClassPathResource( "ehcache.xml" );
+
+	/**
+	 * Configuration class instance or class name.
+	 */
+	private Object configurationObject;
+
+	/**
+	 * Should the created CacheManager be shared at the ClassLoader level.
+	 */
+	private Boolean cacheManagerIsShared = true;
+
+	/**
+	 * Name of the CacheManager instance.
+	 */
+	private String cacheManagerName;
 
 	public Resource getConfigurationResource() {
-		return getProperty( CONFIGURATION_RESOURCE, Resource.class );
+		return configurationResource;
 	}
 
-	public Object getConfiguration() {
-		return getProperty( CONFIGURATION, Object.class );
+	public void setConfigurationResource( Resource configurationResource ) {
+		this.configurationResource = configurationResource;
 	}
 
-	public boolean isSharedCacheManager() {
-		return getProperty( CACHE_MANAGER_IS_SHARED, Boolean.class );
+	public Object getConfigurationObject() {
+		return configurationObject;
 	}
 
-	public String getCachemanagerName() {
-		return getProperty( CACHE_MANAGER_NAME, String.class );
+	public void setConfigurationObject( Object configurationObject ) {
+		this.configurationObject = configurationObject;
+	}
+
+	public Boolean getCacheManagerIsShared() {
+		return cacheManagerIsShared;
+	}
+
+	public void setCacheManagerIsShared( Boolean cacheManagerIsShared ) {
+		this.cacheManagerIsShared = cacheManagerIsShared;
+	}
+
+	public String getCacheManagerName() {
+		return cacheManagerName;
+	}
+
+	public void setCacheManagerName( String cacheManagerName ) {
+		this.cacheManagerName = cacheManagerName;
 	}
 }

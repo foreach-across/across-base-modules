@@ -17,16 +17,18 @@
 package com.foreach.across.modules.it.ehcache;
 
 import com.foreach.across.modules.ehcache.EhcacheModule;
+import com.foreach.across.modules.ehcache.EhcacheModuleSettings;
 import com.foreach.across.test.AcrossTestConfiguration;
+import net.sf.ehcache.config.CacheConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Collection;
@@ -35,9 +37,8 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration(classes = ITEhcacheModule.Config.class)
-@TestPropertySource(properties = "ehcacheModule.configuration-resource=test-ehcache.xml")
-public class ITEhcacheModule
+@ContextConfiguration(classes = ITEhcacheModuleWithConfigurationObject.Config.class)
+public class ITEhcacheModuleWithConfigurationObject
 {
 	@Autowired
 	private CacheManager cacheManager;
@@ -66,5 +67,18 @@ public class ITEhcacheModule
 	@AcrossTestConfiguration(modules = EhcacheModule.NAME)
 	protected static class Config
 	{
+		@Bean
+		public EhcacheModule ehcacheModule() {
+			EhcacheModule ehcacheModule = new EhcacheModule();
+
+			net.sf.ehcache.config.Configuration configuration = new net.sf.ehcache.config.Configuration();
+			CacheConfiguration cacheConfiguration = new CacheConfiguration();
+			cacheConfiguration.setName( "oneElementCache" );
+			cacheConfiguration.setMaxEntriesLocalHeap( 1 );
+			configuration.addCache( cacheConfiguration );
+
+			ehcacheModule.setProperty( EhcacheModuleSettings.CONFIGURATION_OBJECT, configuration );
+			return ehcacheModule;
+		}
 	}
 }
