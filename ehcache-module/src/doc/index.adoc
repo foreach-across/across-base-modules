@@ -59,8 +59,8 @@ Module website: {module-url}
 |_classpath:ehcache.xml_
 
 |ehcacheModule.configurationObject
-|`net.sf.ehcache.config.Configuration.class` or `String.class`
-|Configuration class instance or class name.
+|`net.sf.ehcache.config.Configuration.class`
+|Configuration class instance.
 |_null_
 
 |ehcacheModule.cacheManagerName

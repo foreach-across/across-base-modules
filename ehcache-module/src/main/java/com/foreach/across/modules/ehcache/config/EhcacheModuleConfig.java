@@ -45,20 +45,9 @@ public class EhcacheModuleConfig
 		ehCacheManagerFactoryBean.setCacheManagerName( ehcacheModuleSettings.getCacheManagerName() );
 		ehCacheManagerFactoryBean.setShared( ehcacheModuleSettings.getCacheManagerIsShared() );
 
-		Object configurationObject = ehcacheModuleSettings.getConfigurationObject();
+		net.sf.ehcache.config.Configuration configurationObject = ehcacheModuleSettings.getConfigurationObject();
 		if ( configurationObject != null ) {
-			net.sf.ehcache.config.Configuration configuration;
-			if ( configurationObject instanceof String ) {
-				Class<?> clazz = Class.forName( (String) configurationObject );
-				configuration = (net.sf.ehcache.config.Configuration) clazz.newInstance();
-			}
-			else if ( configurationObject instanceof net.sf.ehcache.config.Configuration ) {
-				configuration = (net.sf.ehcache.config.Configuration) configurationObject;
-			}
-			else {
-				throw new IllegalArgumentException( "unsupported configuration class" );
-			}
-			ehCacheManagerFactoryBean.setConfiguration( configuration );
+			ehCacheManagerFactoryBean.setConfiguration( configurationObject );
 		}
 		else {
 			ehCacheManagerFactoryBean.setConfigLocation( ehcacheModuleSettings.getConfigurationResource() );
