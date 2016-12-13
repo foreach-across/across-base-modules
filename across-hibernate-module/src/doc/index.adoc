@@ -192,11 +192,78 @@ Uses the `ACROSS_SEQUENCES` table created by the `AcrossSequencesInstaller` from
 	private Long id;
 ----
 
-=== AuditableEntity and AuditableSchemaInstaller
+=== Auditable entities
+
+Any entity that implements the `Auditable<String>` interface will get auditing information set on every save or update.
 `AuditableEntity` is a `@MappedSuperClass` that implements the `Auditable<String>` interface.
 It adds auditing related columns: creation and last modification information (timestamp and principal).
 
+==== AuditableSchemaInstaller
+
 The `AuditableSchemaInstaller` is a base installer class that can easily be used to add the relevant auditing columns to multiple tables.
+
+.Example entity with Auditable properties added
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+
+@Entity
+@Table(name = "customers")
+public class Customer extends SettableIdAuditableEntity<Customer>
+{
+	@Id
+	private Long id;
+
+	@Column(name = "customerName")
+	private String customerName;
+
+}
+----
+
+.Equivalent AuditableSchemaInstaller to add the auditing columns in database
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@Order(2)
+@Installer(description = "Adds auditable columns to specific tables", version = 1)
+public class MyAuditableInstaller extends AuditableSchemaInstaller
+{
+	@Override
+	protected Collection<String> getTableNames() {
+		return Collections.singleton( "customers" );
+	}
+}
+----
+
+Note the use of `@Order(2)` which might be necessary to ensure that your `AuditableSchemaInstaller` is run *after* running your base schema installer.
+
+After starting your application, Across will automatically add the following columns to your entities:
+
+|===
+|Column |Type |Description |Default
+
+|created_by
+|`String`
+|The name of the principal that was creating the entity
+|
+
+|created_date
+|`Date`
+|The time at which the object was created
+|
+
+|modified_by
+|`String`
+|The name of the principal that was modifying the entity
+|
+
+|modified_date
+|`Date`
+|The time at which the object was modified
+|
+
+|
+|===
 
 === SettableIdBasedEntity, SettableIdAuditableEntity
 Base entity classes allowing an id to be set before persisting, using the `newEntityId` property.
@@ -330,75 +397,3 @@ public class MyJpaEntityManagerModule extends AcrossHibernateJpaModule {
 }
 ----
 
-== Creating Auditing tables with AuditableSchemaInstaller
-
-When you with to create Auditable tables with Across and {module-name}, you can create an installer that extends `AuditableSchemaInstaller`.
-This installer will decorate your tables with the required columns to support Auditable entities.
-
-First of all, the entity itself should extend `SettableIdAuditableEntity` as seen below.
-
-.A User entity ready to be used as an Auditable object.
-[source,java,indent=0]
-[subs="verbatim,quotes,attributes"]
-----
-
-@Entity
-@Table(name = DomainManagerConstants.TABLE_CUSTOMERS)
-public class Customer extends SettableIdAuditableEntity<Customer>
-{
-	@Id
-	private Long id;
-
-	@Column(name = "customerName")
-	private String customerName;
-
-}
-----
-
-Secondly, create an installer that will add the auditable columns to your entities.
-The installer should return a list of all tables that need to be processed.
-
-.An AuditableSchemaInstaller .
-[source,java,indent=0]
-[subs="verbatim,quotes,attributes"]
-----
-@Order(2)
-@Installer(description = "Adds auditable columns to all entities", version = 1)
-public class MyAuditableInstaller extends AuditableSchemaInstaller
-{
-	@Override
-	protected Collection<String> getTableNames() {
-		return Collections.singleton( DomainManagerConstants.TABLE_CUSTOMERS );
-	}
-}
-----
-
-Note the use of `@Order(2)` which might be necessary to ensure that your `AuditableSchemaInstaller` is run *after* running your `CoreSchemaInstaller`.
-
-After starting your application, Across will automatically add the following columns to your entities:
-
-|===
-|Column |Type |Description |Default
-
-|created_by
-|`String`
-|The name of the principal that was creating the entity
-|
-
-|created_date
-|`Date`
-|The time at which the object was created
-|
-
-|modified_by
-|`String`
-|The name of the principal that was modifying the entity
-|
-
-|modified_date
-|`Date`
-|The time at which the object was modified
-|
-
-|
-|===
