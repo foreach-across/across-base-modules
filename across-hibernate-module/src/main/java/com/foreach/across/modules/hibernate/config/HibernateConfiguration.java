@@ -100,9 +100,11 @@ public class HibernateConfiguration
 		if ( moduleDataSource == null ) {
 			LOG.debug( "No module datasource specified - falling back to default Across datasource" );
 			module.setDataSource( acrossDataSource );
+			return acrossDataSource;
 		}
-
-		return acrossDataSource;
+		else {
+			return moduleDataSource;
+		}
 	}
 
 	@Bean(name = SESSION_HOLDER)
