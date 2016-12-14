@@ -36,7 +36,7 @@ public class EhcacheModuleSettings
 	private Resource configurationResource = new ClassPathResource( "ehcache.xml" );
 
 	/**
-	 * Configuration class instance or class name.
+	 * Configuration class instance.
 	 */
 	private Configuration configurationObject;
 
