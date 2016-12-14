@@ -16,6 +16,7 @@
 
 package com.foreach.across.modules.ehcache;
 
+import net.sf.ehcache.config.Configuration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -35,9 +36,9 @@ public class EhcacheModuleSettings
 	private Resource configurationResource = new ClassPathResource( "ehcache.xml" );
 
 	/**
-	 * Configuration class instance or class name.
+	 * Configuration class instance.
 	 */
-	private Object configurationObject;
+	private Configuration configurationObject;
 
 	/**
 	 * Should the created CacheManager be shared at the ClassLoader level.
@@ -57,11 +58,11 @@ public class EhcacheModuleSettings
 		this.configurationResource = configurationResource;
 	}
 
-	public Object getConfigurationObject() {
+	public Configuration getConfigurationObject() {
 		return configurationObject;
 	}
 
-	public void setConfigurationObject( Object configurationObject ) {
+	public void setConfigurationObject( Configuration configurationObject ) {
 		this.configurationObject = configurationObject;
 	}
 
