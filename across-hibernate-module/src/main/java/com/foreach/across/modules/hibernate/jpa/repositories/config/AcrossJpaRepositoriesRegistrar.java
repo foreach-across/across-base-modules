@@ -16,7 +16,6 @@
 package com.foreach.across.modules.hibernate.jpa.repositories.config;
 
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
-import org.springframework.data.jpa.repository.config.JpaRepositoryConfigExtension;
 import org.springframework.data.repository.config.RepositoryBeanDefinitionRegistrarSupport;
 import org.springframework.data.repository.config.RepositoryConfigurationExtension;
 
@@ -44,6 +43,6 @@ class AcrossJpaRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSu
 	 */
 	@Override
 	protected RepositoryConfigurationExtension getExtension() {
-		return new JpaRepositoryConfigExtension();
+		return new AcrossJpaRepositoryConfigExtension();
 	}
 }
