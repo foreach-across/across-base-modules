@@ -41,7 +41,7 @@ import static org.springframework.beans.factory.BeanFactoryUtils.transformedBean
 /**
  * Custom extension to fix a bug in Spring Data JPA after 1.10.2.
  * Workaround allows the SharedEntityManager to be registered.
- *
+ * <p>
  * todo: remove once https://jira.spring.io/browse/DATAJPA-1005 has been fixed
  *
  * @author Arne Vandamme
@@ -154,9 +154,10 @@ class AcrossJpaRepositoryConfigExtension extends JpaRepositoryConfigExtension
 						definition.getPropertyValues().get( "expectedType" ) ) ) {
 					return;
 				}
-				else if ( !EntityManagerFactory.class.equals( beanFactory.getType( name ) ) ) {
-					return;
-				}
+			}
+			else if ( beanFactory.getType( name ) == null
+					|| !EntityManagerFactory.class.isAssignableFrom( beanFactory.getType( name ) ) ) {
+				return;
 			}
 
 			definitions.add( new BeanDefinitionUtils.EntityManagerFactoryBeanDefinition( name, beanFactory ) );
