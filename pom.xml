@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   ~ Copyright 2014 the original author or authors
   ~
@@ -108,4 +109,21 @@
 		<url>https://bitbucket.org/beforeach/logging-module</url>
 	</scm>
 
+	<profiles>
+		<profile>
+			<id>foreach</id>
+			<distributionManagement>
+				<repository>
+					<id>foreach-nexus</id>
+					<name>Foreach nexus</name>
+					<url>http://repository.foreach.be/nexus/repository/releases</url>
+				</repository>
+				<snapshotRepository>
+					<id>foreach-nexus</id>
+					<name>Foreach nexus</name>
+					<url>http://repository.foreach.be/nexus/repository/snapshots</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+	</profiles>
 </project>

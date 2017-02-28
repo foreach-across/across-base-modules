@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.logging.request;
 
 import org.apache.commons.lang3.StringUtils;
@@ -66,11 +67,12 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 
 	private static final Logger REQUEST_LOG = RequestLogger.LOG;
 
+	private static final String LOG_FORMAT = "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}";
+
 	private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 	private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
-	private String instanceId;
-	private static final String LOG_FORMAT = "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}";
+	private String instanceId = "instance-not-set";
 
 	private Collection<String> includedPathPatterns = Collections.emptyList();
 	private Collection<String> excludedPathPatterns = Collections.emptyList();

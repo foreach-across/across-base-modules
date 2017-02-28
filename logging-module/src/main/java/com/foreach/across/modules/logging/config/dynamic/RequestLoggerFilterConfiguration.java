@@ -48,6 +48,8 @@ public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletCon
 {
 	private Environment environment;
 
+	private RequestLoggerFilter requestLogFilter;
+
 	@Override
 	public void setEnvironment( Environment environment ) {
 		this.environment = environment;
@@ -76,6 +78,8 @@ public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletCon
 			filter.setLoggerLevelThreshold( requestLoggerConfiguration().getLoggerLevelThreshold() );
 		}
 
+		this.requestLogFilter = filter;
+
 		return filter;
 	}
 
@@ -87,7 +91,7 @@ public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletCon
 
 	@Override
 	protected void dynamicConfigurationAllowed( ServletContext servletContext ) throws ServletException {
-		FilterRegistration.Dynamic filter = servletContext.addFilter( "requestLoggerFilter", requestLogFilter() );
+		FilterRegistration.Dynamic filter = servletContext.addFilter( "requestLoggerFilter", requestLogFilter );
 
 		Collection<String> urlFilterMappings = requestLoggerConfiguration().getUrlFilterMappings();
 		Collection<String> servletNameFilterMappings = requestLoggerConfiguration().getServletNameFilterMappings();
