@@ -24,9 +24,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class RequestResponseLogEntry
 {
+	private static final String ILLEGAL_PARAMETER_PATTERN = ".*password.*";
+
 	private final UUID id;
 	private final long started, finished;
 
@@ -40,6 +43,7 @@ public class RequestResponseLogEntry
 	private Map<String, String> requestCookies = new TreeMap<>();
 	private Map<String, String> requestHeaders = new TreeMap<>();
 	private Map<String, String> responseHeaders = new TreeMap<>();
+	private Map<String, String[]> requestParameters = new TreeMap<>();
 
 	public RequestResponseLogEntry( long started,
 	                                long finished,
@@ -112,6 +116,16 @@ public class RequestResponseLogEntry
 		else {
 			requestData = "Request payload is multipart data.";
 		}
+
+		request.getParameterMap()
+		       .forEach( ( key, value ) -> {
+			       if ( Pattern.matches( ILLEGAL_PARAMETER_PATTERN, StringUtils.lowerCase( key ) ) ) {
+				       requestParameters.put( key, new String[] { "*" } );
+			       }
+			       else {
+				       requestParameters.put( key, value );
+			       }
+		       } );
 
 		requestDataTruncated = request.isMaximumReached();
 		requestPayloadSize = FileUtils.byteCountToDisplaySize( request.payloadSize() );
@@ -204,6 +218,10 @@ public class RequestResponseLogEntry
 
 	public Map<String, String> getResponseHeaders() {
 		return responseHeaders;
+	}
+
+	public Map<String, String[]> getRequestParameters() {
+		return requestParameters;
 	}
 
 	public String getRequestInfo() {

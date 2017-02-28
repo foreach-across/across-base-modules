@@ -13,19 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.logging.requestresponse;
 
 import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.Arrays;
 
 /**
  * Configuration instance for request/response debug logging.
  *
  * @author Arne Vandamme
  */
+@ConfigurationProperties("logging.request-response")
 public class RequestResponseLogConfiguration extends RequestLoggerConfiguration
 {
+	/**
+	 * Maximum number of log entries that should be kept.
+	 */
 	private int maxEntries = 100;
-	private boolean paused = false;
+
+	/**
+	 * Should default request/response filtering be enabled.
+	 */
+	private boolean paused = true;
+
+	/**
+	 * Should the filter be installed.
+	 */
+	private boolean enabled = false;
+
+	public RequestResponseLogConfiguration() {
+		setExcludedPathPatterns( Arrays.asList( "/debug/**", "/across/**", "/**/login" ) );
+	}
 
 	public int getMaxEntries() {
 		return maxEntries;
@@ -41,6 +62,14 @@ public class RequestResponseLogConfiguration extends RequestLoggerConfiguration
 
 	public void setPaused( boolean paused ) {
 		this.paused = paused;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled( boolean enabled ) {
+		this.enabled = enabled;
 	}
 
 	public static RequestResponseLogConfiguration allRequests() {

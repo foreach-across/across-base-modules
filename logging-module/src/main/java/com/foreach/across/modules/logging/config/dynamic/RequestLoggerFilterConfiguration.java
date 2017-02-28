@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.logging.config;
+
+package com.foreach.across.modules.logging.config.dynamic;
 
 import com.foreach.across.core.AcrossException;
-import com.foreach.across.core.annotations.AcrossCondition;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
@@ -27,8 +27,10 @@ import com.foreach.across.modules.logging.request.RequestLoggerFilter;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import com.foreach.common.spring.context.ApplicationInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.handler.MappedInterceptor;
 
 import javax.servlet.DispatcherType;
@@ -41,33 +43,37 @@ import java.util.EnumSet;
 /**
  * Configures the RequestLoggerFilter to be first in the filter chain
  */
-@Configuration
 @AcrossDepends(required = "AcrossWebModule")
-@AcrossCondition("settings.requestLogger == T(com.foreach.across.modules.logging.request.RequestLogger).FILTER")
-public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletConfigurer
+public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletConfigurer implements EnvironmentAware
 {
-	private RequestLoggerConfiguration logConfiguration;
+	private Environment environment;
 
-	@Autowired
-	public void configure( LoggingModuleSettings settings ) {
-		logConfiguration = settings.getProperty( LoggingModuleSettings.REQUEST_LOGGER_CONFIGURATION,
-		                                         RequestLoggerConfiguration.class );
+	@Override
+	public void setEnvironment( Environment environment ) {
+		this.environment = environment;
+	}
+
+	@Bean
+	protected RequestLoggerConfiguration requestLoggerConfiguration() {
+		return environment.getProperty( LoggingModuleSettings.REQUEST_LOGGER_CONFIGURATION,
+		                                RequestLoggerConfiguration.class,
+		                                RequestLoggerConfiguration.allRequests() );
 	}
 
 	@Bean
 	public RequestLoggerFilter requestLogFilter() {
 		RequestLoggerFilter filter = new RequestLoggerFilter();
 
-		if ( logConfiguration.getIncludedPathPatterns() != null ) {
-			filter.setIncludedPathPatterns( logConfiguration.getIncludedPathPatterns() );
+		if ( requestLoggerConfiguration().getIncludedPathPatterns() != null ) {
+			filter.setIncludedPathPatterns( requestLoggerConfiguration().getIncludedPathPatterns() );
 		}
 
-		if ( logConfiguration.getExcludedPathPatterns() != null ) {
-			filter.setExcludedPathPatterns( logConfiguration.getExcludedPathPatterns() );
+		if ( requestLoggerConfiguration().getExcludedPathPatterns() != null ) {
+			filter.setExcludedPathPatterns( requestLoggerConfiguration().getExcludedPathPatterns() );
 		}
 
-		if( logConfiguration.getLoggerLevelThreshold() != null ) {
-			filter.setLoggerLevelThreshold( logConfiguration.getLoggerLevelThreshold() );
+		if ( requestLoggerConfiguration().getLoggerLevelThreshold() != null ) {
+			filter.setLoggerLevelThreshold( requestLoggerConfiguration().getLoggerLevelThreshold() );
 		}
 
 		return filter;
@@ -83,8 +89,8 @@ public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletCon
 	protected void dynamicConfigurationAllowed( ServletContext servletContext ) throws ServletException {
 		FilterRegistration.Dynamic filter = servletContext.addFilter( "requestLoggerFilter", requestLogFilter() );
 
-		Collection<String> urlFilterMappings = logConfiguration.getUrlFilterMappings();
-		Collection<String> servletNameFilterMappings = logConfiguration.getServletNameFilterMappings();
+		Collection<String> urlFilterMappings = requestLoggerConfiguration().getUrlFilterMappings();
+		Collection<String> servletNameFilterMappings = requestLoggerConfiguration().getServletNameFilterMappings();
 
 		if ( urlFilterMappings.isEmpty() && servletNameFilterMappings.isEmpty() ) {
 			throw new AcrossException(

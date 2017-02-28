@@ -27,9 +27,9 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="logging-module" target="1.7" />
-      <module name="logging-module-project" target="1.7" />
-      <module name="logging-module-test-web" target="1.7" />
+      <module name="logging-module" target="1.8" />
+      <module name="logging-module-project" target="1.8" />
+      <module name="logging-module-test-web" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

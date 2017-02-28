@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.logging.config;
 
-import com.foreach.across.core.annotations.AcrossCondition;
+package com.foreach.across.modules.logging.config.dynamic;
+
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.modules.web.config.support.PrefixingHandlerMappingConfigurer;
 import com.foreach.across.modules.web.mvc.InterceptorRegistry;
 import com.foreach.common.web.logging.RequestLogInterceptor;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 
 /**
  * @author Andy Somers
  */
-@Configuration
 @AcrossDepends(required = "AcrossWebModule")
-@AcrossCondition("settings.requestLogger == T(com.foreach.across.modules.logging.request.RequestLogger).INTERCEPTOR")
 public class RequestLoggerInterceptorConfiguration implements PrefixingHandlerMappingConfigurer
 {
+	@Autowired
+	private RequestLogInterceptor requestLogInterceptor;
+
 	@Override
 	public boolean supports( String mapperName ) {
 		return true;
@@ -37,6 +39,11 @@ public class RequestLoggerInterceptorConfiguration implements PrefixingHandlerMa
 
 	@Override
 	public void addInterceptors( InterceptorRegistry interceptorRegistry ) {
-		interceptorRegistry.addFirst( new RequestLogInterceptor() );
+		interceptorRegistry.addFirst( requestLogInterceptor );
+	}
+
+	@Bean
+	public RequestLogInterceptor requestLogInterceptor() {
+		return new RequestLogInterceptor();
 	}
 }
