@@ -21,6 +21,8 @@ import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.table.Table;
 import liquibase.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondit
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +46,8 @@ import java.util.Map;
 @DebugWebController
 public class SpringInfoController
 {
+	private static Logger LOG = LoggerFactory.getLogger( SpringInfoController.class );
+
 	@Autowired
 	private ApplicationContext applicationContext;
 
@@ -66,8 +71,8 @@ public class SpringInfoController
 			Field interceptorsField = AbstractHandlerMapping.class.getDeclaredField( "interceptors" );
 			interceptorsField.setAccessible( true );
 
-			Field mappedInterceptorsField = AbstractHandlerMapping.class.getDeclaredField( "mappedInterceptors" );
-			mappedInterceptorsField.setAccessible( true );
+			Method mappedInterceptorsMethod = AbstractHandlerMapping.class.getDeclaredMethod( "getMappedInterceptors" );
+			mappedInterceptorsMethod.setAccessible( true );
 
 			List<Table> tables = new LinkedList<>();
 			for ( Map.Entry<String, AbstractHandlerMapping> handlerEntry : handlers.entrySet() ) {
@@ -82,7 +87,7 @@ public class SpringInfoController
 					}
 				}
 
-				List<MappedInterceptor> mappedInterceptors = (List<MappedInterceptor>) mappedInterceptorsField.get(
+				List<MappedInterceptor> mappedInterceptors = (List<MappedInterceptor>) mappedInterceptorsMethod.invoke(
 						handlerEntry.getValue() );
 				if ( mappedInterceptors != null ) {
 					for ( MappedInterceptor interceptor : mappedInterceptors ) {
@@ -98,6 +103,7 @@ public class SpringInfoController
 		}
 		catch ( Exception ignore ) {
 			// Do nothing
+			LOG.warn( "Exception occured while getting interceptors", ignore );
 		}
 
 		return DebugWeb.VIEW_SPRING_INTERCEPTORS;
