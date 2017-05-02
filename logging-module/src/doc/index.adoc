@@ -1,9 +1,9 @@
 = LoggingModule
 Arne Vandamme
-1.1.0-SNAPSHOT
+1.1.0.RELEASE
 :toc: left
 :sectanchors:
-:module-version: 1.1.0-SNAPSHOT
+:module-version: 1.1.0.RELEASE
 :module-name: LoggingModule
 :module-artifact: logging-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/LoggingModule
@@ -163,7 +163,7 @@ Module website: {module-url}
 == What's new in this version?
 :numbered!:
 
-=== 1.1.0-SNAPSHOT
+=== 1.1.0.RELEASE
 * switched to `@ConfigurationProperties` for settings - allow settings via application.properties
 * request/response debug logging changes now also writes request parameters
 ** the logger is now paused by default (it has a performance impact when enabled)
