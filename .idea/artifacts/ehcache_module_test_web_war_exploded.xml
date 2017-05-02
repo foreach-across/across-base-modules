@@ -1,13 +1,13 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="ehcache-module-test-web:war exploded">
-    <output-path>$PROJECT_DIR$/ehcache-module-test-web/target/ehcache-module-test-web-1.0.1-SNAPSHOT</output-path>
+    <output-path>$PROJECT_DIR$/ehcache-module-test-web/target/ehcache-module-test-web-1.0.1.RELEASE</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
           <element id="module-output" name="ehcache-module-test-web" />
         </element>
         <element id="directory" name="lib">
-          <element id="archive" name="ehcache-module-1.0.1-SNAPSHOT.jar">
+          <element id="archive" name="ehcache-module-1.0.1.RELEASE.jar">
             <element id="module-output" name="ehcache-module" />
           </element>
           <element id="library" level="project" name="Maven: net.sf.ehcache:ehcache:2.8.6" />
@@ -53,7 +53,7 @@
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/ehcache-module-test-web/target/ehcache-module-test-web-1.0.1-SNAPSHOT/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/ehcache-module-test-web/target/ehcache-module-test-web-1.0.1.RELEASE/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="ehcache-module-test-web/web/Web" />
     </root>
