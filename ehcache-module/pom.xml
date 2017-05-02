@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.foreach.across.modules</groupId>
         <artifactId>ehcache-module-project</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1.RELEASE</version>
     </parent>
 
     <artifactId>ehcache-module</artifactId>

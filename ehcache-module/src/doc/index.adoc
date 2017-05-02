@@ -1,9 +1,9 @@
 = EhcacheModule
 Arne Vandamme
-1.0.1-SNAPSHOT
+1.0.1.RELEASE
 :toc: left
 :sectanchors:
-:module-version: 1.0.1-SNAPSHOT
+:module-version: 1.0.1.RELEASE
 :module-name: EhcacheModule
 :module-artifact: ehcache-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/EhcacheModule
@@ -77,7 +77,7 @@ Module website: {module-url}
 
 == What's new in this version?
 :numbered!:
-=== 1.0.1-SNAPSHOT
+=== 1.0.1.RELEASE
 
 * The properties prefix has been changed from *ehcache.* to *ehcacheModule.*
 
