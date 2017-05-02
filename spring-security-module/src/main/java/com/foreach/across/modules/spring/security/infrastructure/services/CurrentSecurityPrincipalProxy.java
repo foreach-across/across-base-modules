@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
@@ -23,10 +24,31 @@ import org.springframework.security.core.GrantedAuthority;
  */
 public interface CurrentSecurityPrincipalProxy extends SecurityPrincipal
 {
+	/**
+	 * @return {@code true} if the there is an authenticated principal attached to the current thread
+	 */
 	boolean isAuthenticated();
 
+	/**
+	 * Checks if the authenticated principal has the matching authority.  This does a {@link String}
+	 * based comparison on {@link GrantedAuthority#getAuthority()}, whereas {@link #hasAuthority(GrantedAuthority)}
+	 * will perform an equality check on the actual {@link GrantedAuthority} instance.
+	 * <p/>
+	 * String based authority checks are usually safest to use.
+	 *
+	 * @param authority string the authentication should have
+	 * @return true if authority string was present
+	 */
 	boolean hasAuthority( String authority );
 
+	/**
+	 * Checks if the authenticated principal has the matching exact authority.  This does an equality check on
+	 * the {@link GrantedAuthority} instance, meaning the type will be taken into account.  In most cases
+	 * using authority strings is enough, see {@link #hasAuthority(String)}.
+	 *
+	 * @param authority instance the authentication should have
+	 * @return true if authority instance was present
+	 */
 	boolean hasAuthority( GrantedAuthority authority );
 
 	/**
@@ -39,7 +61,7 @@ public interface CurrentSecurityPrincipalProxy extends SecurityPrincipal
 	 * In case there is a principal that does not match the type, {@code null} will be returned.
 	 *
 	 * @param principalType expected type of the principal
-	 * @param <V> type of the principal
+	 * @param <V>           type of the principal
 	 * @return instance of available and of the required type, null otherwise
 	 */
 	<V extends SecurityPrincipal> V getPrincipal( Class<V> principalType );

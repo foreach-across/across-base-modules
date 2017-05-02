@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.spring.security.authority;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,8 +31,13 @@ import org.springframework.security.core.SpringSecurityCoreVersion;
  *     {@link org.springframework.security.core.GrantedAuthority} implementation equal if it returns the same
  *     value for {@link #getAuthority()}.
  * </p>
+ * <p>
+ *     Deprecated class, but kept because of possible serialization of authentication in for example OAuth2Module.
+ * </p>
  * @author Arne Vandamme
+ * @deprecated use {@link org.springframework.security.core.authority.SimpleGrantedAuthority} instead
  */
+@Deprecated
 public class NamedGrantedAuthority implements GrantedAuthority
 {
 	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;

@@ -18,8 +18,9 @@ package com.foreach.across.modules.spring.security.config;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 
@@ -36,12 +37,16 @@ public class ModuleGlobalMethodSecurityConfiguration extends GlobalMethodSecurit
 	@Autowired
 	private void setSecurityInfrastructure( SecurityInfrastructure securityInfrastructure ) {
 		this.securityInfrastructure = securityInfrastructure;
-		setAuthenticationTrustResolver( securityInfrastructure.authenticationTrustResolver() );
 	}
 
 	@Override
-	public void setAuthenticationTrustResolver( AuthenticationTrustResolver trustResolver ) {
-		super.setAuthenticationTrustResolver( trustResolver );
+	protected MethodSecurityExpressionHandler createExpressionHandler() {
+		MethodSecurityExpressionHandler expressionHandler = super.createExpressionHandler();
+		if ( expressionHandler instanceof DefaultMethodSecurityExpressionHandler ) {
+			( (DefaultMethodSecurityExpressionHandler) expressionHandler )
+					.setTrustResolver( securityInfrastructure.authenticationTrustResolver() );
+		}
+		return expressionHandler;
 	}
 
 	/*

@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.test.modules.spring.security.authority;
 
 import com.foreach.across.modules.spring.security.authority.AuthorityMatcher;
 import org.junit.Test;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 
-import java.util.Arrays;
-
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -33,16 +35,33 @@ public class TestAuthorityMatcher
 	public void anyOf() {
 		AuthorityMatcher matcher = AuthorityMatcher.anyOf( "manage users", "view groups" );
 
-		assertTrue( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "manage users" ) ) ) );
-		assertTrue( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "view groups" ) ) ) );
+		assertTrue( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
+		assertTrue( matcher.matches( singletonList( new SimpleGrantedAuthority( "view groups" ) ) ) );
 		assertTrue( matcher.matches(
-				            Arrays.asList(
-						            new SimpleGrantedAuthority( "manage users" ),
-						            new SimpleGrantedAuthority( "view groups" )
-				            )
+				asList(
+						new SimpleGrantedAuthority( "manage users" ),
+						new SimpleGrantedAuthority( "view groups" )
+				)
 		            )
 		);
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "other perm" ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );
+	}
+
+	@Test
+	public void anyOfWithAuthorities() {
+		AuthorityMatcher matcher = AuthorityMatcher.anyOf( new SimpleGrantedAuthority( "manage users" ),
+		                                                   new SimpleGrantedAuthority( "view groups" ) );
+
+		assertTrue( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
+		assertTrue( matcher.matches( singletonList( new SwitchUserGrantedAuthority( "view groups", null ) ) ) );
+		assertTrue( matcher.matches(
+				asList(
+						new SwitchUserGrantedAuthority( "manage users", null ),
+						new SimpleGrantedAuthority( "view groups" )
+				)
+		            )
+		);
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );
 	}
 
 	@Test
@@ -52,29 +71,43 @@ public class TestAuthorityMatcher
 				AuthorityMatcher.allOf( "view groups" )
 		);
 
-		assertTrue( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "manage users" ) ) ) );
-		assertTrue( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "view groups" ) ) ) );
+		assertTrue( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
+		assertTrue( matcher.matches( singletonList( new SimpleGrantedAuthority( "view groups" ) ) ) );
 		assertTrue( matcher.matches(
-				            Arrays.asList(
-						            new SimpleGrantedAuthority( "manage users" ),
-						            new SimpleGrantedAuthority( "view groups" )
-				            )
+				asList(
+						new SimpleGrantedAuthority( "manage users" ),
+						new SimpleGrantedAuthority( "view groups" )
+				)
 		            )
 		);
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "other perm" ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );
 	}
 
 	@Test
 	public void allOf() {
 		AuthorityMatcher matcher = AuthorityMatcher.allOf( "manage users", "view groups" );
 
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "manage users" ) ) ) );
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "view groups" ) ) ) );
-		assertTrue( matcher.matches( Arrays.asList(
-				            new SimpleGrantedAuthority( "manage users" ), new SimpleGrantedAuthority( "view groups" )
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "view groups" ) ) ) );
+		assertTrue( matcher.matches( asList(
+				new SimpleGrantedAuthority( "manage users" ), new SimpleGrantedAuthority( "view groups" )
 		            ) )
 		);
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "other perm" ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );
+	}
+
+	@Test
+	public void allOfWithAuthorities() {
+		AuthorityMatcher matcher = AuthorityMatcher.allOf( new SimpleGrantedAuthority( "manage users" ),
+		                                                   new SwitchUserGrantedAuthority( "view groups", null ) );
+
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SwitchUserGrantedAuthority( "view groups", null ) ) ) );
+		assertTrue( matcher.matches( asList(
+				new SwitchUserGrantedAuthority( "manage users", null ), new SimpleGrantedAuthority( "view groups" )
+		            ) )
+		);
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );
 	}
 
 	@Test
@@ -84,26 +117,42 @@ public class TestAuthorityMatcher
 				AuthorityMatcher.allOf( "view groups" )
 		);
 
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "manage users" ) ) ) );
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "view groups" ) ) ) );
-		assertTrue( matcher.matches( Arrays.asList(
-				            new SimpleGrantedAuthority( "manage users" ), new SimpleGrantedAuthority( "view groups" )
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "view groups" ) ) ) );
+		assertTrue( matcher.matches( asList(
+				new SimpleGrantedAuthority( "manage users" ), new SimpleGrantedAuthority( "view groups" )
 		            ) )
 		);
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "other perm" ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );
 	}
 
 	@Test
 	public void noneOf() {
 		AuthorityMatcher matcher = AuthorityMatcher.noneOf( "manage users", "view groups" );
 
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "manage users" ) ) ) );
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "view groups" ) ) ) );
-		assertFalse( matcher.matches( Arrays.asList(
-				             new SimpleGrantedAuthority( "manage users" ), new SimpleGrantedAuthority( "view groups" )
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "view groups" ) ) ) );
+		assertFalse( matcher.matches( asList(
+				new SimpleGrantedAuthority( "manage users" ), new SimpleGrantedAuthority( "view groups" )
 		             ) )
 		);
-		assertTrue( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "other perm" ) ) ) );
+		assertTrue( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );
+	}
+
+	@Test
+	public void noneOfWithAuthorities() {
+		AuthorityMatcher matcher = AuthorityMatcher.noneOf(
+				new SimpleGrantedAuthority( "manage users" ),
+				new SwitchUserGrantedAuthority( "view groups", null )
+		);
+
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SwitchUserGrantedAuthority( "view groups", null ) ) ) );
+		assertFalse( matcher.matches( asList(
+				new SwitchUserGrantedAuthority( "manage users", null ), new SimpleGrantedAuthority( "view groups" )
+		             ) )
+		);
+		assertTrue( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );
 	}
 
 	@Test
@@ -113,12 +162,12 @@ public class TestAuthorityMatcher
 				AuthorityMatcher.anyOf( "view groups" )
 		);
 
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "manage users" ) ) ) );
-		assertFalse( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "view groups" ) ) ) );
-		assertFalse( matcher.matches( Arrays.asList(
-				             new SimpleGrantedAuthority( "manage users" ), new SimpleGrantedAuthority( "view groups" )
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "view groups" ) ) ) );
+		assertFalse( matcher.matches( asList(
+				new SimpleGrantedAuthority( "manage users" ), new SimpleGrantedAuthority( "view groups" )
 		             ) )
 		);
-		assertTrue( matcher.matches( Arrays.asList( new SimpleGrantedAuthority( "other perm" ) ) ) );
+		assertTrue( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );
 	}
 }

@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.spring.security.authority;
 
+import com.foreach.across.modules.spring.security.AuthenticationUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -29,15 +31,10 @@ public abstract class AuthorityMatcher
 	public abstract boolean matches( Collection<? extends GrantedAuthority> authorities );
 
 	/**
-	 * Creates a matcher for authorities represented by the simple string.  Note that the equals() implementation
-	 * of the specific {@link org.springframework.security.core.GrantedAuthority} instances will determine if
-	 * these will match or not.
-	 * <p><strong>
-	 * If possible, use {@link #anyOf(org.springframework.security.core.GrantedAuthority...)} instead.
-	 * </strong></p>
+	 * Creates a matcher for authorities represented by the simple string.
 	 *
-	 * @param authorities array of authorities represented by their id
-	 * @return matcher for the colleciton passed
+	 * @param authorities array of authority strings
+	 * @return matcher for the collection passed
 	 */
 	public static AuthorityMatcher anyOf( final String... authorities ) {
 		return new AuthorityMatcher()
@@ -45,7 +42,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( String authority : authorities ) {
-					if ( actual.contains( new NamedGrantedAuthority( authority ) ) ) {
+					if ( AuthenticationUtils.hasAuthority( actual, authority ) ) {
 						return true;
 					}
 				}
@@ -54,13 +51,20 @@ public abstract class AuthorityMatcher
 		};
 	}
 
+	/**
+	 * Creates a matcher for authority instances.  Note that only the authority string -
+	 * the return value of {@link GrantedAuthority#getAuthority()} will be compared.
+	 *
+	 * @param authorities array of authority instances
+	 * @return matcher for the collection passed
+	 */
 	public static AuthorityMatcher anyOf( final GrantedAuthority... authorities ) {
 		return new AuthorityMatcher()
 		{
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( GrantedAuthority authority : authorities ) {
-					if ( actual.contains( authority ) ) {
+					if ( AuthenticationUtils.hasAuthority( actual, authority.getAuthority() ) ) {
 						return true;
 					}
 				}
@@ -85,14 +89,9 @@ public abstract class AuthorityMatcher
 	}
 
 	/**
-	 * Creates a matcher for authorities represented by the simple string.  Note that the equals() implementation
-	 * of the specific {@link org.springframework.security.core.GrantedAuthority} instances will determine if
-	 * these will match or not.
-	 * <p><strong>
-	 * If possible, use {@link #allOf(org.springframework.security.core.GrantedAuthority...)} instead.
-	 * </strong></p>
+	 * Creates a matcher for authorities represented by the simple string.
 	 *
-	 * @param authorities array of authorities represented by their id
+	 * @param authorities array of authority strings
 	 * @return matcher for the colleciton passed
 	 */
 	public static AuthorityMatcher allOf( final String... authorities ) {
@@ -101,7 +100,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( String authority : authorities ) {
-					if ( !actual.contains( new NamedGrantedAuthority( authority ) ) ) {
+					if ( !AuthenticationUtils.hasAuthority( actual, authority ) ) {
 						return false;
 					}
 				}
@@ -116,7 +115,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( GrantedAuthority authority : authorities ) {
-					if ( !actual.contains( authority ) ) {
+					if ( !AuthenticationUtils.hasAuthority( actual, authority.getAuthority() ) ) {
 						return false;
 					}
 				}
@@ -141,15 +140,10 @@ public abstract class AuthorityMatcher
 	}
 
 	/**
-	 * Creates a matcher for authorities represented by the simple string.  Note that the equals() implementation
-	 * of the specific {@link org.springframework.security.core.GrantedAuthority} instances will determine if
-	 * these will match or not.
-	 * <p><strong>
-	 * If possible, use {@link #noneOf(org.springframework.security.core.GrantedAuthority...)} instead.
-	 * </strong></p>
+	 * Creates a matcher for authorities represented by the simple string.
 	 *
-	 * @param authorities array of authorities represented by their id
-	 * @return matcher for the colleciton passed
+	 * @param authorities array of authority strings
+	 * @return matcher for the collection passed
 	 */
 	public static AuthorityMatcher noneOf( final String... authorities ) {
 		return new AuthorityMatcher()
@@ -157,7 +151,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( String authority : authorities ) {
-					if ( actual.contains( new NamedGrantedAuthority( authority ) ) ) {
+					if ( AuthenticationUtils.hasAuthority( actual, authority ) ) {
 						return false;
 					}
 				}
@@ -172,7 +166,7 @@ public abstract class AuthorityMatcher
 			@Override
 			public boolean matches( Collection<? extends GrantedAuthority> actual ) {
 				for ( GrantedAuthority authority : authorities ) {
-					if ( actual.contains( authority ) ) {
+					if ( AuthenticationUtils.hasAuthority( actual, authority.getAuthority() ) ) {
 						return false;
 					}
 				}

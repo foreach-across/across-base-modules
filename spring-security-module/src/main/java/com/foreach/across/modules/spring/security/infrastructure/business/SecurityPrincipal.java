@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.foreach.across.modules.spring.security.infrastructure.business;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -39,5 +40,6 @@ public interface SecurityPrincipal
 	 * toString() implementation to ensure maximum compatibility with
 	 * SpringSecurity.
 	 */
+	@Override
 	String toString();
 }

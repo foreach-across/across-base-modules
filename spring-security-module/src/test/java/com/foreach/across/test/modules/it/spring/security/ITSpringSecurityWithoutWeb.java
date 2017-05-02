@@ -20,9 +20,7 @@ import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
-import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
-import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalRetrievalStrategy;
-import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
+import com.foreach.across.modules.spring.security.infrastructure.services.*;
 import com.foreach.across.test.AcrossTestConfiguration;
 import org.junit.After;
 import org.junit.Test;
@@ -36,6 +34,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -53,10 +53,16 @@ public class ITSpringSecurityWithoutWeb
 	private SecurityPrincipalService securityPrincipalService;
 
 	@Autowired(required = false)
+	private SecurityPrincipalLabelResolverStrategy securityPrincipalLabelResolverStrategy;
+
+	@Autowired(required = false)
 	private CurrentSecurityPrincipalProxy currentPrincipal;
 
 	@Autowired
 	private SecurityPrincipalRetrievalStrategy principalRetrievalStrategy;
+
+	@Autowired
+	private SecurityPrincipalLabelResolver labelResolver;
 
 	@After
 	public void clearSecurityContext() {
@@ -72,6 +78,15 @@ public class ITSpringSecurityWithoutWeb
 	@Test
 	public void securityPrincipalServiceShouldExist() {
 		assertNotNull( securityPrincipalService );
+	}
+
+	@Test
+	public void securityPrincipalLabelResolverStrategyShouldExist() {
+		assertNotNull( securityPrincipalLabelResolverStrategy );
+		SecurityPrincipal principal = mock( SecurityPrincipal.class );
+		when( labelResolver.resolvePrincipalLabel( principal ) ).thenReturn( Optional.of( "test" ) );
+
+		assertEquals( "test", securityPrincipalLabelResolverStrategy.resolvePrincipalLabel( principal ) );
 	}
 
 	@Test
@@ -108,6 +123,11 @@ public class ITSpringSecurityWithoutWeb
 		@Bean
 		public SecurityPrincipalRetrievalStrategy principalRetrievalStrategy() {
 			return mock( SecurityPrincipalRetrievalStrategy.class );
+		}
+
+		@Bean
+		public SecurityPrincipalLabelResolver labelResolver() {
+			return mock( SecurityPrincipalLabelResolver.class );
 		}
 	}
 }

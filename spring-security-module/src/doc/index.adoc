@@ -1,9 +1,9 @@
 = SpringSecurityModule
 Arne Vandamme
-1.1.0.RELEASE
+2.0.0.RELEASE
 :toc: left
 :sectanchors:
-:module-version: 1.1.0.RELEASE
+:module-version: 2.0.0.RELEASE
 :module-name: SpringSecurityModule
 :module-artifact: spring-security-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/SpringSecurityModule
@@ -12,6 +12,9 @@ Arne Vandamme
 :oauth2-module-url: https://foreach.atlassian.net/wiki/display/AX/OAuth2Module
 :spring-security-acl-module-url: https://foreach.atlassian.net/wiki/display/AX/SpringSecurityAclModule
 :spring-security-url: http://projects.spring.io/spring-security/
+:javadoc: http://across.foreach.be/docs/across-standard-modules/SpringSecurityModule/2.0.0.RELEASE/javadoc
+:javadoc-securityprincipal: {javadoc}/com/foreach/across/modules/spring/security/infrastructure/business/SecurityPrincipal.html
+:javadoc-securityprincipallabelresolver: {javadoc}/com/foreach/across/modules/spring/security/infrastructure/services/SecurityPrincipalLabelResolver.html
 
 [copyright,verbatim]
 --
@@ -55,8 +58,28 @@ Module website: {module-url}
 === Module settings
 {module-name} does not have any settings.
 
+[[cache-configuration]]
+=== Cache configuration
+{module-name} uses the following caches:
+
+|===
+|Name |Description
+
+|securityPrincipalCache +
+ (`SpringSecurityModuleCache.SECURITY_PRINCIPAL`)
+|Caches `SecurityPrincipal` instances by principal name.
+Used by the default <<security-principal,`SecurityPrincipalService`>>.
+
+|===
+
 == What's new in this version?
 :numbered!:
+=== 2.0.0.RELEASE
+Requires Across 2.0.0+.
+
+* compatibility release for Spring 4.2 and Spring Security 4
+* added <<security-principal-label-resolver,`SpringSecurityLabelResolver`>> infrastructure
+
 === 1.1.0.RELEASE
 `SecurityPrincipalService#authenticate()` now returns a `Closeable` instance.
 
@@ -89,7 +112,7 @@ This will output the different configurer beans in the order they will be applie
 [[security-principal]]
 == SecurityPrincipal abstraction
 The `SpringSecurityModule` provides an additional abstraction layer on top of the standard `Authentication` in the form of the `SecurityPrincipal` interface.
-Other modules like the {user-module-url}[UserModule] and {oauth2-module-url}[OAuth2Module] provide an implementation of  the `SecurityPrincipal` concept.
+Other modules like the {user-module-url}[UserModule] and {oauth2-module-url}[OAuth2Module] provide an implementation of  the {javadoc-securityprincipal}[`SecurityPrincipal`] concept.
 
 Since `SecurityPrincipal` is a relatively straightforward interface, a principal can be pretty much anything (user, group, machine...).
 The only requirement is that every `SecurityPrincipal` has a *unique principal name* that identifies it.
@@ -107,8 +130,7 @@ Also provides some helper methods to quickly authenticate or de-authenticate a p
 | Proxies the current security principal (if there is one).
 Allows authority checking from anywhere in your code using the `hasAuthority(String)` method.
 
-The {spring-security-acl-module-url}[SpringSecurityAclModule] wires a `CurrentAclSecurityPrincipalProxy` instead that provides additional methods
-to check for ACL permissions.
+The {spring-security-acl-module-url}[SpringSecurityAclModule] wires a `CurrentAclSecurityPrincipalProxy` instead that provides additional methods to check for ACL permissions.
 
 |===
 
@@ -123,6 +145,27 @@ to check for ACL permissions.
         // do something
     }
 ----
+
+=== SecurityPrincipalRetrievalStrategy
+The default `SecurityPrincipalService` uses a backing `SecurityPrincipalRetrievalStrategy` to fetch the actual principal based on its unique name.
+If you want to define your own custom implementation you can do so by replacing the strategy implementation, see the javadoc and source code for more information.
+
+=== SecurityPrincipal caching
+The default `SecurityPrincipalService` uses the <<cache-configuration,*securityPrincipalCache*>> for retrieving principal instances.
+If the cache does not return an instance, the request is delegated to the the `SecurityPrincipalRetrievalStrategy`.
+Actually maintaining the cache however is left to the implementation providers, the default `SecurityPrincipalService` only caches `null` values (principal not found).
+Examples can be found in `SecurityPrincipal` providing modules, for example {user-module-url}[UserModule].
+
+[[security-principal-label-resolver]]
+=== SecurityPrincipalLabelResolver
+Any module can define one or more {javadoc-securityprincipallabelresolver}[`SecurityPrincipalLabelResolver`] beans.
+These are used to generate a pretty label for a given `SecurityPrincipal` instance.
+`SecurityPrincipalLabelResolver` instances are ordered and the first resolver to return a valid label will be used.
+
+`SecurityPrincipalLabelResolver` beans should not be used directly but through the exposed `SecurityPrincipalLabelResolverStrategy`.
+
+NOTE: It is a best practice to provide a `SecurityPrincipalLabelResolver` for every `SecurityPrincipal` implementation your module provides.
+The resolver beans do not need to be exposed.
 
 == AllowableActions
 `SpringSecurityModule` also provides an `AllowableActions` construct that can easily be used to define a set of actions that can be performed on an item.
