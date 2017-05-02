@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
-import org.springframework.orm.hibernate4.support.OpenSessionInViewFilter;
-import org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor;
+import org.springframework.orm.hibernate5.support.OpenSessionInViewFilter;
+import org.springframework.orm.hibernate5.support.OpenSessionInViewInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 

@@ -13,13 +13,12 @@ public abstract class AbstractHibernatePackageModule extends AcrossModule
 	private Set<HibernatePackageProvider> hibernatePackageProviders = new HashSet<>();
 
 	/**
-	 * Get the datasource associated with this module.  Will return the context datasource if none
-	 * has been set explicitly.
+	 * Get the datasource associated directly with this module.
 	 *
 	 * @return Datasource associated with this module.
 	 */
 	public DataSource getDataSource() {
-		return dataSource != null ? dataSource : getContext().getDataSource();
+		return dataSource;
 	}
 
 	/**

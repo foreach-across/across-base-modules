@@ -15,8 +15,8 @@
  */
 package com.foreach.across.modules.hibernate.config;
 
+import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
@@ -29,19 +29,17 @@ import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.cfg.Environment;
-import org.hibernate.engine.jdbc.batch.internal.BatchBuilderInitiator;
-import org.hibernate.engine.jdbc.batch.internal.FixedBatchBuilderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
+import javax.sql.DataSource;
 import java.util.Map;
 import java.util.Properties;
 
@@ -52,7 +50,6 @@ import java.util.Properties;
  * @see com.foreach.across.modules.hibernate.config.DynamicConfigurationRegistrar
  */
 @Configuration
-@AcrossEventHandler
 @Import(DynamicConfigurationRegistrar.class)
 public class HibernateConfiguration
 {
@@ -69,48 +66,24 @@ public class HibernateConfiguration
 	@Module(AcrossModule.CURRENT_MODULE)
 	private AcrossHibernateModuleSettings settings;
 
-	@Autowired
-	private org.springframework.core.env.Environment environment;
+	@Autowired(required = false)
+	@Qualifier(AcrossContext.DATASOURCE)
+	private DataSource acrossDataSource;
 
 	@Bean
 	@Exposed
 	public LocalSessionFactoryBean sessionFactory( HibernatePackage hibernatePackage ) {
-		String version = org.hibernate.Version.getVersionString();
 		Map hibernateProperties = settings.getHibernateProperties();
 
-		if ( StringUtils.startsWith( version, "4.2" ) ) {
-			if ( hibernateProperties.get( BatchBuilderInitiator.BUILDER ) != null
-					|| environment.getProperty( BatchBuilderInitiator.BUILDER ) != null ) {
-				LOG.info(
-						"Skipping workaround for https://hibernate.atlassian.net/browse/HHH-8853 because you have a custom builder" );
-			}
-			else {
-				// WORKAROUND bug: https://hibernate.atlassian.net/browse/HHH-8853
-				Object hibernateJdbcBatchSize = hibernateProperties.get( Environment.STATEMENT_BATCH_SIZE );
-
-				int batchSize = 0;
-				if ( hibernateJdbcBatchSize != null ) {
-					batchSize = hibernateJdbcBatchSize instanceof Number
-							? ( (Number) hibernateJdbcBatchSize ).intValue()
-							: Integer.valueOf( hibernateJdbcBatchSize.toString() );
-				}
-
-				LOG.info( "Enabling workaround for https://hibernate.atlassian.net/browse/HHH-8853 with batchsize: {}",
-				          batchSize );
-				FixedBatchBuilderImpl.setSize( batchSize );
-				hibernateProperties.put( "hibernate.jdbc.batch.builder", FixedBatchBuilderImpl.class.getName() );
-			}
-		}
-
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-		sessionFactory.setDataSource( module.getDataSource() );
+		sessionFactory.setDataSource( retrieveDataSource() );
 		sessionFactory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
 		sessionFactory.setMappingResources( hibernatePackage.getMappingResources() );
 
 		Map<String, String> tableAliases = hibernatePackage.getTableAliases();
 
 		if ( !tableAliases.isEmpty() ) {
-			sessionFactory.setNamingStrategy( new TableAliasNamingStrategy( tableAliases ) );
+			sessionFactory.setPhysicalNamingStrategy( new TableAliasNamingStrategy( tableAliases ) );
 		}
 
 		Properties propertiesToSet = new Properties();
@@ -119,6 +92,19 @@ public class HibernateConfiguration
 		sessionFactory.setHibernateProperties( propertiesToSet );
 
 		return sessionFactory;
+	}
+
+	private DataSource retrieveDataSource() {
+		DataSource moduleDataSource = module.getDataSource();
+
+		if ( moduleDataSource == null ) {
+			LOG.debug( "No module datasource specified - falling back to default Across datasource" );
+			module.setDataSource( acrossDataSource );
+			return acrossDataSource;
+		}
+		else {
+			return moduleDataSource;
+		}
 	}
 
 	@Bean(name = SESSION_HOLDER)

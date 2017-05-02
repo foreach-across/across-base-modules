@@ -18,7 +18,6 @@ package com.foreach.across.modules.hibernate.unitofwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
 import java.util.concurrent.Callable;
 
 /**
@@ -26,7 +25,7 @@ import java.util.concurrent.Callable;
  * to explicitly know about the sessions themselves.</p>
  * <p>A UnitOfWorkFactory can be used to determine the open session/entity manager demarcations.</p>
  *
- * @see org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor
+ * @see org.springframework.orm.hibernate5.support.OpenSessionInViewInterceptor
  * @see org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor
  */
 public interface UnitOfWorkFactory

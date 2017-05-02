@@ -16,7 +16,6 @@
 
 package com.foreach.across.modules.hibernate.config.dynamic;
 
-import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
@@ -26,13 +25,12 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * @author arne
  */
-@AcrossEventHandler
 @EnableTransactionManagement
 public class TransactionManagementConfiguration
 {

@@ -15,8 +15,8 @@
  */
 package com.foreach.across.modules.hibernate.jpa.config;
 
+import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
@@ -32,14 +32,10 @@ import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepository
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.cfg.Environment;
-import org.hibernate.ejb.AvailableSettings;
-import org.hibernate.engine.jdbc.batch.internal.BatchBuilderInitiator;
-import org.hibernate.engine.jdbc.batch.internal.FixedBatchBuilderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
@@ -63,7 +59,6 @@ import java.util.Map;
 @Configuration
 @Import({ InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class,
           DynamicConfigurationRegistrar.class })
-@AcrossEventHandler
 public class HibernateJpaConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "jpaTransactionManager";
@@ -80,15 +75,21 @@ public class HibernateJpaConfiguration
 	@Autowired
 	private HibernatePackage hibernatePackage;
 
+	@Autowired(required = false)
+	@Qualifier(AcrossContext.DATASOURCE)
+	private DataSource acrossDataSource;
+
 	@Bean(name = "entityManagerFactory")
 	@Exposed
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-		vendorAdapter.setDatabase( determineDatabase( module.getDataSource() ) );
+
+		DataSource dataSource = retrieveDataSource();
+		vendorAdapter.setDatabase( determineDatabase( dataSource ) );
 
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter( vendorAdapter );
-		factory.setDataSource( module.getDataSource() );
+		factory.setDataSource( dataSource );
 		factory.setPersistenceUnitName( settings.getPersistenceUnitName() );
 
 		String[] mappingResources = hibernatePackage.getMappingResources();
@@ -103,39 +104,29 @@ public class HibernateJpaConfiguration
 
 		if ( !tableAliases.isEmpty() ) {
 			// Create a unique naming strategy class referring to the defined table aliases
-			factory.getJpaPropertyMap().put( AvailableSettings.NAMING_STRATEGY,
+			factory.getJpaPropertyMap().put( org.hibernate.cfg.AvailableSettings.PHYSICAL_NAMING_STRATEGY,
 			                                 createTableAliasNamingStrategyClass( tableAliases ).getName() );
 		}
 
 		return factory;
 	}
 
+	private DataSource retrieveDataSource() {
+		DataSource moduleDataSource = module.getDataSource();
+
+		if ( moduleDataSource == null ) {
+			LOG.debug( "No module datasource specified - falling back to default Across datasource" );
+			module.setDataSource( acrossDataSource );
+			return acrossDataSource;
+		}
+		else {
+			return moduleDataSource;
+		}
+	}
+
 	private Map<String, String> hibernateProperties() {
-		String version = org.hibernate.Version.getVersionString();
 		Map<String, String> hibernateProperties = new HashMap<>();
 		hibernateProperties.putAll( settings.getHibernateProperties() );
-
-		if ( StringUtils.startsWith( version, "4.2" ) ) {
-			if ( hibernateProperties.get( BatchBuilderInitiator.BUILDER ) != null ) {
-				LOG.info(
-						"Skipping workaround for https://hibernate.atlassian.net/browse/HHH-8853 because you have a custom builder" );
-			}
-			else {
-				// WORKAROUND bug: https://hibernate.atlassian.net/browse/HHH-8853
-				Object hibernateJdbcBatchSize = hibernateProperties.get( Environment.STATEMENT_BATCH_SIZE );
-
-				int batchSize = 0;
-				if ( hibernateJdbcBatchSize != null ) {
-					batchSize = Integer.valueOf( hibernateJdbcBatchSize.toString() );
-				}
-
-				LOG.info( "Enabling workaround for https://hibernate.atlassian.net/browse/HHH-8853 with batchsize: {}",
-				          batchSize );
-				FixedBatchBuilderImpl.setSize( batchSize );
-				hibernateProperties.put( "hibernate.jdbc.batch.builder", FixedBatchBuilderImpl.class.getName() );
-			}
-		}
-
 		return hibernateProperties;
 	}
 

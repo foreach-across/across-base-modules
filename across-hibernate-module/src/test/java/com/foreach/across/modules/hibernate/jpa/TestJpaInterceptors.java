@@ -210,7 +210,7 @@ public class TestJpaInterceptors
 	}
 
 	@Test
-	public void nestedCreationHappensInSeparateTransaction() {
+	public void nestedCreationHappensInSameTransaction() {
 		doAnswer( invocation -> {
 			Customer customer = new Customer( "nested customer 2" );
 			customerRepository.save( customer );
@@ -236,8 +236,8 @@ public class TestJpaInterceptors
 		}
 
 		assertTrue( failed );
-		assertNotNull( clientRepository.getOne( -7777L ) );
-		assertNotNull( customerRepository.getByName( "nested customer 2" ) );
+		assertNull( clientRepository.findOne( -7777L ) );
+		assertNull( customerRepository.getByName( "nested customer 2" ) );
 	}
 
 	@Test

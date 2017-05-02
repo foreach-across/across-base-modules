@@ -27,9 +27,11 @@ public class JpaRepositoryInterceptorAdvisor extends AbstractBeanFactoryPointcut
 	/**
 	 * By default the interceptor should run within the same transaction.
 	 */
+	@SuppressWarnings("unused")
 	public static final int INTERCEPT_ORDER = TransactionManagementConfigurer.INTERCEPT_ORDER + 1;
+	private static final long serialVersionUID = 2973014201873864201L;
 
-	private final Pointcut pointcut = new JpaRepositoryPointcut();
+	private final transient Pointcut pointcut = new JpaRepositoryPointcut();
 
 	@Override
 	public Pointcut getPointcut() {

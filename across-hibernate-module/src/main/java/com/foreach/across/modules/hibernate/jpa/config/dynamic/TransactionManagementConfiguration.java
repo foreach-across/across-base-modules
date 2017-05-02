@@ -16,7 +16,6 @@
 
 package com.foreach.across.modules.hibernate.jpa.config.dynamic;
 
-import com.foreach.across.core.annotations.AcrossEventHandler;
 import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
@@ -36,7 +35,6 @@ import javax.persistence.EntityManagerFactory;
  * If the module is configured in mixed mode, with both session factory and jpa support enabled,
  * one of both transaction managers should be configured as the primary when exposed.
  */
-@AcrossEventHandler
 @EnableTransactionManagement
 public class TransactionManagementConfiguration
 {

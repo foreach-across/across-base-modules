@@ -16,10 +16,15 @@
 package com.foreach.across.modules.hibernate.jpa.aop;
 
 import com.foreach.across.modules.hibernate.aop.EntityInterceptor;
+import com.foreach.across.modules.hibernate.support.TransactionWrapper;
+import com.foreach.across.modules.hibernate.support.TransactionWrapper.InvocationCallback;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.hibernate.Hibernate;
 import org.springframework.aop.ProxyMethodInvocation;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.repository.CrudRepository;
@@ -32,38 +37,90 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
+ * Intercepts entity related methods on repository instances and executes before and after calls.
+ * These calls are executed in the same transaction as the actual repository method.  If no outer transaction
+ * is present, this interceptor should create one based on the transaction manager configured on the Spring Data
+ * JPA repositories configuration ({@link com.foreach.across.modules.hibernate.jpa.repositories.config.EnableAcrossJpaRepositories}.
+ *
  * @author Andy Somers
+ * @see com.foreach.across.modules.hibernate.jpa.repositories.config.EnableAcrossJpaRepositories
+ * @see TransactionWrapper
  */
-public abstract class AbstractCrudRepositoryInterceptor implements MethodInterceptor
+public abstract class AbstractCrudRepositoryInterceptor implements MethodInterceptor, BeanFactoryAware
 {
 	static final String SAVE = "save";
 	static final String DELETE = "delete";
 	static final String DELETE_ALL = "deleteAll";
 
 	private final Collection<EntityInterceptor> interceptors;
+	private BeanFactory beanFactory;
+	private TransactionWrapper transactionWrapper = null;
 
 	protected AbstractCrudRepositoryInterceptor( Collection<EntityInterceptor> interceptors ) {
 		this.interceptors = interceptors;
 	}
 
 	@Override
-	public Object invoke( MethodInvocation invocation ) throws Throwable {
-		Class<?> entityClass = getEntityClass( invocation );
+	public void setBeanFactory( BeanFactory beanFactory ) throws BeansException {
+		this.beanFactory = beanFactory;
+	}
 
+	/**
+	 * Set the name of the {@link org.springframework.transaction.PlatformTransactionManager} that should be used
+	 * for the transaction wrapping the intercept methods.
+	 *
+	 * @param transactionManagerName name of the transaction manager bean
+	 */
+	public void setTransactionManagerName( String transactionManagerName ) {
+		if ( transactionManagerName != null ) {
+			transactionWrapper = new TransactionWrapper();
+			transactionWrapper.setTransactionManagerBeanName( transactionManagerName );
+			transactionWrapper.setBeanFactory( beanFactory );
+			transactionWrapper.afterPropertiesSet();
+		}
+		else {
+			transactionManagerName = null;
+		}
+	}
+
+	@Override
+	public Object invoke( MethodInvocation invocation ) throws Throwable {
 		Method method = invocation.getMethod();
 		if ( JpaRepositoryPointcut.isEntityMethod( method ) ) {
-			Object[] arguments = invocation.getArguments();
-			String methodName = method.getName();
-			switch ( methodName ) {
-				case DELETE_ALL:
+			InvocationCallback<Object> handler = determineCallbackMethod( invocation );
+
+			if ( handler != null ) {
+				if ( transactionWrapper != null ) {
+					return transactionWrapper.invokeWithinTransaction( handler );
+				}
+
+				return handler.invoke();
+			}
+		}
+
+		return invocation.proceed();
+	}
+
+	protected InvocationCallback<Object> determineCallbackMethod( final MethodInvocation invocation ) {
+		Class<?> entityClass = getEntityClass( invocation );
+		Method method = invocation.getMethod();
+
+		Object[] arguments = invocation.getArguments();
+		String methodName = method.getName();
+		switch ( methodName ) {
+			case DELETE_ALL:
+				return () -> {
 					Collection<EntityInterceptor> interceptorsForDeleteAll
 							= findInterceptorsToApply( entityClass, getInterceptors() );
 					callBeforeDeleteAll( interceptorsForDeleteAll, entityClass );
 
 					Object returnValueForDeleteAll = invocation.proceed();
 					callAfterDeleteAll( interceptorsForDeleteAll, entityClass );
+
 					return returnValueForDeleteAll;
-				case DELETE:
+				};
+			case DELETE:
+				return () -> {
 					Object entityObject = arguments[0];
 
 					Class<?> targetClass = method.getParameterTypes()[0];
@@ -96,7 +153,9 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 
 						return returnValueForDelete;
 					}
-				case SAVE:
+				};
+			case SAVE:
+				return () -> {
 					Object objectToSave = arguments[0];
 					Class<?> targetClassToSave = method.getParameterTypes()[0];
 					Class<?> userClassToSave = ClassUtils.getUserClass( targetClassToSave );
@@ -156,12 +215,10 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 
 						return returnValueForSave;
 					}
-				default:
-					return handleRepositoryMethods( invocation );
-			}
+				};
+			default:
+				return null;
 		}
-
-		return invocation.proceed();
 	}
 
 	protected Class<?> getEntityClass( MethodInvocation invocation ) {
@@ -173,8 +230,6 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 		                     .upcast( CrudRepository.class ).getResolvableType().getGeneric( 0 )
 		                     .resolve();
 	}
-
-	protected abstract Object handleRepositoryMethods( MethodInvocation invocation ) throws Throwable;
 
 	@SuppressWarnings("unchecked")
 	protected Collection<EntityInterceptor> findInterceptorsToApply( Class<?> entityClass,

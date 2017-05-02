@@ -16,22 +16,28 @@
 package com.foreach.across.modules.hibernate.installers;
 
 import com.foreach.across.core.AcrossContext;
+import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.InstallerGroup;
 import com.foreach.across.core.annotations.InstallerMethod;
-import com.foreach.across.core.context.AcrossContextUtils;
-import com.foreach.across.core.context.info.AcrossContextInfo;
+import com.foreach.across.core.annotations.Module;
+import com.foreach.across.core.context.info.AcrossModuleInfo;
+import com.foreach.across.core.context.support.ModuleBeanSelectorUtils;
 import com.foreach.across.core.database.SchemaConfiguration;
 import com.foreach.across.core.installers.AcrossLiquibaseInstaller;
+import liquibase.exception.LiquibaseException;
 import liquibase.integration.spring.SpringLiquibase;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
 
 import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 /**
  * <p>
@@ -53,13 +59,18 @@ public abstract class AuditableSchemaInstaller
 	private static final Logger LOG = LoggerFactory.getLogger( AuditableSchemaInstaller.class );
 
 	@Autowired
-	private AcrossContextInfo acrossContext;
+	private ApplicationContext applicationContext;
+
+	@Autowired
+	@Module(AcrossModule.CURRENT_MODULE)
+	private AcrossModuleInfo moduleInfo;
 
 	@Autowired
 	@Qualifier(AcrossContext.INSTALLER_DATASOURCE)
 	private DataSource dataSource;
 
 	private SchemaConfiguration schemaConfiguration;
+	private String defaultSchema;
 
 	public AuditableSchemaInstaller() {
 	}
@@ -78,6 +89,25 @@ public abstract class AuditableSchemaInstaller
 		this.schemaConfiguration = schemaConfiguration;
 	}
 
+	/**
+	 * Sets the default Schema that will be used during the liquibase update
+	 * <p>
+	 * This will override the defaultSchema configured in {@link SchemaConfiguration#getDefaultSchema()}
+	 *
+	 * @param defaultSchema The default db schema name
+	 * @see liquibase.integration.spring.SpringLiquibase#setDefaultSchema(String)
+	 */
+	protected void setDefaultSchema( String defaultSchema ) {
+		this.defaultSchema = defaultSchema;
+	}
+
+	/**
+	 * @return The db schema name that will be used as default schema during the liquibase update
+	 */
+	protected String getDefaultSchema() {
+		return defaultSchema;
+	}
+
 	protected DataSource getDataSource() {
 		return dataSource;
 	}
@@ -91,23 +121,40 @@ public abstract class AuditableSchemaInstaller
 		this.dataSource = dataSource;
 	}
 
-	@InstallerMethod
-	public void install() {
-		AutowireCapableBeanFactory beanFactory = AcrossContextUtils.getBeanFactory( acrossContext.getContext() );
+	@Autowired
+	protected void setBeanFactory( ConfigurableListableBeanFactory beanFactory ) {
+		if ( schemaConfiguration == null ) {
+			Optional<SchemaConfiguration> schemaConfigurationOptional = ModuleBeanSelectorUtils
+					.selectBeanForModule( SchemaConfiguration.class, moduleInfo.getName(), beanFactory );
+			schemaConfigurationOptional.ifPresent( this::setSchemaConfiguration );
+		}
+	}
 
+	@InstallerMethod
+	public void install() throws LiquibaseException {
 		for ( String tableName : getTableNames() ) {
 			String tableNameToUse = schemaConfiguration != null
 					? schemaConfiguration.getCurrentTableName( tableName ) : tableName;
 
 			SpringLiquibase liquibase = new SpringLiquibase();
+			if ( liquibase.getResourceLoader() == null ) {
+				liquibase.setResourceLoader( applicationContext );
+			}
 			liquibase.setChangeLog( CHANGELOG );
+
+			if ( StringUtils.isNotEmpty( getDefaultSchema() ) ) {
+				liquibase.setDefaultSchema( getDefaultSchema() );
+			}
+			else if ( getSchemaConfiguration() != null ) {
+				liquibase.setDefaultSchema( getSchemaConfiguration().getDefaultSchema() );
+			}
+
 			liquibase.setDataSource( dataSource );
 			liquibase.setChangeLogParameters( Collections.singletonMap( "table.auditable_table", tableNameToUse ) );
 
 			LOG.debug( "Installing auditable columns for table {}", tableNameToUse );
 
-			beanFactory.autowireBeanProperties( liquibase, AutowireCapableBeanFactory.AUTOWIRE_NO, false );
-			beanFactory.initializeBean( liquibase, "" );
+			liquibase.afterPropertiesSet();
 		}
 	}
 }
