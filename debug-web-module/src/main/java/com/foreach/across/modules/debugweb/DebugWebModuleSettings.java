@@ -25,8 +25,13 @@ public class DebugWebModuleSettings
 {
 	public static final String DEFAULT_DASHBOARD = "/";
 
-	@SuppressWarnings( "unused" )
+	@SuppressWarnings("unused")
 	public static final String DASHBOARD_PATH = "debugWebModule.dashboard";
+
+	public static final String SECURITY_ENABLED = "debugWebModule.security.enabled";
+	public static final String SECURITY_USERNAME = "debugWebModule.security.username";
+	public static final String SECURITY_PASSWORD = "debugWebModule.security.password";
+	public static final String SECURITY_IP_ADDRESSES = "debugWebModule.security.ipAddresses";
 
 	/**
 	 * Path within the debug web context for the initial dashboard.
@@ -52,5 +57,74 @@ public class DebugWebModuleSettings
 
 	public void setRootPath( String rootPath ) {
 		this.rootPath = rootPath;
+	}
+
+	@ConfigurationProperties(prefix = "debugWebModule.security")
+	public static class SecuritySettings
+	{
+		/**
+		 * Enable Basic Authentication for debug web controllers
+		 */
+		private Boolean enabled = true;
+
+		/**
+		 * The username to use for Basic Authentication
+		 */
+		private String username = "debug";
+
+		/**
+		 * The password to use for Basic Authentication
+		 */
+		private String password;
+
+		/**
+		 * A comma separated list of IP Addresses to allow without Basic Authentication
+		 */
+		private String[] ipAddresses = new String[] { "127.0.0.0/8", "::1" };
+
+		/**
+		 * Authority that the authenticated principal should have for accessing debug web controllers.
+		 */
+		private String authority = "ROLE_DEBUG_USER";
+
+		public Boolean getEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled( Boolean enabled ) {
+			this.enabled = enabled;
+		}
+
+		public String getUsername() {
+			return username;
+		}
+
+		public void setUsername( String username ) {
+			this.username = username;
+		}
+
+		public String getPassword() {
+			return password;
+		}
+
+		public void setPassword( String password ) {
+			this.password = password;
+		}
+
+		public String[] getIpAddresses() {
+			return ipAddresses.clone();
+		}
+
+		public void setIpAddresses( String[] ipAddresses ) {
+			this.ipAddresses = ipAddresses.clone();
+		}
+
+		public String getAuthority() {
+			return authority;
+		}
+
+		public void setAuthority( String authority ) {
+			this.authority = authority;
+		}
 	}
 }

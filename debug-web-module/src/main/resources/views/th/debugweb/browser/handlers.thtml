@@ -30,20 +30,18 @@
 <div class="row" th:if="${selectedContext.enabled}">
 	<p>
 		<div class="alert alert-info">
-			<strong th:text="${eventHandlers.size()}"></strong> event handler beans found in this ApplicationContext.
+			<strong th:text="${handlerMethodsByEvent.size()}"></strong> events handled by beans in this ApplicationContext.
 		</div>
 	</p>
 
-	<div th:each="eventHandler : ${eventHandlers}">
+	<div th:each="handlersByEvent: ${handlerMethodsByEvent}">
 		<h4>
-			<span th:text="${eventHandler.name}">Event handler name</span>
-			<small th:text="${eventHandler.beanType}">type</small>
+			<span th:text="${handlersByEvent.key}">Event handler name</span>
 		</h4>
 
 		<table class="table table-condensed table-bordered table-hover">
-			<tr th:each="method : ${eventHandler.handlerMethods}">
-				<td class="col-sm-4" th:text="|${method.name}()|"></td>
-				<td class="col-sm-8" th:text="${method.parameterTypes[0].canonicalName}"></td>
+			<tr th:each="method : ${handlersByEvent.value}">
+				<td class="col-sm-12" th:text="|${method.declaringClass.name}#${method.name}()|"></td>
 			</tr>
 		</table>
 	</div>

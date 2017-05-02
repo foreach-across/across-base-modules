@@ -48,7 +48,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		properties = {
 				"my.password.value=passwordvalue",
 				"some.secret=secretvalue",
-				"custom.property=custom.value"
+				"custom.property=custom.value",
+				"debugWebModule.security.enabled=false"
 		}
 )
 public class ITDefaultMaskedProperties

@@ -50,7 +50,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 				"some.secret=secretvalue",
 				"custom.property=custom.value",
 				"debugWebModule.properties.masks=^custom.*",
-				"debugWebModule.properties.masked-properties=some.secret"
+				"debugWebModule.properties.masked-properties=some.secret",
+		        "debugWebModule.security.enabled=false"
 		}
 )
 public class ITCustomMaskedProperties

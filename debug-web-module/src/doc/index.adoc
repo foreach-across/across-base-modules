@@ -1,9 +1,9 @@
 = DebugWebModule
 Arne Vandamme
-1.0.1.RELEASE
+2.0.0.RELEASE
 :toc: left
 :sectanchors:
-:module-version: 1.0.1.RELEASE
+:module-version: 2.0.0.RELEASE
 :module-name: DebugWebModule
 :module-artifact: debug-web-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/DebugWebModule
@@ -72,10 +72,43 @@ All properties start with the *debugWebModule.* prefix.
 |Set explicit property names that should be masked.
 |
 
+|security.enabled
+|`String`
+|Should the root path be secured with Basic Authentication.
+|`true`
+
+|security.username
+|`String`
+|The username to use for Basic Authentication to access the root path. +
+Leave blank to disable the in-memory user.
+|debug
+
+|security.password
+|`String`
+|The password to use for Basic Authentication to access the root path.
+|
+
+|security.ip-addresses
+|`String`
+|The comma separated list of IP addresses that will always have access to the root path, without needing Basic Authentication.
+|
+
+|security.authority
+|`String`
+|The authority that an authenticated principal should have for accessing debug web. +
+Useful if you want to share a global security configuration.
+|ROLE_DEBUG_USER
+
 |===
 
 == What's new in this version?
 :numbered!:
+=== 2.0.0.RELEASE
+
+* *Requires Across 2.0.0.*
+* Context browser now shows event handler methods grouped by event instead of bean instance.
+* The root path is now by default secured, it can be disabled with the `debugWebModule.security.enabled=false` property.
+
 === 1.0.1.RELEASE
 
 * both root path and dashboard path are now configurable through properties
@@ -113,9 +146,14 @@ If you would like a particular controller to open you can set another relative p
 The path should not contain the root path prefix.
 
 == Securing debug web
-By default the {module-name} takes no care of securing the debug endpoints.  This is considered the responsibility of
-the application itself.  Securing can
-easily be done on a webserver level or through {spring-security-module-url}[Spring security].
+By default the {module-name} takes care of securing the debug endpoints if {spring-security-module-url}[SpringSecurityModule] is active.
+The username and password can be configured with the `debugWebModule.security.username` and `debugWebModule.security.password` property.
+A whiletist of IP addresses can be configured using the `debugWebModule.security.ip-addresses` property.
+This is a comma separated list of IP addresses or sub-nets.
+These IP addresses will *always* have access to the root path.
+
+Default security can be disabled by setting `debugWebModule.security.enabled` to `false`.
+Securing can then easily be done on a web-server level or using custom Spring security configuration.
 
 .Example securing debug web with Spring security
 [source,java,indent=0]
