@@ -21,7 +21,7 @@
 	<parent>
 		<artifactId>logging-module-project</artifactId>
 		<groupId>com.foreach.across.modules</groupId>
-		<version>1.0.1.RELEASE</version>
+		<version>1.1.0.RELEASE</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -62,13 +62,16 @@
 			<artifactId>debug-web-module</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<scope>provided</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
 		</dependency>
 	</dependencies>
 
