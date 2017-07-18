@@ -91,7 +91,7 @@ Leave blank to disable the in-memory user.
 |security.ip-addresses
 |`String`
 |The comma separated list of IP addresses that will always have access to the root path, without needing Basic Authentication.
-|
+|`127.0.0.0/8`, `::1`
 
 |security.authority
 |`String`
