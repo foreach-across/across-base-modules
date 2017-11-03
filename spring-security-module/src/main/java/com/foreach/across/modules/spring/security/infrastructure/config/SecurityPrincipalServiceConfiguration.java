@@ -18,9 +18,10 @@ package com.foreach.across.modules.spring.security.infrastructure.config;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.modules.spring.security.infrastructure.services.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.AbstractLazyCreationTargetSource;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +39,8 @@ import java.util.List;
 @Configuration
 public class SecurityPrincipalServiceConfiguration
 {
+	private static final Logger LOG = LoggerFactory.getLogger( SecurityPrincipalServiceConfiguration.class );
+
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
 
@@ -99,9 +102,13 @@ public class SecurityPrincipalServiceConfiguration
 			List beans = contextBeanRegistry.getBeansOfType( beanType, true );
 
 			if ( beans.isEmpty() ) {
-				throw new BeanCreationException(
-						"No bean of " + beanType + " found in the entire AcrossContext.  One is required before " +
-								"you can use a SecurityPrincipalService." );
+				LOG.warn(
+						"No bean of {} found in the entire AcrossContext.  One is required before you can use a SecurityPrincipalService. " +
+								"Falling back to retrieval strategy that will fail to resolve any principal.",
+						beanType
+				);
+
+				return (SecurityPrincipalRetrievalStrategy) principalName -> null;
 			}
 
 			return beans.get( 0 );

@@ -1,9 +1,9 @@
 = SpringSecurityModule
 Arne Vandamme
-2.0.0.RELEASE
+2.0.1-SNAPSHOT
 :toc: left
 :sectanchors:
-:module-version: 2.0.0.RELEASE
+:module-version: 2.0.1-SNAPSHOT
 :module-name: SpringSecurityModule
 :module-artifact: spring-security-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/SpringSecurityModule
@@ -12,7 +12,7 @@ Arne Vandamme
 :oauth2-module-url: https://foreach.atlassian.net/wiki/display/AX/OAuth2Module
 :spring-security-acl-module-url: https://foreach.atlassian.net/wiki/display/AX/SpringSecurityAclModule
 :spring-security-url: http://projects.spring.io/spring-security/
-:javadoc: http://across.foreach.be/docs/across-standard-modules/SpringSecurityModule/2.0.0.RELEASE/javadoc
+:javadoc: http://across.foreach.be/docs/across-standard-modules/SpringSecurityModule/2.0.1-SNAPSHOT/javadoc
 :javadoc-securityprincipal: {javadoc}/com/foreach/across/modules/spring/security/infrastructure/business/SecurityPrincipal.html
 :javadoc-securityprincipallabelresolver: {javadoc}/com/foreach/across/modules/spring/security/infrastructure/services/SecurityPrincipalLabelResolver.html
 
