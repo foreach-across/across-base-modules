@@ -1,9 +1,9 @@
 = AcrossHibernateJpaModule
 Arne Vandamme
-2.0.1.RELEASE
+3.0.0-SNAPSHOT
 :toc: left
 :sectanchors:
-:module-version: 2.0.1.RELEASE
+:module-version: 3.0.0-SNAPSHOT
 :module-name: AcrossHibernateJpaModule
 :module-artifact: across-hibernate-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/AcrossHibernateModule
@@ -88,6 +88,9 @@ All properties start with the acrossHibernate. prefix
 
 == What's new in this version?
 :numbered!:
+
+=== 3.0.0-SNAPSHOT
+* fix compatibility with Spring Data which changes the signature of `JpaRepositoryFactoryBean`
 
 === 2.0.1.RELEASE
 * fix Spring Boot relaxed binding support for *acrossHibernate.* properties
