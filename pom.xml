@@ -98,4 +98,12 @@
 		<url>https://bitbucket.org/beforeach/across-hibernate-module</url>
 	</scm>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>LATEST</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 </project>

@@ -16,6 +16,8 @@
 package com.foreach.across.modules.hibernate;
 
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.Ordered;
 
@@ -60,6 +62,13 @@ public class AcrossHibernateModuleSettings
 	 * Should common Repository implementations in modules automatically be intercepted.
 	 */
 	private boolean registerRepositoryInterceptor = true;
+
+	/**
+	 * Should the dynamic application module be scanned automatically for entities.
+	 */
+	@Getter
+	@Setter
+	private boolean autoScanApplicationModule = false;
 
 	public void setHibernateProperties( Map<String, String> hibernateProperties ) {
 		this.hibernateProperties = hibernateProperties;

@@ -16,7 +16,6 @@
 
 package com.foreach.across.modules.hibernate.config.dynamic;
 
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
@@ -25,6 +24,7 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -42,7 +42,7 @@ public class TransactionManagementConfiguration
 		return new HibernateTransactionManager( sessionFactory );
 	}
 
-	@Event
+	@EventListener
 	@SuppressWarnings("unused")
 	protected void registerClientModuleTransactionSupport( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
 		LOG.trace( "Enabling @Transaction support in module {}",

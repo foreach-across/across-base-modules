@@ -17,13 +17,13 @@ package com.foreach.across.modules.hibernate.config;
 
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.hibernate.AcrossHibernateModule;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
+import com.foreach.across.modules.hibernate.jpa.config.JpaModulePropertiesRegistrar;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.event.EventListener;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
@@ -50,7 +51,7 @@ import java.util.Properties;
  * @see com.foreach.across.modules.hibernate.config.DynamicConfigurationRegistrar
  */
 @Configuration
-@Import(DynamicConfigurationRegistrar.class)
+@Import({ JpaModulePropertiesRegistrar.class, DynamicConfigurationRegistrar.class, HibernatePackageBuilder.class })
 public class HibernateConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "transactionManager";
@@ -119,7 +120,7 @@ public class HibernateConfiguration
 		return new PersistenceExceptionTranslationPostProcessor();
 	}
 
-	@Event
+	@EventListener
 	@SuppressWarnings("unused")
 	protected void registerClientModuleRepositoryInterceptors( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
 		if ( settings.isRegisterRepositoryInterceptor() ) {

@@ -16,8 +16,8 @@
 
 package com.foreach.across.modules.hibernate;
 
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Installer;
+import com.foreach.across.core.events.AcrossLifecycleListener;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.core.installers.InstallerPhase;
 import com.foreach.across.modules.hibernate.installers.AuditableSchemaInstaller;
@@ -51,7 +51,7 @@ public class TestAuditableSchemaInstaller
 	private DataSource dataSource;
 
 	@Test
-	public void auditableInstallerRunsOnAcrossModulesTable() throws Exception {
+	public void auditableInstallerRunsOnAcrossModulesTable() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate( dataSource );
 		List<String> items = jdbcTemplate.query( "SELECT * FROM ACROSSMODULES", ( rs, rowNum ) -> {
 			assertEquals( null, rs.getString( "created_by" ) );
@@ -62,16 +62,18 @@ public class TestAuditableSchemaInstaller
 		} );
 		assertNotNull( items );
 		assertTrue( items.contains( "Across" ) );
-		assertTrue( items.contains( "AcrossHibernateModule" ) );
+		assertTrue( items.contains( AcrossHibernateModule.NAME ) );
 	}
 
 	@Configuration
 	@AcrossTestConfiguration(modules = AcrossHibernateModule.NAME)
-	protected static class Config
+	protected static class Config implements AcrossLifecycleListener
 	{
-		@Event
-		public void afterBootstratp( AcrossModuleBeforeBootstrapEvent event ) {
-			event.getModule().getBootstrapConfiguration().getInstallers().add( CustomAuditableInstaller.class );
+		@Override
+		public void onAcrossModuleBeforeBootstrapEvent( AcrossModuleBeforeBootstrapEvent event ) {
+			if ( AcrossHibernateModule.NAME.equals( event.getModule().getName() ) ) {
+				event.getModule().getBootstrapConfiguration().getInstallers().add( CustomAuditableInstaller.class );
+			}
 		}
 	}
 

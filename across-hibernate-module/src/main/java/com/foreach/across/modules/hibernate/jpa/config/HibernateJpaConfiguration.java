@@ -17,7 +17,7 @@ package com.foreach.across.modules.hibernate.jpa.config;
 
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.Event;
+import com.foreach.across.core.DynamicAcrossModule;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
@@ -27,6 +27,7 @@ import com.foreach.across.modules.hibernate.config.HibernatePackageBuilder;
 import com.foreach.across.modules.hibernate.config.InterceptorRegistryConfiguration;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
+import com.foreach.across.modules.hibernate.jpa.config.dynamic.JpaRepositoriesRegistrar;
 import com.foreach.across.modules.hibernate.jpa.services.JpaHibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
@@ -42,6 +43,7 @@ import org.springframework.cglib.proxy.NoOp;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.event.EventListener;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -57,8 +59,7 @@ import java.util.Map;
  * @see com.foreach.across.modules.hibernate.config.DynamicConfigurationRegistrar
  */
 @Configuration
-@Import({ InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class,
-          DynamicConfigurationRegistrar.class })
+@Import({ JpaModulePropertiesRegistrar.class, InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class, DynamicConfigurationRegistrar.class })
 public class HibernateJpaConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "jpaTransactionManager";
@@ -153,7 +154,7 @@ public class HibernateJpaConfiguration
 		return new JpaHibernateSessionHolderImpl();
 	}
 
-	@Event
+	@EventListener
 	@SuppressWarnings("unused")
 	public void registerClientModuleRepositoryInterceptors( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
 		if ( settings.isRegisterRepositoryInterceptor() ) {
@@ -162,6 +163,11 @@ public class HibernateJpaConfiguration
 			beforeBootstrapEvent.addApplicationContextConfigurers(
 					new AnnotatedClassConfigurer( ModuleBasicRepositoryInterceptorConfiguration.class )
 			);
+		}
+
+		// todo: use across jpa repositories
+		if ( beforeBootstrapEvent.getModule().getModule() instanceof DynamicAcrossModule.DynamicApplicationModule ) {
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( JpaRepositoriesRegistrar.class );
 		}
 	}
 

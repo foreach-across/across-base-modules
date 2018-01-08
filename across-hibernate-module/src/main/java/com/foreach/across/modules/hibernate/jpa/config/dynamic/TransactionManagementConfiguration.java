@@ -16,17 +16,19 @@
 
 package com.foreach.across.modules.hibernate.jpa.config.dynamic;
 
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
+import com.foreach.across.modules.hibernate.jpa.config.JpaModuleProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -42,11 +44,19 @@ public class TransactionManagementConfiguration
 
 	@Bean(name = HibernateJpaConfiguration.TRANSACTION_MANAGER)
 	@Exposed
-	public PlatformTransactionManager jpaTransactionManager( EntityManagerFactory entityManagerFactory ) {
-		return new JpaTransactionManager( entityManagerFactory );
+	public PlatformTransactionManager jpaTransactionManager( EntityManagerFactory entityManagerFactory, JpaModuleProperties jpaModuleProperties ) {
+		final JpaTransactionManager transactionManager = new JpaTransactionManager( entityManagerFactory );
+		jpaModuleProperties.getTransactionProperties().customize( transactionManager );
+		return transactionManager;
 	}
 
-	@Event
+	@Bean
+	@Exposed
+	public TransactionTemplate jpaTransactionTemplate( PlatformTransactionManager jpaTransactionManager ) {
+		return new TransactionTemplate( jpaTransactionManager );
+	}
+
+	@EventListener
 	@SuppressWarnings("unused")
 	protected void registerClientModuleTransactionSupport( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
 		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );

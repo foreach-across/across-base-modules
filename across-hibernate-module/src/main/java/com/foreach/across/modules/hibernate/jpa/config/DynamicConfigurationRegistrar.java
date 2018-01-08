@@ -22,6 +22,9 @@ import com.foreach.across.modules.hibernate.jpa.config.dynamic.PersistenceContex
 import com.foreach.across.modules.hibernate.jpa.config.dynamic.PersistenceContextInViewConfiguration.OpenEntityManagerInViewInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.jpa.config.dynamic.TransactionManagementConfiguration;
 import com.foreach.across.modules.hibernate.jpa.config.dynamic.UnitOfWorkConfiguration;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportSelector;
@@ -42,13 +45,18 @@ import static com.foreach.across.modules.hibernate.config.DynamicConfigurationRe
  * The use of the registrar allows additional modules to extend
  * {@link com.foreach.across.modules.hibernate.AbstractHibernatePackageModule} and have the optional configuration work.
  */
-public class DynamicConfigurationRegistrar implements ImportSelector, EnvironmentAware
+public class DynamicConfigurationRegistrar implements ImportSelector, EnvironmentAware, BeanFactoryAware
 {
-
 	private Environment environment;
+	private BeanFactory beanFactory;
 
 	public void setEnvironment( Environment environment ) {
 		this.environment = environment;
+	}
+
+	@Override
+	public void setBeanFactory( BeanFactory beanFactory ) throws BeansException {
+		this.beanFactory = beanFactory;
 	}
 
 	@Override

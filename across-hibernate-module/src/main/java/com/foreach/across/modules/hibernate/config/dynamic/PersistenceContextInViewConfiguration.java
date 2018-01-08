@@ -17,7 +17,7 @@
 package com.foreach.across.modules.hibernate.config.dynamic;
 
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
@@ -42,7 +42,7 @@ public class PersistenceContextInViewConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger( PersistenceContextInViewConfiguration.class );
 
-	@AcrossDepends(required = "AcrossWebModule")
+	@ConditionalOnAcrossModule(allOf = "AcrossWebModule")
 	public static class OpenSessionFactoryInViewFilterConfiguration extends AcrossWebDynamicServletConfigurer
 	{
 		@Autowired
@@ -86,7 +86,7 @@ public class PersistenceContextInViewConfiguration
 		}
 	}
 
-	@AcrossDepends(required = "AcrossWebModule")
+	@ConditionalOnAcrossModule(allOf = "AcrossWebModule")
 	public static class OpenSessionFactoryInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
 	{
 		@Autowired

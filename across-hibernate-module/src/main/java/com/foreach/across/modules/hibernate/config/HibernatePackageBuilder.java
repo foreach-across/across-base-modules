@@ -17,9 +17,12 @@
 package com.foreach.across.modules.hibernate.config;
 
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.DynamicAcrossModule;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.info.AcrossContextInfo;
+import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.modules.hibernate.AbstractHibernatePackageModule;
+import com.foreach.across.modules.hibernate.jpa.config.JpaModuleProperties;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageConfigurer;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -31,17 +34,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Responsible for building the resources that should be mapped to the entity manager.
+ *
  * @author Arne Vandamme
  */
 @Configuration
 public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackage>
 {
-	@Autowired
-	private AcrossContextInfo context;
+	private final AcrossContextInfo contextInfo;
+	private final AbstractHibernatePackageModule currentModule;
+	private final JpaModuleProperties jpaModuleProperties;
 
 	@Autowired
-	@Module(AcrossModule.CURRENT_MODULE)
-	private AbstractHibernatePackageModule currentModule;
+	public HibernatePackageBuilder( AcrossContextInfo contextInfo,
+	                                @Module(AcrossModule.CURRENT_MODULE) AbstractHibernatePackageModule currentModule,
+	                                JpaModuleProperties jpaModuleProperties ) {
+		this.contextInfo = contextInfo;
+		this.currentModule = currentModule;
+		this.jpaModuleProperties = jpaModuleProperties;
+	}
 
 	@Override
 	public Class<?> getObjectType() {
@@ -49,7 +60,7 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 	}
 
 	@Override
-	protected HibernatePackage createInstance() throws Exception {
+	protected HibernatePackage createInstance() {
 		HibernatePackage hibernatePackage = new HibernatePackage( currentModule.getName() );
 
 		currentModule.getHibernatePackageProviders().forEach( hibernatePackage::add );
@@ -57,10 +68,10 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 		if ( currentModule.isScanForHibernatePackages() ) {
 			Set<HibernatePackageConfigurer> configurers = new HashSet<>();
 
-			context.getModules().stream()
-			       .filter( acrossModuleInfo -> acrossModuleInfo.getModule() instanceof HibernatePackageConfigurer )
-			       .forEach( acrossModuleInfo -> configurers.add(
-					       (HibernatePackageConfigurer) acrossModuleInfo.getModule() ) );
+			contextInfo.getModules().stream()
+			           .filter( acrossModuleInfo -> acrossModuleInfo.getModule() instanceof HibernatePackageConfigurer )
+			           .forEach( acrossModuleInfo -> configurers.add(
+					           (HibernatePackageConfigurer) acrossModuleInfo.getModule() ) );
 
 			( (ListableBeanFactory) getBeanFactory() )
 					.getBeansOfType( HibernatePackageConfigurer.class )
@@ -69,6 +80,19 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 			configurers.forEach( c -> c.configureHibernatePackage( hibernatePackage ) );
 		}
 
+		registerDynamicApplicationPackage( hibernatePackage );
+
 		return hibernatePackage;
+	}
+
+	private void registerDynamicApplicationPackage( HibernatePackage hibernatePackage ) {
+		contextInfo.getModules()
+		           .stream()
+		           .map( AcrossModuleInfo::getModule )
+		           .filter( DynamicAcrossModule.DynamicApplicationModule.class::isInstance )
+		           .map( DynamicAcrossModule.DynamicApplicationModule.class::cast )
+		           .findFirst()
+		           .ifPresent( module -> hibernatePackage.addPackageToScan( module.getBasePackage() ) );
+
 	}
 }
