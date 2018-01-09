@@ -14,38 +14,21 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.spring.security.test.application;
+package com.foreach.across.test.modules.it.spring.security.application.application.config;
 
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Steven Gentens
- * @since 3.0.0-SNAPSHOT
+ * @since 3.0.0
  */
-@Component
-public class CustomSpringSecurityWebConfigurer implements SpringSecurityWebConfigurer
+@Configuration
+public class SpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
 {
 	@Override
-	public boolean isDisableDefaults() {
-		return false;
-	}
-
-	@Override
-	public void configure( AuthenticationManagerBuilder auth ) throws Exception {
-
-	}
-
-	@Override
-	public void configure( WebSecurity web ) throws Exception {
-
-	}
-
-	@Override
 	public void configure( HttpSecurity http ) throws Exception {
-
+		http.antMatcher( "/bla" ).authorizeRequests().anyRequest().denyAll();
 	}
 }

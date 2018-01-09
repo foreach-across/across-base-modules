@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.spring.security.test;
+package com.foreach.across.test.modules.it.spring.security.application;
 
 import com.foreach.across.config.AcrossApplication;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
@@ -31,7 +31,7 @@ import javax.sql.DataSource;
  * @since 3.0.0-SNAPSHOT
  */
 @AcrossApplication(modules = { AcrossWebModule.NAME, SpringSecurityModule.NAME })
-public class SpringSecurityApplication
+public class SpringSecurityTestApplication
 {
 	@Bean
 	public DataSource acrossDataSource() {
@@ -39,6 +39,6 @@ public class SpringSecurityApplication
 	}
 
 	public static void main( String args[] ) {
-		SpringApplication.run( SpringSecurityApplication.class, args );
+		SpringApplication.run( SpringSecurityTestApplication.class, args );
 	}
 }

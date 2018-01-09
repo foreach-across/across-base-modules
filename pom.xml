@@ -65,7 +65,6 @@
 
     <modules>
         <module>spring-security-module</module>
-        <module>spring-security-module-test-website</module>
     </modules>
 
     <dependencyManagement>
