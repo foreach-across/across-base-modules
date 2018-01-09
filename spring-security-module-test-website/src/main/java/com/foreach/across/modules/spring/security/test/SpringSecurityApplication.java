@@ -17,8 +17,6 @@
 package com.foreach.across.modules.spring.security.test;
 
 import com.foreach.across.config.AcrossApplication;
-import com.foreach.across.modules.adminweb.AdminWebModule;
-import com.foreach.across.modules.oauth2.OAuth2Module;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.modules.web.AcrossWebModule;
 import org.springframework.boot.SpringApplication;
@@ -30,9 +28,9 @@ import javax.sql.DataSource;
 
 /**
  * @author Steven Gentens
- * @since 2.0.2-SNAPSHOT
+ * @since 3.0.0-SNAPSHOT
  */
-@AcrossApplication(modules = { AcrossWebModule.NAME, SpringSecurityModule.NAME, /*OAuth2Module.NAME,*/ AdminWebModule.NAME })
+@AcrossApplication(modules = { AcrossWebModule.NAME, SpringSecurityModule.NAME })
 public class SpringSecurityApplication
 {
 	@Bean
