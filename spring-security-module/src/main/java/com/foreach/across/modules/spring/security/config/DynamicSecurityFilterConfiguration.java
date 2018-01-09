@@ -22,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Conventions;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
@@ -40,6 +42,7 @@ import java.util.Set;
  */
 @Configuration
 @AcrossDepends(required = "AcrossWebModule")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class DynamicSecurityFilterConfiguration extends AcrossWebDynamicServletConfigurer
 {
 	private static final Logger LOG = LoggerFactory.getLogger( DynamicSecurityFilterConfiguration.class );
@@ -160,8 +163,9 @@ public class DynamicSecurityFilterConfiguration extends AcrossWebDynamicServletC
 	                             Filter filter ) {
 		FilterRegistration.Dynamic registration = servletContext.addFilter( filterName, filter );
 		if ( registration == null ) {
-			throw new IllegalStateException(
-					"Duplicate Filter registration for '" + filterName + "'. Check to ensure the Filter is only configured once." );
+			return;
+			//throw new IllegalStateException(
+			//		"Duplicate Filter registration for '" + filterName + "'. Check to ensure the Filter is only configured once." );
 		}
 		registration.setAsyncSupported( isAsyncSecuritySupported() );
 		EnumSet<DispatcherType> dispatcherTypes = getSecurityDispatcherTypes();
