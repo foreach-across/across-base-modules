@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.hibernate.jpa.config.dynamic;
+package com.foreach.across.modules.hibernate.jpa.config;
 
 import com.foreach.across.core.annotations.Exposed;
-import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
-import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
-import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
-import com.foreach.across.modules.hibernate.jpa.config.JpaModuleProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
+import com.foreach.across.modules.hibernate.modules.config.EnableTransactionManagementConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.EventListener;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -37,16 +33,15 @@ import javax.persistence.EntityManagerFactory;
  * If the module is configured in mixed mode, with both session factory and jpa support enabled,
  * one of both transaction managers should be configured as the primary when exposed.
  */
-@EnableTransactionManagement
+@Configuration
+@EnableTransactionManagement(order = EnableTransactionManagementConfiguration.INTERCEPT_ORDER)
 public class TransactionManagementConfiguration
 {
-	private static final Logger LOG = LoggerFactory.getLogger( TransactionManagementConfiguration.class );
-
 	@Bean(name = HibernateJpaConfiguration.TRANSACTION_MANAGER)
 	@Exposed
-	public PlatformTransactionManager jpaTransactionManager( EntityManagerFactory entityManagerFactory, JpaModuleProperties jpaModuleProperties ) {
+	public PlatformTransactionManager jpaTransactionManager( EntityManagerFactory entityManagerFactory, AcrossHibernateModuleSettings moduleSettings ) {
 		final JpaTransactionManager transactionManager = new JpaTransactionManager( entityManagerFactory );
-		jpaModuleProperties.getTransactionProperties().customize( transactionManager );
+		moduleSettings.getTransactionProperties().customize( transactionManager );
 		return transactionManager;
 	}
 
@@ -54,12 +49,5 @@ public class TransactionManagementConfiguration
 	@Exposed
 	public TransactionTemplate jpaTransactionTemplate( PlatformTransactionManager jpaTransactionManager ) {
 		return new TransactionTemplate( jpaTransactionManager );
-	}
-
-	@EventListener
-	@SuppressWarnings("unused")
-	protected void registerClientModuleTransactionSupport( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
-		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );
-		beforeBootstrapEvent.addApplicationContextConfigurers( new TransactionManagementConfigurer() );
 	}
 }

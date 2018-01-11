@@ -20,7 +20,6 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.DynamicAcrossModule;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
-import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.database.DatabaseInfo;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.hibernate.config.HibernatePackageBuilder;
@@ -29,14 +28,18 @@ import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
 import com.foreach.across.modules.hibernate.jpa.config.dynamic.JpaRepositoriesRegistrar;
 import com.foreach.across.modules.hibernate.jpa.services.JpaHibernateSessionHolderImpl;
+import com.foreach.across.modules.hibernate.jpa.unitofwork.JpaUnitOfWorkFactoryImpl;
+import com.foreach.across.modules.hibernate.modules.config.EnableTransactionManagementConfiguration;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
+import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
@@ -48,18 +51,19 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 /**
  * Configures a JPA EntityManagerFactory.
  *
  * @see com.foreach.across.modules.hibernate.config.HibernateConfiguration
- * @see com.foreach.across.modules.hibernate.config.DynamicConfigurationRegistrar
+ * @see com.foreach.across.modules.hibernate.jpa.config.JpaModuleSettingsRegistrar
  */
 @Configuration
-@Import({ JpaModulePropertiesRegistrar.class, InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class, DynamicConfigurationRegistrar.class })
+@Import({ JpaModuleSettingsRegistrar.class, InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class })
 public class HibernateJpaConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "jpaTransactionManager";
@@ -98,8 +102,7 @@ public class HibernateJpaConfiguration
 			factory.setMappingResources( hibernatePackage.getMappingResources() );
 		}
 		factory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
-
-		factory.getJpaPropertyMap().putAll( hibernateProperties() );
+		factory.getJpaPropertyMap().putAll( settings.getHibernateProperties( dataSource ) );
 
 		Map<String, String> tableAliases = hibernatePackage.getTableAliases();
 
@@ -125,12 +128,6 @@ public class HibernateJpaConfiguration
 		}
 	}
 
-	private Map<String, String> hibernateProperties() {
-		Map<String, String> hibernateProperties = new HashMap<>();
-		hibernateProperties.putAll( settings.getHibernateProperties() );
-		return hibernateProperties;
-	}
-
 	private Class createTableAliasNamingStrategyClass( Map<String, String> tableAliases ) {
 		InterfaceMaker interfaceMaker = new InterfaceMaker();
 		Class dynamicInterface = interfaceMaker.create();
@@ -154,21 +151,29 @@ public class HibernateJpaConfiguration
 		return new JpaHibernateSessionHolderImpl();
 	}
 
+	@Bean
+	@Exposed
+	@ConditionalOnExpression("@moduleSettings.createUnitOfWorkFactory")
+	public UnitOfWorkFactory unitOfWork( EntityManagerFactory entityManagerFactory ) {
+		return new JpaUnitOfWorkFactoryImpl( Collections.singleton( entityManagerFactory ) );
+	}
+
 	@EventListener
 	@SuppressWarnings("unused")
 	public void registerClientModuleRepositoryInterceptors( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
 		if ( settings.isRegisterRepositoryInterceptor() ) {
 			LOG.trace( "Enabling BasicRepository EntityInterceptor support in module {}",
 			           beforeBootstrapEvent.getModule().getName() );
-			beforeBootstrapEvent.addApplicationContextConfigurers(
-					new AnnotatedClassConfigurer( ModuleBasicRepositoryInterceptorConfiguration.class )
-			);
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ModuleBasicRepositoryInterceptorConfiguration.class );
 		}
 
 		// todo: use across jpa repositories
 		if ( beforeBootstrapEvent.getModule().getModule() instanceof DynamicAcrossModule.DynamicApplicationModule ) {
-			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( JpaRepositoriesRegistrar.class );
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, JpaRepositoriesRegistrar.class );
 		}
+
+		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );
+		beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, EnableTransactionManagementConfiguration.class );
 	}
 
 	private Database determineDatabase( DataSource dataSource ) {

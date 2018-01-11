@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.hibernate.jpa.config.dynamic;
+package com.foreach.across.modules.hibernate.extensions;
 
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
@@ -24,7 +24,9 @@ import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
@@ -38,11 +40,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.util.EnumSet;
 
-public class PersistenceContextInViewConfiguration
+@ConditionalOnAcrossModule("AcrossWebModule")
+public class JpaPersistenceContextInViewConfiguration
 {
-	private static final Logger LOG = LoggerFactory.getLogger( PersistenceContextInViewConfiguration.class );
+	private static final Logger LOG = LoggerFactory.getLogger( JpaPersistenceContextInViewConfiguration.class );
 
-	@ConditionalOnAcrossModule(allOf = "AcrossWebModule")
+	@Configuration
+	@ConditionalOnExpression("@moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'FILTER'")
 	public static class OpenEntityManagerInViewFilterConfiguration extends AcrossWebDynamicServletConfigurer
 	{
 		@Autowired
@@ -86,7 +90,8 @@ public class PersistenceContextInViewConfiguration
 		}
 	}
 
-	@ConditionalOnAcrossModule(allOf = "AcrossWebModule")
+	@Configuration
+	@ConditionalOnExpression("@moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'INTERCEPTOR'")
 	public static class OpenEntityManagerInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
 	{
 		@Autowired

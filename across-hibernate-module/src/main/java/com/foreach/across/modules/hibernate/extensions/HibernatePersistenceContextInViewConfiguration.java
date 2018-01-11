@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.hibernate.config.dynamic;
+package com.foreach.across.modules.hibernate.extensions;
 
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
@@ -25,7 +25,9 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.orm.hibernate5.support.OpenSessionInViewFilter;
 import org.springframework.orm.hibernate5.support.OpenSessionInViewInterceptor;
@@ -38,11 +40,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.util.EnumSet;
 
-public class PersistenceContextInViewConfiguration
+@ConditionalOnAcrossModule("AcrossWebModule")
+public class HibernatePersistenceContextInViewConfiguration
 {
-	private static final Logger LOG = LoggerFactory.getLogger( PersistenceContextInViewConfiguration.class );
+	private static final Logger LOG = LoggerFactory.getLogger( HibernatePersistenceContextInViewConfiguration.class );
 
-	@ConditionalOnAcrossModule(allOf = "AcrossWebModule")
+	@Configuration
+	@ConditionalOnExpression("@moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'FILTER'")
 	public static class OpenSessionFactoryInViewFilterConfiguration extends AcrossWebDynamicServletConfigurer
 	{
 		@Autowired
@@ -86,7 +90,8 @@ public class PersistenceContextInViewConfiguration
 		}
 	}
 
-	@ConditionalOnAcrossModule(allOf = "AcrossWebModule")
+	@Configuration
+	@ConditionalOnExpression("@moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'INTERCEPTOR'")
 	public static class OpenSessionFactoryInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
 	{
 		@Autowired

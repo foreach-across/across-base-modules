@@ -19,20 +19,23 @@ import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
-import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.hibernate.AcrossHibernateModule;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
-import com.foreach.across.modules.hibernate.jpa.config.JpaModulePropertiesRegistrar;
+import com.foreach.across.modules.hibernate.modules.config.EnableTransactionManagementConfiguration;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
+import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
+import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactoryImpl;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -41,6 +44,7 @@ import org.springframework.dao.annotation.PersistenceExceptionTranslationPostPro
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 
@@ -48,10 +52,10 @@ import java.util.Properties;
  * Configures a standard SessionFactory.
  *
  * @see com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration
- * @see com.foreach.across.modules.hibernate.config.DynamicConfigurationRegistrar
+ * @see com.foreach.across.modules.hibernate.config.ModuleSettingsRegistrar
  */
 @Configuration
-@Import({ JpaModulePropertiesRegistrar.class, DynamicConfigurationRegistrar.class, HibernatePackageBuilder.class })
+@Import({ ModuleSettingsRegistrar.class, HibernatePackageBuilder.class })
 public class HibernateConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "transactionManager";
@@ -74,10 +78,9 @@ public class HibernateConfiguration
 	@Bean
 	@Exposed
 	public LocalSessionFactoryBean sessionFactory( HibernatePackage hibernatePackage ) {
-		Map hibernateProperties = settings.getHibernateProperties();
-
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-		sessionFactory.setDataSource( retrieveDataSource() );
+		final DataSource dataSource = retrieveDataSource();
+		sessionFactory.setDataSource( dataSource );
 		sessionFactory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
 		sessionFactory.setMappingResources( hibernatePackage.getMappingResources() );
 
@@ -88,7 +91,7 @@ public class HibernateConfiguration
 		}
 
 		Properties propertiesToSet = new Properties();
-		propertiesToSet.putAll( hibernateProperties );
+		propertiesToSet.putAll( settings.getHibernateProperties( dataSource ) );
 
 		sessionFactory.setHibernateProperties( propertiesToSet );
 
@@ -114,6 +117,13 @@ public class HibernateConfiguration
 		return new HibernateSessionHolderImpl();
 	}
 
+	@ConditionalOnExpression("@moduleSettings.createUnitOfWorkFactory")
+	@Bean
+	@Exposed
+	public UnitOfWorkFactory unitOfWork( SessionFactory sessionFactory ) {
+		return new UnitOfWorkFactoryImpl( Collections.singleton( sessionFactory ) );
+	}
+
 	@Bean
 	@Exposed
 	public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
@@ -126,9 +136,10 @@ public class HibernateConfiguration
 		if ( settings.isRegisterRepositoryInterceptor() ) {
 			LOG.trace( "Enabling BasicRepositoryInterceptor support in module {}",
 			           beforeBootstrapEvent.getModule().getName() );
-			beforeBootstrapEvent.addApplicationContextConfigurers(
-					new AnnotatedClassConfigurer( ModuleBasicRepositoryInterceptorConfiguration.class )
-			);
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ModuleBasicRepositoryInterceptorConfiguration.class );
 		}
+
+		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );
+		beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, EnableTransactionManagementConfiguration.class );
 	}
 }

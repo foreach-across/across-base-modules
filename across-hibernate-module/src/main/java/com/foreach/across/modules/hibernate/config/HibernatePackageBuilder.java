@@ -22,7 +22,7 @@ import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.modules.hibernate.AbstractHibernatePackageModule;
-import com.foreach.across.modules.hibernate.jpa.config.JpaModuleProperties;
+import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageConfigurer;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -43,15 +43,15 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 {
 	private final AcrossContextInfo contextInfo;
 	private final AbstractHibernatePackageModule currentModule;
-	private final JpaModuleProperties jpaModuleProperties;
+	private final AcrossHibernateModuleSettings moduleSettings;
 
 	@Autowired
 	public HibernatePackageBuilder( AcrossContextInfo contextInfo,
 	                                @Module(AcrossModule.CURRENT_MODULE) AbstractHibernatePackageModule currentModule,
-	                                JpaModuleProperties jpaModuleProperties ) {
+	                                AcrossHibernateModuleSettings moduleSettings ) {
 		this.contextInfo = contextInfo;
 		this.currentModule = currentModule;
-		this.jpaModuleProperties = jpaModuleProperties;
+		this.moduleSettings = moduleSettings;
 	}
 
 	@Override
@@ -73,6 +73,7 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 			           .forEach( acrossModuleInfo -> configurers.add(
 					           (HibernatePackageConfigurer) acrossModuleInfo.getModule() ) );
 
+			// get HibernatePackageConfigurer registered inside the current module only
 			( (ListableBeanFactory) getBeanFactory() )
 					.getBeansOfType( HibernatePackageConfigurer.class )
 					.forEach( ( name, configurer ) -> configurers.add( configurer ) );
@@ -80,12 +81,15 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 			configurers.forEach( c -> c.configureHibernatePackage( hibernatePackage ) );
 		}
 
-		registerDynamicApplicationPackage( hibernatePackage );
+		if ( moduleSettings.getApplicationModule().isEntityScan() ) {
+			registerDynamicApplicationPackage( hibernatePackage );
+		}
 
 		return hibernatePackage;
 	}
 
 	private void registerDynamicApplicationPackage( HibernatePackage hibernatePackage ) {
+		// if should register dynamic application
 		contextInfo.getModules()
 		           .stream()
 		           .map( AcrossModuleInfo::getModule )
@@ -93,6 +97,5 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 		           .map( DynamicAcrossModule.DynamicApplicationModule.class::cast )
 		           .findFirst()
 		           .ifPresent( module -> hibernatePackage.addPackageToScan( module.getBasePackage() ) );
-
 	}
 }

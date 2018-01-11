@@ -1,10 +1,10 @@
 package com.foreach.across.modules.hibernate.jpa;
 
 import com.foreach.across.core.EmptyAcrossModule;
-import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
 import com.foreach.across.modules.hibernate.jpa.services.JpaHibernateSessionHolderImpl;
+import com.foreach.across.modules.hibernate.modules.config.EnableTransactionManagementConfiguration;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.modules.web.AcrossWebModule;
@@ -37,28 +37,7 @@ public class TestJpaModuleSettings
 			assertEquals(
 					1,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
-					   .getBeansOfType( TransactionManagementConfigurer.Config.class )
-					   .size()
-			);
-		}
-	}
-
-	@Test
-	public void noTransactions() {
-		try (
-				AcrossTestContext ctx = standard()
-						.property( AcrossHibernateModuleSettings.CREATE_TRANSACTION_MANAGER, false )
-						.modules( AcrossHibernateJpaModule.NAME )
-						.modules( new EmptyAcrossModule( "client" ) )
-						.build()
-		) {
-			assertNotNull( ctx.getBeanOfType( EntityManagerFactory.class ) );
-			assertTrue( ctx.getBeansOfType( PlatformTransactionManager.class ).isEmpty() );
-			assertEquals( 0, ctx.getBeansOfType( UnitOfWorkFactory.class ).size() );
-			assertEquals(
-					0,
-					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
-					   .getBeansOfType( TransactionManagementConfigurer.Config.class )
+					   .getBeansOfType( EnableTransactionManagementConfiguration.class )
 					   .size()
 			);
 		}

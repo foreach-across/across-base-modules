@@ -18,7 +18,7 @@ package test.boot;
 
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import com.foreach.across.modules.hibernate.jpa.config.JpaModuleProperties;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,11 +60,12 @@ public class TestSingleDataSourceApplication
 	protected AcrossContextBeanRegistry beanRegistry;
 
 	@Test
-	public void jpaModulePropertiesShouldBeBound() {
-		JpaModuleProperties jpaModuleProperties = beanRegistry.getBeanOfTypeFromModule( AcrossHibernateJpaModule.NAME, JpaModuleProperties.class );
+	public void moduleSettingsShouldBeBound() {
+		AcrossHibernateJpaModuleSettings moduleSettings
+				= beanRegistry.getBeanOfTypeFromModule( AcrossHibernateJpaModule.NAME, AcrossHibernateJpaModuleSettings.class );
 
-		assertTrue( jpaModuleProperties.getJpaProperties().isShowSql() );
-		assertEquals( Integer.valueOf( 25 ), jpaModuleProperties.getTransactionProperties().getDefaultTimeout() );
+		assertTrue( moduleSettings.isShowSql() );
+		assertEquals( Integer.valueOf( 25 ), moduleSettings.getTransactionProperties().getDefaultTimeout() );
 	}
 
 	@Test

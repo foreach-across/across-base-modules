@@ -15,7 +15,7 @@
  */
 package com.foreach.across.modules.hibernate.jpa.aop;
 
-import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
+import com.foreach.across.modules.hibernate.modules.config.EnableTransactionManagementConfiguration;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 
@@ -28,7 +28,7 @@ public class JpaRepositoryInterceptorAdvisor extends AbstractBeanFactoryPointcut
 	 * By default the interceptor should run within the same transaction.
 	 */
 	@SuppressWarnings("unused")
-	public static final int INTERCEPT_ORDER = TransactionManagementConfigurer.INTERCEPT_ORDER + 1;
+	public static final int INTERCEPT_ORDER = EnableTransactionManagementConfiguration.INTERCEPT_ORDER + 1;
 	private static final long serialVersionUID = 2973014201873864201L;
 
 	private final transient Pointcut pointcut = new JpaRepositoryPointcut();

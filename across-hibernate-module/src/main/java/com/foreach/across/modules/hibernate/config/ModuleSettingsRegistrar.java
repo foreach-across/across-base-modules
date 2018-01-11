@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.hibernate.jpa.config;
+package com.foreach.across.modules.hibernate.config;
 
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.context.AcrossListableBeanFactory;
 import com.foreach.across.core.context.info.AcrossContextInfo;
+import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.modules.hibernate.AbstractHibernatePackageModule;
+import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
+import com.foreach.across.modules.hibernate.extensions.HibernatePersistenceContextInViewConfiguration;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
@@ -37,12 +42,17 @@ import org.springframework.core.type.AnnotationMetadata;
 import java.util.Iterator;
 
 /**
+ * Creates the {@link com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings} as early as possible,
+ * and registers it as a singleton named <strong>moduleSettings</strong> in the {@link  BeanFactory}.
+ *
  * @author Arne Vandamme
  * @since 3.0.0
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class JpaModulePropertiesRegistrar implements ImportSelector, BeanFactoryAware, EnvironmentAware
+public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware, EnvironmentAware
 {
+	public static final String BEAN_NAME = "moduleSettings";
+
 	private Environment environment;
 	private BeanFactory beanFactory;
 
@@ -57,12 +67,12 @@ public class JpaModulePropertiesRegistrar implements ImportSelector, BeanFactory
 	}
 
 	@Override
-	public String[] selectImports( AnnotationMetadata importingClassMetadata ) {
+	public final String[] selectImports( AnnotationMetadata importingClassMetadata ) {
 		AcrossListableBeanFactory lbf = (AcrossListableBeanFactory) beanFactory;
 
 		lbf.registerSingleton(
-				JpaModuleProperties.BEAN_NAME,
-				new JpaModulePropertiesFactory(
+				AcrossModule.CURRENT_MODULE + "Settings",
+				new ModuleSettingsFactory(
 						lbf.getParentBeanFactory().getBean( AcrossContextInfo.class ),
 						(AbstractHibernatePackageModule) lbf.getBean( AcrossModule.CURRENT_MODULE ),
 						environment,
@@ -70,27 +80,45 @@ public class JpaModulePropertiesRegistrar implements ImportSelector, BeanFactory
 				).createInstance()
 		);
 
-		return new String[0];
+		lbf.registerAlias( AcrossModule.CURRENT_MODULE + "Settings", BEAN_NAME );
+
+		return settingsDependantImports();
+	}
+
+	protected String[] settingsDependantImports() {
+		return new String[] { HibernatePersistenceContextInViewConfiguration.class.getName() };
 	}
 
 	@RequiredArgsConstructor
-	static class JpaModulePropertiesFactory
+	static class ModuleSettingsFactory
 	{
-		private final AcrossContextInfo context;
+		private final AcrossContextInfo contextInfo;
 		private final AbstractHibernatePackageModule currentModule;
 		private final Environment environment;
 		private final ConversionService conversionService;
 
 		@SneakyThrows
-		JpaModuleProperties createInstance() {
-			JpaModuleProperties moduleProperties = new JpaModuleProperties();
+		AcrossHibernateModuleSettings createInstance() {
+			AcrossHibernateModuleSettings moduleSettings = currentModule.createSettings();
+			applyDefaultValues( moduleSettings );
+
 			PropertySources propertySources = createPropertySources( environment );
 
-			bindProperties( propertySources, "spring.jpa", moduleProperties.getJpaProperties() );
-			bindProperties( propertySources, "spring.transaction", moduleProperties.getTransactionProperties() );
-			bindProperties( propertySources, "acrossHibernate", moduleProperties.getHibernateModuleSettings() );
+			if ( isDefaultHibernateModule() ) {
+				bindProperties( propertySources, "spring.jpa", moduleSettings );
+				bindProperties( propertySources, "spring.transaction", moduleSettings.getTransactionProperties() );
+				moduleSettings.getApplicationModule().setRepositoryScan(
+						environment.getProperty( "spring.data.jpa.repositories.enabled", boolean.class,
+						                         moduleSettings.getApplicationModule().isRepositoryScan() )
+				);
+			}
 
-			return moduleProperties;
+			String modulePrefix = currentModule.getPropertiesPrefix();
+			bindProperties( propertySources, modulePrefix, moduleSettings );
+			bindProperties( propertySources, modulePrefix + ".transaction", moduleSettings.getTransactionProperties() );
+			bindProperties( propertySources, modulePrefix + ".application", moduleSettings.getApplicationModule() );
+
+			return moduleSettings;
 		}
 
 		private void bindProperties( PropertySources propertySources, String prefix, Object target ) throws Exception {
@@ -110,8 +138,29 @@ public class JpaModulePropertiesRegistrar implements ImportSelector, BeanFactory
 		 * If a dynamic application module is present, and we are the original JPA module as well
 		 * as the only one, scan the application module for entities automatically.
 		 */
-		private void applyDefaultValues( JpaModuleProperties moduleProperties ) {
+		private void applyDefaultValues( AcrossHibernateModuleSettings moduleSettings ) {
+			boolean scanDefaults = isDefaultHibernateModule() && isSingleHibernateModule();
 
+			moduleSettings.getApplicationModule().setEntityScan( scanDefaults );
+			moduleSettings.getApplicationModule().setRepositoryScan( scanDefaults );
+			moduleSettings.setGenerateDdl( false );
+			moduleSettings.getHibernate().setDdlAuto( "none" );
+
+			if ( moduleSettings instanceof AcrossHibernateJpaModuleSettings ) {
+				( (AcrossHibernateJpaModuleSettings) moduleSettings ).setPersistenceUnitName( currentModule.getName() );
+			}
+		}
+
+		private boolean isDefaultHibernateModule() {
+			return AcrossHibernateJpaModule.NAME.equals( currentModule.getName() );
+		}
+
+		private boolean isSingleHibernateModule() {
+			return contextInfo.getModules()
+			                  .stream()
+			                  .map( AcrossModuleInfo::getModule )
+			                  .filter( AbstractHibernatePackageModule.class::isInstance )
+			                  .count() == 1;
 		}
 
 		private PropertySources createPropertySources( Environment environment ) {

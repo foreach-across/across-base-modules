@@ -16,24 +16,20 @@
 
 package com.foreach.across.modules.hibernate.jpa.config;
 
-import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
-import lombok.Data;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
-import org.springframework.boot.autoconfigure.transaction.TransactionProperties;
+import com.foreach.across.modules.hibernate.config.ModuleSettingsRegistrar;
+import com.foreach.across.modules.hibernate.extensions.JpaPersistenceContextInViewConfiguration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 /**
  * @author Arne Vandamme
  * @since 3.0.0
  */
-@Data
-public class JpaModuleProperties
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class JpaModuleSettingsRegistrar extends ModuleSettingsRegistrar
 {
-	public static final String BEAN_NAME = "jpaModuleProperties";
-
-	private TransactionProperties transactionProperties = new TransactionProperties();
-	private JpaProperties jpaProperties = new JpaProperties();
-	private AcrossHibernateJpaModuleSettings hibernateModuleSettings = new AcrossHibernateJpaModuleSettings();
-
-	JpaModuleProperties() {
+	@Override
+	protected String[] settingsDependantImports() {
+		return new String[] { JpaPersistenceContextInViewConfiguration.class.getName() };
 	}
 }
