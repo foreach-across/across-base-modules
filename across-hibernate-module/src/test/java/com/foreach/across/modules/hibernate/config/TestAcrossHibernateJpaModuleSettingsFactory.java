@@ -23,6 +23,7 @@ import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -61,6 +62,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		when( currentModuleInfo.getName() ).thenReturn( AcrossHibernateJpaModule.NAME );
 		when( currentModuleInfo.getModule() ).thenReturn( currentModule );
 
+		when( contextInfo.getApplicationContext() ).thenReturn( mock( ApplicationContext.class ) );
 		when( contextInfo.getModules() ).thenReturn( Collections.singletonList( currentModuleInfo ) );
 		when( currentModule.getName() ).thenReturn( AcrossHibernateJpaModule.NAME );
 		when( currentModule.getPropertiesPrefix() ).thenReturn( "acrossHibernate" );
@@ -79,6 +81,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		assertThat( properties.getHibernateProperties( mock( DataSource.class ) ) )
 				.doesNotContainKey( "hibernate.hbm2ddl.auto" );
 
+		assertThat( properties.getPrimary() ).isTrue();
 		assertThat( properties.isShowSql() ).isFalse();
 		assertThat( properties.isOpenInView() ).isTrue();
 		assertThat( properties.getTransactionProperties().getDefaultTimeout() ).isNull();
@@ -99,6 +102,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		when( contextInfo.getModules() ).thenReturn( Arrays.asList( currentModuleInfo, otherModuleInfo ) );
 
 		AcrossHibernateJpaModuleSettings properties = (AcrossHibernateJpaModuleSettings) propertiesFactory.createInstance();
+		assertThat( properties.getPrimary() ).isNull();
 		assertThat( properties.getApplicationModule().isEntityScan() ).isFalse();
 		assertThat( properties.getApplicationModule().isRepositoryScan() ).isFalse();
 		assertThat( properties.isGenerateDdl() ).isFalse();

@@ -29,6 +29,7 @@ import java.util.List;
 /**
  * <p>Basic implementation for a imple Hibernate based repository.
  * <strong>Deprecated</strong>, favour the use of Spring Data JPA repositories instead.</p>
+ *
  * @param <T>
  */
 @Deprecated

@@ -27,9 +27,11 @@ import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.boot.bind.PropertiesConfigurationFactory;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportSelector;
@@ -38,6 +40,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.env.*;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Iterator;
 
@@ -48,6 +51,7 @@ import java.util.Iterator;
  * @author Arne Vandamme
  * @since 3.0.0
  */
+@Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware, EnvironmentAware
 {
@@ -147,7 +151,14 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 			moduleSettings.getHibernate().setDdlAuto( "none" );
 
 			if ( moduleSettings instanceof AcrossHibernateJpaModuleSettings ) {
-				( (AcrossHibernateJpaModuleSettings) moduleSettings ).setPersistenceUnitName( currentModule.getName() );
+				final AcrossHibernateJpaModuleSettings jpaModuleSettings = (AcrossHibernateJpaModuleSettings) moduleSettings;
+				jpaModuleSettings.setPersistenceUnitName( currentModule.getName() );
+
+				if ( isSingleHibernateModule()
+						&& BeanFactoryUtils.beansOfTypeIncludingAncestors( contextInfo.getApplicationContext(), PlatformTransactionManager.class ).isEmpty() ) {
+					LOG.trace( "Switching to default primary as this is the only AcrossHibernateJpaModule and there are no other transaction managers" );
+					jpaModuleSettings.setPrimary( true );
+				}
 			}
 		}
 

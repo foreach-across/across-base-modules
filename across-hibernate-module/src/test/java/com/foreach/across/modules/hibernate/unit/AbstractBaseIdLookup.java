@@ -47,9 +47,8 @@ public abstract class AbstractBaseIdLookup
 		return userType.nullSafeGet( resultSet, names, sessionImplementor, new Object() );
 	}
 
-
 	protected void mockResultSetAndTestValueToInt( UserType userType, Integer expectedValue,
-	                                             Object rowValue ) throws SQLException {
+	                                               Object rowValue ) throws SQLException {
 		PreparedStatement preparedStatement = mock( PreparedStatement.class );
 		SessionImplementor sessionImplementor = mock( SessionImplementor.class );
 		SessionFactoryImplementor sessionFactoryImplementor = mock( SessionFactoryImplementor.class );
@@ -58,9 +57,10 @@ public abstract class AbstractBaseIdLookup
 
 		userType.nullSafeSet( preparedStatement, rowValue, 3, sessionImplementor );
 
-		if( expectedValue == null ) {
+		if ( expectedValue == null ) {
 			verify( preparedStatement, times( 1 ) ).setNull( eq( 3 ), eq( IntegerType.INSTANCE.sqlType() ) );
-		} else {
+		}
+		else {
 			verify( preparedStatement, times( 1 ) ).setInt( eq( 3 ), eq( expectedValue ) );
 		}
 

@@ -19,7 +19,11 @@ package com.foreach.across.modules.hibernate.jpa;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.AcrossRole;
 import com.foreach.across.core.context.AcrossModuleRole;
+import com.foreach.across.core.context.bootstrap.AcrossBootstrapConfig;
+import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
+import com.foreach.across.core.transformers.BeanDefinitionTransformerComposite;
 import com.foreach.across.modules.hibernate.AbstractHibernatePackageModule;
+import com.foreach.across.modules.hibernate.jpa.config.PrimaryTransactionManagerTransformer;
 
 import javax.sql.DataSource;
 
@@ -57,8 +61,32 @@ public class AcrossHibernateJpaModule extends AbstractHibernatePackageModule
 		setProperty( AcrossHibernateJpaModuleSettings.PERSISTENCE_UNIT_NAME, persistenceUnitName );
 	}
 
+	/**
+	 * Configure this module as primary: makes some exposed beans primary and will attempt to register aliases
+	 * for the transaction manager and transaction template.
+	 *
+	 * @param primary or not
+	 */
+	public void setPrimary( Boolean primary ) {
+		setProperty( AcrossHibernateJpaModuleSettings.PRIMARY, primary );
+	}
+
 	@Override
 	public AcrossHibernateJpaModuleSettings createSettings() {
 		return new AcrossHibernateJpaModuleSettings();
+	}
+
+	@Override
+	public void prepareForBootstrap( ModuleBootstrapConfig currentModule, AcrossBootstrapConfig contextConfig ) {
+		if ( getName().equals( currentModule.getModuleName() ) ) {
+			if ( currentModule.getExposeTransformer() != null ) {
+				currentModule.setExposeTransformer(
+						new BeanDefinitionTransformerComposite( currentModule.getExposeTransformer(), new PrimaryTransactionManagerTransformer( this ) )
+				);
+			}
+			else {
+				currentModule.setExposeTransformer( new PrimaryTransactionManagerTransformer( this ) );
+			}
+		}
 	}
 }

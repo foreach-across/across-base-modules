@@ -26,7 +26,7 @@ import com.foreach.across.modules.hibernate.config.HibernatePackageBuilder;
 import com.foreach.across.modules.hibernate.config.InterceptorRegistryConfiguration;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
-import com.foreach.across.modules.hibernate.jpa.config.dynamic.JpaRepositoriesRegistrar;
+import com.foreach.across.modules.hibernate.jpa.repositories.config.ApplicationModuleRepositoryAutoConfiguration;
 import com.foreach.across.modules.hibernate.jpa.services.JpaHibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.jpa.unitofwork.JpaUnitOfWorkFactoryImpl;
 import com.foreach.across.modules.hibernate.modules.config.EnableTransactionManagementConfiguration;
@@ -69,6 +69,7 @@ import java.util.Map;
 public class HibernateJpaConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "jpaTransactionManager";
+	public static final String TRANSACTION_TEMPLATE = "jpaTransactionTemplate";
 
 	private static final Logger LOG = LoggerFactory.getLogger( HibernateJpaConfiguration.class );
 
@@ -169,9 +170,9 @@ public class HibernateJpaConfiguration
 			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ModuleBasicRepositoryInterceptorConfiguration.class );
 		}
 
-		// todo: use across jpa repositories
-		if ( beforeBootstrapEvent.getModule().getModule() instanceof DynamicAcrossModule.DynamicApplicationModule ) {
-			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, JpaRepositoriesRegistrar.class );
+		if ( settings.getApplicationModule().isRepositoryScan()
+				&& beforeBootstrapEvent.getModule().getModule() instanceof DynamicAcrossModule.DynamicApplicationModule ) {
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ApplicationModuleRepositoryAutoConfiguration.class );
 		}
 
 		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );

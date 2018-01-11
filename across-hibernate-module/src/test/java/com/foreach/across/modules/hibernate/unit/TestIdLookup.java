@@ -26,10 +26,10 @@ public class TestIdLookup extends AbstractBaseIdLookup
 	@Test
 	public void testConvertIntFieldToEnum() throws Exception {
 		TestHibernateIdLookupUserType userType = new TestHibernateIdLookupUserType();
-		assertEquals( null, mockResultSetAndTestValue( userType , null ) );
-		assertEquals( IntegerValues.ONE, mockResultSetAndTestValue( userType , 1 ) );
-		assertEquals( IntegerValues.TWO, mockResultSetAndTestValue( userType , 2 ) );
-		assertEquals( IntegerValues.THREE, mockResultSetAndTestValue( userType , 3 ) );
+		assertEquals( null, mockResultSetAndTestValue( userType, null ) );
+		assertEquals( IntegerValues.ONE, mockResultSetAndTestValue( userType, 1 ) );
+		assertEquals( IntegerValues.TWO, mockResultSetAndTestValue( userType, 2 ) );
+		assertEquals( IntegerValues.THREE, mockResultSetAndTestValue( userType, 3 ) );
 
 	}
 

@@ -33,6 +33,7 @@ import test.boot.apps.application.book.BookRepository;
 import java.util.Collections;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -57,7 +58,10 @@ public class TestSingleDataSourceApplication
 	private BookRepository bookRepository;
 
 	@Autowired
-	protected AcrossContextBeanRegistry beanRegistry;
+	private AcrossContextBeanRegistry beanRegistry;
+
+	@Autowired
+	private SingleDataSourceApplication.BookInterceptor bookInterceptor;
 
 	@Test
 	public void moduleSettingsShouldBeBound() {
@@ -87,6 +91,8 @@ public class TestSingleDataSourceApplication
 		book.setPrice( 100 );
 
 		bookRepository.save( book );
+
+		assertThat( bookInterceptor.getCreatedBook() ).isSameAs( book );
 
 		Book fetched = bookRepository.findOneByNameAndAuthor( "John Doe's Biography", "John Doe" );
 		assertEquals( book, fetched );

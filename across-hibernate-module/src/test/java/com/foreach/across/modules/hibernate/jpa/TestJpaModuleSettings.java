@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -33,6 +34,14 @@ public class TestJpaModuleSettings
 		) {
 			assertNotNull( ctx.getBeanOfType( EntityManagerFactory.class ) );
 			assertNotNull( ctx.getBeanOfType( PlatformTransactionManager.class ) );
+			assertNotNull( ctx.getBeanOfType( TransactionTemplate.class ) );
+			assertSame( ctx.getBeanOfType( PlatformTransactionManager.class ), ctx.getBean( "jpaTransactionManager" ) );
+			assertSame( ctx.getBeanOfType( TransactionTemplate.class ), ctx.getBean( "jpaTransactionTemplate" ) );
+
+			// transaction manager aliases should also be registered
+			assertSame( ctx.getBeanOfType( PlatformTransactionManager.class ), ctx.getBean( "transactionManager" ) );
+			assertSame( ctx.getBeanOfType( TransactionTemplate.class ), ctx.getBean( "transactionTemplate" ) );
+
 			assertEquals( 0, ctx.getBeansOfType( UnitOfWorkFactory.class ).size() );
 			assertEquals(
 					1,

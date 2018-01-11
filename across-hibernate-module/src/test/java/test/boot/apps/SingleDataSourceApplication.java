@@ -17,8 +17,12 @@
 package test.boot.apps;
 
 import com.foreach.across.config.AcrossApplication;
+import com.foreach.across.modules.hibernate.aop.EntityInterceptorAdapter;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
+import lombok.Getter;
 import org.springframework.boot.SpringApplication;
+import org.springframework.context.annotation.Bean;
+import test.boot.apps.application.book.Book;
 
 /**
  * @author Arne Vandamme
@@ -26,7 +30,28 @@ import org.springframework.boot.SpringApplication;
 @AcrossApplication(modules = AcrossHibernateJpaModule.NAME)
 public class SingleDataSourceApplication
 {
+	@Bean
+	public BookInterceptor bookInterceptor() {
+		return new BookInterceptor();
+	}
+
 	public static void main( String[] args ) {
 		SpringApplication.run( SingleDataSourceApplication.class );
+	}
+
+	public static class BookInterceptor extends EntityInterceptorAdapter<Book>
+	{
+		@Getter
+		private Book createdBook;
+
+		@Override
+		public boolean handles( Class<?> entityClass ) {
+			return Book.class.isAssignableFrom( entityClass );
+		}
+
+		@Override
+		public void beforeCreate( Book entity ) {
+			this.createdBook = entity;
+		}
 	}
 }
