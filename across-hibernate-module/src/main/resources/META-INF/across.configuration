@@ -18,4 +18,5 @@
 com.foreach.across.AutoConfigurationDisabled=\
   org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration,\
   org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,\
-  org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration
+  org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration,\
+  org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration

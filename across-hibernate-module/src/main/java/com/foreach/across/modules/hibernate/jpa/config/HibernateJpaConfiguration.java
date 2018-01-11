@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
@@ -63,7 +64,8 @@ import java.util.Map;
  * @see com.foreach.across.modules.hibernate.jpa.config.JpaModuleSettingsRegistrar
  */
 @Configuration
-@Import({ JpaModuleSettingsRegistrar.class, InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class })
+@Import({ JpaModuleSettingsRegistrar.class, InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class,
+          PersistenceExceptionTranslationAutoConfiguration.class })
 public class HibernateJpaConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "jpaTransactionManager";
@@ -173,7 +175,11 @@ public class HibernateJpaConfiguration
 		}
 
 		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );
-		beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, EnableTransactionManagementConfiguration.class );
+		beforeBootstrapEvent.getBootstrapConfig()
+		                    .addApplicationContextConfigurer( true,
+		                                                      EnableTransactionManagementConfiguration.class,
+		                                                      PersistenceExceptionTranslationAutoConfiguration.class
+		                    );
 	}
 
 	private Database determineDatabase( DataSource dataSource ) {

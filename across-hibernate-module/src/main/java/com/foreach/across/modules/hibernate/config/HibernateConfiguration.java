@@ -36,11 +36,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.event.EventListener;
-import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 import javax.sql.DataSource;
@@ -55,7 +55,7 @@ import java.util.Properties;
  * @see com.foreach.across.modules.hibernate.config.ModuleSettingsRegistrar
  */
 @Configuration
-@Import({ ModuleSettingsRegistrar.class, HibernatePackageBuilder.class })
+@Import({ ModuleSettingsRegistrar.class, HibernatePackageBuilder.class, PersistenceExceptionTranslationAutoConfiguration.class })
 public class HibernateConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "transactionManager";
@@ -124,12 +124,6 @@ public class HibernateConfiguration
 		return new UnitOfWorkFactoryImpl( Collections.singleton( sessionFactory ) );
 	}
 
-	@Bean
-	@Exposed
-	public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
-		return new PersistenceExceptionTranslationPostProcessor();
-	}
-
 	@EventListener
 	@SuppressWarnings("unused")
 	protected void registerClientModuleRepositoryInterceptors( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
@@ -140,6 +134,9 @@ public class HibernateConfiguration
 		}
 
 		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );
-		beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, EnableTransactionManagementConfiguration.class );
+		beforeBootstrapEvent.getBootstrapConfig()
+		                    .addApplicationContextConfigurer( true,
+		                                                      EnableTransactionManagementConfiguration.class,
+		                                                      PersistenceExceptionTranslationAutoConfiguration.class );
 	}
 }
