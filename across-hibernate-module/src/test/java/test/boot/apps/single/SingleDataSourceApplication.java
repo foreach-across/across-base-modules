@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.boot.apps;
+package test.boot.apps.single;
 
 import com.foreach.across.config.AcrossApplication;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptorAdapter;
@@ -22,7 +22,7 @@ import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import lombok.Getter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.Bean;
-import test.boot.apps.application.book.Book;
+import test.boot.apps.single.application.Book;
 
 /**
  * @author Arne Vandamme

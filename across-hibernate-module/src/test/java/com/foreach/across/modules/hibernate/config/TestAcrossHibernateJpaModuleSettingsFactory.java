@@ -24,8 +24,6 @@ import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.StandardEnvironment;
@@ -49,18 +47,18 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 	private AcrossContextInfo contextInfo = mock( AcrossContextInfo.class );
 	private AbstractHibernatePackageModule currentModule = mock( AbstractHibernatePackageModule.class );
 	private ConfigurableEnvironment environment = new StandardEnvironment();
-	private ConversionService conversionService = new DefaultConversionService();
 
 	private AcrossModuleInfo currentModuleInfo;
 
 	private ModuleSettingsRegistrar.ModuleSettingsFactory propertiesFactory
-			= new ModuleSettingsRegistrar.ModuleSettingsFactory( contextInfo, currentModule, environment, conversionService );
+			= new ModuleSettingsRegistrar.ModuleSettingsFactory( contextInfo, currentModule, environment );
 
 	@Before
 	public void reset() {
 		currentModuleInfo = mock( AcrossModuleInfo.class );
 		when( currentModuleInfo.getName() ).thenReturn( AcrossHibernateJpaModule.NAME );
 		when( currentModuleInfo.getModule() ).thenReturn( currentModule );
+		when( currentModule.getDataSourceName() ).thenReturn( "myDataSource" );
 
 		when( contextInfo.getApplicationContext() ).thenReturn( mock( ApplicationContext.class ) );
 		when( contextInfo.getModules() ).thenReturn( Collections.singletonList( currentModuleInfo ) );
@@ -77,6 +75,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		assertThat( properties.getApplicationModule().isRepositoryScan() ).isTrue();
 		assertThat( properties.isGenerateDdl() ).isFalse();
 		assertThat( properties.getHibernate().getDdlAuto() ).isEqualTo( "none" );
+		assertThat( properties.getDataSource() ).isEqualTo( "myDataSource" );
 
 		assertThat( properties.getHibernateProperties( mock( DataSource.class ) ) )
 				.doesNotContainKey( "hibernate.hbm2ddl.auto" );
@@ -167,6 +166,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		environment.getPropertySources().addFirst( mp );
 
 		properties(
+				"acrossHibernate.data-source=some-ds",
 				"acrossHibernate.application.entity-scan=false",
 				"acrossHibernate.application.repository-scan=false",
 				"spring.jpa.generate-ddl=true",
@@ -193,6 +193,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		assertThat( properties.getTransactionProperties().getRollbackOnCommitFailure() ).isTrue();
 		assertThat( properties.isCreateUnitOfWorkFactory() ).isTrue();
 		assertThat( properties.getPersistenceContextInView().getHandler() ).isEqualTo( PersistenceContextInView.INTERCEPTOR );
+		assertThat( properties.getDataSource() ).isEqualTo( "some-ds" );
 
 		assertThat( properties.getHibernateProperties( mock( DataSource.class ) ) )
 				.containsEntry( "key", "value" )

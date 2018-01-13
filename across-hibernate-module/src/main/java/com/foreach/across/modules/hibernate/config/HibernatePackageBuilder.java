@@ -28,6 +28,7 @@ import com.foreach.across.modules.hibernate.provider.HibernatePackageConfigurer;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
+import org.springframework.boot.autoconfigure.domain.EntityScanPackages;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.HashSet;
@@ -80,6 +81,10 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 
 			configurers.forEach( c -> c.configureHibernatePackage( hibernatePackage ) );
 		}
+
+		// Detect additional @EntityScan registrations
+		EntityScanPackages.get( currentModule.getAcrossApplicationContextHolder().getApplicationContext() ).getPackageNames()
+		                  .forEach( hibernatePackage::addPackageToScan );
 
 		if ( moduleSettings.getApplicationModule().isEntityScan() ) {
 			registerDynamicApplicationPackage( hibernatePackage );

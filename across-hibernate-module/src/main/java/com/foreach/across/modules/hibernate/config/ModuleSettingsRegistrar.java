@@ -17,6 +17,7 @@
 package com.foreach.across.modules.hibernate.config;
 
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.AcrossListableBeanFactory;
 import com.foreach.across.core.context.info.AcrossContextInfo;
 import com.foreach.across.core.context.info.AcrossModuleInfo;
@@ -32,12 +33,14 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.support.AutowireCandidateQualifier;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.bind.PropertiesConfigurationFactory;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.env.*;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -74,17 +77,25 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 	public final String[] selectImports( AnnotationMetadata importingClassMetadata ) {
 		AcrossListableBeanFactory lbf = (AcrossListableBeanFactory) beanFactory;
 
-		lbf.registerSingleton(
-				AcrossModule.CURRENT_MODULE + "Settings",
-				new ModuleSettingsFactory(
-						lbf.getParentBeanFactory().getBean( AcrossContextInfo.class ),
-						(AbstractHibernatePackageModule) lbf.getBean( AcrossModule.CURRENT_MODULE ),
-						environment,
-						lbf.getParentBeanFactory().getBean( ConversionService.class )
-				).createInstance()
-		);
+		String beanName = AcrossModule.CURRENT_MODULE + "Settings";
+		AcrossHibernateModuleSettings moduleSettings = new ModuleSettingsFactory(
+				lbf.getParentBeanFactory().getBean( AcrossContextInfo.class ),
+				(AbstractHibernatePackageModule) lbf.getBean( AcrossModule.CURRENT_MODULE ),
+				environment
+		).createInstance();
 
-		lbf.registerAlias( AcrossModule.CURRENT_MODULE + "Settings", BEAN_NAME );
+		if ( !lbf.containsBeanDefinition( beanName ) ) {
+			GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+			beanDefinition.setBeanClass( moduleSettings.getClass() );
+			beanDefinition.setPrimary( true );
+			beanDefinition.addQualifier(
+					new AutowireCandidateQualifier( Module.class.getName(), AcrossModule.CURRENT_MODULE )
+			);
+			lbf.registerBeanDefinition( beanName, beanDefinition );
+		}
+
+		lbf.registerSingleton( beanName, moduleSettings );
+		lbf.registerAlias( beanName, BEAN_NAME );
 
 		return settingsDependantImports();
 	}
@@ -99,7 +110,7 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 		private final AcrossContextInfo contextInfo;
 		private final AbstractHibernatePackageModule currentModule;
 		private final Environment environment;
-		private final ConversionService conversionService;
+		private final DefaultConversionService conversionService = new DefaultConversionService();
 
 		@SneakyThrows
 		AcrossHibernateModuleSettings createInstance() {
@@ -145,6 +156,7 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 		private void applyDefaultValues( AcrossHibernateModuleSettings moduleSettings ) {
 			boolean scanDefaults = isDefaultHibernateModule() && isSingleHibernateModule();
 
+			moduleSettings.setDataSource( currentModule.getDataSourceName() );
 			moduleSettings.getApplicationModule().setEntityScan( scanDefaults );
 			moduleSettings.getApplicationModule().setRepositoryScan( scanDefaults );
 			moduleSettings.setGenerateDdl( false );

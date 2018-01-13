@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.boot;
+package test.boot.apps;
 
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
@@ -26,9 +26,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
-import test.boot.apps.SingleDataSourceApplication;
-import test.boot.apps.application.book.Book;
-import test.boot.apps.application.book.BookRepository;
+import test.boot.apps.single.SingleDataSourceApplication;
+import test.boot.apps.single.application.Book;
+import test.boot.apps.single.application.BookRepository;
 
 import java.util.Collections;
 import java.util.Optional;

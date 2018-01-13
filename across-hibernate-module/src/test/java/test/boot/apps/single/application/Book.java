@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.boot.apps.application.book;
+package test.boot.apps.single.application;
 
 import lombok.*;
 import org.springframework.data.domain.Persistable;

@@ -20,7 +20,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.autoconfigure.transaction.TransactionProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.Ordered;
 
 import javax.sql.DataSource;
@@ -30,7 +29,6 @@ import java.util.Map;
 /**
  * @author Arne Vandamme
  */
-@ConfigurationProperties(prefix = "acrossHibernate")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AcrossHibernateModuleSettings extends JpaProperties
@@ -44,6 +42,11 @@ public class AcrossHibernateModuleSettings extends JpaProperties
 	private TransactionProperties transactionProperties = new TransactionProperties();
 	private ApplicationModule applicationModule = new ApplicationModule();
 	private PersistenceContextInViewProperties persistenceContextInView = new PersistenceContextInViewProperties();
+
+	/**
+	 * Name of the dataSource bean that should be resolved and used for the entity manager.
+	 */
+	private String dataSource;
 
 	/**
 	 * Map of Hibernate specific properties.

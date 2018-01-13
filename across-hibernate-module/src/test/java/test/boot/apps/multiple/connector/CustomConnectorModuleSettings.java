@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package test.boot.apps.application.book;
+package test.boot.apps.multiple.connector;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Arne Vandamme
+ * @since 3.0.0
  */
-public interface BookRepository extends JpaRepository<Book, Long>
+@ConfigurationProperties("customConnector")
+public class CustomConnectorModuleSettings extends AcrossHibernateJpaModuleSettings
 {
-	Book findOneByNameAndAuthor( String name, String author );
 }

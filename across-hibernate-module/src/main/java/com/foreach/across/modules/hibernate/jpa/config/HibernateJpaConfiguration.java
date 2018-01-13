@@ -15,12 +15,10 @@
  */
 package com.foreach.across.modules.hibernate.jpa.config;
 
-import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.DynamicAcrossModule;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
-import com.foreach.across.core.database.DatabaseInfo;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.hibernate.config.HibernatePackageBuilder;
 import com.foreach.across.modules.hibernate.config.InterceptorRegistryConfiguration;
@@ -35,10 +33,12 @@ import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
 import org.springframework.cglib.proxy.Enhancer;
@@ -49,7 +49,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.event.EventListener;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import javax.persistence.EntityManagerFactory;
@@ -73,19 +72,21 @@ public class HibernateJpaConfiguration
 
 	private static final Logger LOG = LoggerFactory.getLogger( HibernateJpaConfiguration.class );
 
-	@Autowired
-	@Module(AcrossModule.CURRENT_MODULE)
-	private AcrossHibernateJpaModule module;
+	private final AcrossHibernateJpaModule module;
+	private final AcrossHibernateJpaModuleSettings settings;
+	private final HibernatePackage hibernatePackage;
+	private final ListableBeanFactory beanFactory;
 
 	@Autowired
-	private AcrossHibernateJpaModuleSettings settings;
-
-	@Autowired
-	private HibernatePackage hibernatePackage;
-
-	@Autowired(required = false)
-	@Qualifier(AcrossContext.DATASOURCE)
-	private DataSource acrossDataSource;
+	public HibernateJpaConfiguration( @Module(AcrossModule.CURRENT_MODULE) AcrossHibernateJpaModule module,
+	                                  @Module(AcrossModule.CURRENT_MODULE) AcrossHibernateJpaModuleSettings settings,
+	                                  HibernatePackage hibernatePackage,
+	                                  ListableBeanFactory beanFactory ) {
+		this.module = module;
+		this.settings = settings;
+		this.hibernatePackage = hibernatePackage;
+		this.beanFactory = beanFactory;
+	}
 
 	@Bean(name = "entityManagerFactory")
 	@Exposed
@@ -93,7 +94,10 @@ public class HibernateJpaConfiguration
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 
 		DataSource dataSource = retrieveDataSource();
-		vendorAdapter.setDatabase( determineDatabase( dataSource ) );
+		vendorAdapter.setShowSql( settings.isShowSql() );
+		vendorAdapter.setDatabase( settings.determineDatabase( dataSource ) );
+		vendorAdapter.setDatabasePlatform( settings.getDatabasePlatform() );
+		vendorAdapter.setGenerateDdl( settings.isGenerateDdl() );
 
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter( vendorAdapter );
@@ -121,14 +125,22 @@ public class HibernateJpaConfiguration
 	private DataSource retrieveDataSource() {
 		DataSource moduleDataSource = module.getDataSource();
 
-		if ( moduleDataSource == null ) {
-			LOG.debug( "No module datasource specified - falling back to default Across datasource" );
-			module.setDataSource( acrossDataSource );
-			return acrossDataSource;
-		}
-		else {
+		if ( moduleDataSource != null ) {
+			LOG.info( "Using datasource attached directly to module {} for the EntityManagerFactory", module.getName() );
 			return moduleDataSource;
 		}
+
+		if ( !StringUtils.isEmpty( settings.getDataSource() ) ) {
+			LOG.info( "Resolving datasource bean {} for the EntityManagerFactory", settings.getDataSource() );
+			return beanFactory.getBean( settings.getDataSource(), DataSource.class );
+		}
+
+		if ( BeanFactoryUtils.beansOfTypeIncludingAncestors( beanFactory, DataSource.class ).size() == 1 ) {
+			LOG.info( "Using the single datasource bean for the EntityManagerFactory" );
+			return beanFactory.getBean( DataSource.class );
+		}
+
+		throw new IllegalStateException( "Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
 	}
 
 	private Class createTableAliasNamingStrategyClass( Map<String, String> tableAliases ) {
@@ -181,24 +193,5 @@ public class HibernateJpaConfiguration
 		                                                      EnableTransactionManagementConfiguration.class,
 		                                                      PersistenceExceptionTranslationAutoConfiguration.class
 		                    );
-	}
-
-	private Database determineDatabase( DataSource dataSource ) {
-		DatabaseInfo databaseInfo = DatabaseInfo.retrieve( dataSource );
-
-		if ( databaseInfo.isHsql() ) {
-			return Database.HSQL;
-		}
-		if ( databaseInfo.isOracle() ) {
-			return Database.ORACLE;
-		}
-		if ( databaseInfo.isMySQL() ) {
-			return Database.MYSQL;
-		}
-		if ( databaseInfo.isSqlServer() ) {
-			return Database.SQL_SERVER;
-		}
-
-		return null;
 	}
 }

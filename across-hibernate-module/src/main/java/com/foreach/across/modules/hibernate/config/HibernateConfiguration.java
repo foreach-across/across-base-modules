@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.hibernate.config;
 
-import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
@@ -30,11 +29,13 @@ import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactoryImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -63,23 +64,25 @@ public class HibernateConfiguration
 
 	private static final Logger LOG = LoggerFactory.getLogger( HibernateConfiguration.class );
 
-	@Autowired
-	@Module(AcrossModule.CURRENT_MODULE)
-	private AcrossHibernateModule module;
+	private final AcrossHibernateModule module;
+	private final AcrossHibernateModuleSettings settings;
+	private final ListableBeanFactory beanFactory;
 
 	@Autowired
-	@Module(AcrossModule.CURRENT_MODULE)
-	private AcrossHibernateModuleSettings settings;
-
-	@Autowired(required = false)
-	@Qualifier(AcrossContext.DATASOURCE)
-	private DataSource acrossDataSource;
+	public HibernateConfiguration( @Module(AcrossModule.CURRENT_MODULE) AcrossHibernateModule module,
+	                               @Module(AcrossModule.CURRENT_MODULE) AcrossHibernateModuleSettings settings,
+	                               ListableBeanFactory beanFactory ) {
+		this.module = module;
+		this.settings = settings;
+		this.beanFactory = beanFactory;
+	}
 
 	@Bean
 	@Exposed
 	public LocalSessionFactoryBean sessionFactory( HibernatePackage hibernatePackage ) {
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-		final DataSource dataSource = retrieveDataSource();
+
+		DataSource dataSource = retrieveDataSource();
 		sessionFactory.setDataSource( dataSource );
 		sessionFactory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
 		sessionFactory.setMappingResources( hibernatePackage.getMappingResources() );
@@ -101,14 +104,22 @@ public class HibernateConfiguration
 	private DataSource retrieveDataSource() {
 		DataSource moduleDataSource = module.getDataSource();
 
-		if ( moduleDataSource == null ) {
-			LOG.debug( "No module datasource specified - falling back to default Across datasource" );
-			module.setDataSource( acrossDataSource );
-			return acrossDataSource;
-		}
-		else {
+		if ( moduleDataSource != null ) {
+			LOG.info( "Using datasource attached directly to module {} for the SessionFactory", module.getName() );
 			return moduleDataSource;
 		}
+
+		if ( !StringUtils.isEmpty( settings.getDataSource() ) ) {
+			LOG.info( "Resolving datasource bean {} for the SessionFactory", settings.getDataSource() );
+			return beanFactory.getBean( settings.getDataSource(), DataSource.class );
+		}
+
+		if ( BeanFactoryUtils.beansOfTypeIncludingAncestors( beanFactory, DataSource.class ).size() == 1 ) {
+			LOG.info( "Using the single datasource bean for the SessionFactory" );
+			return beanFactory.getBean( DataSource.class );
+		}
+
+		throw new IllegalStateException( "Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
 	}
 
 	@Bean(name = SESSION_HOLDER)
