@@ -16,8 +16,8 @@
 package com.foreach.across.modules.hibernate;
 
 import com.foreach.across.core.EmptyAcrossModule;
-import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
+import com.foreach.across.modules.hibernate.modules.config.EnableTransactionManagementConfiguration;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
@@ -30,6 +30,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.orm.hibernate5.support.OpenSessionInViewFilter;
 import org.springframework.orm.hibernate5.support.OpenSessionInViewInterceptor;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import static com.foreach.across.test.support.AcrossTestBuilders.standard;
 import static com.foreach.across.test.support.AcrossTestBuilders.web;
@@ -47,38 +48,20 @@ public class TestModuleSettings
 		) {
 			assertNotNull( ctx.getBeanOfType( SessionFactory.class ) );
 			assertNotNull( ctx.getBeanOfType( PlatformTransactionManager.class ) );
+			assertNotNull( ctx.getBeanOfType( TransactionTemplate.class ) );
+			assertSame( ctx.getBeanOfType( PlatformTransactionManager.class ), ctx.getBean( "transactionManager" ) );
+			assertSame( ctx.getBeanOfType( TransactionTemplate.class ), ctx.getBean( "transactionTemplate" ) );
 			assertEquals( 0, ctx.getBeansOfType( UnitOfWorkFactory.class ).size() );
 			assertEquals(
 					1,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
-					   .getBeansOfType( TransactionManagementConfigurer.Config.class )
+					   .getBeansOfType( EnableTransactionManagementConfiguration.class )
 					   .size()
 			);
 			assertEquals(
 					1,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
 					   .getBeansOfType( ModuleBasicRepositoryInterceptorConfiguration.class )
-					   .size()
-			);
-		}
-	}
-
-	@Test
-	public void noTransactions() {
-		try (
-				AcrossTestContext ctx = standard()
-						.property( AcrossHibernateModuleSettings.CREATE_TRANSACTION_MANAGER, false )
-						.modules( AcrossHibernateModule.NAME )
-						.modules( new EmptyAcrossModule( "client" ) )
-						.build()
-		) {
-			assertNotNull( ctx.getBeanOfType( SessionFactory.class ) );
-			assertTrue( ctx.getBeansOfType( PlatformTransactionManager.class ).isEmpty() );
-			assertEquals( 0, ctx.getBeansOfType( UnitOfWorkFactory.class ).size() );
-			assertEquals(
-					0,
-					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
-					   .getBeansOfType( TransactionManagementConfigurer.Config.class )
 					   .size()
 			);
 		}

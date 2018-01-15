@@ -137,7 +137,7 @@ public class AcrossSequenceGenerator extends TableGenerator
 				return id;
 			}
 			else if ( object instanceof SettableIdBasedEntity ) {
-				id = ((SettableIdBasedEntity) object ).getNewEntityId();
+				id = ( (SettableIdBasedEntity) object ).getNewEntityId();
 				if ( id != null && !Long.valueOf( 0 ).equals( id ) ) {
 					return id;
 				}

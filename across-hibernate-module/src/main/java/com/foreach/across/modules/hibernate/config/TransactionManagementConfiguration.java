@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.hibernate.config.dynamic;
+package com.foreach.across.modules.hibernate.config;
 
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
-import com.foreach.across.core.context.configurer.TransactionManagementConfigurer;
-import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
-import com.foreach.across.modules.hibernate.config.HibernateConfiguration;
+import com.foreach.across.modules.hibernate.modules.config.EnableTransactionManagementConfiguration;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * @author arne
+ * @author Arne Vandamme
  */
-@EnableTransactionManagement
+@Configuration
+@EnableTransactionManagement(order = EnableTransactionManagementConfiguration.INTERCEPT_ORDER)
 public class TransactionManagementConfiguration
 {
 	public static final Logger LOG = LoggerFactory.getLogger( TransactionManagementConfiguration.class );
@@ -42,11 +43,9 @@ public class TransactionManagementConfiguration
 		return new HibernateTransactionManager( sessionFactory );
 	}
 
-	@Event
-	@SuppressWarnings("unused")
-	protected void registerClientModuleTransactionSupport( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
-		LOG.trace( "Enabling @Transaction support in module {}",
-		           beforeBootstrapEvent.getModule().getName() );
-		beforeBootstrapEvent.addApplicationContextConfigurers( new TransactionManagementConfigurer() );
+	@Bean
+	@Exposed
+	public TransactionTemplate transactionTemplate( PlatformTransactionManager transactionManager ) {
+		return new TransactionTemplate( transactionManager );
 	}
 }

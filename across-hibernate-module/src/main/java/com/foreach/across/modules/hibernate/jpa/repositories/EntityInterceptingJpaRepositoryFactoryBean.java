@@ -23,12 +23,14 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
+import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.data.repository.core.support.RepositoryProxyPostProcessor;
 import org.springframework.data.repository.util.TxUtils;
 
 import javax.persistence.EntityManager;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -38,10 +40,14 @@ import java.util.List;
  *
  * @author Arne Vandamme
  */
-public class EntityInterceptingJpaRepositoryFactoryBean extends JpaRepositoryFactoryBean
+public class EntityInterceptingJpaRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable> extends JpaRepositoryFactoryBean<T, S, ID>
 {
 	private String transactionManagerName = TxUtils.DEFAULT_TRANSACTION_MANAGER;
 	private AcrossContextBeanRegistry acrossContextBeanRegistry;
+
+	public EntityInterceptingJpaRepositoryFactoryBean( Class<? extends T> repositoryInterface ) {
+		super( repositoryInterface );
+	}
 
 	@Autowired
 	public void setAcrossContextBeanRegistry( AcrossContextBeanRegistry acrossContextBeanRegistry ) {

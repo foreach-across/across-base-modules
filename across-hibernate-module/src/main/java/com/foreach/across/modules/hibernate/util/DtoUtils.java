@@ -29,17 +29,17 @@ public class DtoUtils
 	/**
 	 * Attempts to create a default dto for an object by creating a new instance
 	 * and copying all properties.  This requires the entity type to have a parameterless constructor.
-	 *
+	 * <p>
 	 * Will throw a runtime exception if anything goes wrong.
 	 *
 	 * @param entity Original entity.
-	 * @param <T> Entity type.
+	 * @param <T>    Entity type.
 	 * @return New instance with the same properties or null if the original was null.
 	 */
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public static <T> T createDto( T entity ) {
 		if ( entity != null ) {
-			Class entityType = ClassUtils.getUserClass(entity );
+			Class entityType = ClassUtils.getUserClass( entity );
 
 			try {
 				T dto = (T) entityType.newInstance();
