@@ -35,6 +35,8 @@ import test.boot.apps.multiple.application.car.Car;
 import test.boot.apps.multiple.application.car.CarRepository;
 import test.boot.apps.multiple.application.street.Street;
 import test.boot.apps.multiple.application.street.StreetRepository;
+import test.boot.apps.multiple.entities.city.City;
+import test.boot.apps.multiple.entities.city.CityRepository;
 
 import javax.sql.DataSource;
 
@@ -75,6 +77,9 @@ public class TestMultipleDataSourceApplication
 	private StreetRepository streetRepository;
 
 	@Autowired
+	private CityRepository cityRepository;
+
+	@Autowired
 	private DataSource acrossDataSource;
 
 	@Autowired
@@ -105,6 +110,22 @@ public class TestMultipleDataSourceApplication
 		          .row()
 		          .value( "id" ).isEqualTo( 1L )
 		          .value( "name" ).isEqualTo( "Heineken" );
+	}
+
+	@Test
+	public void saveAndFetchCity() {
+		City city = new City();
+		city.setName( "Antwerp" );
+		cityRepository.save( city );
+
+		assertThat( cityRepository.findOneByName( "Antwerp" ) ).isEqualTo( city );
+		assertThat( interceptor.received( city ) ).isTrue();
+
+		Table table = new Table( acrossDataSource, "city" );
+		Assertions.assertThat( table )
+		          .row()
+		          .value( "id" ).isEqualTo( 1L )
+		          .value( "name" ).isEqualTo( "Antwerp" );
 	}
 
 	@Test

@@ -2,28 +2,33 @@
 Arne Vandamme
 3.0.0-SNAPSHOT
 :toc: left
+:toclevels: 3
 :sectanchors:
 :module-version: 3.0.0-SNAPSHOT
 :module-name: AcrossHibernateJpaModule
 :module-artifact: across-hibernate-module
-:module-url: https://foreach.atlassian.net/wiki/display/AX/AcrossHibernateModule
+:module-url: https://across.foreach.be/modules/AcrossHibernateJpaModule
+:entity-module-url: https://across.foreach.be/modules/EntityModule
 
 [copyright,verbatim]
 --
-Copyright (C) 2014-2015 +
+Copyright (C) 2014-2018 +
 [small]#Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically.#
 --
 
 [abstract]
 == About
-The {module-artifact} artifact contains 2 Across modules: `AcrossHibernateModule` and `AcrossHibernateJpaModule`.
+The {module-artifact} artifact actually contains 2 Across modules: *AcrossHibernateJpaModule* and *AcrossHibernateModule*.
 
-`AcrossHibernateModule` activates Hibernate support in other modules using a traditional `SessionFactory`.
-While fully supported and providing some useful infrastructure, the `AcrossHibernateJpaModule` should be favoured instead.
-
-`AcrossHibernateJpaModule` activates JPA support for other modules.
+*AcrossHibernateJpaModule* activates JPA support for the entire Across context.
+It allows other module to subscribe their entities to the JPA `EntityManager` represented by the AcrossHibernateJpaModule.
 The JPA implementation is built on top of Hibernate.
 The module also activates support for Spring Data `JpaRepository` implementations and comes with a set of <<base-classes,helpers>> to facilitate repository implementations.
+
+In an Across application with a single entity manager, adding AcrossHibernateJpaModule will serve as a drop-in replacement for the regular Spring Boot JPA starter in the application module.
+
+The older *AcrossHibernateModule* is still kept for historical compatibility, but does not support JPA nor Spring Data repositories.
+It has been deprecated and should no longer be used.
 
 Module website: {module-url}
 
@@ -46,51 +51,93 @@ Module website: {module-url}
 === Module dependencies
 {module-name} does not have any dependencies on other modules.
 
+[[module-settings]]
 === Module settings
-All properties start with the acrossHibernate. prefix
+AcrossHibernateJpaModule supports the following properties:
+[source,properties]
+----
+# APPLICATION MODULE SUPPORT
+acrossHibernate.application.entity-scan= # Scan for entities in the application module. Defaults to true if only one JPA module detected.
+acrossHibernate.application.repository-scan= # Enable Spring Data JPA repositories in the application module. Defaults to true if only one JPA module detected.
 
-|===
-|Property |Type |Description |Default
+# JPA/HIBERNATE
+acrossHibernate.primary= # Mark the exposed beans as primary in the Across context. Default is true if only one JPA module detected.
+acrossHibernate.data-source= # Name of the DataSource bean that should be resolved and used for the entity manager.
+acrossHibernate.persistence-unit-name= # Name of the persistence unit this EntityManager represents. Defaults to the module name.
+acrossHibernate.database= # Target database to operate on, auto-detected by default. Can be alternatively set using the "databasePlatform" property.
+acrossHibernate.database-platform= # Name of the target database to operate on, auto-detected by default. Can be alternatively set using the "Database" enum.
+acrossHibernate.generate-ddl=false # Initialize the schema on startup.
+acrossHibernate.hibernate.ddl-auto= # DDL mode. This is actually a shortcut for the "hibernate.hbm2ddl.auto" property. Default to "none".
+acrossHibernate.hibernate.naming.implicit-strategy= # Hibernate 5 implicit naming strategy fully qualified name.
+acrossHibernate.hibernate.naming.physical-strategy= # Hibernate 5 physical naming strategy fully qualified name.
+acrossHibernate.hibernate.use-new-id-generator-mappings= # Use Hibernate's newer IdentifierGenerator for AUTO, TABLE and SEQUENCE.
+acrossHibernate.properties.*= # Additional native properties to set on the JPA provider.
+acrossHibernate.show-sql=false # Enable logging of SQL statements.
+acrossHibernate.create-unit-of-work-factory=false # Create and expose a UnitOfWorkFactory.
+acrossHibernate.register-repository-interceptor=true # Enable EntityInterceptor support in Spring Data JpaRepository implementations.
 
-|createTransactionManager
-|`Boolean`
-|Should a TransactionManager bean be created.  If true this will also enable support for @Transaction in all modules bootstrapping later.
-|_true_
+# WEB SUPPORT
+acrossHibernate.open-in-view=true # Register an open-in-view handler. Binds a JPA EntityManager to the thread for the entire processing of the request.
+acrossHibernate.persistenceContextInView.handler=FILTER # Type of open-in-view handler that should be created.
+acrossHibernate.persistenceContextInView.order= # Order of the open-in-view handler. Defaults to 'HIGHEST_PRECEDENCE + 1'.
 
-|createUnitOfWorkFactory
-|`Boolean`
-|Should a <<unitofworkfactory,UnitOfWorkFactory bean>> be created.
-|_false_
+# TRANSACTION
+acrossHibernate.transaction.default-timeout= # Default transaction timeout in seconds.
+acrossHibernate.transaction.rollback-on-commit-failure= # Perform the rollback on commit failures.
+----
 
-|persistenceContextInView.handler
-|`PersistenceContextInView`
-|If a view layer is enabled, should an open session/entity manager be created for the entire request by using either a filter or an interceptor.
-|_PersistenceContextInView.NONE_
+[discrete]
+==== Spring Boot properties fallback
+The default AcrossHibernateJpaModule will also respect the default Spring Boot JPA and transaction related properties.
+However, values configured using the `acrossHibernate` prefix will always take precedence.
 
-|persistenceContextInView.order
-|`Integer`
-|Configure the order of the persistence context view handler (if created).
-|_Ordered.HIGHEST_PRECEDENCE + 1_
+Mapping the original Spring Boot properties allows for easy migration of an Across application using the default JPA starter, to one backed by the AcrossHibernateJpaModule.
+In the best case the developer will not have to make any property changes.
 
-|registerRepositoryInterceptor
-|`Boolean`
-|Should common Repository implementations in modules automatically be intercepted. Currently `JpaRepository` and the legacy
-`BasicRepository` interfaces are intercepted.  See chapter <<EntityInterceptor>> for more information.
-|_true_
+.Spring Boot properties mapped to AcrossHibernateJpaModuleSettings
+[source,properties]
+----
+# JPA (JpaBaseConfiguration, HibernateJpaAutoConfiguration)
+spring.data.jpa.repositories.enabled=true # Enable JPA repositories in the application module.
+spring.jpa.database= # Target database to operate on, auto-detected by default. Can be alternatively set using the "databasePlatform" property.
+spring.jpa.database-platform= # Name of the target database to operate on, auto-detected by default. Can be alternatively set using the "Database" enum.
+spring.jpa.generate-ddl=false # Initialize the schema on startup.
+spring.jpa.hibernate.ddl-auto= # DDL mode. This is actually a shortcut for the "hibernate.hbm2ddl.auto" property. Default to "none".
+spring.jpa.hibernate.naming.implicit-strategy= # Hibernate 5 implicit naming strategy fully qualified name.
+spring.jpa.hibernate.naming.physical-strategy= # Hibernate 5 physical naming strategy fully qualified name.
+spring.jpa.hibernate.use-new-id-generator-mappings= # Use Hibernate's newer IdentifierGenerator for AUTO, TABLE and SEQUENCE.
+spring.jpa.open-in-view=true # Register OpenEntityManagerInViewInterceptor. Binds a JPA EntityManager to the thread for the entire processing of the request.
+spring.jpa.properties.*= # Additional native properties to set on the JPA provider.
+spring.jpa.show-sql=false # Enable logging of SQL statements.
 
-|persistenceUnitName
-|`String`
-|Name of the persistence unit that is being managed by this module.
-|Module name
+# TRANSACTION (TransactionProperties)
+spring.transaction.default-timeout= # Default transaction timeout in seconds.
+spring.transaction.rollback-on-commit-failure= # Perform the rollback on commit failures.
+----
 
-|
-|===
+NOTE: A custom module will never map the original Spring Boot properties.
 
 == What's new in this version?
 :numbered!:
 
 === 3.0.0-SNAPSHOT
+This version requires Across 3.0.0.
+It is also a major update increasing compatibility with the Spring Boot JPA starter.
+
+* when plugging a single AcrossHibernateJpaModule in an application it will transparently take over the starter JPA support on the application module
+** the single exception is the default handling of schema creation in case of a memory database: standard Spring Boot will create the schema by default whereas AcrossHibernateJpaModule will not
+* a `PlatformTransactionManager` is now always created
+** the (largely unused) configuration property to disable the `PlatformTransactionManager` has been removed
+* in addition a `TransactionTemplate` bean is now also created and exposed
+* several new <<module-settings,configurable properties>> have been added
+** all `spring.jpa` and `spring.transaction` configuration properties will be respected, they can also be set directly using the `acrossHibernate` prefix
+* it is now much easier to <<multiple-modules,create a separate AcrossHibernateJpaModule>> for an additional `EntityManager`
+** using `AcrossHibernateJpaModule.builder()` a custom module can now also be created at runtime
+** property handling for custom modules is much easier
+* it's now also possible to specify packages to scan for entities by injecting an `@EntityScan` annotated class into the AcrossHibernateJpaModule
 * fix compatibility with Spring Data which changes the signature of `JpaRepositoryFactoryBean`
+
+NOTE: The original AcrossHibernateModule is still present but has officially been deprecated.
 
 === 2.0.1.RELEASE
 * fix Spring Boot relaxed binding support for *acrossHibernate.* properties
@@ -114,30 +161,93 @@ Major addition of the new `AcrossHibernateJpaModule` as a replacement for the le
 Initial public release available on http://search.maven.org/[Maven central].
 
 :numbered:
-== Basic configuration
+== Using AcrossHibernateJpaModule
+
+=== Application module support
 The {module-name} builds a JPA `EntityManager` for a Persistence Unit with the same name, using Hibernate as the implementation engine.
-Other modules can configure mappings in the `EntityManager` by adding them to the <<HibernatePackage,HibernatePackage>> that this module handles.
-Unless otherwise specified, the {module-name} will create its own `PlatformTransactionManager` and enable transaction management support in other modules.
-If Spring Data JPA repositories are being used, this module also allows the possibility of <<EntityInterceptor,intercepting CRUD operations>>.
+Other modules can configure mappings in the `EntityManager` by adding them to the <<HibernatePackage,HibernatePackage>> that the AcrossHibernateJpaModule handles.
 
-NOTE: Configuring default Hibernate configuration properties can be done on the {module-name} instance.
+The AcrossHibernateJpaModule serves as an alternative for using the `spring-boot-starter-data-jpa` in a multi-module application.
 
-=== Activating Spring Data JPA Repositories
-Use *`@EnableAcrossJpaRepositories`* in your modules to generate JPA repositories based on the {module-name}.
-The custom annotation provides useful default values that will link to the right `PlatformTransactionManager` and will enable <<EntityInterceptor,entity intercepting>>.
+Using an `@AcrossApplication` with `across-autoconfigure` and `spring-boot-starter-data-jpa`, you might have JPA enabled in your application module.
+The latter however does not easily allow shared Across modules to attach to the same `EntityManager`.
 
-See the annotation source code for the custom defaults that are being used.
+In an Across application module, using AcrossHibernateJpaModule should not necessarily require any changes.
+If you simply add AcrossHibernateJpaModule to your application configuration, it will transparently replace the `spring-boot-starter-data-jpa` functionality:
+
+* the single datasource will be used
+* the entire application module will be scanned for entities
+* Spring Data JPA repositories in the application module will be activated
+** compared to the default JPA starter, the AcrossHibernateJpaModule will also enable <<EntityInterceptor,entity intercepting support>>
+* a single `PlatformTransactionManager` with the default name will be available
+
+Most of the default behaviour can be controlled using the <<module-settings,module settings>>.
+If you do not want to use the default entity scan or Spring Data repository scan, you should treat the application module as if it is a shared module and <<manual-configuration,register your entities manually>>.
+
+AcrossHibernateJpaModule also makes it easier to work with <<multiple-modules,multiple entity managers>> in a single application.
+
+[[manual-configuration]]
+=== Manual configuration
+In a simple application the developer probably has to do nothing to make use of the `EntityManager` provided by the AcrossHibernateJpaModule.
+If you want to use the `EntityManager` in a shared module, there's a couple of steps involved:
+
+. Add a required dependency from your module to AcrossHibernateJpaModule using fi `@AcrossDepends(required="AcrossHibernateJpaModule")`
+. <<HibernatePackage,Register the entities>> that should be managed by the shared `EntityManager`
+. Configure the <<spring-data-repositories,Spring Data JPA repositories>> for you module
+
+AcrossHibernateJpaModule always creates a `PlatformTransactionManager` and enables transaction management support in all modules bootstrapping later.
+When having <<multiple-modules,multiple JPA modules>> in a single application, you will have multiple transaction managers and you will have to specify which one to use.
+
+==== Specifying the datasource
+By default the AcrossHibernateJpaModule will use the main Across context datasource for the mapping context.
+It does so by looking for a datasource bean named `acrossDataSource`.
+
+You can specify a different datasource bean to use by setting the `acrossHibernate.data-source` property value.
+
+Alternatively, you can also create the `AcrossHibernateJpaModule` instance manually and provide a `DataSource` in the constructor.
+This will always take precedence over any configured property.
+
+[source,java]
+----
+@Bean
+public AcrossHibernateJpaModule acrossHibernateJpaModule( DataSource myDataSource ) {
+  return new AcrossHibernateJpaModule( myDataSource );
+}
+----
 
 [[HibernatePackage]]
-=== Configuring a HibernatePackage
-{module-name} creates a `HibernatePackage` with the same name as the module itself - also the name of the JPA Persistence Unit.
-This package determines the mapping context that is available in the `EntityManager`.
-When bootstrapping, the {module-name} will delegate configuration to all `HibernatePackageConfigurer` beans found.
-Consuming modules should inject an implementation into the Hibernate module using `@ModuleConfiguration`.
+==== Registering entities
+AcrossHibernateJpaModule creates a Hibernate backed `EntityManager` for the classes assigned to it.
+Modules should tell the AcrossHibernateJpaModule where to scan for entities.
+The easiest way to do this is to register a module extension in the AcrossHibernateJpaModule with an `@EntityScan` for the correct packages.
 
-NOTE: If the same configurer class is injected into multiple modules, the package name can be used as a discriminator.
+.Registering entities code implementing a HibernatePackageConfigurer
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@ModuleConfiguration(AcrossHibernateJpaModule.NAME)
+@EntityScan( basePackageClasses = MyEntities.class )
+public class MyEntitiesConfiguration {
+}
+----
 
-.Example code implementing a HibernatePackageConfigurer
+The location of `MyEntitiesConfiguration` in the above example would usually be in the `extensions` child package of that module's root package.
+
+.Application module support
+The application module is automatically scanned for entities if either of the following applies:
+
+* there is only the default `AcrossHibernateJpaModule` and property `acrossHibernate.application.entity-scan` is not `false`
+* property `acrossHibernate.application.entity-scan` is `true`
+
+.Advanced configuration
+Apart from using `@EntityScan` there are different ways to register entities with AcrossHibernateJpaModule.
+To determined the entities it managed, any AcrossHibernateJpaModule creates a `HibernatePackage` with the same name as the module itself (AcrossHibernateJpaModule by default).
+
+This package determines the entire mapping context that is available in the `EntityManager`.
+When bootstrapping, the AcrossHibernateJpaModule will delegate configuration to all `HibernatePackageConfigurer` beans found, followed by looking for `@EntityScan` annotated classes in its module context.
+As such, consuming modules can also inject a `HibernatePackageConfigurer` implementation into the JPA module using `@ModuleConfiguration`.
+
+.Example code using a HibernatePackageConfigurer
 [source,java,indent=0]
 [subs="verbatim,quotes,attributes"]
 ----
@@ -151,19 +261,68 @@ public class UserEntitiesConfiguration implements HibernatePackageConfigurer
 }
 ----
 
-=== Transaction management
-By default the {module-name} will create a new `PlatformTransactionManager` and will enable transaction management support in other modules.
-The `PlatformTransactionManager` bean created and exposed is named *jpaTransactionManager* (available as `HibernateJpaConfiguration.TRANSACTION_MANAGER`).
+The `HibernatePackageConfigurer` exposes the `HibernatePackageRegistry` which also allows you to register XML-based resources.
 
-Transaction manager creation can be controlled by setting the *acrossHibernate.transactionManager* property.
+NOTE: Unlike with `@EntityScan` the same configurer class can also be injected into multiple JPA modules.
+The `HibernatePackageRegistry.getName()` can then be used to discriminate between mapping contexts.
 
-=== Open EntityManager in View pattern
-If AcrossWebModule is present and the *acrossHibernate.persistenceContextInView.handler* property is set, the {module-name} will automatically register either a `OpenEntityManagerInViewFilter` or a `OpenEntityManagerInViewInterceptor` bean for the `EntityManager`.
-In case of a `HandlerInterceptor` the order can be modified through the *acrossHibernate.persistenceContextInView.order* property.
+==== Configure JPA properties
+Custom JPA or Hibernate properties can be set using the <<module-settings,module settings>>.
+AcrossHibernateJpaModule will attempt to detect sensible defaults, but you can manually set most properties if you prefer.
+
+.Example JPA property configuration
+[source,properties]
+----
+acrossHibernate.show-sql=true   # Show SQL statements
+acrossHibernate.database=SQL_SERVER # Manually specify the database type for the Hibernate dialect
+----
+
+Setting `acrossHibernate.generate-ddl=true` will enable automatic schema creation using Hibernate `hbm2ddl.auto=update` value.
+If you want to be more specific you can set the Hibernate value using `acrossHibernate.hibernate.ddl-auto`.
+Unlike the Spring Boot default behaviour, AcrossHibernateJpaModule will *never* automatically enable schema creation, not even for embedded databases.
+
+All properties passed to `acrossHibernate.properties.*` are passed through as Hibernate configuration properties (without the prefix).
+They will also replace any possibly generated property values if they match.
+
+NOTE: The default AcrossHibernateJpaModule also supports the `spring.jpa.\*` properties.
+
+[[spring-data-repositories]]
+==== Using Spring Data JPA Repositories
+Use *`@EnableAcrossJpaRepositories`* in your modules to generate JPA repositories attaching to the default AcrossHibernateJpaModule `EntityManager`.
+This is a full equivalent of `@EnableJpaRepositories` but it automatically select the default `PlatformTransactionManager` and `EntityManagerFactory` created by AcrossHibernateJpaModule.
+In addition it will also enable <<EntityInterceptor,entity intercepting>>.
+
+.Application module support
+The application module is automatically scanned for Spring Data JPA repositories if either of the following applies:
+
+* there is only the default `AcrossHibernateJpaModule` and property `acrossHibernate.application.repository-scan` is not `false`
+* property `acrossHibernate.application.repository-scan` is `true`
+
+WARNING: Using the default application module repository scanning is only supported with the default AcrossHibernateJpaModule.
+Custom modules will usually need to provide their own mechanism as they will usually expose the required beans under a different name.
+
+.Using default JPA repositories
+It is possible to use the `@EnableJpaRepositories` instead if you manually specify the `PlatformTransactionManager` and `EntityManagerFactory`.
+You will however not be able to use entity intercepting unless you also specify the custom repository factory bean.
+
+==== Transaction management
+AcrossHibernateJpaModule automatically enables transaction management in all modules.
+It exposes a single `PlatformTransactionManager` and `TransactionTemplate.
+The default bean names are *jpaTransactionManager* and *jpaTransactionTemplate* respectively.
+
+If the property `acrossHibernate.primary` is `true`, the exposed beans will automatically be marked as primary and an alias *transactionManager* and *transactionTemplate* will be created as well.
+This is the default behaviour if there is only a single AcrossHibernateJpaModule present.
+In a <<multiple-modules,multi-module application>> it is important to manually demarcate the right module as primary.
+
+[[web-support]]
+==== Web support
+If AcrossWebModule is present and the `acrossHibernate.open-in-view` property is `true` (default), the {module-name} will automatically register either a `OpenEntityManagerInViewFilter` or a `OpenEntityManagerInViewInterceptor` bean for the `EntityManager`.
+
+More advanced configuration options can be set using the `acrossHibernate.persistenceContextInView.*` properties.
 
 [[unitofworkfactory]]
-=== UnitOfWorkFactory
-Usually the use of the Open EntityManager in View pattern and `@Transaction` annotations will suffice for simple use cases.
+==== UnitOfWorkFactory
+Usually the use of the <<web-support,Open EntityManager in View pattern>> and `@Transaction` annotations will suffice for simple use cases.
 If however you want to manually demarcate `EntityManager` scope in your code, you can also expose a `UnitOfWorkFactory` bean.
 A `UnitOfWorkFactory` allows you to easily execute a Unit of Work, code that should run in a single session.
 
@@ -171,11 +330,11 @@ The creation of a `UnitOfWorkFactory` is controlled through the *acrossHibernate
 The default `UnitOfWorkFactory` only manages the `EntityManager` of the module itself.
 In case of a <<multiple-modules,multi-module>> setup, you can manually create a composite using the `CompositeUnitOfWorkFactory`.
 
-== Accessing the Hibernate Session directly
+==== Using the Hibernate Session
 Accessing the Hibernate `Session` directly can be done through the utility methods of the exposed `HibernateSessionHolder` bean.
 
 [[base-classes]]
-== Base classes and utilities
+== Helper classes and utilities
 In addition to the bean infrastructure, this module also provides a set of base classes and general helpers to build a persistent domain model.
 
 === AcrossSequenceGenerator
@@ -204,6 +363,7 @@ Any entity that implements the `Auditable<String>` interface will get auditing i
 `AuditableEntity` is a `@MappedSuperClass` that implements the `Auditable<String>` interface.
 It adds auditing related columns: creation and last modification information (timestamp and principal).
 
+[discrete]
 ==== AuditableSchemaInstaller
 
 The `AuditableSchemaInstaller` is a base installer class that can easily be used to add the relevant auditing columns to multiple tables.
@@ -319,8 +479,8 @@ Shortcut interfaces to reduce code repetition.
 Using these interfaces will ensure repository integration with other modules (for example `EntityModule`).
 
 [[EntityInterceptor]]
-== EntityInterceptor
-By default `JpaRepository` and `BasicRepository` interfaces have their `save` and `delete` methods intercepted.
+== Entity intercepting
+By default `JpaRepository` and `BasicRepository` (legacy) interfaces have their `save` and `delete` methods intercepted.
 Any module can then provide an `EntityInterceptor` bean that executes code before or after the entity state is being updated.
 Note that the `EntityInterceptor` listens to the repository calls and does not take into account when the actual session flushing happens (which might be at a later point in time).
 
@@ -350,16 +510,22 @@ WARNING: Entity intercepting of Spring data JPA Repositories is only activated i
 If you did not activate JPA repositories using the specific `@EnableAcrossJpaRepositories`, you might have to specify the factory bean class manually.
 
 === Known limitations
+[discrete]
 ==== Persistable entities only
 Currently `JpaRepository` methods are only intercepted if they manage a `Persistable` entity.
 Reason for this is the use of the `isNew` method to determine a create or update event.
 Entities extending `SettableIdBasedEntity` automatically implement the required interface.
 
+[discrete]
 ==== Transactional behaviour
 The `EntityInterceptor` calls happen in the same transaction as the repository method.
 If no outer transaction is busy yet, a new one will be created that wraps calls like `beforeCreate`, `afterCreate` and the repository method.
 The transaction manager used is the transaction manager declared in the `@EnableAcrossJpaRepositories` definition.
 
+WARNING: When using multiple JPA modules with entity intercepting enabled, only a single transaction scope will kept.
+You should pay special attention to avoid transactional issues.
+
+[discrete]
 ==== Custom save/delete methods and recursive calls
 The `JpaRepositoryInterceptor` implementation used intercepts only the known `JpaRepository` methods.
 If for some reason you decide to create your own save or delete methods, these will not be intercepted.
@@ -368,38 +534,141 @@ Likewise calling any `save` or `delete` method from within the repository will n
 This is due to the standard proxy behaviour.
 
 [[multiple-modules]]
-== Working with multiple EntityManagers
-The {module-name} represents a single `EntityManager` attached to a single datasource.
-If you require multiple `EntityManager` instances you can use the {module-name} as the base for a new module.
-Things to consider when doing so:
+== Multiple EntityManagers
+A single AcrossHibernateJpaModule represents a single `EntityManager` attached to a single datasource.
+If you require multiple `EntityManager` instances you can use AcrossHibernateJpeModule as a base for a new module.
 
-* replace the default `ApplicationContextConfigurer` so it loads the same configuration as the original {module-name}
-* the name of your module will be the name of the `HibernatePackage` it configures
-* transform the exposed beans to avoid conflicts (or make them primary)
+A couple of things noteworthy:
 
-.Custom module building a JPA HibernatePackage
-[source,java,indent=0]
-[subs="verbatim,quotes,attributes"]
+* every instance creates its own `EntityManager` and builds its own mapping context
+** modules will need to specify separately which entities they want to register in which mapping context
+* every instance has its own set of <<module-settings,settings>> used for configuration
+* every instance exposes at least its own `EntityManagerFactory`, `PlatformTransactionManager` and `TransactionTemplate`
+** you should ensure that one of each is preferably marked as primary, see property `acrossHibernate.primary`
+** you should ensure all of them are exposed under a unique name to avoid conflicts (eg. by prefixing them using an `ExposedBeanDefinitionTransformer`)
+
+An application usually has to take special care when working in a configuration with multiple JPA modules.
+Usually the default AcrossHibernateJpaModule will be set as primary and additional modules only used explicitly.
+
+There are 2 ways to create additional JPA modules:
+
+* create a custom module at runtime
+* extend AcrossHibernateJpaModule to create a separate shared module
+
+=== Runtime JPA module
+Creating a separate JPA module at runtime is very convenient, especially when only required in a single application.
+You can easily create a custom module using the `AcrossHibernateJpaModule.builder()`.
+
+As a minimum you should specify a unique prefix for that module, which will be used to generate the rest of the configuration options.
+
+.Example runtime JPA module and datasource
+[source,java]
 ----
-public class MyJpaEntityManagerModule extends AcrossHibernateJpaModule {
-    public MyJpaEntityManagerModule( DataSource mmeDataSource ) {
-        super( mmeDataSource );
+@Bean
+@ConfigurationProperties("app.datasource.my")
+public DataSourceProperties myDataSourceProperties() {
+    return new DataSourceProperties();
+}
 
-		// change some properties
-        setProperty( MmeCoreConnectorModuleSettings.REGISTER_REPOSITORY_INTERCEPTOR, false );
-        setProperty( MmeCoreConnectorModuleSettings.CREATE_UNITOFWORK_FACTORY, true );
-        setProperty( MmeCoreConnectorModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER, PersistenceContextInView.FILTER );
+@Bean
+@ConfigurationProperties("app.datasource.my")
+public DataSource myDataSource() {
+    return myDataSourceProperties().initializeDataSourceBuilder().build();
+}
 
-        // ensure transaction manager is named myCustomJpaTransactionManager
-		setExposeTransformer( new BeanPrefixingTransformer( "myCustom" ) );
-    }
-
-    @Override
-    protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-        contextConfigurers.add(
-                new ComponentScanConfigurer( AcrossHibernateJpaModule.class.getPackage().getName() + ".config" )
-        );
-    }
+@Bean
+public AcrossHibernateJpaModule myJpaModule() {
+    return AcrossHibernateJpaModule.builder().prefix( "my" ).build();
 }
 ----
 
+The above example defines a separate datasource which reads the properties `app.datasource.my` and creates the `DataSource` bean called `myDataSource`.
+
+The custom `AcrossHibernateJpaModule` is built using only the prefix *my*, which results in the following:
+
+* the generated module name will be `MyJpaModule`
+* all properties starting with `my.jpa` will be considered configuration properties for that module (eg. `my.jpa.generate-ddl=true`)
+* a datasource bean named *myDataSource* will be expected as the datasource for the mapping context
+* exposed beans will be prefixed with `my`, resulting in `PlatformTransactionManager` being exposed as *myJpaTransactionManager*
+
+The `AcrossHibernateJpaModuleBuilder` allows customizing all options of your module separately.
+See the javadoc or source code for all details.
+
+Entities should be attached explicitly to the separate mapping context:
+
+.Registering entities for the runtime JPA module
+[source,java]
+----
+@ModuleConfiguration("MyJpaModule")
+@EntityScan(basePackageClasses = MyEntity.class)
+public class MyEntitiesRegistrar
+{
+}
+----
+
+Likewise, using Spring Data JPA repositories requires you to configure them manually with the correct `PlatformTransactionManager` and `EntityManagerFactory` reference.
+
+.Enabling the Spring Data JPA repositories in your module
+[source,java]
+----
+@Configuration
+@EnableAcrossJpaRepositories(
+  transactionManagerRef = "myJpaTransactionManager",
+  entityManagerFactoryRef = "myEntityManagerFactory"
+)
+public class MyEntitiesConfiguration
+{
+}
+----
+
+This way, it would be perfectly possible for `MyJpaModule` to be present alongside any number of other `AcrossHibernateJpaModule` instances.
+
+=== Shared JPA module
+If you want to create a new shared module building a different `EntityManager`, you can extend `AcrossHibernateJpaModule` and customize some settings.
+
+.Custom shared module
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+public class CustomConnectorModule extends AcrossHibernateJpaModule
+{
+	public static final String NAME = "CustomConnectorModule";
+
+	public CustomConnectorModule() {
+		setPropertiesPrefix( "customConnector" ); <1>
+		setExposeTransformer( new BeanPrefixingTransformer( "custom" ) ); <2>
+		setPrimary( false ); <3>
+	}
+
+	@Override
+	public String getName() {
+		return NAME; <4>
+	}
+}
+----
+
+<1> Configure a separate properties prefix.
+All properties starting with `customConnector` will be considered configuration properties for this module (eg. `customConnector.generate-ddl=true`)
+<2> Unique prefix to be added to the exposed beans.
+In this case the `PlatformTransactionManager` will be exposed as *customJpaTransactionManager*
+<3> Explicitly set this module as non-primary.
+This ensures that none of the exposed beans will be set marked as primary.
+Useful if you want to ensure that - even in an application where it is the only one - this module does not attempt to take over the default JPA support.
+<4> As with any custom Across module, provide it a unique name.
+Providing the `public static final String NAME` allows the module to be scanned by name.
+
+If you easily want to generate Spring Boot configuration metadata for your custom properties, you could additionally extend `AcrossHibernateJpaModuleSettings` and register a seperate `@ConfigurationProperties`.
+
+.Build Spring Boot configuration metadata for the *customConnector* properties
+[source,java,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+@ConfigurationProperties("customConnector")
+public class CustomConnectorModuleSettings extends AcrossHibernateJpaModuleSettings
+{
+}
+----
+
+Registering entities or activating Spring Data JPA repositories is done in exactly the same way as with a separate runtime JPA module.
+
+Using a fully custom shared module also allows you to add additional configuration to your module.

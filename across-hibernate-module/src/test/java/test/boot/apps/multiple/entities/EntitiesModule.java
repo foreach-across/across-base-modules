@@ -14,19 +14,30 @@
  * limitations under the License.
  */
 
-package test.boot.apps.multiple.application.extensions;
+package test.boot.apps.multiple.entities;
 
-import com.foreach.across.core.annotations.ModuleConfiguration;
+import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
+import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import test.boot.apps.multiple.application.brand.Brand;
+
+import java.util.Set;
 
 /**
  * @author Arne Vandamme
  * @since 3.0.0
  */
-@ModuleConfiguration(AcrossHibernateJpaModule.NAME)
-@EntityScan(basePackageClasses = Brand.class)
-public class BrandEntitiesConfiguration
+@AcrossDepends(required = AcrossHibernateJpaModule.NAME)
+public class EntitiesModule extends AcrossModule
 {
+	@Override
+	public String getName() {
+		return "EntitiesModule";
+	}
+
+	@Override
+	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
+		contextConfigurers.add( ComponentScanConfigurer.forAcrossModule( EntitiesModule.class ) );
+	}
 }

@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Persistable;
 import org.springframework.stereotype.Component;
 import test.boot.apps.multiple.connector.CustomConnectorModule;
+import test.boot.apps.multiple.entities.EntitiesModule;
 
 import javax.sql.DataSource;
 import java.util.HashSet;
@@ -80,6 +81,11 @@ public class MultipleDataSourceApplication
 	@Bean
 	public AcrossModule myJpaModule() {
 		return AcrossHibernateJpaModule.builder().prefix( "my" ).build();
+	}
+
+	@Bean
+	public EntitiesModule entitiesModule() {
+		return new EntitiesModule();
 	}
 
 	@Component

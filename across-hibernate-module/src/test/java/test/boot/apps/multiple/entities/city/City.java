@@ -14,19 +14,41 @@
  * limitations under the License.
  */
 
-package test.boot.apps.multiple.application.extensions;
+package test.boot.apps.multiple.entities.city;
 
-import com.foreach.across.core.annotations.ModuleConfiguration;
-import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import test.boot.apps.multiple.application.brand.Brand;
+import lombok.*;
+import org.springframework.data.domain.Persistable;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * @author Arne Vandamme
  * @since 3.0.0
  */
-@ModuleConfiguration(AcrossHibernateJpaModule.NAME)
-@EntityScan(basePackageClasses = Brand.class)
-public class BrandEntitiesConfiguration
+@Entity
+@Table(name = "city")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
+public class City implements Persistable<Long>, Serializable
 {
+	@Id
+	@GeneratedValue
+	private Long id;
+
+	@Column(name = "name")
+	private String name;
+
+	@Override
+	public Long getId() {
+		return id;
+	}
+
+	@Override
+	public boolean isNew() {
+		return id == null || id == 0;
+	}
 }
