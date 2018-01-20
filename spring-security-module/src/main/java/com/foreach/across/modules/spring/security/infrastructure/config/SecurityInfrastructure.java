@@ -16,7 +16,6 @@
 package com.foreach.across.modules.spring.security.infrastructure.config;
 
 import com.foreach.across.core.annotations.AcrossEventHandler;
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.PostRefresh;
 import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
@@ -28,6 +27,7 @@ import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityI
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
@@ -84,7 +84,7 @@ public class SecurityInfrastructure
 		}
 	}
 
-	@Event
+	@EventListener
 	protected void registerModuleMethodSecurity( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
 		if ( !isSecurityModule( beforeBootstrapEvent.getBootstrapConfig() ) ) {
 			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer(

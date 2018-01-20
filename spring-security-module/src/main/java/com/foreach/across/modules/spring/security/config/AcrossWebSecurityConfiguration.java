@@ -15,12 +15,13 @@
  */
 package com.foreach.across.modules.spring.security.config;
 
-import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer;
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapper;
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapperFactory;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
+import com.foreach.across.modules.web.AcrossWebModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ import java.util.*;
  */
 @Configuration
 @EnableWebSecurity
-@AcrossDepends(required = "AcrossWebModule")
+@ConditionalOnAcrossModule(AcrossWebModule.NAME)
 public class AcrossWebSecurityConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger( AcrossWebSecurityConfiguration.class );

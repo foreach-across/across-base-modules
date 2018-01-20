@@ -15,7 +15,8 @@
  */
 package com.foreach.across.modules.spring.security.config;
 
-import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
+import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.modules.web.config.multipart.MultipartResolverConfiguration;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ import java.util.Set;
  * @see org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer
  */
 @Configuration
-@AcrossDepends(required = "AcrossWebModule")
+@ConditionalOnAcrossModule(AcrossWebModule.NAME)
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class DynamicSecurityFilterConfiguration extends AcrossWebDynamicServletConfigurer
 {
