@@ -19,6 +19,7 @@ import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
+import com.foreach.across.modules.spring.security.actions.AllowableAction;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.*;
 import com.foreach.across.test.AcrossTestConfiguration;
@@ -28,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -63,6 +65,9 @@ public class ITSpringSecurityWithoutWeb
 
 	@Autowired
 	private SecurityPrincipalLabelResolver labelResolver;
+
+	@Autowired
+	private ConversionService conversionService;
 
 	@After
 	public void clearSecurityContext() {
@@ -105,6 +110,11 @@ public class ITSpringSecurityWithoutWeb
 
 		assertTrue( currentPrincipal.isAuthenticated() );
 		assertSame( principal, currentPrincipal.getPrincipal() );
+	}
+
+	@Test
+	public void allowableActionCanAlwaysBeConverted() {
+		assertEquals( AllowableAction.CREATE, conversionService.convert( "create", AllowableAction.class ) );
 	}
 
 	@Configuration

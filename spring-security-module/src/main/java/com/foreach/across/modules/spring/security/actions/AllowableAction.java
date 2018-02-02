@@ -29,6 +29,7 @@ import java.util.List;
  * @author Arne Vandamme
  * @see com.foreach.across.modules.spring.security.actions.AllowableActions
  */
+@SuppressWarnings( "unused" )
 public class AllowableAction implements Comparable<AllowableAction>
 {
 	/**
@@ -81,6 +82,16 @@ public class AllowableAction implements Comparable<AllowableAction>
 	@Override
 	public int compareTo( AllowableAction other ) {
 		return getId().compareTo( other.getId() );
+	}
+
+	/**
+	 * Convert a {@code String} into an {@link AllowableAction} instance.
+	 *
+	 * @param id of the action
+	 * @return instance
+	 */
+	public static AllowableAction from( String id ) {
+		return new AllowableAction( id );
 	}
 
 	public static Collection<AllowableAction> toAllowableActions( String... ids ) {
