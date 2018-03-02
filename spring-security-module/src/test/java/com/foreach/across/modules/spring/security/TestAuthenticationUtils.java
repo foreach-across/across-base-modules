@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import com.foreach.across.modules.spring.security.AuthenticationUtils;
+package com.foreach.across.modules.spring.security;
+
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;

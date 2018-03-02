@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/spring-security-module/spring-security-module.iml" filepath="$PROJECT_DIR$/spring-security-module/spring-security-module.iml" />
-      <module fileurl="file://$PROJECT_DIR$/spring-security-module/spring-security-module.iml" filepath="$PROJECT_DIR$/spring-security-module/spring-security-module.iml" />
-      <module fileurl="file://$PROJECT_DIR$/spring-security-module-project.iml" filepath="$PROJECT_DIR$/spring-security-module-project.iml" />
       <module fileurl="file://$PROJECT_DIR$/spring-security-module-project.iml" filepath="$PROJECT_DIR$/spring-security-module-project.iml" />
     </modules>
   </component>

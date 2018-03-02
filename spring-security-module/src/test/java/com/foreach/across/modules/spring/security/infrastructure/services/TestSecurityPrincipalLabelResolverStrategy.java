@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package com.foreach.across.test.modules.spring.security.infrastructure.services;
+package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
-import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalLabelResolver;
-import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalLabelResolverStrategy;
-import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.test.modules.it.spring.security;
+package test;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
@@ -45,8 +45,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration(classes = ITSpringSecurityWithoutWeb.Config.class)
-public class ITSpringSecurityWithoutWeb
+@ContextConfiguration(classes = TestSpringSecurityWithoutWeb.Config.class)
+public class TestSpringSecurityWithoutWeb
 {
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;

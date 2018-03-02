@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.test.modules.spring.security.infrastructure;
+package com.foreach.across.modules.spring.security;
 
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
 import com.foreach.across.test.AbstractAcrossModuleConventionsTest;
 
 /**
  * @author Arne Vandamme
  */
-public class TestSpringSecurityInfrastructureModuleConventions extends AbstractAcrossModuleConventionsTest
+public class TestSpringSecurityModuleConventions extends AbstractAcrossModuleConventionsTest
 {
 	@Override
 	protected boolean hasSettings() {
@@ -31,6 +30,6 @@ public class TestSpringSecurityInfrastructureModuleConventions extends AbstractA
 
 	@Override
 	protected AcrossModule createModule() {
-		return new SpringSecurityInfrastructureModule();
+		return new SpringSecurityModule();
 	}
 }

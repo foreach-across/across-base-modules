@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.foreach.across.test.modules.it.spring.security.application;
+package test.app;
 
 import com.foreach.across.config.AcrossApplication;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;

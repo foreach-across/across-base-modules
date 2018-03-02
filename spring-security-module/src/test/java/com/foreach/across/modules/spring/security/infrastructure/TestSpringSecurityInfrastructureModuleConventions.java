@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.foreach.across.modules.spring.security.infrastructure;
 
-package com.foreach.across.test.modules.it.spring.security.application.application.config;
-
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import com.foreach.across.core.AcrossModule;
+import com.foreach.across.test.AbstractAcrossModuleConventionsTest;
 
 /**
- * @author Steven Gentens
- * @since 3.0.0
+ * @author Arne Vandamme
  */
-@Configuration
-public class SpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
+public class TestSpringSecurityInfrastructureModuleConventions extends AbstractAcrossModuleConventionsTest
 {
 	@Override
-	public void configure( HttpSecurity http ) throws Exception {
-		http.antMatcher( "/bla" ).authorizeRequests().anyRequest().denyAll();
+	protected boolean hasSettings() {
+		return false;
+	}
+
+	@Override
+	protected AcrossModule createModule() {
+		return new SpringSecurityInfrastructureModule();
 	}
 }

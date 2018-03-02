@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.foreach.across.test.modules.spring.security.infrastructure.services;
+package test;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;

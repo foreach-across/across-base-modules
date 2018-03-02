@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package com.foreach.across.test.modules.it.spring.security;
+package test;
 
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
-import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
-import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
-import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalRetrievalStrategy;
-import com.foreach.across.test.modules.it.spring.security.application.SpringSecurityTestApplication;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator;
@@ -37,20 +32,18 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import test.app.SpringSecurityTestApplication;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Steven Gentens
- * @since
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 @WebAppConfiguration
 @ContextConfiguration(classes = SpringSecurityTestApplication.class)
-public class ITSpringSecurityWithTomcat
+public class TestSpringSecurityWithTomcat
 {
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
@@ -86,5 +79,4 @@ public class ITSpringSecurityWithTomcat
 		assertNotNull( requestDataValueProcessor );
 		assertNotNull( webInvocationPrivilegeEvaluator );
 	}
-
 }

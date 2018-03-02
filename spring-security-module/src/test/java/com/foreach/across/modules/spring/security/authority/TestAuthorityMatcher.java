@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.foreach.across.test.modules.spring.security.authority;
+package com.foreach.across.modules.spring.security.authority;
 
-import com.foreach.across.modules.spring.security.authority.AuthorityMatcher;
 import org.junit.Test;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
