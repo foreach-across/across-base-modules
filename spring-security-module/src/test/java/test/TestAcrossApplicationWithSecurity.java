@@ -43,7 +43,7 @@ import static org.junit.Assert.assertNotNull;
 @DirtiesContext
 @WebAppConfiguration
 @ContextConfiguration(classes = SpringSecurityTestApplication.class)
-public class TestSpringSecurityWithTomcat
+public class TestAcrossApplicationWithSecurity
 {
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
