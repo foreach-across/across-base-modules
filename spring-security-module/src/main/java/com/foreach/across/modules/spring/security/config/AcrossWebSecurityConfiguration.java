@@ -22,9 +22,9 @@ import com.foreach.across.modules.spring.security.configuration.WebSecurityConfi
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapperFactory;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import com.foreach.across.modules.web.AcrossWebModule;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +44,7 @@ import java.util.*;
 @Configuration
 @EnableWebSecurity
 @ConditionalOnAcrossModule(AcrossWebModule.NAME)
+@RequiredArgsConstructor
 public class AcrossWebSecurityConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger( AcrossWebSecurityConfiguration.class );
@@ -52,11 +53,8 @@ public class AcrossWebSecurityConfiguration
 	private static final String CLASS_SPRING_SECURITY_DIALECT =
 			"org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect";
 
-	@Autowired
-	private ApplicationContext applicationContext;
-
-	@Autowired
-	private AcrossContextBeanRegistry contextBeanRegistry;
+	private final ApplicationContext applicationContext;
+	private final AcrossContextBeanRegistry contextBeanRegistry;
 
 	@PostConstruct
 	public void registerThymeleafDialect() {
@@ -131,7 +129,7 @@ public class AcrossWebSecurityConfiguration
 
 	@Bean
 	WebSecurityConfigurerWrapperFactory webSecurityConfigurerWrapperFactory() {
-		return new WebSecurityConfigurerWrapperFactory();
+		return new WebSecurityConfigurerWrapperFactory( applicationContext );
 	}
 
 	/**

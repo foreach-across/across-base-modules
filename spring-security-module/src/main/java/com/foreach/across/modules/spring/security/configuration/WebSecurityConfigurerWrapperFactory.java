@@ -15,7 +15,7 @@
  */
 package com.foreach.across.modules.spring.security.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
@@ -31,10 +31,10 @@ import org.springframework.stereotype.Component;
  * @since 1.0.3
  */
 @Component
+@RequiredArgsConstructor
 public class WebSecurityConfigurerWrapperFactory
 {
-	@Autowired
-	private ApplicationContext applicationContext;
+	private final ApplicationContext applicationContext;
 
 	/**
 	 * Creates a dynamic wrapper for a SpringSecurityWebConfigurer.  Due to the standard configuration of http

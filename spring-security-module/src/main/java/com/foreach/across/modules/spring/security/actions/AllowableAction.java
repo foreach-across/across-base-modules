@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.spring.security.actions;
 
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
@@ -43,8 +44,8 @@ public class AllowableAction implements Comparable<AllowableAction>
 
 	private final String id;
 
-	public AllowableAction( String id ) {
-		Assert.isTrue( StringUtils.isNotBlank( id ) );
+	public AllowableAction( @NonNull String id ) {
+		Assert.isTrue( StringUtils.isNotEmpty( id ), "An AllowableAction required a non-empty id" );
 
 		this.id = id;
 	}
