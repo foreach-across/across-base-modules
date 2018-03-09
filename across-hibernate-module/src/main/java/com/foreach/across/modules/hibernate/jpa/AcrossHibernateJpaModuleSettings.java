@@ -44,8 +44,9 @@ public class AcrossHibernateJpaModuleSettings extends AcrossHibernateModuleSetti
 	 * {@link org.springframework.transaction.PlatformTransactionManager} and
 	 * {@link org.springframework.transaction.support.TransactionTemplate}.
 	 * <p/>
-	 * If not set explicitly, this will be {@code true} by default for the standard {@code AcrossHibernateJpaModule},
-	 * with the module name {@code AcrossHibernateJpaModule}.
+	 * If not set explicitly, this will be {@code true} by default for the standard {@code AcrossHibernateJpaModule}
+	 * (with the module name {@code AcrossHibernateJpaModule}) or in case of the module being the only one in an
+	 * entire Across context.
 	 */
 	private Boolean primary;
 }

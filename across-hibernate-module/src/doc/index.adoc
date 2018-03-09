@@ -61,7 +61,7 @@ acrossHibernate.application.entity-scan= # Scan for entities in the application 
 acrossHibernate.application.repository-scan= # Enable Spring Data JPA repositories in the application module. Defaults to true if only one JPA module detected.
 
 # JPA/HIBERNATE
-acrossHibernate.primary= # Mark the exposed beans as primary in the Across context. Default is true if only one JPA module detected.
+acrossHibernate.primary= # Mark the exposed beans as primary in the Across context. Default is true for the AcrossHibernateJpaModule or if only a single JPA module.
 acrossHibernate.data-source= # Name of the DataSource bean that should be resolved and used for the entity manager.
 acrossHibernate.persistence-unit-name= # Name of the persistence unit this EntityManager represents. Defaults to the module name.
 acrossHibernate.database= # Target database to operate on, auto-detected by default. Can be alternatively set using the "databasePlatform" property.
@@ -124,11 +124,25 @@ NOTE: A custom module will never map the original Spring Boot properties.
 This version requires Across 3.0.0.
 It is also a major update increasing compatibility with the Spring Boot JPA starter.
 
+The default configuration now builds on top of Spring Boot JPA support.
+
+.Naming strategy
+Due to Spring Boot compatibility, the default naming strategy being used has been changed since the previous version: the default is now a Spring naming strategy, instead of a Hibernate one.
+This can cause problems with query generation.
+
+Some issues have been mentioned regarding reserved keywords (eg. as a table or column name).
+
+You can manually revert to the previous naming strategy by setting: `acrossHibernate.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl`.
+
+.List of changes
 * when plugging a single AcrossHibernateJpaModule in an application it will transparently take over the starter JPA support on the application module
 ** the single exception is the default handling of schema creation in case of a memory database: standard Spring Boot will create the schema by default whereas AcrossHibernateJpaModule will not
 * a `PlatformTransactionManager` is now always created
 ** the (largely unused) configuration property to disable the `PlatformTransactionManager` has been removed
 * in addition a `TransactionTemplate` bean is now also created and exposed
+* the AcrossHibernateJpaModule will mark its exposed beans as `@Primary` by default
+** if you want another module to expose the primary beans, set the property `acrossHibernate.primary` to `false`
+** a custom module (eg. extending AcrossHibernateJpaModule) works the opposite way: it will not expose primary beans unless the relevant property is explicitly set to `true` or it is the only module in the Across context
 * several new <<module-settings,configurable properties>> have been added
 ** all `spring.jpa` and `spring.transaction` configuration properties will be respected, they can also be set directly using the `acrossHibernate` prefix
 * it is now much easier to <<multiple-modules,create a separate AcrossHibernateJpaModule>> for an additional `EntityManager`
@@ -284,7 +298,7 @@ Unlike the Spring Boot default behaviour, AcrossHibernateJpaModule will *never* 
 All properties passed to `acrossHibernate.properties.*` are passed through as Hibernate configuration properties (without the prefix).
 They will also replace any possibly generated property values if they match.
 
-NOTE: The default AcrossHibernateJpaModule also supports the `spring.jpa.\*` properties.
+NOTE: The default AcrossHibernateJpaModule also supports the `spring.jpa.*` properties.
 
 [[spring-data-repositories]]
 ==== Using Spring Data JPA Repositories
@@ -307,12 +321,12 @@ You will however not be able to use entity intercepting unless you also specify 
 
 ==== Transaction management
 AcrossHibernateJpaModule automatically enables transaction management in all modules.
-It exposes a single `PlatformTransactionManager` and `TransactionTemplate.
+It exposes a single `PlatformTransactionManager` and `TransactionTemplate`.
 The default bean names are *jpaTransactionManager* and *jpaTransactionTemplate* respectively.
 
-If the property `acrossHibernate.primary` is `true`, the exposed beans will automatically be marked as primary and an alias *transactionManager* and *transactionTemplate* will be created as well.
-This is the default behaviour if there is only a single AcrossHibernateJpaModule present.
-In a <<multiple-modules,multi-module application>> it is important to manually demarcate the right module as primary.
+Unless the property `acrossHibernate.primary` is `false`, the exposed beans will automatically be marked as primary and an alias *transactionManager* and *transactionTemplate* will be created as well.
+This is the default behaviour for the initial AcrossHibernateJpaModule.
+If you want a custom module to take the primary rule - for example in a <<multiple-modules,multi-module application>> - it is important to disable primary on the AcrossHibernateJpaModule and set it to `true` on your custom module.
 
 [[web-support]]
 ==== Web support
@@ -637,7 +651,7 @@ public class CustomConnectorModule extends AcrossHibernateJpaModule
 	public CustomConnectorModule() {
 		setPropertiesPrefix( "customConnector" ); <1>
 		setExposeTransformer( new BeanPrefixingTransformer( "custom" ) ); <2>
-		setPrimary( false ); <3>
+		setPrimary( true ); <3>
 	}
 
 	@Override
@@ -651,9 +665,10 @@ public class CustomConnectorModule extends AcrossHibernateJpaModule
 All properties starting with `customConnector` will be considered configuration properties for this module (eg. `customConnector.generate-ddl=true`)
 <2> Unique prefix to be added to the exposed beans.
 In this case the `PlatformTransactionManager` will be exposed as *customJpaTransactionManager*
-<3> Explicitly set this module as non-primary.
-This ensures that none of the exposed beans will be set marked as primary.
-Useful if you want to ensure that - even in an application where it is the only one - this module does not attempt to take over the default JPA support.
+<3> Explicitly set this module primary.
+Do this only in the case where you want this module to always expose the primary transaction manager.
+When combining with AcrossHibernateJpaModule in the same application, it is also important to unset the default module primary status.
+You can always omit this and set the primary status using the corresponding property value instead.
 <4> As with any custom Across module, provide it a unique name.
 Providing the `public static final String NAME` allows the module to be scanned by name.
 
