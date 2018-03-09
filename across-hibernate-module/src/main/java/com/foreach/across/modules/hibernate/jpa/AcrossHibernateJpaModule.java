@@ -86,7 +86,12 @@ public class AcrossHibernateJpaModule extends AbstractHibernatePackageModule
 	 * @param primary or not
 	 */
 	public final void setPrimary( Boolean primary ) {
-		setProperty( getPropertiesPrefix() + ".primary", primary );
+		if ( primary != null ) {
+			setProperty( getPropertiesPrefix() + ".primary", primary );
+		}
+		else {
+			getProperties().remove( getPropertiesPrefix() + ".primary" );
+		}
 	}
 
 	@Override
@@ -104,7 +109,8 @@ public class AcrossHibernateJpaModule extends AbstractHibernatePackageModule
 		if ( getName().equals( currentModule.getModuleName() ) ) {
 			if ( currentModule.getExposeTransformer() != null ) {
 				currentModule.setExposeTransformer(
-						new BeanDefinitionTransformerComposite( currentModule.getExposeTransformer(), new PrimaryTransactionManagerTransformer( this ) )
+						new BeanDefinitionTransformerComposite( currentModule.getExposeTransformer(),
+						                                        new PrimaryTransactionManagerTransformer( this ) )
 				);
 			}
 			else {
@@ -203,7 +209,8 @@ public class AcrossHibernateJpaModule extends AbstractHibernatePackageModule
 			}
 
 			module.setModuleName( StringUtils.defaultString( this.moduleName, StringUtils.capitalize( prefix + "JpaModule" ) ) );
-			module.setPropertiesPrefix( StringUtils.defaultString( this.propertiesPrefix, StringUtils.uncapitalize( prefix ) + propertiesSuffix ) );
+			module.setPropertiesPrefix(
+					StringUtils.defaultString( this.propertiesPrefix, StringUtils.uncapitalize( prefix ) + propertiesSuffix ) );
 			module.setDataSource( dataSource );
 			module.setDataSourceName( StringUtils.defaultString( dataSourceName, StringUtils.uncapitalize( prefix + "DataSource" ) ) );
 			module.setPersistenceUnitName( StringUtils.defaultString( persistenceUnitName, module.getName() ) );

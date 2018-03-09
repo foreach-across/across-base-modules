@@ -56,7 +56,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 				"app.datasource.my.url=jdbc:hsqldb:mem:my-db",
 				"spring.jpa.show-sql=false",
 				"spring.transaction.default-timeout=25",
-				"acrossHibernate.primary=true",
 				"acrossHibernate.hibernate.ddl-auto=create-drop",
 				"customConnector.generate-ddl=true",
 				"customConnector.data-source=barDataSource",
@@ -162,6 +161,9 @@ public class TestMultipleDataSourceApplication
 
 	@Test
 	public void primaryTransactionManagerIsFromDefaultModule() {
+		assertThat( beanRegistry.getBeansOfType( PlatformTransactionManager.class ) ).hasSize( 3 );
+		assertThat( beanRegistry.getBeansOfType( TransactionTemplate.class ) ).hasSize( 3 );
+
 		assertThat( beanRegistry.getBeanOfType( PlatformTransactionManager.class ) )
 				.isEqualTo( beanRegistry.getBean( "transactionManager" ) )
 				.isEqualTo( beanRegistry.getBean( HibernateJpaConfiguration.TRANSACTION_MANAGER ) );

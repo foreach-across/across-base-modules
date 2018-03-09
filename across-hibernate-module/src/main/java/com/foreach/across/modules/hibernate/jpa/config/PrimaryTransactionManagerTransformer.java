@@ -28,7 +28,8 @@ import java.util.Map;
 
 /**
  * Checks if the transaction manager (and related beans) being exposed should be configured
- * as primary according to the module settings.
+ * as primary according to the module settings. The standard {@link AcrossHibernateJpaModule} is primary
+ * by default unless it has been explicitly disabled with property {@code acrossHibernate.primary=false}.
  *
  * @author Arne Vandamme
  * @since 3.0.0
@@ -45,7 +46,7 @@ public class PrimaryTransactionManagerTransformer implements ExposedBeanDefiniti
 		                                                  .getApplicationContext()
 		                                                  .getBean( AcrossHibernateJpaModuleSettings.class );
 
-		if ( Boolean.TRUE.equals( settings.getPrimary() ) ) {
+		if ( isPrimary( settings ) ) {
 			LOG.debug( "Registering PlatformTransactionManager, TransactionTemplate and HibernateSessionHolder as primary" );
 			beanDefinitions.get( HibernateJpaConfiguration.TRANSACTION_MANAGER ).setPrimary( true );
 			beanDefinitions.get( HibernateJpaConfiguration.TRANSACTION_TEMPLATE ).setPrimary( true );
@@ -61,8 +62,16 @@ public class PrimaryTransactionManagerTransformer implements ExposedBeanDefiniti
 		}
 	}
 
-	private void alias( ApplicationContext parentContext, Map<String, ExposedBeanDefinition> beanDefinitions, String originalBean, String aliasToAdd ) {
-		if ( parentContext.containsBean( originalBean ) ) {
+	private boolean isPrimary( AcrossHibernateJpaModuleSettings settings ) {
+		Boolean manuallySetPrimaryStatus = settings.getPrimary();
+		return manuallySetPrimaryStatus != null ? manuallySetPrimaryStatus : AcrossHibernateJpaModule.NAME.equals( module.getName() );
+	}
+
+	private void alias( ApplicationContext parentContext,
+	                    Map<String, ExposedBeanDefinition> beanDefinitions,
+	                    String originalBean,
+	                    String aliasToAdd ) {
+		if ( parentContext.containsBean( aliasToAdd ) ) {
 			LOG.debug( "Unable to create '{}' alias for the '{}' - there is already a bean with that name", aliasToAdd, originalBean );
 		}
 		else {

@@ -120,6 +120,7 @@ public class TestMixedPersistence
 			context.addModule( hibernateModule );
 
 			AcrossHibernateJpaModule hibernateJpaModule = new AcrossHibernateJpaModule();
+			hibernateJpaModule.setPrimary( false );
 			hibernateJpaModule.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
 			context.addModule( hibernateJpaModule );
 
