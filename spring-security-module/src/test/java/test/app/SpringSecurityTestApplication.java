@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 
 /**
  * @author Steven Gentens
- * @since 3.0.0-SNAPSHOT
+ * @since 3.0.0
  */
 @AcrossApplication(modules = { AcrossWebModule.NAME, SpringSecurityModule.NAME })
 public class SpringSecurityTestApplication

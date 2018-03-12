@@ -49,37 +49,6 @@ public class ModuleGlobalMethodSecurityConfiguration extends GlobalMethodSecurit
 		return expressionHandler;
 	}
 
-	/*
-		@Bean
-		@Refreshable
-		PermissionEvaluator permissionEvaluator() {
-			return new PermissionEvaluator()
-			{
-				private PermissionEvaluator delegate;
-
-				@Override
-				public boolean hasPermission( Authentication authentication,
-											  Object targetDomainObject,
-											  Object permission ) {
-					return delegate.hasPermission( authentication, targetDomainObject, permission );
-				}
-
-				@Override
-				public boolean hasPermission( Authentication authentication,
-											  Serializable targetId,
-											  String targetType,
-											  Object permission ) {
-					return delegate.hasPermission( authentication, targetId, targetType, permission );
-				}
-
-				@PostRefresh
-				public void refresh() {
-					delegate = contextBeanRegistry
-							.getBeanOfTypeFromModule( SpringSecurityAclModule.NAME, AclPermissionEvaluator.class );
-				}
-			};
-		}
-	*/
 	@Override
 	protected AuthenticationManager authenticationManager() {
 		return securityInfrastructure.authenticationManager();

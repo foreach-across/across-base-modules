@@ -25,7 +25,9 @@ import com.foreach.across.modules.spring.security.configuration.SpringSecurityWe
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalRetrievalStrategy;
-import com.foreach.across.test.AcrossTestWebConfiguration;
+import com.foreach.across.modules.web.AcrossWebModule;
+import com.foreach.across.test.AcrossTestConfiguration;
+import com.foreach.across.test.AcrossWebAppConfiguration;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +45,6 @@ import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -51,7 +52,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@WebAppConfiguration
+@AcrossWebAppConfiguration
 @ContextConfiguration(classes = TestSpringSecurityWithWeb.Config.class)
 public class TestSpringSecurityWithWeb
 {
@@ -148,7 +149,7 @@ public class TestSpringSecurityWithWeb
 	}
 
 	@Configuration
-	@AcrossTestWebConfiguration
+	@AcrossTestConfiguration(modules = AcrossWebModule.NAME)
 	protected static class Config implements AcrossContextConfigurer
 	{
 		@Override

@@ -18,17 +18,19 @@ package test;
 
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
+import com.foreach.across.test.support.config.MockAcrossServletContextInitializer;
+import com.foreach.across.test.support.config.MockMvcConfiguration;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -40,9 +42,9 @@ import static org.junit.Assert.assertNotNull;
  * @author Steven Gentens
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
 @WebAppConfiguration
-@ContextConfiguration(classes = SpringSecurityTestApplication.class)
+@SpringBootTest(classes = { SpringSecurityTestApplication.class, MockMvcConfiguration.class })
+@ContextConfiguration(initializers = MockAcrossServletContextInitializer.class)
 public class TestAcrossApplicationWithSecurity
 {
 	@Autowired
