@@ -17,16 +17,12 @@ package com.foreach.across.modules.spring.security.infrastructure.config;
 
 import com.foreach.across.core.annotations.PostRefresh;
 import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
-import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
-import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
-import com.foreach.across.modules.spring.security.config.ModuleGlobalMethodSecurityConfiguration;
 import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
@@ -79,15 +75,6 @@ public class SecurityInfrastructure
 			delegate = contextBeanRegistry
 					.getBeanOfTypeFromModule( SpringSecurityModule.NAME, AuthenticationManagerBuilder.class )
 					.getOrBuild();
-		}
-	}
-
-	@EventListener
-	protected void registerModuleMethodSecurity( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
-		if ( !isSecurityModule( beforeBootstrapEvent.getBootstrapConfig() ) ) {
-			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer(
-					new AnnotatedClassConfigurer( ModuleGlobalMethodSecurityConfiguration.class )
-			);
 		}
 	}
 

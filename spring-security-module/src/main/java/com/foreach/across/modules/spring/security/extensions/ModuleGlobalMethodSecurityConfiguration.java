@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.spring.security.config;
+package com.foreach.across.modules.spring.security.extensions;
 
+import com.foreach.across.core.annotations.ModuleConfiguration;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +28,7 @@ import org.springframework.security.config.annotation.method.configuration.Globa
  * Enables Spring method security in modules, ensuring that the same AuthenticationManager is being used.
  * This exposes an AuthenticationManager delegate in every module.
  */
-@Configuration
+@ModuleConfiguration(exclude = "SpringSecurityAclModule")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ModuleGlobalMethodSecurityConfiguration extends GlobalMethodSecurityConfiguration
 {

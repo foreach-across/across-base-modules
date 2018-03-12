@@ -15,22 +15,20 @@
  */
 package com.foreach.across.modules.spring.security.config;
 
-import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer;
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapper;
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapperFactory;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
-import com.foreach.across.modules.web.AcrossWebModule;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.security.FallbackWebSecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.util.ClassUtils;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
@@ -41,17 +39,13 @@ import java.util.*;
 /**
  * Configures Spring security support in an AcrossWeb enabled context.
  */
-@Configuration
-@EnableWebSecurity
-@ConditionalOnAcrossModule(AcrossWebModule.NAME)
+@Import({ SecurityAutoConfiguration.class, FallbackWebSecurityAutoConfiguration.class })
 @RequiredArgsConstructor
-public class AcrossWebSecurityConfiguration
+@Slf4j
+class AcrossWebSecurityConfiguration
 {
-	private static final Logger LOG = LoggerFactory.getLogger( AcrossWebSecurityConfiguration.class );
-
 	private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring4.SpringTemplateEngine";
-	private static final String CLASS_SPRING_SECURITY_DIALECT =
-			"org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect";
+	private static final String CLASS_SPRING_SECURITY_DIALECT = "org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect";
 
 	private final ApplicationContext applicationContext;
 	private final AcrossContextBeanRegistry contextBeanRegistry;

@@ -23,11 +23,8 @@ import com.foreach.across.core.context.bootstrap.AcrossBootstrapConfig;
 import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
-import com.foreach.across.core.filters.BeanFilterComposite;
-import com.foreach.across.core.filters.ClassBeanFilter;
-import com.foreach.across.core.filters.NamedBeanFilter;
-import com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration;
 import com.foreach.across.modules.spring.security.config.DynamicSecurityFilterConfiguration;
+import com.foreach.across.modules.spring.security.config.SecurityAutoConfigurationAdapter;
 import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -41,20 +38,6 @@ import java.util.Set;
 public class SpringSecurityModule extends AcrossModule
 {
 	public static final String NAME = "SpringSecurityModule";
-
-	public SpringSecurityModule() {
-		setExposeFilter(
-				new BeanFilterComposite(
-						defaultExposeFilter(),
-						new ClassBeanFilter(
-								FilterChainProxy.class,
-								WebInvocationPrivilegeEvaluator.class,
-								SecurityExpressionHandler.class
-						),
-						new NamedBeanFilter( "requestDataValueProcessor" )
-				)
-		);
-	}
 
 	@Override
 	protected void setContext( AcrossContext context ) {
@@ -75,8 +58,7 @@ public class SpringSecurityModule extends AcrossModule
 
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-		contextConfigurers.add( new AnnotatedClassConfigurer( DynamicSecurityFilterConfiguration.class,
-		                                                      AcrossWebSecurityConfiguration.class ) );
+		contextConfigurers.add( new AnnotatedClassConfigurer( DynamicSecurityFilterConfiguration.class, SecurityAutoConfigurationAdapter.class ) );
 	}
 
 	@Override
@@ -90,5 +72,8 @@ public class SpringSecurityModule extends AcrossModule
 					)
 			);
 		}
+
+		currentModule.expose( "requestDataValueProcessor" );
+		currentModule.expose( FilterChainProxy.class, WebInvocationPrivilegeEvaluator.class, SecurityExpressionHandler.class );
 	}
 }
