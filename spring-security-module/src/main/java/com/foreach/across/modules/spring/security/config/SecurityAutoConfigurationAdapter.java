@@ -18,13 +18,20 @@ package com.foreach.across.modules.spring.security.config;
 
 import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.modules.web.AcrossWebModule;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DeferredImportSelector;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
@@ -33,13 +40,49 @@ import org.springframework.core.type.AnnotationMetadata;
  */
 @Configuration
 @ConditionalOnAcrossModule(AcrossWebModule.NAME)
-@Import(SecurityAutoConfigurationAdapter.Importer.class)
+@Import({ SecurityAutoConfigurationAdapter.Importer.class, SecurityAutoConfigurationAdapter.DisableNoWebSecurityAdapter.class })
+@Slf4j
 public class SecurityAutoConfigurationAdapter
 {
 	@Bean
 	@ConditionalOnMissingBean(search = SearchStrategy.ANCESTORS)
 	public ServerProperties serverProperties() {
 		return new ServerProperties();
+	}
+
+	/**
+	 * Removes the Spring Boot basic security configurations, unless it is explicitly enabled.
+	 */
+	static class DisableNoWebSecurityAdapter implements BeanDefinitionRegistryPostProcessor, EnvironmentAware
+	{
+		public static final String SPRING_BOOT_NO_WEB_SECURITY_CONFIGURER =
+				"org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration.ApplicationNoWebSecurityConfigurerAdapter";
+		public static final String SPRING_BOOT_BASIC_WEB_SECURITY_CONFIGURER =
+				"org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration.ApplicationWebSecurityConfigurerAdapter";
+		private Environment environment;
+
+		@Override
+		public void setEnvironment( Environment environment ) {
+			this.environment = environment;
+		}
+
+		@Override
+		public void postProcessBeanDefinitionRegistry( BeanDefinitionRegistry registry ) throws BeansException {
+			if ( !environment.getProperty( "security.basic.enabled", Boolean.class, false ) ) {
+				LOG.info( "Disabling Spring Boot basic security - only explicitly enabling it with 'security.basic.enabled' is supported by SpringSecurityModule" );
+				if ( registry.containsBeanDefinition( SPRING_BOOT_NO_WEB_SECURITY_CONFIGURER ) ) {
+					registry.removeBeanDefinition( SPRING_BOOT_NO_WEB_SECURITY_CONFIGURER );
+				}
+				if ( registry.containsBeanDefinition( SPRING_BOOT_BASIC_WEB_SECURITY_CONFIGURER ) ) {
+					registry.removeBeanDefinition( SPRING_BOOT_BASIC_WEB_SECURITY_CONFIGURER );
+				}
+			}
+		}
+
+		@Override
+		public void postProcessBeanFactory( ConfigurableListableBeanFactory beanFactory ) throws BeansException {
+
+		}
 	}
 
 	static class Importer implements DeferredImportSelector

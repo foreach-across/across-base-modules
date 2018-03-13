@@ -16,19 +16,32 @@
 
 package test.app.application;
 
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * @author Steven Gentens
+ * @author Arne Vandamme
  * @since 3.0.0
  */
-@Configuration
-public class SpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
+@Controller
+public class HomeController
 {
-	@Override
-	public void configure( HttpSecurity http ) throws Exception {
-		http.antMatcher( "/blocked" ).authorizeRequests().anyRequest().denyAll();
+	@GetMapping("/hello")
+	@ResponseBody
+	public String hello() {
+		return "hello";
+	}
+
+	@GetMapping("/hello-public")
+	@ResponseBody
+	public String helloPublic() {
+		return "hello-public";
+	}
+
+	@GetMapping("/blocked")
+	@ResponseBody
+	public String blocked() {
+		return "should-always-be-refused";
 	}
 }

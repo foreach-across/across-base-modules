@@ -41,9 +41,10 @@ import java.util.Set;
  * @author Arne Vandamme
  * @see org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer
  */
-@Configuration
+//@Configuration
 @ConditionalOnAcrossModule(AcrossWebModule.NAME)
 @Order(Ordered.HIGHEST_PRECEDENCE)
+@Deprecated
 public class DynamicSecurityFilterConfiguration extends AcrossWebDynamicServletConfigurer
 {
 	private static final Logger LOG = LoggerFactory.getLogger( DynamicSecurityFilterConfiguration.class );

@@ -19,10 +19,12 @@ package test.app.application.extensions;
 import com.foreach.across.core.annotations.ModuleConfiguration;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+@Profile( "custom-auth" )
 @ModuleConfiguration(SpringSecurityModule.NAME)
 @EnableGlobalAuthentication
 public class AuthenticationConfiguration

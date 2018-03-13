@@ -16,20 +16,27 @@
 package com.foreach.across.modules.spring.security.config;
 
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
+import com.foreach.across.core.context.support.AcrossOrderUtils;
 import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer;
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapper;
 import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapperFactory;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.security.FallbackWebSecurityAutoConfiguration;
+import lombok.val;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.security.IgnoredRequestCustomizer;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.SecurityFilterAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
@@ -39,7 +46,7 @@ import java.util.*;
 /**
  * Configures Spring security support in an AcrossWeb enabled context.
  */
-@Import({ SecurityAutoConfiguration.class, FallbackWebSecurityAutoConfiguration.class })
+@Import({ SecurityAutoConfiguration.class, SecurityFilterAutoConfiguration.class })
 @RequiredArgsConstructor
 @Slf4j
 class AcrossWebSecurityConfiguration
@@ -59,7 +66,7 @@ class AcrossWebSecurityConfiguration
 
 			if ( springTemplateEngine instanceof SpringTemplateEngine ) {
 				( (SpringTemplateEngine) springTemplateEngine ).addDialect( new SpringSecurityDialect() );
-				LOG.debug( "Thymeleaf Spring security dialect registered successfully." );
+				LOG.trace( "Thymeleaf Spring security dialect registered successfully." );
 			}
 			else {
 				LOG.warn(
@@ -83,6 +90,23 @@ class AcrossWebSecurityConfiguration
 	}
 
 	/**
+	 * Ignore any configured error controller path from security matching by default.
+	 * TODO: actually security configuration should happen in the post processor module in the future,
+	 * making this obsolete hopefully
+	 */
+	@Bean
+	@ConditionalOnBean(ServerProperties.class)
+	public IgnoredRequestCustomizer ignoreErrorPathRequestCustomizer( ServerProperties serverProperties ) {
+		return configurer -> {
+			String result = StringUtils.cleanPath( serverProperties.getError().getPath() );
+			if ( !result.startsWith( "/" ) ) {
+				result = "/" + result;
+			}
+			configurer.antMatchers( result );
+		};
+	}
+
+	/**
 	 * Support using SpringSecurityConfigurer instances from other modules.
 	 * This overrides the bean definition in {@link org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration}
 	 * and assembles a collection of WebSecurityConfigurers.  WebSecurityConfigurer instances present in this
@@ -98,9 +122,9 @@ class AcrossWebSecurityConfiguration
 
 		int index = 1;
 
-		LOG.debug( "Applying the following security configurers in order:" );
+		LOG.trace( "Registering the following SpringSecurityWebConfigurer in order:" );
 		for ( Map.Entry<String, SpringSecurityWebConfigurer> entry : configurers.entrySet() ) {
-			LOG.debug( " {} - {} ({})", index, entry.getKey(), ClassUtils.getUserClass( entry.getValue() ).getName() );
+			LOG.trace( " {} - {} ({})", index, entry.getKey(), ClassUtils.getUserClass( entry.getValue() ).getName() );
 
 			WebSecurityConfigurerWrapper wrapper = webSecurityConfigurerWrapperFactory()
 					.createWrapper( entry.getValue(), index++ );
@@ -111,6 +135,17 @@ class AcrossWebSecurityConfiguration
 		if ( webSecurityConfigurers.isEmpty() ) {
 			throw new IllegalStateException(
 					"At least one non-null instance of SpringSecurityWebConfigurer should be present in the Across context." );
+		}
+
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debug( "Applying the following WebSecurityConfigurers in order:" );
+			val list = webSecurityConfigurers.getWebSecurityConfigurers();
+			list.sort( AnnotationAwareOrderComparator.INSTANCE );
+			list.forEach( cfg -> {
+				              int order = AcrossOrderUtils.findOrder( cfg );
+				              LOG.debug( " {} - {}", order, cfg );
+			              }
+			);
 		}
 
 		return webSecurityConfigurers;
@@ -130,7 +165,7 @@ class AcrossWebSecurityConfiguration
 	 * Wrapping class that exposes the property used in
 	 * {@link org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration}.
 	 */
-	private static class WebSecurityConfigurerSet extends HashSet<WebSecurityConfigurer>
+	private static class WebSecurityConfigurerSet extends LinkedHashSet<WebSecurityConfigurer>
 	{
 		public List<WebSecurityConfigurer> getWebSecurityConfigurers() {
 			return new ArrayList<>( this );

@@ -20,6 +20,7 @@ import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.test.support.config.MockAcrossServletContextInitializer;
 import com.foreach.across.test.support.config.MockMvcConfiguration;
+import lombok.SneakyThrows;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,22 +32,34 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
 import test.app.SpringSecurityTestApplication;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author Steven Gentens
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
+@DirtiesContext
 @SpringBootTest(classes = { SpringSecurityTestApplication.class, MockMvcConfiguration.class })
 @ContextConfiguration(initializers = MockAcrossServletContextInitializer.class)
-public class TestAcrossApplicationWithSecurity
+@ActiveProfiles("custom-auth")
+public class TestApplicationWithDefaultSecurity
 {
+	@Autowired
+	private MockMvc mockMvc;
+
 	@Autowired
 	private AcrossContextBeanRegistry contextBeanRegistry;
 
@@ -70,8 +83,7 @@ public class TestAcrossApplicationWithSecurity
 
 	@Test
 	public void authenticationManagerBuilderShouldExist() {
-		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME,
-		                                                            AuthenticationManagerBuilder.class ) );
+		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME, AuthenticationManagerBuilder.class ) );
 	}
 
 	@Test
@@ -80,5 +92,31 @@ public class TestAcrossApplicationWithSecurity
 		assertNotNull( securityExpressionHandler );
 		assertNotNull( requestDataValueProcessor );
 		assertNotNull( webInvocationPrivilegeEvaluator );
+	}
+
+	@Test
+	@SneakyThrows
+	public void blockedShouldNotBeAllowed() {
+		mockMvc.perform( get( "/blocked" ) )
+		       .andExpect( status().isForbidden() );
+	}
+
+	@Test
+	@SneakyThrows
+	public void defaultPathsAreNotSecured() {
+		mockMvc.perform( get( "/hello" ) )
+		       .andExpect( status().isOk() )
+		       .andExpect( content().string( "hello" ) );
+		mockMvc.perform( get( "/hello-public" ) )
+		       .andExpect( status().isOk() )
+		       .andExpect( content().string( "hello-public" ) );
+	}
+
+	@Test
+	@SneakyThrows
+	public void errorPageShouldNotBeSecured() {
+		mockMvc.perform( get( "/error" ) )
+		       .andExpect( status().isInternalServerError() )
+		       .andExpect( content().string( containsString( "No message available" ) ) );
 	}
 }

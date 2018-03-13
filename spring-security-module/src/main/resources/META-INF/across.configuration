@@ -15,8 +15,18 @@
 #
 
 #
-# SpringSecurityModule does not allow any WebSecurityConfigurer bean to be present on the parent context,
-# they should all be shifted to the AcrossContextPostProcessorModule instead
+# SpringSecurityModule prefers any WebSecurityConfigurer to be added to itself
 #
+com.foreach.across.Exposed=\
+  org.springframework.boot.autoconfigure.security.IgnoredRequestCustomizer,\
+  org.springframework.security.config.annotation.web.WebSecurityConfigurer
+
 com.foreach.across.AutoConfigurationDisabled=\
-  org.springframework.boot.autoconfigure.security.SpringBootWebSecurityConfiguration
+  org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration,\
+  org.springframework.boot.autoconfigure.security.SecurityFilterAutoConfiguration,\
+  org.springframework.boot.autoconfigure.security.FallbackWebSecurityAutoConfiguration
+
+com.foreach.across.AutoConfigurationEnabled=\
+  org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration->SpringSecurityModule,\
+  org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration->SpringSecurityModule
+
