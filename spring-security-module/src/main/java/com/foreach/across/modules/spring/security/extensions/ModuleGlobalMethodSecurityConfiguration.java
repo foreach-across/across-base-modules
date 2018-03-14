@@ -17,7 +17,8 @@ package com.foreach.across.modules.spring.security.extensions;
 
 import com.foreach.across.core.annotations.ModuleConfiguration;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,15 +30,12 @@ import org.springframework.security.config.annotation.method.configuration.Globa
  * This exposes an AuthenticationManager delegate in every module.
  */
 @ModuleConfiguration(exclude = "SpringSecurityAclModule")
+@ConditionalOnBean(SecurityInfrastructure.class)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class ModuleGlobalMethodSecurityConfiguration extends GlobalMethodSecurityConfiguration
 {
-	private SecurityInfrastructure securityInfrastructure;
-
-	@Autowired
-	private void setSecurityInfrastructure( SecurityInfrastructure securityInfrastructure ) {
-		this.securityInfrastructure = securityInfrastructure;
-	}
+	private final SecurityInfrastructure securityInfrastructure;
 
 	@Override
 	protected MethodSecurityExpressionHandler createExpressionHandler() {

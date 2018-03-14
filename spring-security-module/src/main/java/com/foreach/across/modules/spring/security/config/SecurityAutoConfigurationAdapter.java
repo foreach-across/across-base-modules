@@ -68,9 +68,12 @@ public class SecurityAutoConfigurationAdapter
 
 		@Override
 		public void postProcessBeanDefinitionRegistry( BeanDefinitionRegistry registry ) throws BeansException {
-			if ( !environment.getProperty( "security.basic.enabled", Boolean.class, false ) ) {
+			Boolean securityEnabled = environment.getProperty( "security.basic.enabled", Boolean.class );
+
+			if ( !Boolean.TRUE.equals( securityEnabled ) ) {
+				boolean explicitlyDisabled = Boolean.FALSE.equals( securityEnabled );
 				LOG.info( "Disabling Spring Boot basic security - only explicitly enabling it with 'security.basic.enabled' is supported by SpringSecurityModule" );
-				if ( registry.containsBeanDefinition( SPRING_BOOT_NO_WEB_SECURITY_CONFIGURER ) ) {
+				if ( !explicitlyDisabled && registry.containsBeanDefinition( SPRING_BOOT_NO_WEB_SECURITY_CONFIGURER ) ) {
 					registry.removeBeanDefinition( SPRING_BOOT_NO_WEB_SECURITY_CONFIGURER );
 				}
 				if ( registry.containsBeanDefinition( SPRING_BOOT_BASIC_WEB_SECURITY_CONFIGURER ) ) {

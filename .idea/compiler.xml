@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="spring-security-module" />
+        <module name="spring-security-module-actuator" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="spring-security-module" target="1.8" />
+      <module name="spring-security-module-actuator" target="1.8" />
       <module name="spring-security-module-project" target="1.8" />
       <module name="spring-security-module-test-website" target="1.8" />
     </bytecodeTargetLevel>
