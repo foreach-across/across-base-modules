@@ -1,31 +1,33 @@
 = SpringSecurityModule
 Arne Vandamme
-2.0.1.RELEASE
+3.0.0-SNAPSHOT
 :toc: left
 :sectanchors:
-:module-version: 2.0.1.RELEASE
+:module-version: 3.0.0-SNAPSHOT
 :module-name: SpringSecurityModule
 :module-artifact: spring-security-module
-:module-url: https://foreach.atlassian.net/wiki/display/AX/SpringSecurityModule
-:across-hibernate-module-url: https://foreach.atlassian.net/wiki/display/AX/AcrossHibernateModule
-:user-module-url: https://foreach.atlassian.net/wiki/display/AX/UserModule
-:oauth2-module-url: https://foreach.atlassian.net/wiki/display/AX/OAuth2Module
-:spring-security-acl-module-url: https://foreach.atlassian.net/wiki/display/AX/SpringSecurityAclModule
+:module-url: https://across.foreach.be/modules/SpringSecurityModule
+:across-docs-url: https://across-docs.foreach.be/across/3.0.0-SNAPSHOT/reference/
+:across-hibernate-module-url: https://across.foreach.be/modules/AcrossHibernateModule
+:user-module-url: https://across.foreach.be/modules/UserModule
+:oauth2-module-url: https://across.foreach.be/modules/OAuth2Module
+:spring-security-acl-module-url: https://across.foreach.be/modules/SpringSecurityAclModule
 :spring-security-url: http://projects.spring.io/spring-security/
-:javadoc: http://across.foreach.be/docs/across-standard-modules/SpringSecurityModule/2.0.1.RELEASE/javadoc
+:javadoc: http://across.foreach.be/docs/across-standard-modules/SpringSecurityModule/3.0.0-SNAPSHOT/javadoc
 :javadoc-securityprincipal: {javadoc}/com/foreach/across/modules/spring/security/infrastructure/business/SecurityPrincipal.html
 :javadoc-securityprincipallabelresolver: {javadoc}/com/foreach/across/modules/spring/security/infrastructure/services/SecurityPrincipalLabelResolver.html
 
 [copyright,verbatim]
 --
-Copyright (C) 2014-2015 +
+Copyright (C) 2014-2018 +
 [small]#Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically.#
 --
 
 [abstract]
 == About
-This module enables support for {spring-security-url}[Spring security] for the Across based application.
+This module enables support for {spring-security-url}[Spring security] for an Across based application.
 The standard Spring security filter chain and method security annotation processors will be registered automatically if this module is present.
+It also allows other Across modules to customize the security rules of your application.
 
 Module website: {module-url}
 
@@ -55,6 +57,7 @@ Module website: {module-url}
 |Creates the <<auditable-entity-interceptor,AuditableEntityInterceptor>> bean.
 
 |===
+
 === Module settings
 {module-name} does not have any settings.
 
@@ -74,6 +77,22 @@ Used by the default <<security-principal,`SecurityPrincipalService`>>.
 
 == What's new in this version?
 :numbered!:
+=== 3.0.0-SNAPSHOT
+Requires Across 3.0.0 or higher.
+
+The security implementation has been rewritten to reuse existing Spring Boot security auto-configuration where possible.
+In certain applications (for example with Actuator or the H2 Console), this might mean that additional security will now be active by default.
+
+List of changes:
+
+* `WebSecurityConfigurer` beans from other modules or the parent `ApplicationContext` are now also supported
+** it is no longer strictly required to use `SpringSecurityWebConfigurer` from a module
+* default Spring Boot security configuration will be applied as of this version
+** an additional default Security filter for ignoring requests is automatically added, a module or application can provide one or more `IgnoredRequestCustomizer`
+** the default `InMemoryAuthenticationManager`
+* unlike a regular Spring Boot application this module does not activate <<basic-security,basic authentication>> by default
+** basic authentication for the entire application is only explicitly enabled if you set property `security.basic.enabled` to `true`
+
 === 2.0.1.RELEASE
 Minor bugfixes.
 
@@ -97,6 +116,49 @@ The `SpringSecurityModule` itself is responsible for registering the security fi
 Only the `SpringSecurityModule` should be manually added to the `AcrossContext`, the infrastructure module will be added automatically.
 
 == Configuring web security
+
+=== Authentication manager
+SpringSecurityModule will always build an `AuthenticationManager` when it is present.
+If you do not build one yourself, a default one with an in-memory user based on the `SecurityProperties` will be added.
+Unless a password is set using `security.user.password`, one will be generated when the application starts, and printed in the logs.
+
+[[basic-security]]
+=== Basic security
+SpringSecurityModule supports the default `SecurityProperties` provided by Spring Boot.
+Unlike a regular Spring Boot application however, basic security for the entire application is not enabled by default.
+
+If you set property `security.basic.enabled` to `true`, basic security will be applied for the entire application.
+
+.Spring Boot SecurityProperties
+[source,properties]
+----
+# SECURITY (SecurityProperties)
+security.basic.authorize-mode=role # Security authorize mode to apply.
+security.basic.enabled=false # Enable basic authentication.
+security.basic.path=/** # Comma-separated list of paths to secure.
+security.basic.realm=Spring # HTTP basic realm name.
+security.enable-csrf=false # Enable Cross Site Request Forgery support.
+security.filter-order=0 # Security filter chain order.
+security.filter-dispatcher-types=ASYNC, FORWARD, INCLUDE, REQUEST # Security filter chain dispatcher types.
+security.headers.cache=true # Enable cache control HTTP headers.
+security.headers.content-security-policy= # Value for content security policy header.
+security.headers.content-security-policy-mode=default # Content security policy mode.
+security.headers.content-type=true # Enable "X-Content-Type-Options" header.
+security.headers.frame=true # Enable "X-Frame-Options" header.
+security.headers.hsts=all # HTTP Strict Transport Security (HSTS) mode (none, domain, all).
+security.headers.xss=true # Enable cross site scripting (XSS) protection.
+security.ignored= # Comma-separated list of paths to exclude from the default secured paths.
+security.require-ssl=false # Enable secure channel for all requests.
+security.sessions=stateless # Session creation policy (always, never, if_required, stateless).
+security.user.name=user # Default user name.
+security.user.password= # Password for the default user name. A random password is logged on startup by default.
+security.user.role=USER # Granted roles for the default user name.
+----
+
+Although SpringSecurityModule does not enable basic security by default, other libraries might still apply security unless it is explicitly disabled.
+An example is the H2 Console which will apply the basic security unless `security.basic.enabled` is explicitly set to `false`.
+
+=== Custom security
 The `SpringSecurityModule` enables support for `SpringSecurityWebConfigurer` implementations to be provided by different modules.
 Usually this is done by implementing your own `SpringSecurityWebConfigurerAdapter`.
 Every `SpringSecurityWebConfigurerAdapter` results in a separate request filter to be added to the Spring security filter chain.
@@ -105,10 +167,34 @@ Once a request has been handled by a filter, all remaining filters will be skipp
 For this reason *it is vital that `SpringSecurityWebConfigurerAdapter` instances are added in the correct order and are correctly scoped to the subset of requests they are meant for*.
 The `SpringSecurityModule` respects all bean ordering rules that Across provides: using the module order by default and allowing the use of `@Order`, `@OrderInModule` or their respective interfaces.
 
-NOTE: Spring security itself allows very advanced configuration and customization.
+NOTE: As of version 3.0.0, default `WebSecurityConfigurer` beans from modules are supported as well for security configuration.
+
+Spring security itself allows very advanced configuration and customization.
 Please refer to the official {spring-security-url}[Spring security] documentation for more details.
 
-=== Debugging SpringSecurityWebConfigurer ordering
+=== Disabling security on requests
+If you want to exclude certain paths from security (for example for static resources), you can either set them using the property `security.ignored` or provide an `IgnoredRequestCustomizer` to add them.
+
+=== Auto-configuration support
+Most of the actual security configuration is applied in the context of the SpringSecurityModule.
+Even though `WebSecurityConfigurer` or `SpringSecurityWebConfigurer` beans can be provided by other modules, when they need fine-grained access to the Spring security beans (eg. `ObjectPostProcessor`) it is usually better to inject them in the SpringSecurityModule.
+
+When adapting auto-configuration classes of existing starters, you should try shifting the relevant security configurations to the SpringSecurityModule.
+This can often be done simply by adding an entry in a `META-INF/across.configuration``
+
+.Example META-INF/across.configuration (excerpt of SpringSecurityModule)
+[source,properties]
+----
+# Move existing security auto-configurations to SpringSecurityModule
+com.foreach.across.AutoConfigurationEnabled=\
+  org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration->SpringSecurityModule,\
+  org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration->SpringSecurityModule
+----
+
+If this is not sufficient, you might have to write a custom `AcrossBootstrapConfigurer` adapter, and inject that class instead of the original auto-configuration.
+Please see the link:{across-docs-url}[Across framework reference documentation] for more information on the `across.configuration` file.
+
+=== Debugging security configuration ordering
 If you want to trace the different configurers that are being applied, you should enable `DEBUG` logging for class `com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration`.
 This will output the different configurer beans in the order they will be applied, along with their type, bean and module name (if available).
 
