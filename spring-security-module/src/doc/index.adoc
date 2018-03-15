@@ -13,7 +13,7 @@ Arne Vandamme
 :oauth2-module-url: https://across.foreach.be/modules/OAuth2Module
 :spring-security-acl-module-url: https://across.foreach.be/modules/SpringSecurityAclModule
 :spring-security-url: http://projects.spring.io/spring-security/
-:javadoc: http://across.foreach.be/docs/across-standard-modules/SpringSecurityModule/3.0.0-SNAPSHOT/javadoc
+:javadoc: https://across-docs.foreach.be/across-standard-modules/SpringSecurityModule/3.0.0-SNAPSHOT/javadoc
 :javadoc-securityprincipal: {javadoc}/com/foreach/across/modules/spring/security/infrastructure/business/SecurityPrincipal.html
 :javadoc-securityprincipallabelresolver: {javadoc}/com/foreach/across/modules/spring/security/infrastructure/services/SecurityPrincipalLabelResolver.html
 
