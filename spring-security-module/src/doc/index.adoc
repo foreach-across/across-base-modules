@@ -116,6 +116,9 @@ The `SpringSecurityModule` itself is responsible for registering the security fi
 Only the `SpringSecurityModule` should be manually added to the `AcrossContext`, the infrastructure module will be added automatically.
 
 == Configuring web security
+This chapter details how security configuration can be applied in an Across application.
+It does not explain how to create security rules or how Spring Security works.
+Please refer to the official {spring-security-url}[Spring security] documentation for this.
 
 === Authentication manager
 SpringSecurityModule will always build an `AuthenticationManager` when it is present.
