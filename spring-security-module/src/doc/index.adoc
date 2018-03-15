@@ -122,6 +122,25 @@ SpringSecurityModule will always build an `AuthenticationManager` when it is pre
 If you do not build one yourself, a default one with an in-memory user based on the `SecurityProperties` will be added.
 Unless a password is set using `security.user.password`, one will be generated when the application starts, and printed in the logs.
 
+Any module can configure the global `AuthenticationManager`, by injecting an `@EnableGlobalAuthentication` class in the SpringSecurityModule.
+This is usually done by adding it as a module extension (`@ModuleConfiguration` in an `extensions` package).
+
+.Example configuration of the global AuthenticationManager
+[source,java]
+----
+@ModuleConfiguration(SpringSecurityModule.NAME)
+@EnableGlobalAuthentication
+public class AuthenticationConfiguration
+{
+        @Autowired
+        public void configureGlobal( AuthenticationManagerBuilder auth ) throws Exception {
+                auth.inMemoryAuthentication()
+                    .withUser( "admin" ).password( "admin" )
+                    .authorities( new SimpleGrantedAuthority( "access administration" ) );
+        }
+}
+----
+
 [[basic-security]]
 === Basic security
 SpringSecurityModule supports the default `SecurityProperties` provided by Spring Boot.
