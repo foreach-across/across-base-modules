@@ -16,87 +16,89 @@
 package com.foreach.across.modules.hibernate;
 
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
+import org.springframework.boot.autoconfigure.transaction.TransactionProperties;
 import org.springframework.core.Ordered;
 
+import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Arne Vandamme
  */
-@SuppressWarnings("all")
-@ConfigurationProperties(prefix = "acrossHibernate")
-public class AcrossHibernateModuleSettings
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class AcrossHibernateModuleSettings extends JpaProperties
 {
 	public static final String HIBERNATE_PROPERTIES = "acrossHibernate.hibernateProperties";
 	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER = "acrossHibernate.persistenceContextInView.handler";
-	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER =
-			"acrossHibernate.persistenceContextInView.order";
-	public static final String CREATE_TRANSACTION_MANAGER = "acrossHibernate.createTransactionManager";
+	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER = "acrossHibernate.persistenceContextInView.order";
 	public static final String CREATE_UNITOFWORK_FACTORY = "acrossHibernate.createUnitOfWorkFactory";
 	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "acrossHibernate.registerRepositoryInterceptor";
 
-	private final PersistenceContextInViewProperties persistenceContextInView =
-			new PersistenceContextInViewProperties();
+	private TransactionProperties transactionProperties = new TransactionProperties();
+	private ApplicationModule applicationModule = new ApplicationModule();
+	private PersistenceContextInViewProperties persistenceContextInView = new PersistenceContextInViewProperties();
+
+	/**
+	 * Name of the dataSource bean that should be resolved and used for the entity manager.
+	 */
+	private String dataSource;
 
 	/**
 	 * Map of Hibernate specific properties.
+	 *
+	 * @deprecated use the more generic {@link #setProperties(Map)}
 	 */
 	private Map<String, String> hibernateProperties = new HashMap<>();
 
 	/**
-	 * Should a TransactionManager bean be created.  If true this will also enable support for
-	 * {@link org.springframework.transaction.annotation.Transactional} in all modules bootstrapping later.
-	 */
-	private boolean createTransactionManager = true;
-
-	/**
-	 * Should a UnitOfWorkFactory be created.
+	 * Should a UnitOfWorkFactory be created. This allows you manually manage a session.
 	 */
 	private boolean createUnitOfWorkFactory = false;
 
 	/**
 	 * Should common Repository implementations in modules automatically be intercepted.
+	 * This will enable support for {@link com.foreach.across.modules.hibernate.aop.EntityInterceptor} on the entities
+	 * managed by those repositories.
 	 */
 	private boolean registerRepositoryInterceptor = true;
 
-	public void setHibernateProperties( Map<String, String> hibernateProperties ) {
-		this.hibernateProperties = hibernateProperties;
-	}
+	/**
+	 * Should session/entity manager open in view be registered.
+	 */
+	private boolean openInView = true;
 
-	public void setCreateTransactionManager( boolean createTransactionManager ) {
-		this.createTransactionManager = createTransactionManager;
-	}
-
-	public void setCreateUnitOfWorkFactory( boolean createUnitOfWorkFactory ) {
-		this.createUnitOfWorkFactory = createUnitOfWorkFactory;
-	}
-
-	public void setRegisterRepositoryInterceptor( boolean registerRepositoryInterceptor ) {
-		this.registerRepositoryInterceptor = registerRepositoryInterceptor;
-	}
-
-	public PersistenceContextInViewProperties getPersistenceContextInView() {
-		return persistenceContextInView;
-	}
-
-	public Map<String, String> getHibernateProperties() {
+	/**
+	 * Get the merged set of Hibernate properties for the datasource.
+	 *
+	 * @param dataSource to detect default properties from
+	 * @return merged properties set
+	 */
+	public Map<String, String> getHibernateProperties( DataSource dataSource ) {
+		Map<String, String> hibernateProperties = super.getHibernateProperties( dataSource );
+		hibernateProperties.putAll( getHibernateProperties() );
 		return hibernateProperties;
 	}
 
-	public boolean isCreateTransactionManager() {
-		return createTransactionManager;
+	@Data
+	public static class ApplicationModule
+	{
+		/**
+		 * Is entity scanning of the application module enabled?
+		 */
+		private boolean entityScan = false;
+
+		/**
+		 * Is Spring data repository scanning of the application module enabled?
+		 */
+		private boolean repositoryScan = false;
 	}
 
-	public boolean isCreateUnitOfWorkFactory() {
-		return createUnitOfWorkFactory;
-	}
-
-	public boolean isRegisterRepositoryInterceptor() {
-		return registerRepositoryInterceptor;
-	}
-
+	@Data
 	public static class PersistenceContextInViewProperties
 	{
 		/**
@@ -109,21 +111,5 @@ public class AcrossHibernateModuleSettings
 		 * Configure the order of the persistence context view handler (if created).
 		 */
 		private int order = Ordered.HIGHEST_PRECEDENCE + 1;
-
-		public PersistenceContextInView getHandler() {
-			return handler;
-		}
-
-		public void setHandler( PersistenceContextInView handler ) {
-			this.handler = handler;
-		}
-
-		public int getOrder() {
-			return order;
-		}
-
-		public void setOrder( int order ) {
-			this.order = order;
-		}
 	}
 }

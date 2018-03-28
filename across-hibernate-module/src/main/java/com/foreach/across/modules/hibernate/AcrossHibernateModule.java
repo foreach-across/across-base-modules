@@ -25,6 +25,7 @@ import javax.sql.DataSource;
  * Activates hibernate support on all modules implementing HasHibernatePackageProvider
  * Will also activate Transactional support on the modules.
  */
+@Deprecated
 @AcrossRole(AcrossModuleRole.INFRASTRUCTURE)
 @AcrossDepends(optional = "EhcacheModule")
 public class AcrossHibernateModule extends AbstractHibernatePackageModule
@@ -33,6 +34,7 @@ public class AcrossHibernateModule extends AbstractHibernatePackageModule
 
 	public AcrossHibernateModule() {
 		setHibernateProperty( "hibernate.cache.use_second_level_cache", "false" );
+		setPropertiesPrefix( NAME.equals( getName() ) ? "acrossHibernate" : null );
 	}
 
 	public AcrossHibernateModule( DataSource dataSource ) {

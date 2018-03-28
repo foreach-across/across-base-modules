@@ -22,7 +22,7 @@ public class Client extends SettableIdBasedEntity<Client>
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn (name = "LINKED_ID", nullable = true)
+	@JoinColumn(name = "LINKED_ID", nullable = true)
 	private Client linkedClient;
 
 	@Column(unique = true)

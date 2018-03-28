@@ -15,31 +15,37 @@
  */
 package com.foreach.across.modules.hibernate.config;
 
-import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
-import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.hibernate.AcrossHibernateModule;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
+import com.foreach.across.modules.hibernate.modules.config.EnableTransactionManagementConfiguration;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.strategy.TableAliasNamingStrategy;
+import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
+import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactoryImpl;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
+import org.springframework.context.event.EventListener;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 
@@ -47,10 +53,10 @@ import java.util.Properties;
  * Configures a standard SessionFactory.
  *
  * @see com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration
- * @see com.foreach.across.modules.hibernate.config.DynamicConfigurationRegistrar
+ * @see com.foreach.across.modules.hibernate.config.ModuleSettingsRegistrar
  */
 @Configuration
-@Import(DynamicConfigurationRegistrar.class)
+@Import({ ModuleSettingsRegistrar.class, HibernatePackageBuilder.class, PersistenceExceptionTranslationAutoConfiguration.class })
 public class HibernateConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "transactionManager";
@@ -58,25 +64,26 @@ public class HibernateConfiguration
 
 	private static final Logger LOG = LoggerFactory.getLogger( HibernateConfiguration.class );
 
-	@Autowired
-	@Module(AcrossModule.CURRENT_MODULE)
-	private AcrossHibernateModule module;
+	private final AcrossHibernateModule module;
+	private final AcrossHibernateModuleSettings settings;
+	private final ListableBeanFactory beanFactory;
 
 	@Autowired
-	@Module(AcrossModule.CURRENT_MODULE)
-	private AcrossHibernateModuleSettings settings;
-
-	@Autowired(required = false)
-	@Qualifier(AcrossContext.DATASOURCE)
-	private DataSource acrossDataSource;
+	public HibernateConfiguration( @Module(AcrossModule.CURRENT_MODULE) AcrossHibernateModule module,
+	                               @Module(AcrossModule.CURRENT_MODULE) AcrossHibernateModuleSettings settings,
+	                               ListableBeanFactory beanFactory ) {
+		this.module = module;
+		this.settings = settings;
+		this.beanFactory = beanFactory;
+	}
 
 	@Bean
 	@Exposed
 	public LocalSessionFactoryBean sessionFactory( HibernatePackage hibernatePackage ) {
-		Map hibernateProperties = settings.getHibernateProperties();
-
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-		sessionFactory.setDataSource( retrieveDataSource() );
+
+		DataSource dataSource = retrieveDataSource();
+		sessionFactory.setDataSource( dataSource );
 		sessionFactory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
 		sessionFactory.setMappingResources( hibernatePackage.getMappingResources() );
 
@@ -87,7 +94,7 @@ public class HibernateConfiguration
 		}
 
 		Properties propertiesToSet = new Properties();
-		propertiesToSet.putAll( hibernateProperties );
+		propertiesToSet.putAll( settings.getHibernateProperties( dataSource ) );
 
 		sessionFactory.setHibernateProperties( propertiesToSet );
 
@@ -97,14 +104,22 @@ public class HibernateConfiguration
 	private DataSource retrieveDataSource() {
 		DataSource moduleDataSource = module.getDataSource();
 
-		if ( moduleDataSource == null ) {
-			LOG.debug( "No module datasource specified - falling back to default Across datasource" );
-			module.setDataSource( acrossDataSource );
-			return acrossDataSource;
-		}
-		else {
+		if ( moduleDataSource != null ) {
+			LOG.info( "Using datasource attached directly to module {} for the SessionFactory", module.getName() );
 			return moduleDataSource;
 		}
+
+		if ( !StringUtils.isEmpty( settings.getDataSource() ) ) {
+			LOG.info( "Resolving datasource bean {} for the SessionFactory", settings.getDataSource() );
+			return beanFactory.getBean( settings.getDataSource(), DataSource.class );
+		}
+
+		if ( BeanFactoryUtils.beansOfTypeIncludingAncestors( beanFactory, DataSource.class ).size() == 1 ) {
+			LOG.info( "Using the single datasource bean for the SessionFactory" );
+			return beanFactory.getBean( DataSource.class );
+		}
+
+		throw new IllegalStateException( "Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
 	}
 
 	@Bean(name = SESSION_HOLDER)
@@ -113,21 +128,26 @@ public class HibernateConfiguration
 		return new HibernateSessionHolderImpl();
 	}
 
+	@ConditionalOnExpression("@moduleSettings.createUnitOfWorkFactory")
 	@Bean
 	@Exposed
-	public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
-		return new PersistenceExceptionTranslationPostProcessor();
+	public UnitOfWorkFactory unitOfWork( SessionFactory sessionFactory ) {
+		return new UnitOfWorkFactoryImpl( Collections.singleton( sessionFactory ) );
 	}
 
-	@Event
+	@EventListener
 	@SuppressWarnings("unused")
 	protected void registerClientModuleRepositoryInterceptors( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
 		if ( settings.isRegisterRepositoryInterceptor() ) {
 			LOG.trace( "Enabling BasicRepositoryInterceptor support in module {}",
 			           beforeBootstrapEvent.getModule().getName() );
-			beforeBootstrapEvent.addApplicationContextConfigurers(
-					new AnnotatedClassConfigurer( ModuleBasicRepositoryInterceptorConfiguration.class )
-			);
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ModuleBasicRepositoryInterceptorConfiguration.class );
 		}
+
+		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );
+		beforeBootstrapEvent.getBootstrapConfig()
+		                    .addApplicationContextConfigurer( true,
+		                                                      EnableTransactionManagementConfiguration.class,
+		                                                      PersistenceExceptionTranslationAutoConfiguration.class );
 	}
 }

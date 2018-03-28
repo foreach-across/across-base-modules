@@ -17,31 +17,43 @@
 package com.foreach.across.modules.hibernate.config;
 
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.DynamicAcrossModule;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.core.context.info.AcrossContextInfo;
+import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.modules.hibernate.AbstractHibernatePackageModule;
+import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.provider.HibernatePackageConfigurer;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
+import org.springframework.boot.autoconfigure.domain.EntityScanPackages;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Responsible for building the resources that should be mapped to the entity manager.
+ *
  * @author Arne Vandamme
  */
 @Configuration
 public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackage>
 {
-	@Autowired
-	private AcrossContextInfo context;
+	private final AcrossContextInfo contextInfo;
+	private final AbstractHibernatePackageModule currentModule;
+	private final AcrossHibernateModuleSettings moduleSettings;
 
 	@Autowired
-	@Module(AcrossModule.CURRENT_MODULE)
-	private AbstractHibernatePackageModule currentModule;
+	public HibernatePackageBuilder( AcrossContextInfo contextInfo,
+	                                @Module(AcrossModule.CURRENT_MODULE) AbstractHibernatePackageModule currentModule,
+	                                AcrossHibernateModuleSettings moduleSettings ) {
+		this.contextInfo = contextInfo;
+		this.currentModule = currentModule;
+		this.moduleSettings = moduleSettings;
+	}
 
 	@Override
 	public Class<?> getObjectType() {
@@ -49,7 +61,7 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 	}
 
 	@Override
-	protected HibernatePackage createInstance() throws Exception {
+	protected HibernatePackage createInstance() {
 		HibernatePackage hibernatePackage = new HibernatePackage( currentModule.getName() );
 
 		currentModule.getHibernatePackageProviders().forEach( hibernatePackage::add );
@@ -57,11 +69,12 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 		if ( currentModule.isScanForHibernatePackages() ) {
 			Set<HibernatePackageConfigurer> configurers = new HashSet<>();
 
-			context.getModules().stream()
-			       .filter( acrossModuleInfo -> acrossModuleInfo.getModule() instanceof HibernatePackageConfigurer )
-			       .forEach( acrossModuleInfo -> configurers.add(
-					       (HibernatePackageConfigurer) acrossModuleInfo.getModule() ) );
+			contextInfo.getModules().stream()
+			           .filter( acrossModuleInfo -> acrossModuleInfo.getModule() instanceof HibernatePackageConfigurer )
+			           .forEach( acrossModuleInfo -> configurers.add(
+					           (HibernatePackageConfigurer) acrossModuleInfo.getModule() ) );
 
+			// get HibernatePackageConfigurer registered inside the current module only
 			( (ListableBeanFactory) getBeanFactory() )
 					.getBeansOfType( HibernatePackageConfigurer.class )
 					.forEach( ( name, configurer ) -> configurers.add( configurer ) );
@@ -69,6 +82,25 @@ public class HibernatePackageBuilder extends AbstractFactoryBean<HibernatePackag
 			configurers.forEach( c -> c.configureHibernatePackage( hibernatePackage ) );
 		}
 
+		// Detect additional @EntityScan registrations
+		EntityScanPackages.get( currentModule.getAcrossApplicationContextHolder().getApplicationContext() ).getPackageNames()
+		                  .forEach( hibernatePackage::addPackageToScan );
+
+		if ( moduleSettings.getApplicationModule().isEntityScan() ) {
+			registerDynamicApplicationPackage( hibernatePackage );
+		}
+
 		return hibernatePackage;
+	}
+
+	private void registerDynamicApplicationPackage( HibernatePackage hibernatePackage ) {
+		// if should register dynamic application
+		contextInfo.getModules()
+		           .stream()
+		           .map( AcrossModuleInfo::getModule )
+		           .filter( DynamicAcrossModule.DynamicApplicationModule.class::isInstance )
+		           .map( DynamicAcrossModule.DynamicApplicationModule.class::cast )
+		           .findFirst()
+		           .ifPresent( module -> hibernatePackage.addPackageToScan( module.getBasePackage() ) );
 	}
 }

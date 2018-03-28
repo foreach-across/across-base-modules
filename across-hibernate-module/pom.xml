@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>com.foreach.across.modules</groupId>
 		<artifactId>across-hibernate-module-project</artifactId>
-		<version>2.0.1.RELEASE</version>
+		<version>3.0.0.RELEASE</version>
 	</parent>
 
 	<artifactId>across-hibernate-module</artifactId>
@@ -124,6 +124,7 @@
 					<sourceDocumentName>index.adoc</sourceDocumentName>
 					<outputDirectory>${project.reporting.outputDirectory}/${project.version}/reference</outputDirectory>
 					<backend>html</backend>
+					<sourceHighlighter>coderay</sourceHighlighter>
 				</configuration>
 				<executions>
 					<execution>

@@ -14,23 +14,30 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.hibernate.testmodules.hibernate2.config;
+package test.boot.apps.multiple.entities;
 
-import com.foreach.across.core.annotations.ModuleConfiguration;
-import com.foreach.across.modules.hibernate.AcrossHibernateModule;
+import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
+import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import com.foreach.across.modules.hibernate.provider.HibernatePackageConfigurer;
-import com.foreach.across.modules.hibernate.provider.HibernatePackageRegistry;
-import com.foreach.across.modules.hibernate.testmodules.hibernate2.User;
+
+import java.util.Set;
 
 /**
  * @author Arne Vandamme
+ * @since 3.0.0
  */
-@ModuleConfiguration({ AcrossHibernateModule.NAME, AcrossHibernateJpaModule.NAME })
-public class PackageConfiguration implements HibernatePackageConfigurer
+@AcrossDepends(required = AcrossHibernateJpaModule.NAME)
+public class EntitiesModule extends AcrossModule
 {
 	@Override
-	public void configureHibernatePackage( HibernatePackageRegistry hibernatePackage ) {
-		hibernatePackage.addPackageToScan( User.class );
+	public String getName() {
+		return "EntitiesModule";
+	}
+
+	@Override
+	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
+		contextConfigurers.add( ComponentScanConfigurer.forAcrossModule( EntitiesModule.class ) );
 	}
 }

@@ -14,51 +14,55 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.hibernate.jpa.config.dynamic;
+package com.foreach.across.modules.hibernate.extensions;
 
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
-import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
+import org.springframework.orm.hibernate5.support.OpenSessionInViewFilter;
+import org.springframework.orm.hibernate5.support.OpenSessionInViewInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import javax.persistence.EntityManagerFactory;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.util.EnumSet;
 
-public class PersistenceContextInViewConfiguration
+@ConditionalOnAcrossModule("AcrossWebModule")
+public class HibernatePersistenceContextInViewConfiguration
 {
-	private static final Logger LOG = LoggerFactory.getLogger( PersistenceContextInViewConfiguration.class );
+	private static final Logger LOG = LoggerFactory.getLogger( HibernatePersistenceContextInViewConfiguration.class );
 
-	@AcrossDepends(required = "AcrossWebModule")
-	public static class OpenEntityManagerInViewFilterConfiguration extends AcrossWebDynamicServletConfigurer
+	@Configuration
+	@ConditionalOnExpression("@moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'FILTER'")
+	public static class OpenSessionFactoryInViewFilterConfiguration extends AcrossWebDynamicServletConfigurer
 	{
 		@Autowired
-		private EntityManagerFactory entityManagerFactory;
+		private SessionFactory sessionFactory;
 
 		@Autowired
 		@Module(AcrossModule.CURRENT_MODULE)
 		private AcrossModule currentModule;
 
 		@Bean
-		public OpenEntityManagerInViewFilter openEntityManagerInViewFilter() {
-			return new OpenEntityManagerInViewFilter()
+		public OpenSessionInViewFilter openSessionInViewFilter() {
+			return new OpenSessionInViewFilter()
 			{
 				@Override
-				protected EntityManagerFactory lookupEntityManagerFactory() {
-					return entityManagerFactory;
+				protected SessionFactory lookupSessionFactory() {
+					return sessionFactory;
 				}
 			};
 		}
@@ -66,7 +70,7 @@ public class PersistenceContextInViewConfiguration
 		@Override
 		protected void dynamicConfigurationAllowed( ServletContext servletContext ) throws ServletException {
 			FilterRegistration.Dynamic registration = servletContext.addFilter(
-					currentModule.getName() + ".OpenEntityManagerInViewFilter", openEntityManagerInViewFilter()
+					currentModule.getName() + ".OpenSessionInViewFilter", openSessionInViewFilter()
 			);
 			registration.setAsyncSupported( true );
 
@@ -86,11 +90,12 @@ public class PersistenceContextInViewConfiguration
 		}
 	}
 
-	@AcrossDepends(required = "AcrossWebModule")
-	public static class OpenEntityManagerInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
+	@Configuration
+	@ConditionalOnExpression("@moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'INTERCEPTOR'")
+	public static class OpenSessionFactoryInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
 	{
 		@Autowired
-		private EntityManagerFactory entityManagerFactory;
+		private SessionFactory sessionFactory;
 
 		@Autowired
 		@Module(AcrossModule.CURRENT_MODULE)
@@ -103,13 +108,13 @@ public class PersistenceContextInViewConfiguration
 
 		@Override
 		public void addInterceptors( InterceptorRegistry registry ) {
-			registry.addWebRequestInterceptor( openEntityManagerInViewInterceptor() );
+			registry.addWebRequestInterceptor( openSessionInViewInterceptor() );
 		}
 
 		@Bean
-		public OpenEntityManagerInViewInterceptor openEntityManagerInViewInterceptor() {
-			OpenEntityManagerInViewInterceptor interceptor = new OpenEntityManagerInViewInterceptor();
-			interceptor.setEntityManagerFactory( entityManagerFactory );
+		public OpenSessionInViewInterceptor openSessionInViewInterceptor() {
+			OpenSessionInViewInterceptor interceptor = new OpenSessionInViewInterceptor();
+			interceptor.setSessionFactory( sessionFactory );
 
 			return interceptor;
 		}
