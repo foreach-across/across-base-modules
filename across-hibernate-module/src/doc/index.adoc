@@ -1,10 +1,10 @@
 = AcrossHibernateJpaModule
 Arne Vandamme
-3.0.0-SNAPSHOT
+3.0.0.RELEASE
 :toc: left
 :toclevels: 3
 :sectanchors:
-:module-version: 3.0.0-SNAPSHOT
+:module-version: 3.0.0.RELEASE
 :module-name: AcrossHibernateJpaModule
 :module-artifact: across-hibernate-module
 :module-url: https://across.foreach.be/modules/AcrossHibernateJpaModule
@@ -120,7 +120,7 @@ NOTE: A custom module will never map the original Spring Boot properties.
 == What's new in this version?
 :numbered!:
 
-=== 3.0.0-SNAPSHOT
+=== 3.0.0.RELEASE
 This version requires Across 3.0.0.
 It is also a major update increasing compatibility with the Spring Boot JPA starter.
 
