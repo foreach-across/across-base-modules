@@ -16,4 +16,6 @@
   -->
 <configuration>
 	<include resource="logback-across-test.xml"/>
+
+	<logger name="com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration" level="DEBUG" />
 </configuration>

@@ -3,3 +3,4 @@ target
 .idea/excludeFromValidation
 .idea/libraries
 *.iml
+.idea/template/template_variable_settings.xml

@@ -18,11 +18,11 @@ package com.foreach.across.modules.spring.security.actions;
 
 import com.foreach.across.modules.spring.security.authority.AuthorityMatcher;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import lombok.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.Assert;
 
 import java.util.*;
 
@@ -92,10 +92,9 @@ public abstract class AuthorityMatchingAllowableActions implements AllowableActi
 	{
 		private final SecurityPrincipal securityPrincipal;
 
-		public SecurityPrincipalAuthorityMatchingAllowableActions( SecurityPrincipal securityPrincipal,
+		public SecurityPrincipalAuthorityMatchingAllowableActions( @NonNull SecurityPrincipal securityPrincipal,
 		                                                           Map<AllowableAction, AuthorityMatcher> actionAuthorityMap ) {
 			super( actionAuthorityMap );
-			Assert.notNull( securityPrincipal );
 			this.securityPrincipal = securityPrincipal;
 		}
 
@@ -109,10 +108,9 @@ public abstract class AuthorityMatchingAllowableActions implements AllowableActi
 	{
 		private final Authentication authentication;
 
-		public AuthenticationAuthorityMatchingAllowableActions( Authentication authentication,
+		public AuthenticationAuthorityMatchingAllowableActions( @NonNull Authentication authentication,
 		                                                        Map<AllowableAction, AuthorityMatcher> actionAuthorityMap ) {
 			super( actionAuthorityMap );
-			Assert.notNull( authentication );
 			this.authentication = authentication;
 		}
 
@@ -126,10 +124,9 @@ public abstract class AuthorityMatchingAllowableActions implements AllowableActi
 	{
 		private final Collection<? extends GrantedAuthority> grantedAuthorities;
 
-		public CollectionAuthorityMatchingAllowableActions( Collection<? extends GrantedAuthority> grantedAuthorities,
+		public CollectionAuthorityMatchingAllowableActions( @NonNull Collection<? extends GrantedAuthority> grantedAuthorities,
 		                                                    Map<AllowableAction, AuthorityMatcher> actionAuthorityMap ) {
 			super( actionAuthorityMap );
-			Assert.notNull( grantedAuthorities );
 			this.grantedAuthorities = grantedAuthorities;
 		}
 

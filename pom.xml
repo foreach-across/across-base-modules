@@ -1,110 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright 2014 the original author or authors
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+  ~ Copyright 2014 the original author or authors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.foreach.across</groupId>
-        <artifactId>standard-module-bom</artifactId>
-        <version>2.0.0.RELEASE</version>
-    </parent>
+	<parent>
+		<groupId>com.foreach.across</groupId>
+		<artifactId>standard-module-bom</artifactId>
+		<version>3.0.0.RELEASE</version>
+	</parent>
 
-    <groupId>com.foreach.across.modules</groupId>
-    <artifactId>spring-security-module-project</artifactId>
-    <version>2.0.1.RELEASE</version>
-    <packaging>pom</packaging>
+	<groupId>com.foreach.across.modules</groupId>
+	<artifactId>spring-security-module-project</artifactId>
+	<version>3.0.0.RELEASE</version>
+	<packaging>pom</packaging>
 
-    <name>${project.groupId}:${project.artifactId}</name>
-    <description>
-        Activates Spring security support in modules.
-    </description>
-    <url>https://foreach.atlassian.net/wiki/display/AX/SpringSecurityModule</url>
-    <licenses>
-        <license>
-            <name>The Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>
+		Activates Spring security support in modules.
+	</description>
+	<url>https://foreach.atlassian.net/wiki/display/AX/SpringSecurityModule</url>
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
 
-    <developers>
-        <developer>
-            <name>Arne Vandamme</name>
-            <email>arne@foreach.be</email>
-            <organization>Foreach</organization>
-            <organizationUrl>http://www.foreach.be</organizationUrl>
-        </developer>
-    </developers>
+	<developers>
+		<developer>
+			<name>Arne Vandamme</name>
+			<email>arne@foreach.be</email>
+			<organization>Foreach</organization>
+			<organizationUrl>http://www.foreach.be</organizationUrl>
+		</developer>
+	</developers>
 
-    <repositories>
-        <repository>
-            <id>foreach-nexus</id>
-            <name>Foreach repository</name>
-            <url>http://repository.foreach.be/nexus/repository/public</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>foreach-nexus</id>
+			<name>Foreach repository</name>
+			<url>http://repository.foreach.be/nexus/repository/public</url>
+		</repository>
+	</repositories>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
 
-    <modules>
-        <module>spring-security-module</module>
-    </modules>
+	<modules>
+		<module>spring-security-module</module>
+		<module>spring-security-module-actuator</module>
+	</modules>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.foreach.across.modules</groupId>
-                <artifactId>across-hibernate-module</artifactId>
-                <version>2.0.0.RELEASE</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.foreach.across.modules</groupId>
+				<artifactId>across-hibernate-module</artifactId>
+				<version>3.0.0.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>com.foreach.across</groupId>
+				<artifactId>across-autoconfigure</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.5</version>
-                <inherited>false</inherited>
-                <configuration>
-                    <finalName>${project.artifactId}</finalName>
-                    <descriptors>
-                        <descriptor>site.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.16.8</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
-    <scm>
-        <connection>scm:git:https://bitbucket.org/beforeach/spring-security-module.git</connection>
-        <developerConnection>scm:git:https://bitbucket.org/beforeach/spring-security-module.git</developerConnection>
-        <url>https://bitbucket.org/beforeach/spring-security-module</url>
-    </scm>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.5</version>
+				<inherited>false</inherited>
+				<configuration>
+					<finalName>${project.artifactId}</finalName>
+					<descriptors>
+						<descriptor>site.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<scm>
+		<connection>scm:git:https://bitbucket.org/beforeach/spring-security-module.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/beforeach/spring-security-module.git</developerConnection>
+		<url>https://bitbucket.org/beforeach/spring-security-module</url>
+	</scm>
 
 </project>

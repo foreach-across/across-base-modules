@@ -15,17 +15,12 @@
  */
 package com.foreach.across.modules.spring.security.infrastructure.config;
 
-import com.foreach.across.core.annotations.AcrossEventHandler;
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.PostRefresh;
 import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
-import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
-import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
-import com.foreach.across.modules.spring.security.config.ModuleGlobalMethodSecurityConfiguration;
 import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,11 +37,10 @@ import org.springframework.security.core.AuthenticationException;
  * @author Arne Vandamme
  */
 @Configuration
-@AcrossEventHandler
+@RequiredArgsConstructor
 public class SecurityInfrastructure
 {
-	@Autowired
-	private AcrossContextBeanRegistry contextBeanRegistry;
+	private final AcrossContextBeanRegistry contextBeanRegistry;
 
 	@Bean
 	public AuthenticationTrustResolver authenticationTrustResolver() {
@@ -81,15 +75,6 @@ public class SecurityInfrastructure
 			delegate = contextBeanRegistry
 					.getBeanOfTypeFromModule( SpringSecurityModule.NAME, AuthenticationManagerBuilder.class )
 					.getOrBuild();
-		}
-	}
-
-	@Event
-	protected void registerModuleMethodSecurity( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) {
-		if ( !isSecurityModule( beforeBootstrapEvent.getBootstrapConfig() ) ) {
-			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer(
-					new AnnotatedClassConfigurer( ModuleGlobalMethodSecurityConfiguration.class )
-			);
 		}
 	}
 

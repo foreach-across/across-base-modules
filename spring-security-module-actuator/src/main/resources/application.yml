@@ -1,0 +1,9 @@
+security:
+  user:
+    name: john.doe
+    password: somepwd
+
+spring:
+  h2:
+    console:
+      enabled: true

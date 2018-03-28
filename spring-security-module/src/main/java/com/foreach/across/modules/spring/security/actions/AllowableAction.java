@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.spring.security.actions;
 
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
@@ -29,6 +30,7 @@ import java.util.List;
  * @author Arne Vandamme
  * @see com.foreach.across.modules.spring.security.actions.AllowableActions
  */
+@SuppressWarnings( "unused" )
 public class AllowableAction implements Comparable<AllowableAction>
 {
 	/**
@@ -42,8 +44,8 @@ public class AllowableAction implements Comparable<AllowableAction>
 
 	private final String id;
 
-	public AllowableAction( String id ) {
-		Assert.isTrue( StringUtils.isNotBlank( id ) );
+	public AllowableAction( @NonNull String id ) {
+		Assert.isTrue( StringUtils.isNotEmpty( id ), "An AllowableAction required a non-empty id" );
 
 		this.id = id;
 	}
@@ -81,6 +83,16 @@ public class AllowableAction implements Comparable<AllowableAction>
 	@Override
 	public int compareTo( AllowableAction other ) {
 		return getId().compareTo( other.getId() );
+	}
+
+	/**
+	 * Convert a {@code String} into an {@link AllowableAction} instance.
+	 *
+	 * @param id of the action
+	 * @return instance
+	 */
+	public static AllowableAction from( String id ) {
+		return new AllowableAction( id );
 	}
 
 	public static Collection<AllowableAction> toAllowableActions( String... ids ) {
