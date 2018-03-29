@@ -26,7 +26,7 @@
 
 	<groupId>com.foreach.across.modules</groupId>
 	<artifactId>spring-security-module-project</artifactId>
-	<version>3.0.0.RELEASE</version>
+	<version>3.0.1.RELEASE</version>
 	<packaging>pom</packaging>
 
 	<name>${project.groupId}:${project.artifactId}</name>
@@ -78,7 +78,7 @@
 			<dependency>
 				<groupId>com.foreach.across</groupId>
 				<artifactId>across-autoconfigure</artifactId>
-				<version>1.0.0-SNAPSHOT</version>
+				<version>1.0.0.RELEASE</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
