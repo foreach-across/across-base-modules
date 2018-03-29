@@ -1,9 +1,9 @@
 = SpringSecurityModule
 Arne Vandamme
-3.0.0.RELEASE
+3.0.1.RELEASE
 :toc: left
 :sectanchors:
-:module-version: 3.0.0.RELEASE
+:module-version: 3.0.1.RELEASE
 :module-name: SpringSecurityModule
 :module-artifact: spring-security-module
 :module-url: https://across.foreach.be/modules/SpringSecurityModule
@@ -13,7 +13,7 @@ Arne Vandamme
 :oauth2-module-url: https://across.foreach.be/modules/OAuth2Module
 :spring-security-acl-module-url: https://across.foreach.be/modules/SpringSecurityAclModule
 :spring-security-url: http://projects.spring.io/spring-security/
-:javadoc: https://across-docs.foreach.be/across-standard-modules/SpringSecurityModule/3.0.0.RELEASE/javadoc
+:javadoc: https://across-docs.foreach.be/across-standard-modules/SpringSecurityModule/3.0.1.RELEASE/javadoc
 :javadoc-securityprincipal: {javadoc}/com/foreach/across/modules/spring/security/infrastructure/business/SecurityPrincipal.html
 :javadoc-securityprincipallabelresolver: {javadoc}/com/foreach/across/modules/spring/security/infrastructure/services/SecurityPrincipalLabelResolver.html
 
