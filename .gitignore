@@ -4,4 +4,4 @@ target
 .idea/libraries
 *.iml
 
-!/.idea/artifacts/
+/.idea/artifacts/
