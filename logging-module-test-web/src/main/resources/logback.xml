@@ -24,9 +24,8 @@
 					<pattern>
 						<pattern>
 							{
-							"application": "POC",
-							"appender": "server",
-							"logback_env": "dev"
+							"application": "poc",
+							"appender": "server"
 							}
 						</pattern>
 					</pattern>
@@ -56,9 +55,8 @@
 					<pattern>
 						<pattern>
 							{
-							"application": "POC",
-							"appender": "methods",
-							"logback_env": "dev"
+							"application": "poc",
+							"appender": "methods"
 							}
 						</pattern>
 					</pattern>
@@ -88,9 +86,8 @@
 					<pattern>
 						<pattern>
 							{
-							"application": "POC",
-							"appender": "hikari",
-							"logback_env": "dev"
+							"application": "poc",
+							"appender": "hikari"
 							}
 						</pattern>
 					</pattern>
@@ -120,9 +117,8 @@
 					<pattern>
 						<pattern>
 							{
-							"application": "POC",
-							"appender": "requests",
-							"logback_env": "dev"
+							"application": "poc",
+							"appender": "requests"
 							}
 						</pattern>
 					</pattern>
