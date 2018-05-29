@@ -1,11 +1,10 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="LoggingModuleApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+    <module name="logging-module-test-web" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.foreach.across.samples.logging.LoggingModuleApplication" />
+    <option name="HIDE_BANNER" value="true" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH" />
-    <module name="logging-module-test-web" />
-    <envs />
     <method />
   </configuration>
 </component>
