@@ -29,4 +29,7 @@ public class LoggingModuleSettings
 
 	public static final String REQUEST_LOGGER = "logging.request.logger";
 	public static final String REQUEST_LOGGER_CONFIGURATION = "logging.request.configuration";
+
+	public static final String LOGSTASH_CONFIGURATION_ENABLED = "logging.logstash.enabled";
+	public static final String LOGSTASH_CONFIGURATION = "logging.logstash";
 }
