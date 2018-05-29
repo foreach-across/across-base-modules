@@ -198,6 +198,7 @@
 	<!--this can be enabled at runtime via debugweb (/debug/logging/loggers#)-->
 	<logger name="com.foreach.across.modules.logging.request.RequestLogger" level="OFF" additivity="false">
 		<appender-ref ref="elk-requests"/>
+		<appender-ref ref="console"/>
 	</logger>
 
 	<logger name="org.springframework.data" level="WARN" additivity="false"/>
