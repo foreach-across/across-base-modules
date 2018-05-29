@@ -3,10 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/logging-module/logging-module.iml" filepath="$PROJECT_DIR$/logging-module/logging-module.iml" />
-      <module fileurl="file://$PROJECT_DIR$/logging-module/logging-module.iml" filepath="$PROJECT_DIR$/logging-module/logging-module.iml" />
       <module fileurl="file://$PROJECT_DIR$/logging-module-project.iml" filepath="$PROJECT_DIR$/logging-module-project.iml" />
-      <module fileurl="file://$PROJECT_DIR$/logging-module-project.iml" filepath="$PROJECT_DIR$/logging-module-project.iml" />
-      <module fileurl="file://$PROJECT_DIR$/logging-module-test-web/logging-module-test-web.iml" filepath="$PROJECT_DIR$/logging-module-test-web/logging-module-test-web.iml" />
       <module fileurl="file://$PROJECT_DIR$/logging-module-test-web/logging-module-test-web.iml" filepath="$PROJECT_DIR$/logging-module-test-web/logging-module-test-web.iml" />
     </modules>
   </component>
