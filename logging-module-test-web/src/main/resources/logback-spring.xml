@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<springProperty name="log-dir" source="log.dir"/>
+
+	<appender name="elk" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<destination>localhost:5010</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<message/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "POC",
+							"appender": "server",
+							"logback_env": "dev"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
+	<appender name="elk-methods" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<destination>localhost:5010/</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<message/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "POC",
+							"appender": "methods",
+							"logback_env": "dev"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
+	<appender name="elk-hikari" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<destination>localhost:5010/</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<message/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "POC",
+							"appender": "hikari",
+							"logback_env": "dev"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
+	<appender name="elk-requests" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<destination>localhost:5010/</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<message/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "POC",
+							"appender": "requests",
+							"logback_env": "dev"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d %5p %40.40c:%4L - %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="errors">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/errors.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="thymeleaf">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/thymeleaf.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="application">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/application.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="methods">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/methods.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%logger{0}\t%m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="across">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/across.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="hikari">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/hikari.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%logger{0}\t%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="com.zaxxer.hikari.pool" level="INFO" additivity="false">
+		<appender-ref ref="hikari"/>
+		<appender-ref ref="elk-hikari"/>
+	</logger>
+
+	<logger name="com.foreach.across.modules.logging.method.MethodLogger" level="INFO" additivity="false">
+		<appender-ref ref="methods"/>
+		<appender-ref ref="elk-methods"/>
+	</logger>
+
+	<!--this can be enabled at runtime via debugweb (/debug/logging/loggers#)-->
+	<logger name="com.foreach.across.modules.logging.request.RequestLogger" level="OFF" additivity="false">
+		<appender-ref ref="elk-requests"/>
+	</logger>
+
+	<logger name="org.springframework.data" level="WARN" additivity="false"/>
+
+	<logger name="be.resto.site.application" level="INFO">
+		<appender-ref ref="application"/>
+		<appender-ref ref="elk"/>
+	</logger>
+
+	<logger name="com.foreach.across" level="INFO" additivity="false">
+		<appender-ref ref="across"/>
+		<appender-ref ref="elk"/>
+	</logger>
+
+	<logger name="com.foreach.across.core.context.bootstrap.AcrossBootstrapper" level="INFO" additivity="false">
+		<appender-ref ref="console"/>
+		<appender-ref ref="across"/>
+		<appender-ref ref="elk"/>
+	</logger>
+
+	<root level="INFO">
+		<appender-ref ref="elk"/>
+	</root>
+
+</configuration>
