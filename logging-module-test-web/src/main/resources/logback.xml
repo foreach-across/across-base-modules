@@ -2,6 +2,7 @@
 <configuration>
 	<springProperty name="log-dir" source="log.dir"/>
 
+
 	<appender name="elk" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
 			<destination>localhost:5010</destination>
