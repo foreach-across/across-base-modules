@@ -16,14 +16,21 @@
 
 package com.foreach.across.samples.logging.application.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class TestLogController
 {
+	private Logger LOG = LoggerFactory.getLogger( TestLogController.class );
+
+	@ResponseBody
 	@RequestMapping("/generate-error")
-	public String testMdc() throws RuntimeException {
-		throw new RuntimeException( "Dummy error" );
+	public String generateError() {
+		LOG.error( "Dummy error", new RuntimeException( "wOOO" ) );
+		return "ERROR LOGGED";
 	}
 }

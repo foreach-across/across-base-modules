@@ -27,15 +27,21 @@
 
 	<logger name="com.foreach.across" level="INFO" additivity="false">
 		<appender-ref ref="across"/>
+		<appender-ref ref="errors"/>
+		<appender-ref ref="elk-errors"/>
 	</logger>
 
 	<logger name="com.foreach.across.core.context.bootstrap.AcrossBootstrapper" level="INFO" additivity="false">
 		<appender-ref ref="console"/>
 		<appender-ref ref="across"/>
+		<appender-ref ref="errors"/>
+		<appender-ref ref="elk-errors"/>
 	</logger>
 
 	<root level="INFO">
 		<appender-ref ref="console"/>
+		<appender-ref ref="errors"/>
+		<appender-ref ref="elk-errors"/>
 	</root>
 
 </configuration>

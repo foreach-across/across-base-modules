@@ -30,6 +30,40 @@
 			</encoder>
 		</appender>
 	</appender>
+	<appender name="elk-errors" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+				<level>ERROR</level>
+			</filter>
+			<destination>${logging.logstash.servers}</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<message/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "${logging.logstash.application}",
+							"appender": "errors"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
 	<appender name="elk-requests" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
 			<destination>${logging.logstash.servers}</destination>
@@ -42,7 +76,6 @@
 					<loggerName/>
 
 					<threadName/>
-					<message/>
 					<provider class="com.foreach.across.modules.logging.request.RequestLoggerJsonProvider"/>
 
 					<logstashMarkers/>
@@ -68,6 +101,9 @@
 		</encoder>
 	</appender>
 	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="errors">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${log.dir}/%d{yyyy'/'MM'/'dd'/errors.'yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
