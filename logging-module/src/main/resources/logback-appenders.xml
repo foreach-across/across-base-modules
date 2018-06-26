@@ -5,7 +5,7 @@
 
 	<appender name="elk-methods" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>${logstash-server}</destination>
+			<destination>localhost:5000</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -25,39 +25,8 @@
 					<pattern>
 						<pattern>
 							{
-							"application": "${logstash-application}",
+							"application": "poc",
 							"appender": "methods"
-							}
-						</pattern>
-					</pattern>
-				</providers>
-			</encoder>
-		</appender>
-	</appender>
-	<appender name="elk-hikari" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
-		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>${logstash-server}</destination>
-			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-				<providers>
-					<mdc/>
-					<context/>
-					<version/>
-					<logLevel/>
-					<loggerName/>
-
-					<threadName/>
-					<message/>
-
-					<logstashMarkers/>
-					<arguments/>
-
-					<stackTrace/>
-
-					<pattern>
-						<pattern>
-							{
-							"application": "${logstash-application}",
-							"appender": "hikari"
 							}
 						</pattern>
 					</pattern>
