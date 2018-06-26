@@ -15,7 +15,7 @@
 					<loggerName/>
 
 					<threadName/>
-					<message/>
+					<provider class="com.foreach.across.modules.logging.method.MethodLoggerJsonProvider"/>
 
 					<logstashMarkers/>
 					<arguments/>
@@ -46,8 +46,8 @@
 					<loggerName/>
 
 					<threadName/>
-					<message />
-					<provider class="com.foreach.across.modules.logging.request.RequestLoggerJsonProvider" />
+					<message/>
+					<provider class="com.foreach.across.modules.logging.request.RequestLoggerJsonProvider"/>
 
 					<logstashMarkers/>
 					<arguments/>
