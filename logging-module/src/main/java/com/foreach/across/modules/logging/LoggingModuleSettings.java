@@ -30,6 +30,6 @@ public class LoggingModuleSettings
 	public static final String REQUEST_LOGGER = "logging.request.logger";
 	public static final String REQUEST_LOGGER_CONFIGURATION = "logging.request.configuration";
 
-	public static final String LOGSTASH_CONFIGURATION_SERVER = "logging.logstash.server";
+	public static final String LOGSTASH_CONFIGURATION_SERVER = "logging.logstash.servers";
 	public static final String LOGSTASH_CONFIGURATION_APPLICATION = "logging.logstash.application";
 }

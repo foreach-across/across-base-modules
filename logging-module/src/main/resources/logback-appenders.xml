@@ -1,6 +1,6 @@
 <included>
 	<springProperty name="log-dir" source="log.dir"/>
-	<springProperty name="logstash-server" source="logging.logstash.server"/>
+	<springProperty name="logstash-servers" source="logging.logstash.servers"/>
 	<springProperty name="logstash-application" source="logging.logstash.application"/>
 
 	<appender name="elk-methods" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
@@ -36,7 +36,7 @@
 	</appender>
 	<appender name="elk-requests" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>${logstash-server}</destination>
+			<destination>${logstash-servers}</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
