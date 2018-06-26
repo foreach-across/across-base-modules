@@ -5,7 +5,7 @@
 
 	<appender name="elk-methods" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>localhost:5000</destination>
+			<destination>${logstash-servers}</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -25,7 +25,7 @@
 					<pattern>
 						<pattern>
 							{
-							"application": "poc",
+							"application": "${logstash-application}",
 							"appender": "methods"
 							}
 						</pattern>
