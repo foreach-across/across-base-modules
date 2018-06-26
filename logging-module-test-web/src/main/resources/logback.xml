@@ -2,38 +2,6 @@
 <configuration>
 	<springProperty name="log-dir" source="log.dir"/>
 
-
-	<appender name="elk" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
-		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>localhost:5000</destination>
-			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-				<providers>
-					<mdc/>
-					<context/>
-					<version/>
-					<logLevel/>
-					<loggerName/>
-
-					<threadName/>
-					<message/>
-
-					<logstashMarkers/>
-					<arguments/>
-
-					<stackTrace/>
-
-					<pattern>
-						<pattern>
-							{
-							"application": "poc",
-							"appender": "server"
-							}
-						</pattern>
-					</pattern>
-				</providers>
-			</encoder>
-		</appender>
-	</appender>
 	<appender name="elk-methods" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
 			<destination>localhost:5000</destination>
@@ -108,6 +76,7 @@
 					<loggerName/>
 
 					<threadName/>
+					<message />
 					<provider class="com.foreach.across.modules.logging.request.RequestLoggerJsonProvider" />
 
 					<logstashMarkers/>
@@ -199,24 +168,17 @@
 
 	<logger name="org.springframework.data" level="WARN" additivity="false"/>
 
-	<logger name="be.resto.site.application" level="INFO">
-		<appender-ref ref="application"/>
-		<appender-ref ref="elk"/>
-	</logger>
-
 	<logger name="com.foreach.across" level="INFO" additivity="false">
 		<appender-ref ref="across"/>
-		<appender-ref ref="elk"/>
 	</logger>
 
 	<logger name="com.foreach.across.core.context.bootstrap.AcrossBootstrapper" level="INFO" additivity="false">
 		<appender-ref ref="console"/>
 		<appender-ref ref="across"/>
-		<appender-ref ref="elk"/>
 	</logger>
 
 	<root level="INFO">
-		<appender-ref ref="elk"/>
+		<appender-ref ref="console"/>
 	</root>
 
 </configuration>

@@ -50,7 +50,7 @@ public class LoggingModuleApplication
 
 		// Enable agressive method logging
 		//loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_ENABLED, true );
-		MethodLogConfiguration methodLogConfiguration = MethodLogConfiguration.all( 15 );
+		MethodLogConfiguration methodLogConfiguration = MethodLogConfiguration.all( 5 );
 		loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_CONFIGURATION, methodLogConfiguration );
 
 		RequestLoggerConfiguration requestLoggerConfiguration = RequestLoggerConfiguration.allRequests();
