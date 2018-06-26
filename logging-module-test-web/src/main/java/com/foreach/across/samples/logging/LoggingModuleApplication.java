@@ -23,6 +23,7 @@ import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.method.MethodLogConfiguration;
 import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
 import com.foreach.across.modules.web.AcrossWebModule;
+import com.foreach.across.samples.logging.controllers.TestLogController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -57,6 +58,11 @@ public class LoggingModuleApplication
 		loggingModule.setProperty( LoggingModuleSettings.REQUEST_LOGGER_CONFIGURATION, requestLoggerConfiguration );
 
 		return loggingModule;
+	}
+
+	@Bean
+	public TestLogController testLogController(){
+		return new TestLogController();
 	}
 
 	public static void main( String[] args ) {
