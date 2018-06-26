@@ -1,0 +1,151 @@
+<included>
+	<springProperty name="log-dir" source="log.dir"/>
+
+	<appender name="elk-methods" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<destination>localhost:5000</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<message/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "poc",
+							"appender": "methods"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
+	<appender name="elk-hikari" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<destination>localhost:5000</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<message/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "poc",
+							"appender": "hikari"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
+	<appender name="elk-requests" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<destination>localhost:5000</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<message />
+					<provider class="com.foreach.across.modules.logging.request.RequestLoggerJsonProvider" />
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "poc",
+							"appender": "requests"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d %5p %40.40c:%4L - %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="errors">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/errors.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="thymeleaf">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/thymeleaf.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="application">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/application.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="methods">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/methods.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%logger{0}\t%m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="across">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/across.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
+		</encoder>
+	</appender>
+	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="hikari">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log-dir}/%d{yyyy'/'MM'/'dd'/hikari.'yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%logger{0}\t%m%n</pattern>
+		</encoder>
+	</appender>
+</included>
