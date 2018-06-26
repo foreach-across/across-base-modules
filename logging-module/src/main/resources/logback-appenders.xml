@@ -32,37 +32,6 @@
 			</encoder>
 		</appender>
 	</appender>
-	<appender name="elk-hikari" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
-		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>localhost:5000</destination>
-			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-				<providers>
-					<mdc/>
-					<context/>
-					<version/>
-					<logLevel/>
-					<loggerName/>
-
-					<threadName/>
-					<message/>
-
-					<logstashMarkers/>
-					<arguments/>
-
-					<stackTrace/>
-
-					<pattern>
-						<pattern>
-							{
-							"application": "poc",
-							"appender": "hikari"
-							}
-						</pattern>
-					</pattern>
-				</providers>
-			</encoder>
-		</appender>
-	</appender>
 	<appender name="elk-requests" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
 			<destination>localhost:5000</destination>

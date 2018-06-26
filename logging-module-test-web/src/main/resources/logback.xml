@@ -5,7 +5,6 @@
 
 	<logger name="com.zaxxer.hikari.pool" level="INFO" additivity="false">
 		<appender-ref ref="hikari"/>
-		<appender-ref ref="elk-hikari"/>
 	</logger>
 
 	<logger name="com.foreach.across.modules.logging.method.MethodLogger" level="INFO" additivity="false">
@@ -22,6 +21,7 @@
 	<logger name="org.springframework.data" level="WARN" additivity="false"/>
 	<logger name="org.thymeleaf" level="WARN"/>
 	<logger name="liquibase" level="WARN"/>
+	<logger name="com.zaxxer.hikari" level="INFO"/>
 	<logger name="net.sf.ehcache" level="WARN"/>
 
 	<logger name="com.foreach.across" level="INFO" additivity="false">
