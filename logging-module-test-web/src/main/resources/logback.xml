@@ -20,6 +20,9 @@
 	</logger>
 
 	<logger name="org.springframework.data" level="WARN" additivity="false"/>
+	<logger name="org.thymeleaf" level="WARN"/>
+	<logger name="liquibase" level="WARN"/>
+	<logger name="net.sf.ehcache" level="WARN"/>
 
 	<logger name="com.foreach.across" level="INFO" additivity="false">
 		<appender-ref ref="across"/>
