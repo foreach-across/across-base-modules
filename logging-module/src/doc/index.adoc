@@ -551,3 +551,43 @@ NOTE: Only available if {debug-web-module-url}[DebugWebModule] is present.
 If request/response debug logging is enabled, {module-name} adds a subsection *Request - response* to the *Logging* section.
 The *Settings* controller allows you to update the path settings that requests should match before their details are logged.
 The *Overview* controller allows you to pause/activate the logging, as well as browse all log entries.
+
+[[logging-elk]]
+== Send logging to ELK stack
+The logging module provides an easy way to send yours to logstash. This can be done by adding appenders
+to your loggers in the logback configuration file. These appenders ensure that the right format is being
+used so all fields are send to logstash correctly.
+
+The logging module provides the following appenders that you can use to send your data to elastic search:
+- elk-methods
+- elk-requests
+
+=== Configuration the logstash appenders
+Before you can send your logs to logstash you need to set the logstash server & the application properties.
+
+[subs="verbatim,quotes,attributes"]
+----
+logging.logstash.server
+logging.logstash.application
+----
+
+Once the properties are set you can use the provided appenders to send your logs to logstash.
+You can start using the provided appenders by including them in your logback.xml
+
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+<include resource="logback-appenders.xml" />
+----
+
+You can then add these appenders to your configured loggers to forwards these to logstash.
+An example to have your request logs forwarded to logstash:
+
+[source,xml,indent=0]
+[subs="verbatim,quotes,attributes"]
+----
+<logger name="com.foreach.across.modules.logging.request.RequestLogger" level="OFF" additivity="false">
+    <appender-ref ref="console"/>
+    <appender-ref ref="elk-requests"/>
+</logger>
+----

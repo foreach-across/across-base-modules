@@ -1,9 +1,11 @@
 <included>
 	<springProperty name="log-dir" source="log.dir"/>
+	<springProperty name="logstash-server" source="logging.logstash.server"/>
+	<springProperty name="logstash-application" source="logging.logstash.application"/>
 
 	<appender name="elk-methods" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>localhost:5000</destination>
+			<destination>${logstash-server}</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -23,7 +25,7 @@
 					<pattern>
 						<pattern>
 							{
-							"application": "poc",
+							"application": "${logstash-application}",
 							"appender": "methods"
 							}
 						</pattern>
@@ -34,7 +36,7 @@
 	</appender>
 	<appender name="elk-hikari" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>localhost:5000</destination>
+			<destination>${logstash-server}</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -54,7 +56,7 @@
 					<pattern>
 						<pattern>
 							{
-							"application": "poc",
+							"application": "${logstash-application}",
 							"appender": "hikari"
 							}
 						</pattern>
@@ -65,7 +67,7 @@
 	</appender>
 	<appender name="elk-requests" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>localhost:5000</destination>
+			<destination>${logstash-server}</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -86,7 +88,7 @@
 					<pattern>
 						<pattern>
 							{
-							"application": "poc",
+							"application": "${logstash-application}",
 							"appender": "requests"
 							}
 						</pattern>
