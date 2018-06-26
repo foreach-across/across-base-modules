@@ -108,7 +108,7 @@
 					<loggerName/>
 
 					<threadName/>
-					<message/>
+					<provider class="com.foreach.across.modules.logging.request.RequestLoggerJsonProvider" />
 
 					<logstashMarkers/>
 					<arguments/>
