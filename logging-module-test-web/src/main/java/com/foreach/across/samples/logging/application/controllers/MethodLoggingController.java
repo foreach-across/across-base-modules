@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.foreach.across.samples.logging.controllers;
+package com.foreach.across.samples.logging.application.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-public class TestLogController
+public class MethodLoggingController
 {
-	@RequestMapping("/generate-error")
-	public String testMdc() throws RuntimeException {
-		throw new RuntimeException( "Dummy error" );
+	@ResponseBody
+	@RequestMapping("/generate-method-log")
+	public String ok() throws InterruptedException {
+		Thread.sleep( 2500L );
+		return "OK";
 	}
 }

@@ -23,7 +23,6 @@ import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.method.MethodLogConfiguration;
 import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
 import com.foreach.across.modules.web.AcrossWebModule;
-import com.foreach.across.samples.logging.controllers.TestLogController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -40,6 +39,8 @@ import javax.sql.DataSource;
 })
 public class LoggingModuleApplication
 {
+	public final static String NAME = "LoggingModuleApplication";
+
 	@Bean
 	public DataSource acrossDataSource() {
 		return new EmbeddedDatabaseBuilder().setType( EmbeddedDatabaseType.H2 ).build();
@@ -50,19 +51,14 @@ public class LoggingModuleApplication
 		LoggingModule loggingModule = new LoggingModule();
 
 		// Enable agressive method logging
-		//loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_ENABLED, true );
-		MethodLogConfiguration methodLogConfiguration = MethodLogConfiguration.all( 5 );
+		loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_ENABLED, true );
+		MethodLogConfiguration methodLogConfiguration = MethodLogConfiguration.all( 1 );
 		loggingModule.setProperty( LoggingModuleSettings.METHOD_LOG_CONFIGURATION, methodLogConfiguration );
 
 		RequestLoggerConfiguration requestLoggerConfiguration = RequestLoggerConfiguration.allRequests();
 		loggingModule.setProperty( LoggingModuleSettings.REQUEST_LOGGER_CONFIGURATION, requestLoggerConfiguration );
 
 		return loggingModule;
-	}
-
-	@Bean
-	public TestLogController testLogController(){
-		return new TestLogController();
 	}
 
 	public static void main( String[] args ) {
