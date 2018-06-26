@@ -26,7 +26,7 @@
 
 	<groupId>com.foreach.across.modules</groupId>
 	<artifactId>spring-security-module-project</artifactId>
-	<version>3.0.1.RELEASE</version>
+	<version>3.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>${project.groupId}:${project.artifactId}</name>
