@@ -36,7 +36,7 @@
 	</appender>
 	<appender name="elk-methods" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>localhost:5000/</destination>
+			<destination>localhost:5000</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -67,7 +67,7 @@
 	</appender>
 	<appender name="elk-hikari" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>localhost:5000/</destination>
+			<destination>localhost:5000</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -98,7 +98,7 @@
 	</appender>
 	<appender name="elk-requests" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>localhost:5000/</destination>
+			<destination>localhost:5000</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -193,8 +193,8 @@
 
 	<!--this can be enabled at runtime via debugweb (/debug/logging/loggers#)-->
 	<logger name="com.foreach.across.modules.logging.request.RequestLogger" level="OFF" additivity="false">
-		<appender-ref ref="elk-requests"/>
 		<appender-ref ref="console"/>
+		<appender-ref ref="elk-requests"/>
 	</logger>
 
 	<logger name="org.springframework.data" level="WARN" additivity="false"/>
