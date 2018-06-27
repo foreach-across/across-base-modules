@@ -8,10 +8,6 @@ tracker if you are unable to contribute yourself.  See the [module wiki][] for t
 ### Building from source
 The source can be built using [Maven][] with JDK 8.
 
-## Start a local ELK environment
-Checkout https://github.com/deviantony/docker-elk
-Run docker-compose up -d
-
 ### License
 Licensed under version 2.0 of the [Apache License][].
 

@@ -158,6 +158,16 @@ Module website: {module-url}
 |Advanced configuration settings for request/response debug logging.
 |_null_
 
+|logging.logstash.server
+|String
+|The host and port of the Logstash server. E.g. localhost:5000
+|
+
+|logging.logstash.application
+|String
+|The name of the application that will be used for populating the application field within ElasticSearch
+|
+
 |===
 
 == What's new in this version?
@@ -553,14 +563,32 @@ The *Settings* controller allows you to update the path settings that requests s
 The *Overview* controller allows you to pause/activate the logging, as well as browse all log entries.
 
 [[logging-elk]]
+== Bootstrapping an ELK stack
+====
+Using this setup for providing an ELK stack is written for small applications.
+If expect lots of logging, setup a custom ElasticSearch cluster yourself.
+====
+You can use the link:logging-module-test-web/docker/docker-compose.yml[docker-compose.yml] file for bootstrapping an ELK stack.
+
+This wil bootstrap 3 Docker containers:
+
+* ElasticSearch: official ElasticSearch image from ElasticSearch
+* Kibana: official Kibana image from ElasticSearch
+* Logstash: custom Logstash image.
+This one extends the official Logstash image with a custom link:logging-module-test-web/docker/logstash/logback.conf[logback.conf].
+This logback.conf uses different ports to distinguish different environments.
+Also It is possible te enable plugins in this Dockerfile.
+
 == Send logging to ELK stack
 The logging module provides an easy way to send yours to logstash. This can be done by adding appenders
 to your loggers in the logback configuration file. These appenders ensure that the right format is being
 used so all fields are send to logstash correctly.
 
 The logging module provides the following appenders that you can use to send your data to elastic search:
-- elk-methods
-- elk-requests
+
+* elk-methods: This appender uses link:com.foreach.across.modules.logging.method.MethodLoggerJsonProvider[MethodLoggerProvider] to provide method, methodLevel and duration as fields for ElasticSearch.
+* elk-requests: This appender uses  link:com.foreach.across.modules.logging.request.RequestLoggerJsonProvider[RequestLoggerJsonProvider] to provide additional fields like remoteAddress, url and status for ElasticSearch.
+* elk-errors: This appender is configured with a `ThresholdFilter` so only logs of level *ERROR* are allowed.
 
 === Configuration the logstash appenders
 Before you can send your logs to logstash you need to set the logstash server & the application properties.
