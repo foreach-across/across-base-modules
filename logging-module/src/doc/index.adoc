@@ -607,7 +607,7 @@ You can start using the provided appenders by including them in your logback.xml
 [source,xml,indent=0]
 [subs="verbatim,quotes,attributes"]
 ----
-<include resource="logback-appenders.xml" />
+<include resource="elk-appenders.xml" />
 ----
 
 You can then add these appenders to your configured loggers to forwards these to logstash.
