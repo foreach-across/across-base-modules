@@ -95,6 +95,37 @@
 			</encoder>
 		</appender>
 	</appender>
+	<appender name="elk-hikari" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<destination>${logging.logstash.servers}</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<provider class="com.foreach.across.modules.logging.request.HikariLoggerJsonProvider"/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "${logging.logstash.application}",
+							"appender": "hikari"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d %5p %40.40c:%4L - %m%n</pattern>

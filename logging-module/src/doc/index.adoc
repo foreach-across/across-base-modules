@@ -588,6 +588,8 @@ The logging module provides the following appenders that you can use to send you
 
 * elk-methods: This appender uses link:com.foreach.across.modules.logging.method.MethodLoggerJsonProvider[MethodLoggerProvider] to provide method, methodLevel and duration as fields for ElasticSearch.
 * elk-requests: This appender uses  link:com.foreach.across.modules.logging.request.RequestLoggerJsonProvider[RequestLoggerJsonProvider] to provide additional fields like remoteAddress, url and status for ElasticSearch.
+* elk-hikari: This appender uses link:com.foreach.across.modules.logging.request.HikariLoggerJsonProvider[HikariLoggerJsonProvider] to provide the state of the Hikari Connection pool as fields for ElasticSearch.
+These fields include: total, active, idle and waiting connections.
 * elk-errors: This appender is configured with a `ThresholdFilter` so only logs of level *ERROR* are allowed.
 
 === Configuration the logstash appenders
@@ -614,8 +616,16 @@ An example to have your request logs forwarded to logstash:
 [source,xml,indent=0]
 [subs="verbatim,quotes,attributes"]
 ----
+<logger name="com.foreach.across.modules.logging.method.MethodLogger" level="INFO" additivity="false">
+    <appender-ref ref="elk-methods"/>
+</logger>
 <logger name="com.foreach.across.modules.logging.request.RequestLogger" level="OFF" additivity="false">
-    <appender-ref ref="console"/>
     <appender-ref ref="elk-requests"/>
 </logger>
+<logger name="com.zaxxer.hikari.pool.HikariPool" level="DEBUG" additivity="false" >
+    <appender-ref ref="elk-hikari"/>
+</logger>
+<root level="INFO">
+    <appender-ref ref="elk-errors"/>
+</root>
 ----

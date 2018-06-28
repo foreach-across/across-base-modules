@@ -17,16 +17,20 @@
 package com.foreach.across.samples.logging;
 
 import com.foreach.across.config.AcrossApplication;
+import com.foreach.across.core.annotations.Exposed;
+import com.foreach.across.database.support.HikariDataSourceHelper;
 import com.foreach.across.modules.debugweb.DebugWebModule;
 import com.foreach.across.modules.logging.LoggingModule;
 import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.method.MethodLogConfiguration;
 import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
 import com.foreach.across.modules.web.AcrossWebModule;
+import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 
 import javax.sql.DataSource;
 
@@ -41,9 +45,12 @@ public class LoggingModuleApplication
 {
 	public final static String NAME = "LoggingModuleApplication";
 
+	@Autowired
+	private Environment environment;
+
 	@Bean
-	public DataSource acrossDataSource() {
-		return new EmbeddedDatabaseBuilder().setType( EmbeddedDatabaseType.H2 ).build();
+	public DataSource dataSource() {
+		return new HikariDataSource( HikariDataSourceHelper.create( "poc", (ConfigurableEnvironment) environment ) );
 	}
 
 	@Bean
