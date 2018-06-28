@@ -1,0 +1,98 @@
+<included>
+	<appender name="elk-methods" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<destination>${logging.logstash.servers}</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<provider class="com.foreach.across.modules.logging.method.MethodLoggerJsonProvider"/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "${logging.logstash.application}",
+							"appender": "methods"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
+	<appender name="elk-errors" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+				<level>ERROR</level>
+			</filter>
+			<destination>${logging.logstash.servers}</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<message/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "${logging.logstash.application}",
+							"appender": "errors"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
+	<appender name="elk-requests" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+			<destination>${logging.logstash.servers}</destination>
+			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+				<providers>
+					<mdc/>
+					<context/>
+					<version/>
+					<logLevel/>
+					<loggerName/>
+
+					<threadName/>
+					<provider class="com.foreach.across.modules.logging.request.RequestLoggerJsonProvider"/>
+
+					<logstashMarkers/>
+					<arguments/>
+
+					<stackTrace/>
+
+					<pattern>
+						<pattern>
+							{
+							"application": "${logging.logstash.application}",
+							"appender": "requests"
+							}
+						</pattern>
+					</pattern>
+				</providers>
+			</encoder>
+		</appender>
+	</appender>
+</included>
