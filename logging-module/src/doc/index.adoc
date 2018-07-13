@@ -570,10 +570,13 @@ If expect lots of logging, setup a custom ElasticSearch cluster yourself.
 ====
 You can use the link:logging-module-test-web/docker/docker-compose.yml[docker-compose.yml] file for bootstrapping an ELK stack.
 
+To start use following command:
+docker-compose up -d
+
 This wil bootstrap 3 Docker containers:
 
 * ElasticSearch: official ElasticSearch image from ElasticSearch
-* Kibana: official Kibana image from ElasticSearch
+* Kibana: official Kibana image from ElasticSearch. Available at http://localhost:5601/
 * Logstash: custom Logstash image.
 This one extends the official Logstash image with a custom link:logging-module-test-web/docker/logstash/logback.conf[logback.conf].
 This logback.conf uses different ports to distinguish different environments.
