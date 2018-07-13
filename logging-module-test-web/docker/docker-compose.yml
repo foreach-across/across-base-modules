@@ -35,6 +35,18 @@ services:
     depends_on:
       - elasticsearch
 
+  index-patterns:
+    build:
+      context: ./index-patterns/
+      dockerfile: Dockerfile
+    image: index-patterns:latest
+    depends_on:
+      - elasticsearch
+      - kibana
+    networks:
+      - esnet
+    command: bash -c "sleep 60 && ./wait-for-it.sh -t 360 kibana:5601 -- ./create-default-patterns.sh"
+
   logstash:
     build:
       context: ./logstash/
@@ -50,7 +62,7 @@ services:
       - esnet
     depends_on:
       - elasticsearch
-  # command: bash -c "/wait-for-it.sh -t 360 elasticsearch:9200  -- /insert-logstash-template.sh && /usr/local/bin/docker-entrypoint -f /usr/share/logstash/pipeline/ --http.host 0.0.0.0 --http.port 9600"
+    command: bash -c "./wait-for-it.sh -t 360 elasticsearch:9200  -- ./insert-logstash-template.sh && /usr/local/bin/docker-entrypoint -f /usr/share/logstash/pipeline/ --http.host 0.0.0.0 --http.port 9600"
 
 volumes:
   esdata1:

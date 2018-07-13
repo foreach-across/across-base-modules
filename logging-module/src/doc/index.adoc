@@ -582,6 +582,26 @@ This one extends the official Logstash image with a custom link:logging-module-t
 This logback.conf uses different ports to distinguish different environments.
 Also It is possible te enable plugins in this Dockerfile.
 
+== Index patterns
+Index-patterns used by Kibana can be autocreated at startup.
+The desired patterns can be configured in logging-module-test-web/docker/index-patterns/create-default-patterns.sh[create-default-patterns.sh]
+
+[options="header", cols="<2,<2"]
+|===============
+|Key|Description
+|application_name|Name of the application. This should be the same as the 'logging.logstash.application' property
+|environments|Environments for which an index-pattern should be created
+|appenders|Appenders for which an index-pattern should be created
+|default_index_pattern_environment|Environment for which an default index-pattern should be created.
+|default_index_pattern_appender|Appender for which an default index-pattern should be created.
+|===============
+
+Combination of default_index_pattern_environment and default_index_pattern_appender will define the default index-pattern.
+
+Index-patterns will have the following pattern:
+environment-logs-application_name-appender*
+For example: prod-logs-logging_module-requests
+
 == Send logging to ELK stack
 The logging module provides an easy way to send yours to logstash. This can be done by adding appenders
 to your loggers in the logback configuration file. These appenders ensure that the right format is being
