@@ -35,18 +35,6 @@ services:
     depends_on:
       - elasticsearch
 
-  index-patterns:
-    build:
-      context: ./index-patterns/
-      dockerfile: Dockerfile
-    image: index-patterns:latest
-    depends_on:
-      - elasticsearch
-      - kibana
-    networks:
-      - esnet
-    command: bash -c "sleep 60 && ./wait-for-it.sh -t 360 kibana:5601 -- ./create-default-patterns.sh"
-
   logstash:
     build:
       context: ./logstash/

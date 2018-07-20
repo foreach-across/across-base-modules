@@ -17,7 +17,6 @@
 package com.foreach.across.samples.logging;
 
 import com.foreach.across.config.AcrossApplication;
-import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.database.support.HikariDataSourceHelper;
 import com.foreach.across.modules.debugweb.DebugWebModule;
 import com.foreach.across.modules.logging.LoggingModule;
@@ -49,7 +48,7 @@ public class LoggingModuleApplication
 	private Environment environment;
 
 	@Bean
-	public DataSource dataSource() {
+	public DataSource acrossDataSource() {
 		return new HikariDataSource( HikariDataSourceHelper.create( "poc", (ConfigurableEnvironment) environment ) );
 	}
 

@@ -105,4 +105,8 @@
 		</encoder>
 	</appender>
 
+	<logger name="com.foreach.across.core.installers.AcrossBootstrapInstallerRegistry" level="DEBUG">
+		<appender-ref ref="console"/>
+	</logger>
+
 </configuration>
