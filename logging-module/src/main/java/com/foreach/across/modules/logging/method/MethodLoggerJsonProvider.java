@@ -27,13 +27,18 @@ public class MethodLoggerJsonProvider extends AbstractFieldJsonProvider<ILogging
 {
 	@Override
 	public void writeTo( JsonGenerator generator, ILoggingEvent event ) throws IOException {
-		String message = event.getFormattedMessage();
-		String[] split = message.split( "\t" );
-		int methodLevel = Integer.parseInt( split[0] );
-		String method = split[1];
-		int duration = Integer.parseInt( split[2] );
-		JsonWritingUtils.writeNumberField( generator, "methodLevel", methodLevel );
-		JsonWritingUtils.writeStringField( generator, "method", method );
-		JsonWritingUtils.writeNumberField( generator, "duration", duration );
+		try {
+			String message = event.getFormattedMessage();
+			String[] split = message.split( "\t" );
+			int methodLevel = Integer.parseInt( split[0] );
+			String method = split[1];
+			int duration = Integer.parseInt( split[2] );
+			JsonWritingUtils.writeNumberField( generator, "methodLevel", methodLevel );
+			JsonWritingUtils.writeStringField( generator, "method", method );
+			JsonWritingUtils.writeNumberField( generator, "duration", duration );
+		}
+		catch ( Exception e ) {
+			throw new IOException( e );
+		}
 	}
 }

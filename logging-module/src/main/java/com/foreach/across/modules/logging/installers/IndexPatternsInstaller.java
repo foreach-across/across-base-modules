@@ -20,8 +20,8 @@ import com.foreach.across.core.annotations.Installer;
 import com.foreach.across.core.annotations.InstallerMethod;
 import com.foreach.across.core.installers.InstallerPhase;
 import com.foreach.across.modules.logging.LoggingModuleSettings;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
@@ -33,6 +33,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Objects;
@@ -45,9 +46,20 @@ import java.util.UUID;
 )
 @Slf4j
 @ConditionalOnProperty(name = LoggingModuleSettings.KIBANA_CONFIGURATION_SERVER)
+@RequiredArgsConstructor
 public class IndexPatternsInstaller
 {
-	private Environment env;
+	private final Environment env;
+	private RestTemplate restTemplate;
+
+	@PostConstruct
+	public void setup() {
+		int timeout = 5000;
+		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+		requestFactory.setReadTimeout( timeout );
+		requestFactory.setConnectTimeout( timeout );
+		this.restTemplate = new RestTemplate( requestFactory );
+	}
 
 	@InstallerMethod
 	public void installIndexPatterns() {
@@ -77,7 +89,7 @@ public class IndexPatternsInstaller
 		String request = String.format( "{ \"value\": \"%s\"  }", pattern );
 
 		try {
-			if ( getRestTemplate().postForEntity( kibanaEndpoint, createRequest( request ), Object.class ).getStatusCode().is2xxSuccessful() ) {
+			if ( restTemplate.postForEntity( kibanaEndpoint, createRequest( request ), Object.class ).getStatusCode().is2xxSuccessful() ) {
 				LOG.debug( "Successfully set index-pattern {} as default", pattern );
 			}
 		}
@@ -98,7 +110,7 @@ public class IndexPatternsInstaller
 		String request = String.format( "{ \"attributes\": {\"title\": \"%s\", \"timeFieldName\": \"@timestamp\"} }", pattern );
 
 		try {
-			if ( getRestTemplate().postForEntity( kibanaEndpoint, createRequest( request ), Object.class ).getStatusCode().is2xxSuccessful() ) {
+			if ( restTemplate.postForEntity( kibanaEndpoint, createRequest( request ), Object.class ).getStatusCode().is2xxSuccessful() ) {
 				LOG.debug( "Successfully created index-pattern {}", pattern );
 			}
 		}
@@ -121,19 +133,5 @@ public class IndexPatternsInstaller
 		headers.add( "kbn-xsrf", UUID.randomUUID().toString() );
 
 		return new HttpEntity<>( request, headers );
-	}
-
-	private RestTemplate getRestTemplate() {
-		int timeout = 5000;
-		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-		requestFactory.setReadTimeout( timeout );
-		requestFactory.setConnectTimeout( timeout );
-
-		return new RestTemplate( requestFactory );
-	}
-
-	@Autowired
-	public void setEnv( Environment env ) {
-		this.env = env;
 	}
 }
