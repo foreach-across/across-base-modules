@@ -20,8 +20,8 @@ import com.foreach.across.core.annotations.Installer;
 import com.foreach.across.core.annotations.InstallerMethod;
 import com.foreach.across.core.installers.InstallerPhase;
 import com.foreach.across.modules.logging.LoggingModuleSettings;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
@@ -46,10 +46,9 @@ import java.util.UUID;
 )
 @Slf4j
 @ConditionalOnProperty(name = LoggingModuleSettings.KIBANA_CONFIGURATION_SERVER)
-@RequiredArgsConstructor
 public class IndexPatternsInstaller
 {
-	private final Environment env;
+	private Environment env;
 	private RestTemplate restTemplate;
 
 	@PostConstruct
@@ -133,5 +132,10 @@ public class IndexPatternsInstaller
 		headers.add( "kbn-xsrf", UUID.randomUUID().toString() );
 
 		return new HttpEntity<>( request, headers );
+	}
+
+	@Autowired
+	public void setEnv( Environment env ) {
+		this.env = env;
 	}
 }

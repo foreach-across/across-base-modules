@@ -35,7 +35,8 @@ public class TestIndexPatternsInstaller
 		when( env.getProperty( LoggingModuleSettings.KIBANA_CONFIGURATION_SERVER ) ).thenReturn( KIBANA_SERVER );
 		when( env.getProperty( LoggingModuleSettings.LOGSTASH_CONFIGURATION_APPLICATION ) ).thenReturn( APPLICATION_NAME );
 		when( env.getActiveProfiles() ).thenReturn( new String[] { "acc" } );
-		installer = new IndexPatternsInstaller( env );
+		installer = new IndexPatternsInstaller();
+		installer.setEnv( env );
 		RestTemplate restTemplate = new RestTemplate();
 		mockServer = MockRestServiceServer.createServer( restTemplate );
 		setField( installer, "restTemplate", restTemplate );
