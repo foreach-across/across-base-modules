@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
+<configuration debug="true">
 	<property resource="application.properties" />
 
 	<include resource="elk-appenders.xml"/>
@@ -17,6 +17,7 @@
 	<logger name="com.foreach.across.modules.logging.request.RequestLogger" level="TRACE" additivity="false">
 		<appender-ref ref="console"/>
 		<appender-ref ref="elk-requests"/>
+		<appender-ref ref="pages"/>
 	</logger>
 
 	<logger name="org.springframework.data" level="WARN" additivity="false"/>
@@ -48,6 +49,18 @@
 		<appender-ref ref="elk-errors"/>
 	</root>
 
+	<appender name="pages" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%level\t%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="methods" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%logger{0}\t%m%n</pattern>
+		</encoder>
+	</appender>
+
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d %5p %40.40c:%4L - %m%n</pattern>
@@ -78,14 +91,6 @@
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
-		</encoder>
-	</appender>
-	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="methods">
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${log.dir}/%d{yyyy'/'MM'/'dd'/methods.'yyyy-MM-dd}.log</fileNamePattern>
-		</rollingPolicy>
-		<encoder>
-			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%logger{0}\t%m%n</pattern>
 		</encoder>
 	</appender>
 	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="across">
