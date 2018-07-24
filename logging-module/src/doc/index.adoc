@@ -158,16 +158,6 @@ Module website: {module-url}
 |Advanced configuration settings for request/response debug logging.
 |_null_
 
-|logging.logstash.server
-|String
-|The host and port of the Logstash server. E.g. localhost:5000
-|
-
-|logging.logstash.application
-|String
-|The name of the application that will be used for populating the application field within ElasticSearch
-|
-
 |===
 
 == What's new in this version?
@@ -561,87 +551,3 @@ NOTE: Only available if {debug-web-module-url}[DebugWebModule] is present.
 If request/response debug logging is enabled, {module-name} adds a subsection *Request - response* to the *Logging* section.
 The *Settings* controller allows you to update the path settings that requests should match before their details are logged.
 The *Overview* controller allows you to pause/activate the logging, as well as browse all log entries.
-
-[[logging-elk]]
-== Bootstrapping an ELK stack
-====
-Using this setup for providing an ELK stack is written for small applications.
-If expect lots of logging, setup a custom ElasticSearch cluster yourself.
-====
-You can use the link:logging-module-test-web/docker/docker-compose.yml[docker-compose.yml] file for bootstrapping an ELK stack.
-
-To start use following command:
-docker-compose up -d
-
-This wil bootstrap 3 Docker containers:
-
-* ElasticSearch: official ElasticSearch image from ElasticSearch
-* Kibana: official Kibana image from ElasticSearch. Available at http://localhost:5601/
-* Logstash: custom Logstash image.
-This one extends the official Logstash image with a custom link:logging-module-test-web/docker/logstash/logback.conf[logback.conf].
-This logback.conf uses different ports to distinguish different environments.
-Also It is possible te enable plugins in this Dockerfile.
-
-== Index patterns
-If desired, index-patterns can be created at startup.
-This is done by setting the 'logging.kibana.server' property to a valid Kibana url.
-
-After doing so the link:com.foreach.across.modules.logging.installers.IndexPatternsInstaller[IndexPatternsInstaller] will run and create index-patterns for
-the hikari, requests, error and long-methods appenders.
-This will be done for every Spring profile that is active.
-
-
-Index-patterns will have the following pattern:
-environment-logs-application_name-appender*
-For example: prod-logs-logging_module-requests
-
-== Send logging to ELK stack
-The logging module provides an easy way to send yours to logstash. This can be done by adding appenders
-to your loggers in the logback configuration file. These appenders ensure that the right format is being
-used so all fields are send to logstash correctly.
-
-The logging module provides the following appenders that you can use to send your data to elastic search:
-
-* elk-methods: This appender uses link:com.foreach.across.modules.logging.method.MethodLoggerJsonProvider[MethodLoggerProvider] to provide method, methodLevel and duration as fields for ElasticSearch.
-* elk-requests: This appender uses  link:com.foreach.across.modules.logging.request.RequestLoggerJsonProvider[RequestLoggerJsonProvider] to provide additional fields like remoteAddress, url and status for ElasticSearch.
-* elk-hikari: This appender uses link:com.foreach.across.modules.logging.request.HikariLoggerJsonProvider[HikariLoggerJsonProvider] to provide the state of the Hikari Connection pool as fields for ElasticSearch.
-These fields include: total, active, idle and waiting connections.
-* elk-errors: This appender is configured with a `ThresholdFilter` so only logs of level *ERROR* are allowed.
-
-=== Configuration the logstash appenders
-Before you can send your logs to logstash you need to set the logstash server & the application properties.
-
-[subs="verbatim,quotes,attributes"]
-----
-logging.logstash.server
-logging.logstash.application
-----
-
-Once the properties are set you can use the provided appenders to send your logs to logstash.
-You can start using the provided appenders by including them in your logback.xml
-
-[source,xml,indent=0]
-[subs="verbatim,quotes,attributes"]
-----
-<include resource="elk-appenders.xml" />
-----
-
-You can then add these appenders to your configured loggers to forwards these to logstash.
-An example to have your request logs forwarded to logstash:
-
-[source,xml,indent=0]
-[subs="verbatim,quotes,attributes"]
-----
-<logger name="com.foreach.across.modules.logging.method.MethodLogger" level="INFO" additivity="false">
-    <appender-ref ref="elk-methods"/>
-</logger>
-<logger name="com.foreach.across.modules.logging.request.RequestLogger" level="OFF" additivity="false">
-    <appender-ref ref="elk-requests"/>
-</logger>
-<logger name="com.zaxxer.hikari.pool.HikariPool" level="DEBUG" additivity="false" >
-    <appender-ref ref="elk-hikari"/>
-</logger>
-<root level="INFO">
-    <appender-ref ref="elk-errors"/>
-</root>
-----
