@@ -25,6 +25,10 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * When logstash is configured this JSON-Provider is used to extend fields we use for our the hikari logging fields
+ * that are being send to logstash
+ */
 public class HikariLoggerJsonProvider extends AbstractFieldJsonProvider<ILoggingEvent>
 {
 	private Pattern pattern = Pattern.compile( "(.*)pool stats (.*) \\(total=(\\d+), inUse=(\\d+), avail=(\\d+), waiting=(\\d+)\\)" );

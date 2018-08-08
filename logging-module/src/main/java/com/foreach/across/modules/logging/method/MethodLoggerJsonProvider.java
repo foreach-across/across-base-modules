@@ -23,6 +23,10 @@ import net.logstash.logback.composite.JsonWritingUtils;
 
 import java.io.IOException;
 
+/**
+ * When logstash is configured this JSON-Provider is used to extend fields we use for our the method logging fields
+ * that are being send to logstash
+ */
 public class MethodLoggerJsonProvider extends AbstractFieldJsonProvider<ILoggingEvent>
 {
 	@Override

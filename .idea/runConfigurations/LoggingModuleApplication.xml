@@ -3,6 +3,7 @@
     <module name="logging-module-test-web" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.foreach.across.samples.logging.LoggingModuleApplication" />
     <option name="HIDE_BANNER" value="true" />
+    <option name="ACTIVE_PROFILES" value="dev" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <method />

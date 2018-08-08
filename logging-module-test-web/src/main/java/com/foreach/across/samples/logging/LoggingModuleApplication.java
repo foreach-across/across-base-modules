@@ -38,7 +38,8 @@ import javax.sql.DataSource;
  * @since 2.0.0
  */
 @AcrossApplication(modules = {
-		DebugWebModule.NAME, AcrossWebModule.NAME
+		DebugWebModule.NAME,
+		AcrossWebModule.NAME
 })
 public class LoggingModuleApplication
 {

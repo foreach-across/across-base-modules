@@ -39,6 +39,10 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * This installer only runs when a kibana server url is provided.
+ * The installer creates index patters in kibana based on the provided applicationName
+ */
 @Installer(
 		description = "Create index patterns for application on Kibana",
 		version = 1,
@@ -63,6 +67,10 @@ public class IndexPatternsInstaller
 	@InstallerMethod
 	public void installIndexPatterns() {
 		String application = env.getProperty( LoggingModuleSettings.LOGSTASH_CONFIGURATION_APPLICATION );
+
+		if(application == null){
+			throw new RuntimeException( "No application name provided. Please provided the 'logging.logstash.application' property." );
+		}
 
 		if ( env.getActiveProfiles().length > 0 ) {
 			Arrays.stream( env.getActiveProfiles() ).forEach( profile -> {
