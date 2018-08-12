@@ -95,7 +95,6 @@ public class HibernateConfiguration
 		}
 
 		Properties propertiesToSet = new Properties();
-		// todo: figure out where to get original hibernate settings
 		propertiesToSet.putAll( settings.getHibernateProperties( new HibernateSettings() ) );
 
 		sessionFactory.setHibernateProperties( propertiesToSet );
@@ -121,7 +120,8 @@ public class HibernateConfiguration
 			return beanFactory.getBean( DataSource.class );
 		}
 
-		throw new IllegalStateException( "Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
+		throw new IllegalStateException(
+				"Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
 	}
 
 	@Bean(name = SESSION_HOLDER)
@@ -143,7 +143,8 @@ public class HibernateConfiguration
 		if ( settings.isRegisterRepositoryInterceptor() ) {
 			LOG.trace( "Enabling BasicRepositoryInterceptor support in module {}",
 			           beforeBootstrapEvent.getModule().getName() );
-			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ModuleBasicRepositoryInterceptorConfiguration.class );
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true,
+			                                                                           ModuleBasicRepositoryInterceptorConfiguration.class );
 		}
 
 		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );

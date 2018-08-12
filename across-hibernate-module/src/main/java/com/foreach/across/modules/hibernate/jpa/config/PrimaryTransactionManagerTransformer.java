@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * Checks if the transaction manager (and related beans) being exposed should be configured
  * as primary according to the module settings. The standard {@link AcrossHibernateJpaModule} is primary
- * by default unless it has been explicitly disabled with property {@code across.hibernate.primary=false}.
+ * by default unless it has been explicitly disabled with property {@code across-hibernate.primary=false}.
  *
  * @author Arne Vandamme
  * @since 3.0.0

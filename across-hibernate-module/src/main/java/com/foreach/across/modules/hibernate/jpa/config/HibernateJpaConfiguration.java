@@ -110,7 +110,6 @@ public class HibernateJpaConfiguration
 			factory.setMappingResources( hibernatePackage.getMappingResources() );
 		}
 		factory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
-		// todo: figure out where to get original hibernate settings
 		factory.getJpaPropertyMap().putAll( settings.getHibernateProperties( new HibernateSettings() ) );
 
 		Map<String, String> tableAliases = hibernatePackage.getTableAliases();

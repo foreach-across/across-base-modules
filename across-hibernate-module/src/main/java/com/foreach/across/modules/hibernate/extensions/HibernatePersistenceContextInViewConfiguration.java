@@ -46,7 +46,7 @@ public class HibernatePersistenceContextInViewConfiguration
 	private static final Logger LOG = LoggerFactory.getLogger( HibernatePersistenceContextInViewConfiguration.class );
 
 	@Configuration
-	@ConditionalOnExpression("@moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'FILTER'")
+	@ConditionalOnExpression("true == @moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'FILTER'")
 	public static class OpenSessionFactoryInViewFilterConfiguration extends AcrossWebDynamicServletConfigurer
 	{
 		@Autowired
@@ -91,7 +91,7 @@ public class HibernatePersistenceContextInViewConfiguration
 	}
 
 	@Configuration
-	@ConditionalOnExpression("@moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'INTERCEPTOR'")
+	@ConditionalOnExpression("true == @moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'INTERCEPTOR'")
 	public static class OpenSessionFactoryInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
 	{
 		@Autowired

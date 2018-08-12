@@ -72,7 +72,7 @@ public class TestJpaModuleSettings
 	public void unitOfWorkFactory() {
 		try (
 				AcrossTestContext ctx = standard()
-						.property( "across.hibernate.create-unit-of-work-factory", true )
+						.property( "acrossHibernate.create-unit-of-work-factory", true )
 						.modules( AcrossHibernateJpaModule.NAME )
 						.modules( new EmptyAcrossModule( "client" ) )
 						.build()

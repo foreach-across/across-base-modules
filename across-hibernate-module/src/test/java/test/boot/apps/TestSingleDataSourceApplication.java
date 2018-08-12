@@ -19,10 +19,12 @@ package test.boot.apps;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
+import com.foreach.across.test.ExposeForTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.repository.Repository;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
@@ -48,10 +50,11 @@ import static org.junit.Assert.assertTrue;
 		properties = {
 				"spring.datasource.url=jdbc:hsqldb:mem:single-db",
 				"spring.jpa.show-sql=true",
-				"spring.transaction.default-timeout=25",
-				"across.hibernate.hibernateProperties[hibernate.hbm2ddl.auto]=create-drop"
+				"spring.transaction.default-timeout=25s",
+				"acrossHibernate.hibernateProperties[hibernate.hbm2ddl.auto]=create-drop"
 		}
 )
+@ExposeForTest(Repository.class)
 public class TestSingleDataSourceApplication
 {
 	@Autowired
@@ -69,7 +72,7 @@ public class TestSingleDataSourceApplication
 				= beanRegistry.getBeanOfTypeFromModule( AcrossHibernateJpaModule.NAME, AcrossHibernateJpaModuleSettings.class );
 
 		assertTrue( moduleSettings.isShowSql() );
-		assertEquals( Integer.valueOf( 25 ), moduleSettings.getTransactionProperties().getDefaultTimeout() );
+		assertEquals( 25, moduleSettings.getTransactionProperties().getDefaultTimeout().getSeconds() );
 	}
 
 	@Test

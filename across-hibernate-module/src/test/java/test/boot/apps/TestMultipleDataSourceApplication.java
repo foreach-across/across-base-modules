@@ -18,6 +18,7 @@ package test.boot.apps;
 
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
+import com.foreach.across.test.ExposeForTest;
 import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.repository.Repository;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -56,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 				"app.datasource.my.url=jdbc:hsqldb:mem:my-db",
 				"spring.jpa.show-sql=false",
 				"spring.transaction.default-timeout=25",
-				"across.hibernate.hibernate.ddl-auto=create-drop",
+				"acrossHibernate.hibernate.ddl-auto=create-drop",
 				"customConnector.generate-ddl=true",
 				"customConnector.data-source=barDataSource",
 				"customConnector.show-sql=true",
@@ -64,6 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 				"my.jpa.generate-ddl=true"
 		}
 )
+@ExposeForTest(Repository.class)
 public class TestMultipleDataSourceApplication
 {
 	@Autowired
@@ -107,7 +110,7 @@ public class TestMultipleDataSourceApplication
 		Table table = new Table( acrossDataSource, "brand" );
 		Assertions.assertThat( table )
 		          .row()
-		          .value( "id" ).isEqualTo( 1L )
+		          .value( "id" ).isGreaterThan( 0L )
 		          .value( "name" ).isEqualTo( "Heineken" );
 	}
 
@@ -123,7 +126,7 @@ public class TestMultipleDataSourceApplication
 		Table table = new Table( acrossDataSource, "city" );
 		Assertions.assertThat( table )
 		          .row()
-		          .value( "id" ).isEqualTo( 1L )
+		          .value( "id" ).isGreaterThan( 0L )
 		          .value( "name" ).isEqualTo( "Antwerp" );
 	}
 
@@ -155,7 +158,7 @@ public class TestMultipleDataSourceApplication
 		Table table = new Table( myDataSource, "street" );
 		Assertions.assertThat( table )
 		          .row()
-		          .value( "id" ).isEqualTo( 1L )
+		          .value( "id" ).isGreaterThan( 0L )
 		          .value( "name" ).isEqualTo( "My street" );
 	}
 

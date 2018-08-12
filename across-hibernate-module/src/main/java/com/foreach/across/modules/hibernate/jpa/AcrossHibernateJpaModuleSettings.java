@@ -22,13 +22,13 @@ import lombok.EqualsAndHashCode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @SuppressWarnings("all")
-@ConfigurationProperties("across.hibernate")
+@ConfigurationProperties("across-hibernate")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AcrossHibernateJpaModuleSettings extends AcrossHibernateModuleSettings
 {
-	public static final String PERSISTENCE_UNIT_NAME = "across.hibernate.persistenceUnitName";
-	public static final String PRIMARY = "across.hibernate.primary";
+	public static final String PERSISTENCE_UNIT_NAME = "across-hibernate.persistence-unit-name";
+	public static final String PRIMARY = "across-hibernate.primary";
 
 	/**
 	 * Name of the persistence unit that is being managed by this module. Defaults to the module name.

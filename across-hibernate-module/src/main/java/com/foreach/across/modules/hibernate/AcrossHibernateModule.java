@@ -34,7 +34,7 @@ public class AcrossHibernateModule extends AbstractHibernatePackageModule
 
 	public AcrossHibernateModule() {
 		setHibernateProperty( "hibernate.cache.use_second_level_cache", "false" );
-		setPropertiesPrefix( NAME.equals( getName() ) ? "across.hibernate" : null );
+		setPropertiesPrefix( NAME.equals( getName() ) ? "across-hibernate" : null );
 	}
 
 	public AcrossHibernateModule( DataSource dataSource ) {

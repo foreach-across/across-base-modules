@@ -62,11 +62,13 @@ public class JpaRepositoryPointcut extends StaticMethodMatcherPointcut
 	static boolean isEntityMethod( Method method ) {
 		switch ( method.getName() ) {
 			case JpaRepositoryInterceptor.SAVE:
+			case JpaRepositoryInterceptor.SAVE_ALL:
 			case JpaRepositoryInterceptor.SAVE_AND_FLUSH:
 			case JpaRepositoryInterceptor.DELETE:
 			case JpaRepositoryInterceptor.DELETE_IN_BATCH:
 				return ( method.getParameterTypes().length == 1 );
 			case JpaRepositoryInterceptor.DELETE_ALL:
+				return method.getParameterTypes().length <= 1;
 			case JpaRepositoryInterceptor.DELETE_ALL_IN_BATCH:
 				return method.getParameterTypes().length == 0;
 			default:
