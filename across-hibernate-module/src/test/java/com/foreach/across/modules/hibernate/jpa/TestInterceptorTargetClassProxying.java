@@ -134,7 +134,7 @@ public class TestInterceptorTargetClassProxying
 
 		verifyZeroInteractions( clientInterceptor );
 
-		clientRepository.save( clients );
+		clientRepository.saveAll( clients );
 
 		verify( clientInterceptor ).handles( Client.class );
 		verify( clientInterceptor ).beforeCreate( client );
@@ -148,7 +148,7 @@ public class TestInterceptorTargetClassProxying
 
 		client.setName( "it-client-1-updated" );
 
-		clientRepository.save( clients );
+		clientRepository.saveAll( clients );
 
 		verify( clientInterceptor ).handles( Client.class );
 		verify( clientInterceptor ).beforeUpdate( client );
@@ -160,7 +160,7 @@ public class TestInterceptorTargetClassProxying
 		reset( clientInterceptor );
 		when( clientInterceptor.handles( Client.class ) ).thenReturn( true );
 
-		clientRepository.delete( clients );
+		clientRepository.deleteAll( clients );
 
 		verify( clientInterceptor ).handles( Client.class );
 		verify( clientInterceptor ).beforeDelete( client );

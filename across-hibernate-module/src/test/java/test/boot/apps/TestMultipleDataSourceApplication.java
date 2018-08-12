@@ -56,7 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 				"app.datasource.my.url=jdbc:hsqldb:mem:my-db",
 				"spring.jpa.show-sql=false",
 				"spring.transaction.default-timeout=25",
-				"acrossHibernate.hibernate.ddl-auto=create-drop",
+				"across.hibernate.hibernate.ddl-auto=create-drop",
 				"customConnector.generate-ddl=true",
 				"customConnector.data-source=barDataSource",
 				"customConnector.show-sql=true",

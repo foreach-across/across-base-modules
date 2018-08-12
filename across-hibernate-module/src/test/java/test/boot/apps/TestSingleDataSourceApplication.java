@@ -49,7 +49,7 @@ import static org.junit.Assert.assertTrue;
 				"spring.datasource.url=jdbc:hsqldb:mem:single-db",
 				"spring.jpa.show-sql=true",
 				"spring.transaction.default-timeout=25",
-				"acrossHibernate.hibernateProperties[hibernate.hbm2ddl.auto]=create-drop"
+				"across.hibernate.hibernateProperties[hibernate.hbm2ddl.auto]=create-drop"
 		}
 )
 public class TestSingleDataSourceApplication

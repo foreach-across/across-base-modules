@@ -41,6 +41,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
@@ -109,7 +110,8 @@ public class HibernateJpaConfiguration
 			factory.setMappingResources( hibernatePackage.getMappingResources() );
 		}
 		factory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
-		factory.getJpaPropertyMap().putAll( settings.getHibernateProperties( dataSource ) );
+		// todo: figure out where to get original hibernate settings
+		factory.getJpaPropertyMap().putAll( settings.getHibernateProperties( new HibernateSettings() ) );
 
 		Map<String, String> tableAliases = hibernatePackage.getTableAliases();
 

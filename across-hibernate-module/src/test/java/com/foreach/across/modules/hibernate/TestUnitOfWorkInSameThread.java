@@ -143,7 +143,7 @@ public class TestUnitOfWorkInSameThread
 		public AcrossHibernateModule acrossHibernateModule() {
 			AcrossHibernateModule module = new AcrossHibernateModule();
 			module.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
-			module.setProperty( "acrossHibernate.create-unit-of-work-factory", true );
+			module.setProperty( "across.hibernate.create-unit-of-work-factory", true );
 
 			return module;
 		}

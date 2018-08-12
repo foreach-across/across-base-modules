@@ -38,6 +38,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -94,7 +95,8 @@ public class HibernateConfiguration
 		}
 
 		Properties propertiesToSet = new Properties();
-		propertiesToSet.putAll( settings.getHibernateProperties( dataSource ) );
+		// todo: figure out where to get original hibernate settings
+		propertiesToSet.putAll( settings.getHibernateProperties( new HibernateSettings() ) );
 
 		sessionFactory.setHibernateProperties( propertiesToSet );
 

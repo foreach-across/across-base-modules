@@ -35,7 +35,10 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.boot.bind.PropertiesConfigurationFactory;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.context.properties.bind.PropertySourcesPlaceholdersResolver;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.Ordered;
@@ -137,6 +140,15 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 		}
 
 		private void bindProperties( PropertySources propertySources, String prefix, Object target ) throws Exception {
+			Binder binder = new Binder(
+					ConfigurationPropertySources.from( propertySources ),
+					new PropertySourcesPlaceholdersResolver( propertySources ),
+					conversionService
+			);
+
+			binder.bind( prefix, Bindable.ofInstance( target ) );
+
+			/*
 			PropertiesConfigurationFactory<Object> factory = new PropertiesConfigurationFactory<>( target );
 			factory.setPropertySources( propertySources );
 			factory.setConversionService( conversionService );
@@ -145,7 +157,7 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 			factory.setIgnoreUnknownFields( true );
 			factory.setTargetName( prefix );
 
-			factory.bindPropertiesToTarget();
+			factory.bindPropertiesToTarget();*/
 		}
 
 		/**
@@ -167,8 +179,10 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 				jpaModuleSettings.setPersistenceUnitName( currentModule.getName() );
 
 				if ( isSingleHibernateModule()
-						&& BeanFactoryUtils.beansOfTypeIncludingAncestors( contextInfo.getApplicationContext(), PlatformTransactionManager.class ).isEmpty() ) {
-					LOG.trace( "Switching to default primary as this is the only AcrossHibernateJpaModule and there are no other transaction managers" );
+						&& BeanFactoryUtils.beansOfTypeIncludingAncestors( contextInfo.getApplicationContext(),
+						                                                   PlatformTransactionManager.class ).isEmpty() ) {
+					LOG.trace(
+							"Switching to default primary as this is the only AcrossHibernateJpaModule and there are no other transaction managers" );
 					jpaModuleSettings.setPrimary( true );
 				}
 			}

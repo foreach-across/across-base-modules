@@ -18,11 +18,11 @@ package com.foreach.across.modules.hibernate;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.autoconfigure.transaction.TransactionProperties;
 import org.springframework.core.Ordered;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,11 +33,11 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class AcrossHibernateModuleSettings extends JpaProperties
 {
-	public static final String HIBERNATE_PROPERTIES = "acrossHibernate.hibernateProperties";
-	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER = "acrossHibernate.persistenceContextInView.handler";
-	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER = "acrossHibernate.persistenceContextInView.order";
-	public static final String CREATE_UNITOFWORK_FACTORY = "acrossHibernate.createUnitOfWorkFactory";
-	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "acrossHibernate.registerRepositoryInterceptor";
+	public static final String HIBERNATE_PROPERTIES = "across.hibernate.hibernateProperties";
+	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER = "across.hibernate.persistenceContextInView.handler";
+	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER = "across.hibernate.persistenceContextInView.order";
+	public static final String CREATE_UNITOFWORK_FACTORY = "across.hibernate.createUnitOfWorkFactory";
+	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "across.hibernate.registerRepositoryInterceptor";
 
 	private TransactionProperties transactionProperties = new TransactionProperties();
 	private ApplicationModule applicationModule = new ApplicationModule();
@@ -75,11 +75,12 @@ public class AcrossHibernateModuleSettings extends JpaProperties
 	/**
 	 * Get the merged set of Hibernate properties for the datasource.
 	 *
-	 * @param dataSource to detect default properties from
+	 * @param hibernateSettings to detect default properties from
 	 * @return merged properties set
 	 */
-	public Map<String, String> getHibernateProperties( DataSource dataSource ) {
-		Map<String, String> hibernateProperties = super.getHibernateProperties( dataSource );
+	@Override
+	public Map<String, Object> getHibernateProperties( HibernateSettings hibernateSettings ) {
+		Map<String, Object> hibernateProperties = super.getHibernateProperties( hibernateSettings );
 		hibernateProperties.putAll( getHibernateProperties() );
 		return hibernateProperties;
 	}

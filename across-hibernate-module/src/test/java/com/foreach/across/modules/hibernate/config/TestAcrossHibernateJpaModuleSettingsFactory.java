@@ -23,13 +23,13 @@ import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
-import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,7 +63,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		when( contextInfo.getApplicationContext() ).thenReturn( mock( ApplicationContext.class ) );
 		when( contextInfo.getModules() ).thenReturn( Collections.singletonList( currentModuleInfo ) );
 		when( currentModule.getName() ).thenReturn( AcrossHibernateJpaModule.NAME );
-		when( currentModule.getPropertiesPrefix() ).thenReturn( "acrossHibernate" );
+		when( currentModule.getPropertiesPrefix() ).thenReturn( "across.hibernate" );
 		when( currentModule.createSettings() ).thenReturn( new AcrossHibernateJpaModuleSettings() );
 	}
 
@@ -77,7 +77,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		assertThat( properties.getHibernate().getDdlAuto() ).isEqualTo( "none" );
 		assertThat( properties.getDataSource() ).isEqualTo( "myDataSource" );
 
-		assertThat( properties.getHibernateProperties( mock( DataSource.class ) ) )
+		assertThat( properties.getHibernateProperties( new HibernateSettings() ) )
 				.doesNotContainKey( "hibernate.hbm2ddl.auto" );
 
 		assertThat( properties.getPrimary() ).isTrue();
@@ -131,7 +131,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 
 		when( contextInfo.getModules() ).thenReturn( Arrays.asList( currentModuleInfo, otherModuleInfo ) );
 
-		properties( "acrossHibernate.application.entity-scan=true", "acrossHibernate.application.repository-scan=true" );
+		properties( "across.hibernate.application.entity-scan=true", "across.hibernate.application.repository-scan=true" );
 
 		AcrossHibernateJpaModuleSettings properties = (AcrossHibernateJpaModuleSettings) propertiesFactory.createInstance();
 		assertThat( properties.getApplicationModule().isEntityScan() ).isTrue();
@@ -159,16 +159,16 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		MapPropertySource mp = new MapPropertySource(
 				"moduleProperties",
 				Collections.singletonMap(
-						"acrossHibernate.hibernateProperties",
+						"across.hibernate.hibernateProperties",
 						new HashMap<>( Collections.singletonMap( "other-property", "other-value" ) )
 				)
 		);
 		environment.getPropertySources().addFirst( mp );
 
 		properties(
-				"acrossHibernate.data-source=some-ds",
-				"acrossHibernate.application.entity-scan=false",
-				"acrossHibernate.application.repository-scan=false",
+				"across.hibernate.data-source=some-ds",
+				"across.hibernate.application.entity-scan=false",
+				"across.hibernate.application.repository-scan=false",
 				"spring.jpa.generate-ddl=true",
 				"spring.jpa.hibernate.ddl-auto=create-drop",
 				"spring.jpa.properties.key=value",
@@ -176,9 +176,9 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 				"spring.jpa.open-in-view=false",
 				"spring.transaction.default-timeout=66",
 				"spring.transaction.rollback-on-commit-failure=true",
-				"acrossHibernate.create-unit-of-work-factory=true",
-				"acrossHibernate.persistenceContextInView.handler=INTERCEPTOR",
-				"acrossHibernate.hibernateProperties[hibernate.hbm2ddl.auto]=update",
+				"across.hibernate.create-unit-of-work-factory=true",
+				"across.hibernate.persistenceContextInView.handler=INTERCEPTOR",
+				"across.hibernate.hibernateProperties[hibernate.hbm2ddl.auto]=update",
 				"spring.data.jpa.repositories.enabled=true"
 		);
 
@@ -195,7 +195,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		assertThat( properties.getPersistenceContextInView().getHandler() ).isEqualTo( PersistenceContextInView.INTERCEPTOR );
 		assertThat( properties.getDataSource() ).isEqualTo( "some-ds" );
 
-		assertThat( properties.getHibernateProperties( mock( DataSource.class ) ) )
+		assertThat( properties.getHibernateProperties( new HibernateSettings() ) )
 				.containsEntry( "key", "value" )
 				.containsEntry( "other-property", "other-value" )
 				.containsEntry( "hibernate.hbm2ddl.auto", "update" );
@@ -204,18 +204,18 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 	@Test
 	public void defaultModulePropertyBinding() {
 		properties(
-				"acrossHibernate.application.entity-scan=false",
-				"acrossHibernate.application.repository-scan=false",
-				"acrossHibernate.generate-ddl=true",
-				"acrossHibernate.hibernate.ddl-auto=create-drop",
-				"acrossHibernate.properties.key=value",
-				"acrossHibernate.show-sql=true",
-				"acrossHibernate.open-in-view=false",
-				"acrossHibernate.transaction.default-timeout=66",
-				"acrossHibernate.transaction.rollback-on-commit-failure=true",
-				"acrossHibernate.create-unit-of-work-factory=true",
-				"acrossHibernate.persistenceContextInView.handler=INTERCEPTOR",
-				"acrossHibernate.hibernateProperties[hibernate.hbm2ddl.auto]=update"
+				"across.hibernate.application.entity-scan=false",
+				"across.hibernate.application.repository-scan=false",
+				"across.hibernate.generate-ddl=true",
+				"across.hibernate.hibernate.ddl-auto=create-drop",
+				"across.hibernate.properties.key=value",
+				"across.hibernate.show-sql=true",
+				"across.hibernate.open-in-view=false",
+				"across.hibernate.transaction.default-timeout=66",
+				"across.hibernate.transaction.rollback-on-commit-failure=true",
+				"across.hibernate.create-unit-of-work-factory=true",
+				"across.hibernate.persistenceContextInView.handler=INTERCEPTOR",
+				"across.hibernate.hibernateProperties[hibernate.hbm2ddl.auto]=update"
 		);
 
 		AcrossHibernateJpaModuleSettings properties = (AcrossHibernateJpaModuleSettings) propertiesFactory.createInstance();
@@ -230,7 +230,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		assertThat( properties.isCreateUnitOfWorkFactory() ).isTrue();
 		assertThat( properties.getPersistenceContextInView().getHandler() ).isEqualTo( PersistenceContextInView.INTERCEPTOR );
 
-		assertThat( properties.getHibernateProperties( mock( DataSource.class ) ) )
+		assertThat( properties.getHibernateProperties( new HibernateSettings() ) )
 				.containsEntry( "key", "value" )
 				.containsEntry( "hibernate.hbm2ddl.auto", "update" );
 	}
@@ -250,8 +250,8 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		when( currentModule.getPropertiesPrefix() ).thenReturn( "other" );
 
 		properties(
-				"acrossHibernate.application.entity-scan=false",
-				"acrossHibernate.application.repository-scan=false",
+				"across.hibernate.application.entity-scan=false",
+				"across.hibernate.application.repository-scan=false",
 				"spring.jpa.generate-ddl=true",
 				"spring.jpa.hibernate.ddl-auto=create-drop",
 				"spring.jpa.properties.key=value",
@@ -259,9 +259,9 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 				"spring.jpa.open-in-view=false",
 				"spring.transaction.default-timeout=66",
 				"spring.transaction.rollback-on-commit-failure=true",
-				"acrossHibernate.create-unit-of-work-factory=true",
-				"acrossHibernate.persistenceContextInView.handler=INTERCEPTOR",
-				"acrossHibernate.hibernateProperties[hibernate.hbm2ddl.auto]=update",
+				"across.hibernate.create-unit-of-work-factory=true",
+				"across.hibernate.persistenceContextInView.handler=INTERCEPTOR",
+				"across.hibernate.hibernateProperties[hibernate.hbm2ddl.auto]=update",
 				"spring.data.jpa.repositories.enabled=true"
 		);
 
@@ -272,7 +272,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		assertThat( properties.isGenerateDdl() ).isFalse();
 		assertThat( properties.getHibernate().getDdlAuto() ).isEqualTo( "none" );
 
-		assertThat( properties.getHibernateProperties( mock( DataSource.class ) ) )
+		assertThat( properties.getHibernateProperties( new HibernateSettings() ) )
 				.doesNotContainKey( "hibernate.hbm2ddl.auto" );
 
 		assertThat( properties.isShowSql() ).isFalse();
@@ -316,7 +316,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 		assertThat( properties.isCreateUnitOfWorkFactory() ).isTrue();
 		assertThat( properties.getPersistenceContextInView().getHandler() ).isEqualTo( PersistenceContextInView.INTERCEPTOR );
 
-		assertThat( properties.getHibernateProperties( mock( DataSource.class ) ) )
+		assertThat( properties.getHibernateProperties( new HibernateSettings() ) )
 				.containsEntry( "key", "value" )
 				.containsEntry( "hibernate.hbm2ddl.auto", "update" );
 	}

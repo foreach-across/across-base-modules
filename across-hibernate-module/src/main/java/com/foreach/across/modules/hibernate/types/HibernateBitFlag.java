@@ -16,7 +16,7 @@
 package com.foreach.across.modules.hibernate.types;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.type.IntegerType;
 import org.hibernate.usertype.UserType;
 
@@ -37,7 +37,7 @@ public abstract class HibernateBitFlag<T extends BitFlag> extends HibernateIdLoo
 	@Override
 	public Object nullSafeGet( ResultSet rs,
 	                           String[] names,
-	                           SessionImplementor session,
+	                           SharedSessionContractImplementor session,
 	                           Object owner ) throws HibernateException, SQLException {
 		Integer identifier = (Integer) TYPE.get( rs, names[0], session );
 
@@ -52,7 +52,7 @@ public abstract class HibernateBitFlag<T extends BitFlag> extends HibernateIdLoo
 	public void nullSafeSet( PreparedStatement st,
 	                         Object value,
 	                         int index,
-	                         SessionImplementor session ) throws HibernateException, SQLException {
+	                         SharedSessionContractImplementor session ) throws HibernateException, SQLException {
 		try {
 			int result = toInteger( (Set) value );
 			TYPE.set( st, result, index, session );
