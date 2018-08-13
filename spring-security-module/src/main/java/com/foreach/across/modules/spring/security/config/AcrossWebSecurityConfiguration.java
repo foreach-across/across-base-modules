@@ -24,11 +24,8 @@ import com.foreach.across.modules.spring.security.infrastructure.config.Security
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.security.IgnoredRequestCustomizer;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.SecurityFilterAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -36,9 +33,8 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
-import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -51,8 +47,8 @@ import java.util.*;
 @Slf4j
 class AcrossWebSecurityConfiguration
 {
-	private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring4.SpringTemplateEngine";
-	private static final String CLASS_SPRING_SECURITY_DIALECT = "org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect";
+	private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring5.SpringTemplateEngine";
+	private static final String CLASS_SPRING_SECURITY_DIALECT = "org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect";
 
 	private final ApplicationContext applicationContext;
 	private final AcrossContextBeanRegistry contextBeanRegistry;
@@ -94,17 +90,17 @@ class AcrossWebSecurityConfiguration
 	 * TODO: actually security configuration should happen in the post processor module in the future,
 	 * making this obsolete hopefully
 	 */
-	@Bean
-	@ConditionalOnBean(ServerProperties.class)
-	public IgnoredRequestCustomizer ignoreErrorPathRequestCustomizer( ServerProperties serverProperties ) {
-		return configurer -> {
-			String result = StringUtils.cleanPath( serverProperties.getError().getPath() );
-			if ( !result.startsWith( "/" ) ) {
-				result = "/" + result;
-			}
-			configurer.antMatchers( result );
-		};
-	}
+//	@Bean
+//	@ConditionalOnBean(ServerProperties.class)
+//	public IgnoredRequestCustomizer ignoreErrorPathRequestCustomizer( ServerProperties serverProperties ) {
+//		return configurer -> {
+//			String result = StringUtils.cleanPath( serverProperties.getError().getPath() );
+//			if ( !result.startsWith( "/" ) ) {
+//				result = "/" + result;
+//			}
+//			configurer.antMatchers( result );
+//		};
+//	}
 
 	/**
 	 * Support using SpringSecurityConfigurer instances from other modules.
