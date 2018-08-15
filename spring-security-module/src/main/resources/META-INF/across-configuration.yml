@@ -15,7 +15,11 @@ spring-security-module:
   # Auto-configuration class rules.
   #
   auto-configuration:
-    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration: false
-    org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration: false
+    org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration:
+      destination: SpringSecurityModule
+    org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration:
+      destination: SpringSecurityModule
+    org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration:
+      destination: SpringSecurityModule
     org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration:
       destination: SpringSecurityModule

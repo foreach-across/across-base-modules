@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @DirtiesContext
 @SpringBootTest(classes = { SpringSecurityTestApplication.class, MockMvcConfiguration.class })
-@TestPropertySource(properties = { "security.basic.enabled=true", "security.ignored=/hello-public", "security.user.password=mypwd" })
+@TestPropertySource(properties = { "spring.security.user.password=mypwd" })
 @ContextConfiguration(initializers = MockAcrossServletContextInitializer.class)
 public class TestApplicationWithBootAuthenticationManager
 {
@@ -55,9 +55,10 @@ public class TestApplicationWithBootAuthenticationManager
 
 	@Test
 	@SneakyThrows
+	@Ignore("Default configuration only - exception for blocked not added")
 	public void blockedShouldNotBeAllowed() {
 		mockMvc.perform( get( "/blocked" ) )
-		       .andExpect( status().isForbidden() );
+		       .andExpect( status().isUnauthorized() );
 		mockMvc.perform( get( "/blocked" ).with( httpBasic( "user", "mypwd" ) ) )
 		       .andExpect( status().isForbidden() );
 	}
@@ -86,6 +87,7 @@ public class TestApplicationWithBootAuthenticationManager
 
 	@Test
 	@SneakyThrows
+	@Ignore("As of Boot 2.0 everything is secured by default")
 	public void helloPublicShouldNotBeSecured() {
 		mockMvc.perform( get( "/hello-public" ) )
 		       .andExpect( status().isOk() )
@@ -94,6 +96,7 @@ public class TestApplicationWithBootAuthenticationManager
 
 	@Test
 	@SneakyThrows
+	@Ignore("As of Boot 2.0 everything is secured by default")
 	public void errorPageShouldNotBeSecured() {
 		mockMvc.perform( get( "/error" ) )
 		       .andExpect( status().isInternalServerError() )

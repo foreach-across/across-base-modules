@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package test.app.application;
+package ax.apps.extensions;
 
+import com.foreach.across.core.annotations.ModuleConfiguration;
+import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
- * @author Steven Gentens
- * @since 3.0.0
+ * @author Arne Vandamme
+ * @since 4.0.0
  */
-// todo if we enable this configurer the default security backs off altogether; tests should be revised
-//@Configuration
-public class SpringSecurityConfigurer extends WebSecurityConfigurerAdapter
+@ModuleConfiguration(SpringSecurityModule.NAME)
+public class SecuredPathOnlySecurityAdapter extends WebSecurityConfigurerAdapter
 {
 	@Override
-	public void configure( HttpSecurity http ) throws Exception {
-		http.antMatcher( "/blocked" ).authorizeRequests().anyRequest().denyAll();
+	protected void configure( HttpSecurity http ) throws Exception {
+		http.antMatcher( "/secured" )
+		    .authorizeRequests().anyRequest().authenticated()
+		    .and()
+		    .httpBasic();
 	}
 }

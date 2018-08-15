@@ -23,7 +23,7 @@ import com.foreach.across.core.context.bootstrap.AcrossBootstrapConfig;
 import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
 import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
-import com.foreach.across.modules.spring.security.config.SecurityAutoConfigurationAdapter;
+import com.foreach.across.modules.spring.security.config.AcrossWebSecurityConfiguration;
 import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -43,6 +43,7 @@ public class SpringSecurityModule extends AcrossModule
 		super.setContext( context );
 
 		context.addModule( new SpringSecurityInfrastructureModule() );
+		expose( "inMemoryUserDetailsManager" );
 	}
 
 	@Override
@@ -57,7 +58,7 @@ public class SpringSecurityModule extends AcrossModule
 
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-		contextConfigurers.add( new AnnotatedClassConfigurer( SecurityAutoConfigurationAdapter.class ) );
+		contextConfigurers.add( new AnnotatedClassConfigurer( AcrossWebSecurityConfiguration.class ) );
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import com.foreach.across.test.support.config.MockAcrossServletContextInitialize
 import com.foreach.across.test.support.config.MockMvcConfiguration;
 import lombok.SneakyThrows;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,10 +99,11 @@ public class TestApplicationWithDefaultSecurity
 	@SneakyThrows
 	public void blockedShouldNotBeAllowed() {
 		mockMvc.perform( get( "/blocked" ) )
-		       .andExpect( status().isForbidden() );
+		       .andExpect( status().isUnauthorized() );
 	}
 
 	@Test
+	@Ignore("As of Boot 2.0 everything is secured by default")
 	@SneakyThrows
 	public void defaultPathsAreNotSecured() {
 		mockMvc.perform( get( "/hello" ) )
@@ -113,6 +115,7 @@ public class TestApplicationWithDefaultSecurity
 	}
 
 	@Test
+	@Ignore("As of Boot 2.0 everything is secured by default")
 	@SneakyThrows
 	public void errorPageShouldNotBeSecured() {
 		mockMvc.perform( get( "/error" ) )

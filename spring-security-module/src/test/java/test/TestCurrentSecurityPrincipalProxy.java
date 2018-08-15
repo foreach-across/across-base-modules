@@ -20,7 +20,6 @@ import com.foreach.across.modules.spring.security.infrastructure.business.Securi
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxyImpl;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
-import com.foreach.common.test.MockedLoader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +45,7 @@ import static org.mockito.Mockito.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration(classes = TestCurrentSecurityPrincipalProxy.Config.class, loader = MockedLoader.class)
+@ContextConfiguration(classes = TestCurrentSecurityPrincipalProxy.Config.class)
 public class TestCurrentSecurityPrincipalProxy
 {
 	@Autowired
@@ -168,6 +167,11 @@ public class TestCurrentSecurityPrincipalProxy
 	@Configuration
 	protected static class Config
 	{
+		@Bean
+		public SecurityPrincipalService securityPrincipalService() {
+			return mock( SecurityPrincipalService.class );
+		}
+
 		@Bean
 		public CurrentSecurityPrincipalProxy currentSecurityPrincipalProxy() {
 			return new CurrentSecurityPrincipalProxyImpl();

@@ -17,7 +17,6 @@ package test;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.*;
-import com.foreach.common.test.MockedLoader;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +37,7 @@ import static org.mockito.Mockito.mock;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration(classes = TestSecurityPrincipalService.Config.class, loader = MockedLoader.class)
+@ContextConfiguration(classes = TestSecurityPrincipalService.Config.class)
 public class TestSecurityPrincipalService
 {
 	@Autowired
