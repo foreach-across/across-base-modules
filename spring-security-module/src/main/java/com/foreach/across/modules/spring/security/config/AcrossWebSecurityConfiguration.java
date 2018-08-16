@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.util.ClassUtils;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -41,6 +42,7 @@ import java.util.*;
  */
 @RequiredArgsConstructor
 @Slf4j
+@EnableWebSecurity
 public class AcrossWebSecurityConfiguration
 {
 	private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring5.SpringTemplateEngine";
