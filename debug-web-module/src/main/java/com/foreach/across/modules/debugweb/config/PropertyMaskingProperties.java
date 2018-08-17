@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Arne Vandamme
  */
 @Component
-@ConfigurationProperties(prefix = "debugWebModule.properties")
+@ConfigurationProperties(prefix = "debug-web-module.properties")
 public class PropertyMaskingProperties
 {
 	/**

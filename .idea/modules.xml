@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/debug-web.iml" filepath="$PROJECT_DIR$/debug-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/debug-web.iml" filepath="$PROJECT_DIR$/debug-web.iml" />
       <module fileurl="file://$PROJECT_DIR$/debug-web-module/debug-web-module.iml" filepath="$PROJECT_DIR$/debug-web-module/debug-web-module.iml" />
+      <module fileurl="file://$PROJECT_DIR$/debug-web-module/debug-web-module.iml" filepath="$PROJECT_DIR$/debug-web-module/debug-web-module.iml" />
+      <module fileurl="file://$PROJECT_DIR$/debug-web-test-web/debug-web-test-web.iml" filepath="$PROJECT_DIR$/debug-web-test-web/debug-web-test-web.iml" />
       <module fileurl="file://$PROJECT_DIR$/debug-web-test-web/debug-web-test-web.iml" filepath="$PROJECT_DIR$/debug-web-test-web/debug-web-test-web.iml" />
     </modules>
   </component>

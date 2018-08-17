@@ -20,7 +20,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Arne Vandamme
  */
-@ConfigurationProperties(prefix = "debugWebModule")
+@ConfigurationProperties(prefix = "debug-web-module")
 public class DebugWebModuleSettings
 {
 	public static final String DEFAULT_DASHBOARD = "/";
@@ -59,7 +59,7 @@ public class DebugWebModuleSettings
 		this.rootPath = rootPath;
 	}
 
-	@ConfigurationProperties(prefix = "debugWebModule.security")
+	@ConfigurationProperties(prefix = "debug-web-module.security")
 	public static class SecuritySettings
 	{
 		/**
