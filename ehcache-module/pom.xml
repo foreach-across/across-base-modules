@@ -17,67 +17,42 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.foreach.across.modules</groupId>
-        <artifactId>ehcache-module-project</artifactId>
-        <version>1.0.1.RELEASE</version>
-    </parent>
+	<parent>
+		<groupId>com.foreach.across.modules</groupId>
+		<artifactId>ehcache-module-project</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+	</parent>
 
-    <artifactId>ehcache-module</artifactId>
+	<artifactId>ehcache-module</artifactId>
 
-    <name>${project.groupId}:${project.artifactId}</name>
+	<name>${project.groupId}:${project.artifactId}</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.foreach.across.modules</groupId>
-            <artifactId>debug-web-module</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.foreach.across</groupId>
-            <artifactId>across-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.foreach.across.modules</groupId>
+			<artifactId>debug-web-module</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.foreach.across</groupId>
+			<artifactId>across-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-	    <dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-configuration-processor</artifactId>
-		    <optional>true</optional>
-	    </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.asciidoctor</groupId>
-                <artifactId>asciidoctor-maven-plugin</artifactId>
-                <version>1.5.0</version>
-                <configuration>
-                    <sourceDirectory>${project.basedir}/src/doc</sourceDirectory>
-                    <sourceDocumentName>index.adoc</sourceDocumentName>
-                    <outputDirectory>${project.reporting.outputDirectory}/${project.version}/reference</outputDirectory>
-                    <backend>html</backend>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>output-html</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>process-asciidoc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
 </project>

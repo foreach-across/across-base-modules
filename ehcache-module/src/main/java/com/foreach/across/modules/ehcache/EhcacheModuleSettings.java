@@ -21,14 +21,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-@ConfigurationProperties("ehcacheModule")
+@ConfigurationProperties("ehcache-module")
 public class EhcacheModuleSettings
 {
-	public static final String CONFIGURATION_RESOURCE = "ehcacheModule.configurationResource";
-	public static final String CONFIGURATION_OBJECT = "ehcacheModule.configurationObject";
+	public static final String CONFIGURATION_RESOURCE = "ehcache-module.configuration-resource";
+	public static final String CONFIGURATION_OBJECT = "ehcache-module.configuration-object";
 
-	public static final String CACHE_MANAGER_IS_SHARED = "ehcacheModule.cacheManagerIsShared";
-	public static final String CACHE_MANAGER_NAME = "ehcacheModule.cacheManagerName";
+	public static final String CACHE_MANAGER_IS_SHARED = "ehcache-module.cache-manager-is-shared";
+	public static final String CACHE_MANAGER_NAME = "ehcache-module.cache-manager-name";
 
 	/**
 	 * Resource representing the ehcache XML configuration file (defaults to: ehcache.xml).

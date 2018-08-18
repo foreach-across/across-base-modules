@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ehcache-module/ehcache-module.iml" filepath="$PROJECT_DIR$/ehcache-module/ehcache-module.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ehcache-module/ehcache-module.iml" filepath="$PROJECT_DIR$/ehcache-module/ehcache-module.iml" />
       <module fileurl="file://$PROJECT_DIR$/ehcache-module-project.iml" filepath="$PROJECT_DIR$/ehcache-module-project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ehcache-module-project.iml" filepath="$PROJECT_DIR$/ehcache-module-project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ehcache-module-test-web/ehcache-module-test-web.iml" filepath="$PROJECT_DIR$/ehcache-module-test-web/ehcache-module-test-web.iml" />
       <module fileurl="file://$PROJECT_DIR$/ehcache-module-test-web/ehcache-module-test-web.iml" filepath="$PROJECT_DIR$/ehcache-module-test-web/ehcache-module-test-web.iml" />
     </modules>
   </component>
