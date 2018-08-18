@@ -26,12 +26,12 @@ public class DebugWebModuleSettings
 	public static final String DEFAULT_DASHBOARD = "/";
 
 	@SuppressWarnings("unused")
-	public static final String DASHBOARD_PATH = "debugWebModule.dashboard";
+	public static final String DASHBOARD_PATH = "debug-web-module.dashboard";
 
-	public static final String SECURITY_ENABLED = "debugWebModule.security.enabled";
-	public static final String SECURITY_USERNAME = "debugWebModule.security.username";
-	public static final String SECURITY_PASSWORD = "debugWebModule.security.password";
-	public static final String SECURITY_IP_ADDRESSES = "debugWebModule.security.ipAddresses";
+	public static final String SECURITY_ENABLED = "debug-web-module.security.enabled";
+	public static final String SECURITY_USERNAME = "debug-web-module.security.username";
+	public static final String SECURITY_PASSWORD = "debug-web-module.security.password";
+	public static final String SECURITY_IP_ADDRESSES = "debug-web-module.security.ip-addresses";
 
 	/**
 	 * Path within the debug web context for the initial dashboard.

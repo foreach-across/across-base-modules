@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = ITCustomPathAndController.Config.class)
 @TestPropertySource(
 		properties = {
-				"debugWebModule.security.enabled=false",
+				"debug-web-module.security.enabled=false",
 				"debugWebModule.root-path=/test/debug",
 				"debugWebModule.dashboard=/somedashboard"
 		}

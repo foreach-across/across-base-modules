@@ -49,7 +49,7 @@ public class DebugWebSecurityConfiguration extends SpringSecurityWebConfigurerAd
 			String password = securitySettings.getPassword();
 			if ( StringUtils.isEmpty( password ) ) {
 				throw new IllegalArgumentException(
-						"debugWebModule.security.password cannot be empty when debugWebModule.security.enabled=true" );
+						"debug-web-module.security.password cannot be empty when debug-web-module.security.enabled=true" );
 			}
 			auth.inMemoryAuthentication()
 			    .withUser( securitySettings.getUsername() )
