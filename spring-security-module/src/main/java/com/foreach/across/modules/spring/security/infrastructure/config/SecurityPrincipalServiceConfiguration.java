@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Configures a {@link com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService}.
@@ -108,7 +109,7 @@ public class SecurityPrincipalServiceConfiguration
 						beanType
 				);
 
-				return (SecurityPrincipalRetrievalStrategy) principalName -> null;
+				return (SecurityPrincipalRetrievalStrategy) principalName -> Optional.empty();
 			}
 
 			return beans.get( 0 );

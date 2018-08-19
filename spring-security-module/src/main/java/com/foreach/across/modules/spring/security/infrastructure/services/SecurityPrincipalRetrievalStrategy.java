@@ -17,6 +17,8 @@ package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 
+import java.util.Optional;
+
 /**
  * Interface to implement the backend for fetching security principals
  * for a {@link SecurityPrincipalService}.
@@ -25,5 +27,5 @@ import com.foreach.across.modules.spring.security.infrastructure.business.Securi
  */
 public interface SecurityPrincipalRetrievalStrategy
 {
-	SecurityPrincipal getPrincipalByName( String principalName );
+	Optional<SecurityPrincipal> getPrincipalByName( String principalName );
 }

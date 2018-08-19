@@ -125,12 +125,12 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 
 			if ( authenticationPrincipal instanceof String ) {
 				LOG.debug( "Loading SecurityPrincipal with name {}", authenticationPrincipal );
-				return securityPrincipalService.getPrincipalByName( (String) authenticationPrincipal );
+				return securityPrincipalService.getPrincipalByName( (String) authenticationPrincipal ).orElse( null );
 
 			}
 
 			LOG.debug( "Loading SecurityPrincipal with name {}", authentication.getName() );
-			return securityPrincipalService.getPrincipalByName( authentication.getName() );
+			return securityPrincipalService.getPrincipalByName( authentication.getName() ).orElse( null );
 		}
 
 		return null;

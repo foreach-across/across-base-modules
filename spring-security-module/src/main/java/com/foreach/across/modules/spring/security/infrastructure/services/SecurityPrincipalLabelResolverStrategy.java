@@ -79,7 +79,7 @@ public class SecurityPrincipalLabelResolverStrategy
 
 	private SecurityPrincipal retrieveSecurityPrincipal( Object principal ) {
 		if ( principal instanceof String ) {
-			return securityPrincipalService.getPrincipalByName( (String) principal );
+			return securityPrincipalService.getPrincipalByName( (String) principal ).orElse( null );
 		}
 		else if ( principal instanceof SecurityPrincipal ) {
 			return (SecurityPrincipal) principal;

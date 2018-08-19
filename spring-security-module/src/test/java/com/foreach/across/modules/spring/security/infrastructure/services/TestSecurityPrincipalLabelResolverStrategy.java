@@ -77,7 +77,7 @@ public class TestSecurityPrincipalLabelResolverStrategy
 	public void securityPrincipalIsFetchedIfString() {
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
 		when( labelResolverTwo.resolvePrincipalLabel( principal ) ).thenReturn( Optional.of( "my principal" ) );
-		when( securityPrincipalService.getPrincipalByName( "principal name" ) ).thenReturn( principal );
+		when( securityPrincipalService.getPrincipalByName( "principal name" ) ).thenReturn( Optional.of( principal ) );
 
 		assertEquals( "my principal", labelResolverStrategy.resolvePrincipalLabel( "principal name" ) );
 	}

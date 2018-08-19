@@ -26,6 +26,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 /**
  * @author Arne Vandamme
  * @see SecurityPrincipalRetrievalStrategy
@@ -64,8 +66,8 @@ public class SecurityPrincipalServiceImpl implements SecurityPrincipalService
 	)
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T extends SecurityPrincipal> T getPrincipalByName( String principalName ) {
-		return (T) securityPrincipalRetrievalStrategy.getPrincipalByName( principalName );
+	public <T extends SecurityPrincipal> Optional<T> getPrincipalByName( String principalName ) {
+		return (Optional<T>) securityPrincipalRetrievalStrategy.getPrincipalByName( principalName );
 	}
 
 	@Override

@@ -17,6 +17,8 @@ package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 
+import java.util.Optional;
+
 /**
  * @author Arne Vandamme
  */
@@ -37,7 +39,7 @@ public interface SecurityPrincipalService
 	 */
 	void clearAuthentication();
 
-	<T extends SecurityPrincipal> T getPrincipalByName( String principalName );
+	<T extends SecurityPrincipal> Optional<T> getPrincipalByName( String principalName );
 
 	void publishRenameEvent( String oldPrincipalName, String newPrincipalName );
 }

@@ -106,7 +106,7 @@ public class TestSpringSecurityWithoutWeb
 		when( auth.getPrincipal() ).thenReturn( "principalName" );
 
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
-		when( principalRetrievalStrategy.getPrincipalByName( "principalName" ) ).thenReturn( principal );
+		when( principalRetrievalStrategy.getPrincipalByName( "principalName" ) ).thenReturn( Optional.of( principal ) );
 
 		SecurityContextHolder.getContext().setAuthentication( auth );
 

@@ -36,6 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -93,7 +94,7 @@ public class TestCurrentSecurityPrincipalProxy
 
 		SecurityContextHolder.getContext().setAuthentication( auth );
 
-		when( securityPrincipalService.getPrincipalByName( "principal" ) ).thenReturn( principal );
+		when( securityPrincipalService.getPrincipalByName( "principal" ) ).thenReturn( Optional.of( principal ) );
 
 		assertSame( principal, currentPrincipal.getPrincipal() );
 		assertSame( principal, currentPrincipal.getPrincipal() );
