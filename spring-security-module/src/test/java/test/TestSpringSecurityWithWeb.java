@@ -87,8 +87,7 @@ public class TestSpringSecurityWithWeb
 
 	@Test
 	public void authenticationManagerBuilderShouldExist() {
-		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME,
-		                                                            AuthenticationManagerBuilder.class ) );
+		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME, AuthenticationManagerBuilder.class ) );
 	}
 
 	@Test

@@ -19,7 +19,6 @@ package test;
 import com.foreach.across.test.support.config.MockAcrossServletContextInitializer;
 import com.foreach.across.test.support.config.MockMvcConfiguration;
 import lombok.SneakyThrows;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,11 +53,10 @@ public class TestApplicationWithCustomAuthenticationManager
 	private MockMvc mockMvc;
 
 	@Test
-	@Ignore("Default configuration only - exception for blocked not added")
 	@SneakyThrows
 	public void blockedShouldNotBeAllowed() {
 		mockMvc.perform( get( "/blocked" ) )
-		       .andExpect( status().isUnauthorized() );
+		       .andExpect( status().isForbidden() );
 		mockMvc.perform( get( "/blocked" ).with( httpBasic( "dashboard", "dashboard" ) ) )
 		       .andExpect( status().isForbidden() );
 	}
@@ -79,7 +77,6 @@ public class TestApplicationWithCustomAuthenticationManager
 	}
 
 	@Test
-	@Ignore("As of Boot 2.0 everything is secured by default")
 	@SneakyThrows
 	public void helloPublicShouldNotBeSecured() {
 		mockMvc.perform( get( "/hello-public" ) )
@@ -88,7 +85,6 @@ public class TestApplicationWithCustomAuthenticationManager
 	}
 
 	@Test
-	@Ignore("As of Boot 2.0 everything is secured by default")
 	@SneakyThrows
 	public void errorPageShouldNotBeSecured() {
 		mockMvc.perform( get( "/error" ) )

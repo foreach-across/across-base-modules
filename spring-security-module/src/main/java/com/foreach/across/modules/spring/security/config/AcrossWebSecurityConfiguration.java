@@ -24,8 +24,14 @@ import com.foreach.across.modules.spring.security.infrastructure.config.Security
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
@@ -43,6 +49,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 @EnableWebSecurity
+@Import(AcrossWebSecurityConfiguration.DefaultSpringBootSecurityRemoval.class)
 public class AcrossWebSecurityConfiguration
 {
 	private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring5.SpringTemplateEngine";
@@ -163,6 +170,32 @@ public class AcrossWebSecurityConfiguration
 	{
 		public List<WebSecurityConfigurer> getWebSecurityConfigurers() {
 			return new ArrayList<>( this );
+		}
+	}
+
+	/**
+	 * Removes the default Spring Boot security rules if there is a custom SpringSecurityWebConfigurer present.
+	 * Done this way because the current implementation of regular Spring security vs Across setup uses separate
+	 * configuration classes and Spring Boot thinks there never is any security configured and applies its default.
+	 */
+	static class DefaultSpringBootSecurityRemoval implements BeanDefinitionRegistryPostProcessor
+	{
+		private static final String DEFAULT_SECURITY_CONFIGURATION =
+				"org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration.DefaultConfigurerAdapter";
+
+		@Override
+		public void postProcessBeanDefinitionRegistry( BeanDefinitionRegistry beanDefinitionRegistry ) throws BeansException {
+			if ( beanDefinitionRegistry.containsBeanDefinition( DEFAULT_SECURITY_CONFIGURATION )
+					&& !( (ListableBeanFactory) beanDefinitionRegistry ).getBean( AcrossContextBeanRegistry.class )
+					                                                   .getBeansOfType( SpringSecurityWebConfigurer.class, true )
+					                                                   .isEmpty() ) {
+				beanDefinitionRegistry.removeBeanDefinition( DEFAULT_SECURITY_CONFIGURATION );
+			}
+		}
+
+		@Override
+		public void postProcessBeanFactory( ConfigurableListableBeanFactory configurableListableBeanFactory ) throws BeansException {
+
 		}
 	}
 }

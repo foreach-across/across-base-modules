@@ -16,19 +16,33 @@
 
 package test.app.application;
 
+import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
  * @author Steven Gentens
  * @since 3.0.0
  */
 // todo if we enable this configurer the default security backs off altogether; tests should be revised
-//@Configuration
-public class SpringSecurityConfigurer extends WebSecurityConfigurerAdapter
+@Configuration
+public class SpringSecurityConfigurer
 {
-	@Override
-	public void configure( HttpSecurity http ) throws Exception {
-		http.antMatcher( "/blocked" ).authorizeRequests().anyRequest().denyAll();
+	@Configuration
+	static class BlockedSecurity extends SpringSecurityWebConfigurerAdapter
+	{
+		@Override
+		public void configure( HttpSecurity http ) throws Exception {
+			http.antMatcher( "/blocked" ).authorizeRequests().anyRequest().denyAll();
+		}
+	}
+
+	@Configuration
+	static class HelloSecurity extends SpringSecurityWebConfigurerAdapter
+	{
+		@Override
+		public void configure( HttpSecurity http ) throws Exception {
+			http.antMatcher( "/hello" ).authorizeRequests().anyRequest().authenticated().and().httpBasic();
+		}
 	}
 }

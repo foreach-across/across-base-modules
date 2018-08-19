@@ -11,6 +11,7 @@ spring-security-module:
   #
   exposed:
     - org.springframework.security.config.annotation.web.WebSecurityConfigurer
+    - com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer
   #
   # Auto-configuration class rules.
   #

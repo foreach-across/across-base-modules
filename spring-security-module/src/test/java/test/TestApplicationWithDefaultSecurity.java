@@ -99,7 +99,7 @@ public class TestApplicationWithDefaultSecurity
 	@SneakyThrows
 	public void blockedShouldNotBeAllowed() {
 		mockMvc.perform( get( "/blocked" ) )
-		       .andExpect( status().isUnauthorized() );
+		       .andExpect( status().isForbidden() );
 	}
 
 	@Test
