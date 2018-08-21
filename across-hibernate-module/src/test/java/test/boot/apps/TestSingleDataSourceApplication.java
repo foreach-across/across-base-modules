@@ -32,6 +32,7 @@ import test.boot.apps.single.SingleDataSourceApplication;
 import test.boot.apps.single.application.Book;
 import test.boot.apps.single.application.BookRepository;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -84,6 +85,11 @@ public class TestSingleDataSourceApplication
 		assertEquals( 25, tm.get().getDefaultTimeout() );
 
 		assertEquals( Collections.singletonList( tm.get() ), beanRegistry.getBeansOfType( PlatformTransactionManager.class ) );
+	}
+
+	@Test
+	public void onlySingleEntityManagerFactoryShouldExist() {
+		assertEquals( 1, beanRegistry.getBeansOfType( EntityManagerFactory.class, true ).size() );
 	}
 
 	@Test

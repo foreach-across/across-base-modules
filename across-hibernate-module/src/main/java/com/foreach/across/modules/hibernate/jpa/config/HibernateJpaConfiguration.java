@@ -141,7 +141,8 @@ public class HibernateJpaConfiguration
 			return beanFactory.getBean( DataSource.class );
 		}
 
-		throw new IllegalStateException( "Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
+		throw new IllegalStateException(
+				"Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
 	}
 
 	private Class createTableAliasNamingStrategyClass( Map<String, String> tableAliases ) {
@@ -180,12 +181,14 @@ public class HibernateJpaConfiguration
 		if ( settings.isRegisterRepositoryInterceptor() ) {
 			LOG.trace( "Enabling BasicRepository EntityInterceptor support in module {}",
 			           beforeBootstrapEvent.getModule().getName() );
-			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ModuleBasicRepositoryInterceptorConfiguration.class );
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true,
+			                                                                           ModuleBasicRepositoryInterceptorConfiguration.class );
 		}
 
 		if ( settings.getApplicationModule().isRepositoryScan()
 				&& beforeBootstrapEvent.getModule().getModule() instanceof DynamicAcrossModule.DynamicApplicationModule ) {
-			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ApplicationModuleRepositoryAutoConfiguration.class );
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true,
+			                                                                           ApplicationModuleRepositoryAutoConfiguration.class );
 		}
 
 		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );
