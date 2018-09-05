@@ -16,6 +16,7 @@
 # AcrossHibernateJpaModule replaces the default JPA starter behaviour - so disable those auto-configuration classes.
 #
 across-hibernate-jpa-module:
+  priority: 950
   auto-configuration:
     org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration: false
     org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration: false
