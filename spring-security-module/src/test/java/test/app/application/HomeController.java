@@ -44,4 +44,9 @@ public class HomeController
 	public String blocked() {
 		return "should-always-be-refused";
 	}
+
+	@GetMapping("/thymeleaf-extras")
+	public String thymeleafExtras() {
+		return "th/springSecurityTest/thymeleaf-extras";
+	}
 }

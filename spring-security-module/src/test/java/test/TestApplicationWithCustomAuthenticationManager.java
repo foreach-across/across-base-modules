@@ -19,6 +19,7 @@ package test;
 import com.foreach.across.test.support.config.MockAcrossServletContextInitializer;
 import com.foreach.across.test.support.config.MockMvcConfiguration;
 import lombok.SneakyThrows;
+import org.hamcrest.core.StringContains;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,16 @@ public class TestApplicationWithCustomAuthenticationManager
 		mockMvc.perform( get( "/hello" ).with( httpBasic( "dashboard", "dashboard" ) ) )
 		       .andExpect( status().isOk() )
 		       .andExpect( content().string( "hello" ) );
+	}
+
+	@Test
+	@SneakyThrows
+	public void thymeleafExtrasShouldBeLoaded() {
+		mockMvc.perform( get( "/thymeleaf-extras" ).with( httpBasic( "dashboard", "dashboard" ) ) )
+		       .andExpect( status().isOk() )
+		       .andExpect( content().string( new StringContains( "<h1>dashboard</h1>" ) ) )
+		       .andExpect( content().string( new StringContains( "<h2>dashboard</h2>" ) ) );
+
 	}
 
 	@Test

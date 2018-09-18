@@ -53,7 +53,7 @@ import java.util.*;
 public class AcrossWebSecurityConfiguration
 {
 	private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring5.SpringTemplateEngine";
-	private static final String CLASS_SPRING_SECURITY_DIALECT = "org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect";
+	private static final String CLASS_SPRING_SECURITY_DIALECT = "org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect";
 
 	private final ApplicationContext applicationContext;
 	private final AcrossContextBeanRegistry contextBeanRegistry;

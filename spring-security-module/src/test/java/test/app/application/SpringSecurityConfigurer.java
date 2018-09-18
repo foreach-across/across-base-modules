@@ -45,4 +45,13 @@ public class SpringSecurityConfigurer
 			http.antMatcher( "/hello" ).authorizeRequests().anyRequest().authenticated().and().httpBasic();
 		}
 	}
+
+	@Configuration
+	static class ThymeleafSecurity extends SpringSecurityWebConfigurerAdapter
+	{
+		@Override
+		public void configure( HttpSecurity http ) throws Exception {
+			http.antMatcher( "/thymeleaf-extras" ).authorizeRequests().anyRequest().authenticated().and().httpBasic();
+		}
+	}
 }
