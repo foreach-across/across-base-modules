@@ -71,6 +71,7 @@ public class MethodLoggingConfiguration implements EnvironmentAware
 
 		if ( ClassUtils.isPresent( extensionClassName, moduleClass.getClassLoader() ) ) {
 			LOG.info( "Adding method logging {} configuration to module {}",
+			          extensionClassName,
 			          beforeBootstrapEvent.getModule().getName() );
 
 			Class methodLoggingConfigurationClass
