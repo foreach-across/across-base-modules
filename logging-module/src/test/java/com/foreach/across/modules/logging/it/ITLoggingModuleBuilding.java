@@ -27,23 +27,31 @@ import com.foreach.across.modules.logging.config.dynamic.RequestLoggerIntercepto
 import com.foreach.across.modules.logging.controllers.LogController;
 import com.foreach.across.modules.logging.controllers.RequestResponseLogController;
 import com.foreach.across.modules.logging.request.RequestLogger;
+import com.foreach.across.modules.logging.request.RequestLoggerFilter;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
+import com.foreach.across.modules.logging.requestresponse.RequestResponseLoggingFilter;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
 import com.foreach.across.modules.web.AcrossWebModule;
+import com.foreach.across.modules.web.servlet.AcrossMultipartFilter;
 import com.foreach.across.test.AcrossTestContext;
 import com.foreach.across.test.AcrossTestWebContext;
+import com.foreach.across.test.MockFilterRegistration;
 import com.foreach.across.test.support.AcrossTestBuilders;
 import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.web.filter.OrderedCharacterEncodingFilter;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.servlet.resource.ResourceUrlEncodingFilter;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -219,14 +227,19 @@ public class ITLoggingModuleBuilding
 		try (AcrossTestWebContext ctx = AcrossTestBuilders.web().configurer( new LoggingModuleWithSecurityModuleConfig() ).build()) {
 
 			Map<String, ? extends FilterRegistration> filters = ctx.getServletContext().getFilterRegistrations();
-			List<String> orderedFilters = new ArrayList<>( filters.keySet() );
+			List<? extends Class<? extends Filter>> orderedFilters = filters.values()
+			                                                                .stream()
+			                                                                .map( o -> ( (MockFilterRegistration) o ).getFilterClass() )
+			                                                                .collect( Collectors.toList() );
 
-			assertFalse( orderedFilters.isEmpty() );
-			assertEquals( orderedFilters.get( 0 ), "characterEncodingFilter" );
-			assertEquals( orderedFilters.get( 1 ), "multipartFilter" );
-			assertEquals( orderedFilters.get( 2 ), "requestLoggerFilter" );
-			assertEquals( orderedFilters.get( 3 ), "requestResponseLoggingFilter" );
-			assertEquals( orderedFilters.get( 4 ), "springSecurityFilterChain" );
+			assertFalse( "Filters should not be empty", orderedFilters.isEmpty() );
+
+			assertEquals( "OrderedCharacterEncodingFilter is not 1st filter", OrderedCharacterEncodingFilter.class, orderedFilters.get( 0 ) );
+			assertEquals( "AcrossMultipartFilter is not 2nd filter", AcrossMultipartFilter.class, orderedFilters.get( 1 ) );
+			assertEquals( "RequestLoggerFilter is not 3rd filter", RequestLoggerFilter.class, orderedFilters.get( 2 ) );
+			assertEquals( "RequestResponseLoggingFilter is not 4th filter", RequestResponseLoggingFilter.class, orderedFilters.get( 3 ) );
+			assertEquals( "springSecurityFilterChain is not 5th filter", "springSecurityFilterChain", new ArrayList<>( filters.keySet() ).get( 4 ) );
+			assertEquals( "ResourceUrlEncodingFilter is not 6th filter", ResourceUrlEncodingFilter.class, orderedFilters.get( 5 ) );
 		}
 	}
 
