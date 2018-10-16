@@ -27,15 +27,23 @@ import com.foreach.across.modules.logging.config.dynamic.RequestLoggerIntercepto
 import com.foreach.across.modules.logging.controllers.LogController;
 import com.foreach.across.modules.logging.controllers.RequestResponseLogController;
 import com.foreach.across.modules.logging.request.RequestLogger;
-import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
+import com.foreach.across.modules.spring.security.SpringSecurityModule;
+import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
 import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.test.AcrossTestContext;
+import com.foreach.across.test.AcrossTestWebContext;
 import com.foreach.across.test.support.AcrossTestBuilders;
 import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 
+import javax.servlet.FilterRegistration;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -144,15 +152,11 @@ public class ITLoggingModuleBuilding
 	@Test
 	public void moduleWithRequestLogFilter() throws Exception {
 		try (AcrossTestContext ctx = AcrossTestBuilders.web().configurer( new SimpleLoggingModuleConfig() ).build()) {
-			RequestLoggerConfiguration settings
-					= ctx.getBeanOfTypeFromModule( LOGGING_MODULE, RequestLoggerConfiguration.class );
 
-			RequestLoggerFilterConfiguration filterConfiguration = ctx.getBeanOfTypeFromModule(
-					LOGGING_MODULE, RequestLoggerFilterConfiguration.class );
+			RequestLoggerFilterConfiguration filterConfiguration = ctx.getBeanOfTypeFromModule( LOGGING_MODULE, RequestLoggerFilterConfiguration.class );
 			assertNotNull( filterConfiguration );
 			try {
-				ctx.getBeanOfTypeFromModule( LOGGING_MODULE,
-				                             RequestLoggerInterceptorConfiguration.class );
+				ctx.getBeanOfTypeFromModule( LOGGING_MODULE, RequestLoggerInterceptorConfiguration.class );
 				fail( "There should not be a bean of type " + RequestLoggerInterceptorConfiguration.class.getName() );
 			}
 			catch ( NoSuchBeanDefinitionException e ) {
@@ -210,6 +214,22 @@ public class ITLoggingModuleBuilding
 		}
 	}
 
+	@Test
+	public void moduleWithSpringSecurityModuleOrder() {
+		try (AcrossTestWebContext ctx = AcrossTestBuilders.web().configurer( new LoggingModuleWithSecurityModuleConfig() ).build()) {
+
+			Map<String, ? extends FilterRegistration> filters = ctx.getServletContext().getFilterRegistrations();
+			List<String> orderedFilters = new ArrayList<>( filters.keySet() );
+
+			assertFalse( orderedFilters.isEmpty() );
+			assertEquals( orderedFilters.get( 0 ), "characterEncodingFilter" );
+			assertEquals( orderedFilters.get( 1 ), "multipartFilter" );
+			assertEquals( orderedFilters.get( 2 ), "requestLoggerFilter" );
+			assertEquals( orderedFilters.get( 3 ), "requestResponseLoggingFilter" );
+			assertEquals( orderedFilters.get( 4 ), "springSecurityFilterChain" );
+		}
+	}
+
 	protected static class ComplexLoggingModuleConfig implements AcrossContextConfigurer
 	{
 
@@ -233,6 +253,28 @@ public class ITLoggingModuleBuilding
 		public void configure( AcrossContext context ) {
 			context.addModule( new LoggingModule() );
 			context.addModule( new DebugWebModule() );
+		}
+	}
+
+	protected static class LoggingModuleWithSecurityModuleConfig implements AcrossContextConfigurer
+	{
+		@Override
+		public void configure( AcrossContext context ) {
+			LoggingModule loggingModule = new LoggingModule();
+			loggingModule.setProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_ENABLED, true );
+
+			RequestResponseLogConfiguration logConfiguration = new RequestResponseLogConfiguration();
+			logConfiguration.setExcludedPathPatterns( Arrays.asList( "/static/**", "/debug/**" ) );
+
+			loggingModule.setProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_CONFIGURATION, logConfiguration );
+			context.addModule( loggingModule );
+
+			context.addModule( new DebugWebModule() );
+			context.addModule( new SpringSecurityModule() );
+
+			ConfigurableListableBeanFactory beanFactory = ( (ConfigurableApplicationContext) context.getParentApplicationContext() ).getBeanFactory();
+			beanFactory.registerSingleton( "webSecurityConfigurer", new SpringSecurityWebConfigurerAdapter() );
+
 		}
 	}
 

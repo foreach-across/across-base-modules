@@ -51,6 +51,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.foreach.across.modules</groupId>
+			<artifactId>spring-security-module</artifactId>
+			<version>2.0.0.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.foreach.across.modules</groupId>
 			<artifactId>debug-web-module</artifactId>
 			<optional>true</optional>
 		</dependency>

@@ -83,7 +83,7 @@ public class RequestLoggerFilterConfiguration implements EnvironmentAware
 	@Bean
 	public FilterRegistrationBean requestFilterRegistrationBean( RequestLoggerFilter requestLogFilter ) {
 		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-		filterRegistrationBean.setOrder( Ordered.HIGHEST_PRECEDENCE );
+		filterRegistrationBean.setOrder( Ordered.HIGHEST_PRECEDENCE + 900 ); //SpringSecurityFilterChain = 1000
 		filterRegistrationBean.setFilter( requestLogFilter );
 
 		Collection<String> urlFilterMappings = requestLoggerConfiguration().getUrlFilterMappings();
