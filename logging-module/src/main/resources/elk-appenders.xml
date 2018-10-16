@@ -1,7 +1,7 @@
 <included>
 	<appender name="elk-methods" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>${logging.logstash.servers}</destination>
+			<destination>${logging.logstash.servers:-localhost}</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -35,7 +35,7 @@
 			<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 				<level>ERROR</level>
 			</filter>
-			<destination>${logging.logstash.servers}</destination>
+			<destination>${logging.logstash.servers:-localhost}</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -66,7 +66,7 @@
 	</appender>
 	<appender name="elk-requests" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>${logging.logstash.servers}</destination>
+			<destination>${logging.logstash.servers:-localhost}</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
@@ -97,7 +97,7 @@
 	</appender>
 	<appender name="elk-hikari" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
 		<appender class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-			<destination>${logging.logstash.servers}</destination>
+			<destination>${logging.logstash.servers:-localhost}</destination>
 			<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 				<providers>
 					<mdc/>
