@@ -18,6 +18,7 @@ package com.foreach.across.modules.logging.requestresponse;
 import org.apache.commons.io.output.TeeOutputStream;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
@@ -45,6 +46,16 @@ public class LogResponseWrapper extends HttpServletResponseWrapper
 	public ServletOutputStream getOutputStream() throws IOException {
 		return new ServletOutputStream()
 		{
+			@Override
+			public boolean isReady() {
+				return true;
+			}
+
+			@Override
+			public void setWriteListener( WriteListener writeListener ) {
+
+			}
+
 			private TeeOutputStream tee = new TeeOutputStream( LogResponseWrapper.super.getOutputStream(), bos );
 
 			@Override
