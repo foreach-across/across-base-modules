@@ -17,6 +17,7 @@ package com.foreach.across.modules.logging.requestresponse;
 
 import org.apache.commons.io.input.TeeInputStream;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -34,11 +35,31 @@ public class LogRequestWrapper extends HttpServletRequestWrapper
 	public ServletInputStream getInputStream() throws IOException {
 		return new ServletInputStream()
 		{
+			private boolean finished = false;
 			private TeeInputStream tee = new TeeInputStream( LogRequestWrapper.super.getInputStream(), bos );
 
 			@Override
+			public boolean isFinished() {
+				return finished;
+			}
+
+			@Override
+			public boolean isReady() {
+				return true;
+			}
+
+			@Override
+			public void setReadListener( ReadListener readListener ) {
+
+			}
+
+			@Override
 			public int read() throws IOException {
-				return tee.read();
+				int data = tee.read();
+				if ( data == -1 ) {
+					finished = true;
+				}
+				return data;
 			}
 		};
 	}

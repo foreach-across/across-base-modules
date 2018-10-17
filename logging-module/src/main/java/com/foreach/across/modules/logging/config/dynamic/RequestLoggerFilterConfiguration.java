@@ -24,31 +24,25 @@ import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.request.LogHandlerAndViewNameInterceptor;
 import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
 import com.foreach.across.modules.logging.request.RequestLoggerFilter;
-import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import com.foreach.common.spring.context.ApplicationInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.handler.MappedInterceptor;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import java.util.Collection;
-import java.util.EnumSet;
 
 /**
  * Configures the RequestLoggerFilter to be first in the filter chain
  */
 @AcrossDepends(required = "AcrossWebModule")
-public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletConfigurer implements EnvironmentAware
+public class RequestLoggerFilterConfiguration implements EnvironmentAware
 {
 	private Environment environment;
-
-	private RequestLoggerFilter requestLogFilter;
 
 	@Override
 	public void setEnvironment( Environment environment ) {
@@ -77,9 +71,6 @@ public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletCon
 		if ( requestLoggerConfiguration().getLoggerLevelThreshold() != null ) {
 			filter.setLoggerLevelThreshold( requestLoggerConfiguration().getLoggerLevelThreshold() );
 		}
-
-		this.requestLogFilter = filter;
-
 		return filter;
 	}
 
@@ -89,31 +80,27 @@ public class RequestLoggerFilterConfiguration extends AcrossWebDynamicServletCon
 		return new MappedInterceptor( new String[] { "/**" }, new LogHandlerAndViewNameInterceptor() );
 	}
 
-	@Override
-	protected void dynamicConfigurationAllowed( ServletContext servletContext ) throws ServletException {
-		FilterRegistration.Dynamic filter = servletContext.addFilter( "requestLoggerFilter", requestLogFilter );
+	@Bean
+	public FilterRegistrationBean requestFilterRegistrationBean( RequestLoggerFilter requestLogFilter ) {
+		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+		filterRegistrationBean.setOrder( Ordered.HIGHEST_PRECEDENCE + 900 ); //SpringSecurityFilterChain = 1000
+		filterRegistrationBean.setFilter( requestLogFilter );
 
 		Collection<String> urlFilterMappings = requestLoggerConfiguration().getUrlFilterMappings();
 		Collection<String> servletNameFilterMappings = requestLoggerConfiguration().getServletNameFilterMappings();
 
 		if ( urlFilterMappings.isEmpty() && servletNameFilterMappings.isEmpty() ) {
-			throw new AcrossException(
-					"At least one filter mapping must be specified when enabling request logging" );
+			throw new AcrossException( "At least one filter mapping must be specified when enabling request logging" );
 		}
 
 		if ( !urlFilterMappings.isEmpty() ) {
-			filter.addMappingForUrlPatterns( EnumSet.allOf( DispatcherType.class ), false,
-			                                 urlFilterMappings.toArray( new String[urlFilterMappings.size()] ) );
+			filterRegistrationBean.addUrlPatterns( urlFilterMappings.toArray( new String[urlFilterMappings.size()] ) );
 		}
 		if ( !servletNameFilterMappings.isEmpty() ) {
-			filter.addMappingForServletNames( EnumSet.allOf( DispatcherType.class ), false,
-			                                  servletNameFilterMappings.toArray(
-					                                  new String[servletNameFilterMappings.size()] ) );
+			filterRegistrationBean.addServletNames( servletNameFilterMappings.toArray( new String[servletNameFilterMappings.size()] ) );
 		}
-	}
 
-	@Override
-	protected void dynamicConfigurationDenied( ServletContext servletContext ) throws ServletException {
+		return filterRegistrationBean;
 	}
 
 	/**

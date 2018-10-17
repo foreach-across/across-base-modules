@@ -17,15 +17,13 @@
 package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.modules.logging.LoggingModuleSettings;
-import net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 @Configuration
 @ConditionalOnProperty(name = LoggingModuleSettings.LOGSTASH_CONFIGURATION_SERVER)
-@ConditionalOnMissingClass(value = { LoggingEventAsyncDisruptorAppender.class })
+@ConditionalOnMissingClass("net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender")
 public class LogstashPropertyVerifier
 {
 	public LogstashPropertyVerifier() {

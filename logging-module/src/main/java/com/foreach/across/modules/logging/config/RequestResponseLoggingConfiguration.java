@@ -23,22 +23,16 @@ import com.foreach.across.modules.logging.controllers.RequestResponseLogControll
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogRegistry;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLoggingFilter;
-import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import java.util.Collection;
-import java.util.EnumSet;
 
 /**
  * @author Andy Somers
@@ -46,10 +40,8 @@ import java.util.EnumSet;
 @Configuration
 @AcrossDepends(required = "AcrossWebModule")
 @ConditionalOnProperty(LoggingModuleSettings.REQUEST_RESPONSE_LOG_ENABLED)
-public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServletConfigurer implements EnvironmentAware
+public class RequestResponseLoggingConfiguration implements EnvironmentAware
 {
-	private static final Logger LOG = LoggerFactory.getLogger( RequestResponseLoggingConfiguration.class );
-
 	private Environment environment;
 
 	@Override
@@ -96,33 +88,26 @@ public class RequestResponseLoggingConfiguration extends AcrossWebDynamicServlet
 		return filter;
 	}
 
-	@Override
-	protected void dynamicConfigurationAllowed( ServletContext servletContext ) throws ServletException {
-		FilterRegistration.Dynamic filter = servletContext.addFilter( "requestResponseLogFilter",
-		                                                              requestResponseLoggingFilter() );
+	@Bean
+	public FilterRegistrationBean requestResponseFilterRegistrationBean( RequestResponseLoggingFilter requestResponseLoggingFilter ) {
+		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+		filterRegistrationBean.setOrder( Ordered.HIGHEST_PRECEDENCE + 901 ); //SpringSecurityFilterChain = 1000
+		filterRegistrationBean.setFilter( requestResponseLoggingFilter );
 
 		Collection<String> urlFilterMappings = requestResponseLogConfiguration().getUrlFilterMappings();
 		Collection<String> servletNameFilterMappings = requestResponseLogConfiguration().getServletNameFilterMappings();
 
 		if ( urlFilterMappings.isEmpty() && servletNameFilterMappings.isEmpty() ) {
-			throw new AcrossException(
-					"At least one filter mapping must be specified when enabling request/response debug logging" );
+			throw new AcrossException( "At least one filter mapping must be specified when enabling request logging" );
 		}
 
 		if ( !urlFilterMappings.isEmpty() ) {
-			filter.addMappingForUrlPatterns( EnumSet.allOf( DispatcherType.class ), false,
-			                                 urlFilterMappings.toArray( new String[urlFilterMappings.size()] ) );
+			filterRegistrationBean.addUrlPatterns( urlFilterMappings.toArray( new String[urlFilterMappings.size()] ) );
 		}
 		if ( !servletNameFilterMappings.isEmpty() ) {
-			filter.addMappingForServletNames( EnumSet.allOf( DispatcherType.class ), false,
-			                                  servletNameFilterMappings.toArray(
-					                                  new String[servletNameFilterMappings.size()] ) );
+			filterRegistrationBean.addServletNames( servletNameFilterMappings.toArray( new String[servletNameFilterMappings.size()] ) );
 		}
-	}
 
-	@Override
-	protected void dynamicConfigurationDenied( ServletContext servletContext ) throws ServletException {
-		LOG.warn(
-				"Request/response logging is configured, but I am unable to add RequestResponseLoggingFilter dynamically." );
+		return filterRegistrationBean;
 	}
 }
