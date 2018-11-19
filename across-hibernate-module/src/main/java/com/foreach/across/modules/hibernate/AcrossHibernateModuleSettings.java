@@ -18,6 +18,7 @@ package com.foreach.across.modules.hibernate;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.autoconfigure.transaction.TransactionProperties;
@@ -40,6 +41,7 @@ public class AcrossHibernateModuleSettings extends JpaProperties
 	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "across-hibernate.register-repository-interceptor";
 
 	private TransactionProperties transactionProperties = new TransactionProperties();
+	private HibernateProperties hibernate = new HibernateProperties();
 	private ApplicationModule applicationModule = new ApplicationModule();
 	private PersistenceContextInViewProperties persistenceContextInView = new PersistenceContextInViewProperties();
 
@@ -81,9 +83,8 @@ public class AcrossHibernateModuleSettings extends JpaProperties
 	 * @param hibernateSettings to detect default properties from
 	 * @return merged properties set
 	 */
-	@Override
 	public Map<String, Object> getHibernateProperties( HibernateSettings hibernateSettings ) {
-		Map<String, Object> hibernateProperties = super.getHibernateProperties( hibernateSettings );
+		Map<String, Object> hibernateProperties = getHibernate().determineHibernateProperties( getProperties(), hibernateSettings );
 		hibernateProperties.putAll( getHibernateProperties() );
 		return hibernateProperties;
 	}

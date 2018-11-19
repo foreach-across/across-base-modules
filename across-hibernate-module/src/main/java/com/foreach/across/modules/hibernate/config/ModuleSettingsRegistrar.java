@@ -116,6 +116,7 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 
 			if ( isDefaultHibernateModule() ) {
 				bindProperties( "spring.jpa", moduleSettings );
+				bindProperties( "spring.jpa.hibernate", moduleSettings.getHibernate() );
 				bindProperties( "spring.transaction", moduleSettings.getTransactionProperties() );
 				moduleSettings.getApplicationModule().setRepositoryScan(
 						environment.getProperty( "spring.data.jpa.repositories.enabled", boolean.class,
@@ -126,6 +127,7 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 			String modulePrefix = currentModule.getPropertiesPrefix();
 			bindProperties( modulePrefix, moduleSettings );
 			bindProperties( modulePrefix + ".transaction", moduleSettings.getTransactionProperties() );
+			bindProperties( modulePrefix + ".hibernate", moduleSettings.getHibernate() );
 			bindProperties( modulePrefix + ".application", moduleSettings.getApplicationModule() );
 
 			return moduleSettings;

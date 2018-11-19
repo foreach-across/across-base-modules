@@ -41,6 +41,7 @@ import javax.servlet.ServletException;
 import java.util.EnumSet;
 
 @ConditionalOnAcrossModule("AcrossWebModule")
+@Configuration
 public class HibernatePersistenceContextInViewConfiguration
 {
 	private static final Logger LOG = LoggerFactory.getLogger( HibernatePersistenceContextInViewConfiguration.class );
