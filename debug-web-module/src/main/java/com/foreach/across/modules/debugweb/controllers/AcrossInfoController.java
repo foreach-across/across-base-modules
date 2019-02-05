@@ -19,7 +19,6 @@ import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.context.AcrossContextUtils;
 import com.foreach.across.core.context.ExposedBeanDefinition;
 import com.foreach.across.core.context.info.AcrossContextInfo;
-import com.foreach.across.core.events.AcrossEventPublisher;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.config.PropertyMaskingProperties;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
@@ -52,9 +51,6 @@ public class AcrossInfoController
 {
 	@Autowired
 	private AcrossContextInfo acrossContext;
-
-	@Autowired
-	private AcrossEventPublisher publisher;
 
 	@Autowired
 	private PropertyMaskingProperties propertyMaskingProperties;
@@ -240,7 +236,18 @@ public class AcrossInfoController
 		}
 
 		public Object getEnvironmentValue() {
-			return valueMasker.maskIfNecessary( name, environment.getProperty( name, Object.class ) );
+			try {
+				return valueMasker.maskIfNecessary( name, environment.getProperty( name, Object.class ) );
+			}
+			catch ( IllegalArgumentException ex ) {
+				if ( ex.getMessage().contains( "Could not resolve placeholder" ) ) {
+					return getValue();
+				}
+				else {
+					throw ex;
+				}
+			}
+
 		}
 
 		public boolean isActualValue() {

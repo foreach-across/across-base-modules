@@ -1,9 +1,9 @@
 = DebugWebModule
 Arne Vandamme
-2.0.0.RELEASE
+2.0.1.RELEASE
 :toc: left
 :sectanchors:
-:module-version: 2.0.0.RELEASE
+:module-version: 2.0.1.RELEASE
 :module-name: DebugWebModule
 :module-artifact: debug-web-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/DebugWebModule
@@ -103,6 +103,11 @@ Useful if you want to share a global security configuration.
 
 == What's new in this version?
 :numbered!:
+
+=== 2.0.1.RELEASE
+
+* Fixes an issue where nested placeholders on the properties page could not be displayed.
+
 === 2.0.0.RELEASE
 
 * *Requires Across 2.0.0.*
