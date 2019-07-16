@@ -45,7 +45,7 @@ public class SpringSecurityInfrastructureModule extends AcrossModule
 		// Exposed the security infrastructure bean manually, but don't annotate it as that would also expose
 		// the separate security beans and we don't want that
 		setExposeFilter(
-				new BeanFilterComposite( new ClassBeanFilter( SecurityInfrastructure.class ) )
+				new BeanFilterComposite( BeanFilter.empty(), new ClassBeanFilter( SecurityInfrastructure.class ) )
 		);
 	}
 
