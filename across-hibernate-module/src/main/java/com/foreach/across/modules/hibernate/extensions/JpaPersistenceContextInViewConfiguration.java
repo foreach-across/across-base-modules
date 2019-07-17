@@ -20,11 +20,11 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
-import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -35,9 +35,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import java.util.EnumSet;
 
 @ConditionalOnAcrossModule("AcrossWebModule")
@@ -48,7 +45,7 @@ public class JpaPersistenceContextInViewConfiguration
 
 	@Configuration
 	@ConditionalOnExpression("true == @moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'FILTER'")
-	public static class OpenEntityManagerInViewFilterConfiguration extends AcrossWebDynamicServletConfigurer
+	public static class OpenEntityManagerInViewFilterConfiguration
 	{
 		@Autowired
 		private EntityManagerFactory entityManagerFactory;
@@ -56,6 +53,18 @@ public class JpaPersistenceContextInViewConfiguration
 		@Autowired
 		@Module(AcrossModule.CURRENT_MODULE)
 		private AcrossModule currentModule;
+
+		@Bean
+		public FilterRegistrationBean<OpenEntityManagerInViewFilter> openEntityManagerInViewFilterFilterRegistrationBean() {
+			FilterRegistrationBean<OpenEntityManagerInViewFilter> registrationBean = new FilterRegistrationBean<>();
+
+			registrationBean.setName( currentModule.getName() + ".OpenEntityManagerInViewFilter" );
+			registrationBean.setFilter( openEntityManagerInViewFilter() );
+			registrationBean.setAsyncSupported( true );
+			registrationBean.setDispatcherTypes( EnumSet.of( DispatcherType.REQUEST, DispatcherType.ERROR, DispatcherType.ASYNC ) );
+			registrationBean.addUrlPatterns( "/*" );
+			return registrationBean;
+		}
 
 		@Bean
 		public OpenEntityManagerInViewFilter openEntityManagerInViewFilter() {
@@ -68,27 +77,6 @@ public class JpaPersistenceContextInViewConfiguration
 			};
 		}
 
-		@Override
-		protected void dynamicConfigurationAllowed( ServletContext servletContext ) throws ServletException {
-			FilterRegistration.Dynamic registration = servletContext.addFilter(
-					currentModule.getName() + ".OpenEntityManagerInViewFilter", openEntityManagerInViewFilter()
-			);
-			registration.setAsyncSupported( true );
-
-			registration.addMappingForUrlPatterns( EnumSet.of(
-					DispatcherType.REQUEST,
-					DispatcherType.ERROR,
-					DispatcherType.ASYNC
-			                                       ),
-			                                       false,
-			                                       "/*" );
-		}
-
-		@Override
-		protected void dynamicConfigurationDenied( ServletContext servletContext ) throws ServletException {
-			LOG.warn( "Dynamic servlet filter configuration is not allowed.  " +
-					          "The filter bean has been created but not registered in the ServletContext." );
-		}
 	}
 
 	@Configuration

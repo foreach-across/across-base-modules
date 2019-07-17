@@ -20,12 +20,12 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.core.annotations.Module;
 import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
-import com.foreach.across.modules.web.servlet.AcrossWebDynamicServletConfigurer;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -35,9 +35,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import java.util.EnumSet;
 
 @ConditionalOnAcrossModule("AcrossWebModule")
@@ -48,7 +45,7 @@ public class HibernatePersistenceContextInViewConfiguration
 
 	@Configuration
 	@ConditionalOnExpression("true == @moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'FILTER'")
-	public static class OpenSessionFactoryInViewFilterConfiguration extends AcrossWebDynamicServletConfigurer
+	public static class OpenSessionFactoryInViewFilterConfiguration
 	{
 		@Autowired
 		private SessionFactory sessionFactory;
@@ -68,26 +65,16 @@ public class HibernatePersistenceContextInViewConfiguration
 			};
 		}
 
-		@Override
-		protected void dynamicConfigurationAllowed( ServletContext servletContext ) throws ServletException {
-			FilterRegistration.Dynamic registration = servletContext.addFilter(
-					currentModule.getName() + ".OpenSessionInViewFilter", openSessionInViewFilter()
-			);
-			registration.setAsyncSupported( true );
+		@Bean
+		public FilterRegistrationBean<OpenSessionInViewFilter> openEntityManagerInViewFilterFilterRegistrationBean() {
+			FilterRegistrationBean<OpenSessionInViewFilter> registrationBean = new FilterRegistrationBean<>();
 
-			registration.addMappingForUrlPatterns( EnumSet.of(
-					DispatcherType.REQUEST,
-					DispatcherType.ERROR,
-					DispatcherType.ASYNC
-			                                       ),
-			                                       false,
-			                                       "/*" );
-		}
-
-		@Override
-		protected void dynamicConfigurationDenied( ServletContext servletContext ) throws ServletException {
-			LOG.warn( "Dynamic servlet filter configuration is not allowed.  " +
-					          "The filter bean has been created but not registered in the ServletContext." );
+			registrationBean.setName( currentModule.getName() + ".OpenSessionInViewFilter" );
+			registrationBean.setFilter( openSessionInViewFilter() );
+			registrationBean.setAsyncSupported( true );
+			registrationBean.setDispatcherTypes( EnumSet.of( DispatcherType.REQUEST, DispatcherType.ERROR, DispatcherType.ASYNC ) );
+			registrationBean.addUrlPatterns( "/*" );
+			return registrationBean;
 		}
 	}
 
