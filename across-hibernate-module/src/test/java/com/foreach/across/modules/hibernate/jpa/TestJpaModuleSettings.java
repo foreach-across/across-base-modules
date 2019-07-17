@@ -25,6 +25,7 @@ import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.test.AcrossTestContext;
+import com.foreach.across.test.AcrossTestWebContext;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
@@ -154,7 +155,7 @@ public class TestJpaModuleSettings
 	@Test
 	public void filterIfWebContext() {
 		try (
-				AcrossTestContext ctx = web()
+				AcrossTestWebContext ctx = web()
 						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
 						           PersistenceContextInView.FILTER )
 						.modules( AcrossWebModule.NAME, AcrossHibernateJpaModule.NAME )
@@ -165,6 +166,7 @@ public class TestJpaModuleSettings
 
 			assertEquals( 0, module.getBeansOfType( OpenEntityManagerInViewInterceptor.class ).size() );
 			assertEquals( 1, module.getBeansOfType( OpenEntityManagerInViewFilter.class ).size() );
+			assertNotNull( ctx.getServletContext().getFilterRegistration( AcrossHibernateJpaModule.NAME + ".OpenEntityManagerInViewFilter" ) );
 		}
 	}
 
