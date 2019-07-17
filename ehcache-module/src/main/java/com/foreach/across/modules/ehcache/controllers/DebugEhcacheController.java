@@ -17,15 +17,12 @@
 package com.foreach.across.modules.ehcache.controllers;
 
 import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Refreshable;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.resource.WebResource;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
-import com.foreach.across.modules.web.table.Table;
-import com.foreach.across.modules.web.table.TableHeader;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -36,6 +33,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,7 +58,7 @@ public class DebugEhcacheController
 	@Autowired(required = false)
 	private DebugWeb debugWeb;
 
-	@Event
+	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder().item( "/ehcache", "Cache overview" );
 	}
@@ -235,9 +233,7 @@ public class DebugEhcacheController
 	                         Model model ) {
 		Cache cache = cacheManager.getCache( cacheName );
 
-		Table table = new Table();
-		table.setHeader( new TableHeader( "Key", "Data", "Age", "Last accessed", "Hits" ) );
-
+		List<CacheEntry> cacheEntries = new ArrayList<>();
 		for ( Object key : cache.getKeys() ) {
 			Element cacheElement = cache.getQuiet( key );
 
@@ -245,13 +241,18 @@ public class DebugEhcacheController
 				long age = System.currentTimeMillis() - cacheElement.getLatestOfCreationAndUpdateTime();
 				long accessed = System.currentTimeMillis() - cacheElement.getLastAccessTime();
 
-				table.addRow( key, cacheElement.getObjectValue(), DurationFormatUtils.formatDurationHMS( age ),
-				              DurationFormatUtils.formatDurationHMS( accessed ), cacheElement.getHitCount() );
+				CacheEntry cacheEntry = new CacheEntry();
+				cacheEntry.setKey( key.toString() );
+				cacheEntry.setValue( cacheElement.getObjectValue().toString() );
+				cacheEntry.setAge( DurationFormatUtils.formatDurationHMS( age ) );
+				cacheEntry.setLastAccessed( DurationFormatUtils.formatDurationHMS( accessed ) );
+				cacheEntry.setHits( cacheElement.getHitCount() );
+				cacheEntries.add( cacheEntry );
 			}
 		}
 
 		model.addAttribute( "cache", cache );
-		model.addAttribute( "cacheEntries", table );
+		model.addAttribute( "cacheEntries", cacheEntries );
 
 		if ( StringUtils.equalsIgnoreCase( "true", listPeers ) ) {
 			List<String> cachePeers = new ArrayList<>();
@@ -281,5 +282,54 @@ public class DebugEhcacheController
 		}
 
 		return "th/ehcache/cacheDetail";
+	}
+
+	private static class CacheEntry
+	{
+		private String key;
+		private String value;
+		private String age;
+		private String lastAccessed;
+		private Long hits;
+
+		public String getKey() {
+			return key;
+		}
+
+		public void setKey( String key ) {
+			this.key = key;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue( String value ) {
+			this.value = value;
+		}
+
+		public String getAge() {
+			return age;
+		}
+
+		public void setAge( String age ) {
+			this.age = age;
+		}
+
+		public String getLastAccessed() {
+			return lastAccessed;
+		}
+
+		public void setLastAccessed( String lastAccessed ) {
+			this.lastAccessed = lastAccessed;
+		}
+
+		public Long getHits() {
+			return hits;
+		}
+
+		public void setHits( Long hits ) {
+			this.hits = hits;
+		}
 	}
 }
