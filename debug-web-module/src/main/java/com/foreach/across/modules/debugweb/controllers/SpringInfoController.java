@@ -15,11 +15,10 @@
  */
 package com.foreach.across.modules.debugweb.controllers;
 
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
-import com.foreach.across.modules.web.table.Table;
+import com.foreach.across.modules.debugweb.support.Table;
 import liquibase.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +26,7 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.EventListener;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
@@ -51,7 +51,7 @@ public class SpringInfoController
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	@Event
+	@EventListener
 	@SuppressWarnings("unused")
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder()

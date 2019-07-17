@@ -15,11 +15,9 @@
  */
 package com.foreach.across.modules.debugweb.controllers;
 
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.context.AcrossContextUtils;
 import com.foreach.across.core.context.ExposedBeanDefinition;
 import com.foreach.across.core.context.info.AcrossContextInfo;
-import com.foreach.across.core.events.AcrossEventPublisher;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.config.PropertyMaskingProperties;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
@@ -33,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.*;
@@ -52,14 +52,13 @@ public class AcrossInfoController
 {
 	@Autowired
 	private AcrossContextInfo acrossContext;
-
 	@Autowired
-	private AcrossEventPublisher publisher;
+	private ApplicationEventPublisher publisher;
 
 	@Autowired
 	private PropertyMaskingProperties propertyMaskingProperties;
 
-	@Event
+	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder()
 		     .group( "/across", "Across" ).and()
@@ -489,7 +488,7 @@ public class AcrossInfoController
 			Method[] declaredMethods = ReflectionUtils.getUniqueDeclaredMethods( value.getClass() );
 
 			for ( Method method : declaredMethods ) {
-				if ( AnnotationUtils.findAnnotation( method, Event.class ) != null ) {
+				if ( AnnotationUtils.findAnnotation( method, EventListener.class ) != null ) {
 					methods.add( method );
 				}
 			}
