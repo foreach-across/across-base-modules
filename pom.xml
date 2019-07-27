@@ -35,11 +35,11 @@
 	<description>
 		Activates Ehcache cache management support and provides debug controllers to view and manage the cache.
 	</description>
-	<url>https://foreach.atlassian.net/wiki/display/AX/EhcacheModule</url>
+	<url>https://across.dev/modules/ehcachemodule</url>
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
 
@@ -47,7 +47,7 @@
 		<developer>
 			<name>Arne Vandamme</name>
 			<organization>Foreach</organization>
-			<organizationUrl>http://www.foreach.be</organizationUrl>
+			<organizationUrl>https://www.foreach.be</organizationUrl>
 		</developer>
 	</developers>
 
