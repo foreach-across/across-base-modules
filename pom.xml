@@ -34,20 +34,19 @@
 		DebugWebModule provides support for @DebugWebControllers in other modules.  The purpose is mainly for
 		technical configuration and debugging.
 	</description>
-	<url>https://foreach.atlassian.net/wiki/display/AX/DebugWebModule</url>
+	<url>https://across.dev/modules/debugwebmodule</url>
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
 
 	<developers>
 		<developer>
 			<name>Arne Vandamme</name>
-			<email>arne@foreach.be</email>
 			<organization>Foreach</organization>
-			<organizationUrl>http://www.foreach.be</organizationUrl>
+			<organizationUrl>https://www.foreach.be</organizationUrl>
 		</developer>
 	</developers>
 
