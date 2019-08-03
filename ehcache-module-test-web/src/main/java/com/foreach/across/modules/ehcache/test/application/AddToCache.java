@@ -17,6 +17,7 @@
 package com.foreach.across.modules.ehcache.test.application;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,8 @@ public class AddToCache
 {
 	@Autowired
 	public void addToCache( CacheManager cacheManager ) {
-		cacheManager.getCache( "itemCache" ).put( "some-key", "some-value" );
+		Cache itemCache = cacheManager.getCache( "itemCache" );
+		itemCache.put( "some-key", "some-value" );
+		itemCache.put( "null-value", null );
 	}
 }

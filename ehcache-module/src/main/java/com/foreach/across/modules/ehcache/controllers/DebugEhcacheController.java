@@ -243,7 +243,7 @@ public class DebugEhcacheController
 
 				CacheEntry cacheEntry = new CacheEntry();
 				cacheEntry.setKey( key.toString() );
-				cacheEntry.setValue( cacheElement.getObjectValue().toString() );
+				cacheEntry.setValue( cacheElement.getObjectValue() );
 				cacheEntry.setAge( DurationFormatUtils.formatDurationHMS( age ) );
 				cacheEntry.setLastAccessed( DurationFormatUtils.formatDurationHMS( accessed ) );
 				cacheEntry.setHits( cacheElement.getHitCount() );
@@ -287,7 +287,7 @@ public class DebugEhcacheController
 	private static class CacheEntry
 	{
 		private String key;
-		private String value;
+		private Object value;
 		private String age;
 		private String lastAccessed;
 		private Long hits;
@@ -300,12 +300,16 @@ public class DebugEhcacheController
 			this.key = key;
 		}
 
-		public String getValue() {
+		public Object getValue() {
 			return value;
 		}
 
-		public void setValue( String value ) {
+		public void setValue( Object value ) {
 			this.value = value;
+		}
+
+		public boolean isNullValue() {
+			return value == null;
 		}
 
 		public String getAge() {

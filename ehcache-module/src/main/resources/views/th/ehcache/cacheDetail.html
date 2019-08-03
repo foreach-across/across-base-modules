@@ -48,7 +48,8 @@
         <tbody>
         <tr th:each="cacheEntry : ${cacheEntries}" th:object="${cacheEntry}">
             <td th:text="${cacheEntry.key}"></td>
-            <td th:text="${cacheEntry.value}"></td>
+            <td th:unless="${cacheEntry.nullValue}" th:text="${cacheEntry.value}"></td>
+            <td th:if="${cacheEntry.nullValue}"><em>&lt;null&gt;</em></td>
             <td th:text="${cacheEntry.age}"></td>
             <td th:text="${cacheEntry.lastAccessed}"></td>
             <td th:text="${cacheEntry.hits}"></td>
