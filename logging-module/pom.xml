@@ -90,7 +90,10 @@
 				<inherited>false</inherited>
 				<configuration>
 					<skipAssembly>false</skipAssembly>
-
+					<finalName>${project.artifactId}</finalName>
+					<descriptors>
+						<descriptor>site.xml</descriptor>
+					</descriptors>
 				</configuration>
 				<executions>
 					<execution>
