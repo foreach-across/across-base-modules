@@ -1,9 +1,9 @@
 = LoggingModule
 Arne Vandamme
-1.1.0.RELEASE
+3.0.0-SNAPSHOT
 :toc: left
 :sectanchors:
-:module-version: 1.1.0.RELEASE
+:module-version: 3.0.0-SNAPSHOT
 :module-name: LoggingModule
 :module-artifact: logging-module
 :module-url: https://foreach.atlassian.net/wiki/display/AX/LoggingModule
@@ -162,6 +162,10 @@ Module website: {module-url}
 
 == What's new in this version?
 :numbered!:
+
+=== 3.0.0-SNAPSHOT
+
+* changes for Across Platform 5
 
 === 1.1.0.RELEASE
 * switched to `@ConfigurationProperties` for settings - allow settings via application.properties
