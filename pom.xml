@@ -80,6 +80,15 @@
 	</dependencyManagement>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>3.2.3</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -116,10 +125,7 @@
 				<version>2.5.5</version>
 				<inherited>false</inherited>
 				<configuration>
-					<finalName>${project.artifactId}</finalName>
-					<descriptors>
-						<descriptor>site.xml</descriptor>
-					</descriptors>
+					<skipAssembly>true</skipAssembly>
 				</configuration>
 				<executions>
 					<execution>
