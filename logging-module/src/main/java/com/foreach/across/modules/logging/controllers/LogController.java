@@ -21,12 +21,12 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
-import com.foreach.across.modules.web.table.Table;
+import com.foreach.across.modules.debugweb.support.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,7 +37,7 @@ import java.util.*;
 @DebugWebController
 public class LogController
 {
-	@Event
+	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder().group( "/logging", "Logging" ).and().item( "/logging/loggers", "Logger overview" );
 	}
