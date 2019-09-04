@@ -89,6 +89,7 @@
 				<version>2.5.5</version>
 				<inherited>false</inherited>
 				<configuration>
+					<outputDirectory>${project.basedir}/../target</outputDirectory>
 					<skipAssembly>false</skipAssembly>
 					<finalName>${project.artifactId}</finalName>
 					<descriptors>

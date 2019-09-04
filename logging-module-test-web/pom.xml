@@ -28,8 +28,6 @@
 	<artifactId>logging-module-test-web</artifactId>
 	<packaging>war</packaging>
 
-	<name>${project.groupId}:${project.artifactId}</name>
-
 	<build>
 		<plugins>
 			<plugin>
