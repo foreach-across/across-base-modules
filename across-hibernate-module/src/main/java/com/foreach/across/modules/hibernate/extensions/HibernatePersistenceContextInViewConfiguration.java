@@ -32,7 +32,7 @@ import org.springframework.core.Ordered;
 import org.springframework.orm.hibernate5.support.OpenSessionInViewFilter;
 import org.springframework.orm.hibernate5.support.OpenSessionInViewInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
@@ -80,7 +80,7 @@ public class HibernatePersistenceContextInViewConfiguration
 
 	@Configuration
 	@ConditionalOnExpression("true == @moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'INTERCEPTOR'")
-	public static class OpenSessionFactoryInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
+	public static class OpenSessionFactoryInViewInterceptorConfiguration implements WebMvcConfigurer, Ordered
 	{
 		@Autowired
 		private SessionFactory sessionFactory;

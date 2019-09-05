@@ -31,7 +31,7 @@ import org.springframework.core.Ordered;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.DispatcherType;
@@ -81,7 +81,7 @@ public class JpaPersistenceContextInViewConfiguration
 
 	@Configuration
 	@ConditionalOnExpression("true == @moduleSettings.openInView and @moduleSettings.persistenceContextInView.handler.name() == 'INTERCEPTOR'")
-	public static class OpenEntityManagerInViewInterceptorConfiguration extends WebMvcConfigurerAdapter implements Ordered
+	public static class OpenEntityManagerInViewInterceptorConfiguration implements WebMvcConfigurer, Ordered
 	{
 		@Autowired
 		private EntityManagerFactory entityManagerFactory;
