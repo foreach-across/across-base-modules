@@ -16,10 +16,8 @@
 package com.foreach.across.modules.spring.security.infrastructure.config;
 
 import com.foreach.across.core.annotations.PostRefresh;
-import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
-import com.foreach.across.modules.spring.security.infrastructure.SpringSecurityInfrastructureModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,13 +76,4 @@ public class SecurityInfrastructure
 		}
 	}
 
-	private boolean isSecurityModule( ModuleBootstrapConfig moduleBootstrapConfig ) {
-		switch ( moduleBootstrapConfig.getModuleName() ) {
-			case SpringSecurityInfrastructureModule.ACL_MODULE:
-			case SpringSecurityInfrastructureModule.NAME:
-				return true;
-			default:
-				return false;
-		}
-	}
 }

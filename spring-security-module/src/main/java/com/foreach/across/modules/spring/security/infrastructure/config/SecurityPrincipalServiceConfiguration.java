@@ -18,6 +18,7 @@ package com.foreach.across.modules.spring.security.infrastructure.config;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.core.registry.RefreshableRegistry;
 import com.foreach.across.modules.spring.security.infrastructure.services.*;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
@@ -25,7 +26,6 @@ import org.springframework.aop.target.AbstractLazyCreationTargetSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Optional;
@@ -87,19 +87,16 @@ public class SecurityPrincipalServiceConfiguration
 		private AcrossContextBeanRegistry contextBeanRegistry;
 		private Class<?> beanType;
 
-		public void setContextBeanRegistry( AcrossContextBeanRegistry contextBeanRegistry ) {
+		public void setContextBeanRegistry( @NonNull AcrossContextBeanRegistry contextBeanRegistry ) {
 			this.contextBeanRegistry = contextBeanRegistry;
 		}
 
-		public void setBeanType( Class<?> beanType ) {
+		public void setBeanType( @NonNull Class<?> beanType ) {
 			this.beanType = beanType;
 		}
 
 		@Override
 		protected Object createObject() throws Exception {
-			Assert.notNull( contextBeanRegistry );
-			Assert.notNull( beanType );
-
 			List beans = contextBeanRegistry.getBeansOfType( beanType, true );
 
 			if ( beans.isEmpty() ) {
