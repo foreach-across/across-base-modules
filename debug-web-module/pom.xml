@@ -19,7 +19,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>debug-web</artifactId>
+		<artifactId>debug-web-project</artifactId>
 		<groupId>com.foreach.across.modules</groupId>
 		<version>${revision}</version>
 	</parent>
@@ -29,6 +29,7 @@
 	<properties>
 		<maven.javadoc.skip>false</maven.javadoc.skip>
 		<maven.deploy.skip>false</maven.deploy.skip>
+		<skipAssembly>false</skipAssembly>
 	</properties>
 
 	<dependencies>
@@ -104,13 +105,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<skipAssembly>true</skipAssembly>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
