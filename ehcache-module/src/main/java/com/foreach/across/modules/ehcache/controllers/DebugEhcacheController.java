@@ -23,6 +23,7 @@ import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.resource.WebResource;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
+import com.foreach.across.modules.web.resource.WebResourceRule;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -65,7 +66,8 @@ public class DebugEhcacheController
 
 	@ModelAttribute
 	public void init( WebResourceRegistry registry ) {
-		registry.addWithKey( WebResource.CSS, "EhcacheModule", "/css/ehcache/ehcache.css", WebResource.VIEWS );
+		registry.apply(
+				WebResourceRule.add( WebResource.css( "/css/ehcache/ehcache.css" ) ).toBucket( WebResource.CSS ) );
 	}
 
 	@ModelAttribute
