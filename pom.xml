@@ -60,7 +60,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<revision>5.0.0-TEST-SNAPSHOT</revision>
+		<revision>4.0.0-TEST-SNAPSHOT</revision>
 	</properties>
 
 	<modules>
