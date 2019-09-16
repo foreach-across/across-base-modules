@@ -53,7 +53,7 @@
 
 	<repositories>
 		<repository>
-			<id>foreach-nexus</id>
+			<id>across</id>
 			<name>Foreach repository</name>
 			<url>http://repository.foreach.be/nexus/repository/public</url>
 		</repository>
@@ -111,17 +111,17 @@
 
 	<profiles>
 		<profile>
-			<id>foreach</id>
+			<id>across</id>
 			<distributionManagement>
 				<repository>
-					<id>foreach-nexus</id>
-					<name>Foreach nexus</name>
-					<url>http://repository.foreach.be/nexus/repository/releases</url>
+					<id>across</id>
+					<name>Across Releases Repository</name>
+					<url>https://repository.foreach.be/nexus/repository/across-releases/</url>
 				</repository>
 				<snapshotRepository>
-					<id>foreach-nexus</id>
-					<name>Foreach nexus</name>
-					<url>http://repository.foreach.be/nexus/repository/snapshots</url>
+					<id>across</id>
+					<name>Across Snapshot Repository</name>
+					<url>https://repository.foreach.be/nexus/repository/across-snapshots/</url>
 				</snapshotRepository>
 			</distributionManagement>
 		</profile>
