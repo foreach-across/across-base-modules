@@ -79,12 +79,6 @@
 				<artifactId>across-autoconfigure</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
 			</dependency>
-<!--			 TODO revise when spring platform bom-pom is added-->
-			<dependency>
-				<groupId>org.thymeleaf.extras</groupId>
-				<artifactId>thymeleaf-extras-springsecurity4</artifactId>
-				<version>3.0.1.RELEASE</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
