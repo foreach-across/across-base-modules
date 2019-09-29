@@ -17,6 +17,7 @@ package com.foreach.across.modules.debugweb.config;
 
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.modules.debugweb.DebugWebModuleSettings;
+import com.foreach.across.modules.debugweb.controllers.AcrossInfoController;
 import com.foreach.across.modules.debugweb.mvc.DebugMenu;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuBuilder;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
@@ -27,6 +28,7 @@ import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.annotation.AnnotationClassFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
@@ -35,6 +37,7 @@ import javax.annotation.PostConstruct;
  * Declares a separate handler for debug mappings.
  */
 @Configuration
+@ComponentScan(basePackageClasses = AcrossInfoController.class)
 public class DebugWebMvcConfiguration extends PrefixingHandlerMappingConfiguration
 {
 	@Autowired
