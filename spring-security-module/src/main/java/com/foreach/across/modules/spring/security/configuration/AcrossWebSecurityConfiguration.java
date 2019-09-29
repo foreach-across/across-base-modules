@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.spring.security.config;
+package com.foreach.across.modules.spring.security.configuration;
 
+import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.core.context.support.AcrossOrderUtils;
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer;
-import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapper;
-import com.foreach.across.modules.spring.security.configuration.WebSecurityConfigurerWrapperFactory;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -41,7 +38,7 @@ import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.List;
 
 /**
  * Configures Spring security support in an AcrossWeb enabled context.
@@ -56,7 +53,6 @@ public class AcrossWebSecurityConfiguration
 	private static final String CLASS_SPRING_SECURITY_DIALECT = "org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect";
 
 	private final ApplicationContext applicationContext;
-	private final AcrossContextBeanRegistry contextBeanRegistry;
 
 	@PostConstruct
 	public void registerThymeleafDialect() {
@@ -108,39 +104,22 @@ public class AcrossWebSecurityConfiguration
 //	}
 
 	/**
-	 * Support using SpringSecurityConfigurer instances from other modules.
-	 * This overrides the bean definition in {@link org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration}
-	 * and assembles a collection of WebSecurityConfigurers.  WebSecurityConfigurer instances present in this
-	 * context are added, along with SpringSecurityWebConfigurer instances that are wrapped as WebSecurityConfigurer.
+	 * Uses a custom approach to fetch the {@link WebSecurityConfigurer} instances that should be applied.
+	 *
+	 * @see AcrossOrderedWebSecurityConfigurerSet
 	 */
 	@Bean(name = "autowiredWebSecurityConfigurersIgnoreParents")
-	public Set<WebSecurityConfigurer> autowiredWebSecurityConfigurersIgnoreParents() {
-		Map<String, SpringSecurityWebConfigurer> configurers =
-				contextBeanRegistry.getBeansOfTypeAsMap( SpringSecurityWebConfigurer.class, true );
-
-		WebSecurityConfigurerSet webSecurityConfigurers = new WebSecurityConfigurerSet();
-		webSecurityConfigurers.addAll( applicationContext.getBeansOfType( WebSecurityConfigurer.class ).values() );
-
-		int index = 1;
-
-		LOG.trace( "Registering the following SpringSecurityWebConfigurer in order:" );
-		for ( Map.Entry<String, SpringSecurityWebConfigurer> entry : configurers.entrySet() ) {
-			LOG.trace( " {} - {} ({})", index, entry.getKey(), ClassUtils.getUserClass( entry.getValue() ).getName() );
-
-			WebSecurityConfigurerWrapper wrapper = webSecurityConfigurerWrapperFactory()
-					.createWrapper( entry.getValue(), index++ );
-
-			webSecurityConfigurers.add( wrapper );
-		}
+	public AcrossOrderedWebSecurityConfigurerSet autowiredWebSecurityConfigurersIgnoreParents( AcrossModuleInfo moduleInfo ) {
+		AcrossOrderedWebSecurityConfigurerSet webSecurityConfigurers = new AcrossOrderedWebSecurityConfigurerSet( moduleInfo );
 
 		if ( webSecurityConfigurers.isEmpty() ) {
 			throw new IllegalStateException(
-					"At least one non-null instance of SpringSecurityWebConfigurer should be present in the Across context." );
+					"At least one non-null instance of AcrossWebSecurityConfigurer or WebSecurityConfigurer should be present in the Across context." );
 		}
 
 		if ( LOG.isDebugEnabled() ) {
 			LOG.debug( "Applying the following WebSecurityConfigurers in order:" );
-			val list = webSecurityConfigurers.getWebSecurityConfigurers();
+			List<WebSecurityConfigurer> list = webSecurityConfigurers.getWebSecurityConfigurers();
 			list.sort( AnnotationAwareOrderComparator.INSTANCE );
 			list.forEach( cfg -> {
 				              int order = AcrossOrderUtils.findOrder( cfg );
@@ -157,24 +136,8 @@ public class AcrossWebSecurityConfiguration
 		return securityInfrastructure.authenticationTrustResolver();
 	}
 
-	@Bean
-	WebSecurityConfigurerWrapperFactory webSecurityConfigurerWrapperFactory() {
-		return new WebSecurityConfigurerWrapperFactory( applicationContext );
-	}
-
 	/**
-	 * Wrapping class that exposes the property used in
-	 * {@link org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration}.
-	 */
-	private static class WebSecurityConfigurerSet extends LinkedHashSet<WebSecurityConfigurer>
-	{
-		public List<WebSecurityConfigurer> getWebSecurityConfigurers() {
-			return new ArrayList<>( this );
-		}
-	}
-
-	/**
-	 * Removes the default Spring Boot security rules if there is a custom SpringSecurityWebConfigurer present.
+	 * Removes the default Spring Boot security rules if there is a custom AcrossWebSecurityConfigurer present.
 	 * Done this way because the current implementation of regular Spring security vs Across setup uses separate
 	 * configuration classes and Spring Boot thinks there never is any security configured and applies its default.
 	 */
@@ -187,8 +150,8 @@ public class AcrossWebSecurityConfiguration
 		public void postProcessBeanDefinitionRegistry( BeanDefinitionRegistry beanDefinitionRegistry ) throws BeansException {
 			if ( beanDefinitionRegistry.containsBeanDefinition( DEFAULT_SECURITY_CONFIGURATION )
 					&& !( (ListableBeanFactory) beanDefinitionRegistry ).getBean( AcrossContextBeanRegistry.class )
-					                                                   .getBeansOfType( SpringSecurityWebConfigurer.class, true )
-					                                                   .isEmpty() ) {
+					                                                    .getBeansOfType( AcrossWebSecurityConfigurer.class, true )
+					                                                    .isEmpty() ) {
 				beanDefinitionRegistry.removeBeanDefinition( DEFAULT_SECURITY_CONFIGURATION );
 			}
 		}

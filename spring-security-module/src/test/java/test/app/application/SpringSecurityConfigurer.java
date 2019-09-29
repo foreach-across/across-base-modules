@@ -16,7 +16,7 @@
 
 package test.app.application;
 
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
+import com.foreach.across.modules.spring.security.configuration.AcrossWebSecurityConfigurer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
@@ -29,7 +29,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 public class SpringSecurityConfigurer
 {
 	@Configuration
-	static class BlockedSecurity extends SpringSecurityWebConfigurerAdapter
+	static class BlockedSecurity implements AcrossWebSecurityConfigurer
 	{
 		@Override
 		public void configure( HttpSecurity http ) throws Exception {
@@ -38,7 +38,7 @@ public class SpringSecurityConfigurer
 	}
 
 	@Configuration
-	static class HelloSecurity extends SpringSecurityWebConfigurerAdapter
+	static class HelloSecurity implements AcrossWebSecurityConfigurer
 	{
 		@Override
 		public void configure( HttpSecurity http ) throws Exception {
@@ -47,7 +47,7 @@ public class SpringSecurityConfigurer
 	}
 
 	@Configuration
-	static class ThymeleafSecurity extends SpringSecurityWebConfigurerAdapter
+	static class ThymeleafSecurity implements AcrossWebSecurityConfigurer
 	{
 		@Override
 		public void configure( HttpSecurity http ) throws Exception {

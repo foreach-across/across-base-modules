@@ -20,31 +20,25 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 
 /**
- * Adapter implementation for the SpringSecurityWebConfigurer interface.  Override only
- * the methods you are interested in changing.
+ * Interface to be implemented in modules that want to use the default SpringSecurityModule configuration
+ * abilities. Beans of this type can be declared inside a module and will be turned into actual security
+ * configurers by SpringSecurityModule.
+ * <p/>
+ * This interface provides only the more common configuration methods, more advanced security configuration
+ * should be done by injecting a {@link org.springframework.security.config.annotation.web.WebSecurityConfigurer}
+ * directly in the SpringSecurityModule.
  *
  * @author Arne Vandamme
- * @since 1.0.3
+ * @since 4.0.0
  */
-public class SpringSecurityWebConfigurerAdapter implements SpringSecurityWebConfigurer
+public interface AcrossWebSecurityConfigurer
 {
-	@Override
-	public boolean isDisableDefaults() {
-		return false;
+	default void configure( AuthenticationManagerBuilder auth ) throws Exception {
 	}
 
-	@Override
-	public void configure( AuthenticationManagerBuilder auth ) throws Exception {
-
+	default void configure( WebSecurity web ) throws Exception {
 	}
 
-	@Override
-	public void configure( WebSecurity web ) throws Exception {
-
-	}
-
-	@Override
-	public void configure( HttpSecurity http ) throws Exception {
-
+	default void configure( HttpSecurity http ) throws Exception {
 	}
 }

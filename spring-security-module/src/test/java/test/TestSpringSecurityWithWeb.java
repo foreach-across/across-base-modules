@@ -20,8 +20,7 @@ import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.annotations.OrderInModule;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer;
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
+import com.foreach.across.modules.spring.security.configuration.AcrossWebSecurityConfigurer;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalRetrievalStrategy;
@@ -121,7 +120,7 @@ public class TestSpringSecurityWithWeb
 	 */
 	@Configuration
 	@OrderInModule(2)
-	protected static class SimpleSpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
+	protected static class SimpleSpringSecurityConfigurer implements AcrossWebSecurityConfigurer
 	{
 		@Override
 		public void configure( AuthenticationManagerBuilder auth ) throws Exception {
@@ -141,7 +140,7 @@ public class TestSpringSecurityWithWeb
 
 	@Configuration
 	@OrderInModule(1)
-	protected static class OtherSpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
+	protected static class OtherSpringSecurityConfigurer implements AcrossWebSecurityConfigurer
 	{
 		@Override
 		public void configure( HttpSecurity http ) throws Exception {
@@ -159,7 +158,7 @@ public class TestSpringSecurityWithWeb
 		}
 
 		@Bean
-		public SpringSecurityWebConfigurer springSecurityWebConfigurer() {
+		public AcrossWebSecurityConfigurer springSecurityWebConfigurer() {
 			return new SimpleSpringSecurityConfigurer();
 		}
 
