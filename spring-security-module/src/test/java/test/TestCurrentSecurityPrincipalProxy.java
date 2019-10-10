@@ -17,6 +17,7 @@
 package test;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalId;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxyImpl;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
@@ -78,10 +79,20 @@ public class TestCurrentSecurityPrincipalProxy
 		SecurityContextHolder.getContext().setAuthentication( auth );
 
 		assertEquals( "principal", currentPrincipal.getPrincipalName() );
+		assertEquals( SecurityPrincipalId.of( "principal" ), currentPrincipal.getSecurityPrincipalId() );
 		assertSame( principal, currentPrincipal.getPrincipal() );
 		assertSame( principal, currentPrincipal.getPrincipal() );
 
 		verify( securityPrincipalService, never() ).getPrincipalByName( anyString() );
+	}
+
+	@Test
+	public void principalIdIsNullIfPrincipalNameIsNotPresent() {
+		SecurityPrincipal principal = mock( SecurityPrincipal.class );
+		when( principal.getPrincipalName() ).thenReturn( "" );
+		assertNull( principal.getSecurityPrincipalId() );
+		when( principal.getPrincipalName() ).thenReturn( null );
+		assertNull( principal.getSecurityPrincipalId() );
 	}
 
 	@Test
@@ -114,6 +125,19 @@ public class TestCurrentSecurityPrincipalProxy
 		assertNull( currentPrincipal.getPrincipal() );
 
 		verify( securityPrincipalService, times( 2 ) ).getPrincipalByName( anyString() );
+	}
+
+	@Test
+	public void principalLoadedWithSecurityPrincipalId() {
+		Authentication auth = mock( Authentication.class );
+		SecurityPrincipalId principalId = SecurityPrincipalId.of( "principal" );
+		when( auth.getPrincipal() ).thenReturn( principalId );
+		when( auth.isAuthenticated() ).thenReturn( true );
+
+		SecurityContextHolder.getContext().setAuthentication( auth );
+		assertNull( currentPrincipal.getPrincipal() );
+
+		verify( securityPrincipalService ).getPrincipalById( principalId );
 	}
 
 	@Test

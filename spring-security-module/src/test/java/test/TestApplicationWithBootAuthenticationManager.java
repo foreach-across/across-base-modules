@@ -16,13 +16,23 @@
 
 package test;
 
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalId;
+import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalRetrievalStrategy;
 import com.foreach.across.test.support.config.MockAcrossServletContextInitializer;
 import com.foreach.across.test.support.config.MockMvcConfiguration;
+import lombok.Builder;
+import lombok.Data;
 import lombok.SneakyThrows;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -31,8 +41,15 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import test.app.SpringSecurityTestApplication;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,6 +68,8 @@ public class TestApplicationWithBootAuthenticationManager
 {
 	@Autowired
 	private MockMvc mockMvc;
+	@MockBean
+	private SecurityPrincipalRetrievalStrategy securityPrincipalRetrievalStrategy;
 
 	@Test
 	@SneakyThrows
@@ -97,5 +116,57 @@ public class TestApplicationWithBootAuthenticationManager
 		mockMvc.perform( get( "/error" ) )
 		       .andExpect( status().isInternalServerError() )
 		       .andExpect( content().string( containsString( "No message available" ) ) );
+	}
+
+	@Test
+	@SneakyThrows
+	public void currentSecurityPrincipalShouldThrowAnExceptionWithSpringSecurityUserDetails() {
+		mockMvc.perform( get( "/current-user" ) )
+		       .andExpect( status().isUnauthorized() );
+
+		assertThatThrownBy( () ->
+				                    mockMvc.perform( get( "/current-user" ).with( httpBasic( "user", "mypwd" ) ) )
+				                           .andExpect( status().isInternalServerError() ) )
+				.hasMessageContaining(
+						"EL1004E: Method call: Method getPrincipalById(org.springframework.security.core.userdetails.User) cannot be found on type" );
+	}
+
+	@Test
+	@SneakyThrows
+	public void currentSecurityPrincipalShouldReturnSecurityPrincipalInAcross() {
+		User user = User.builder().principalName( "userPrincipal" ).firstName( "firstname" ).lastName( "lastname" ).build();
+		SecurityContext securityContext = new SecurityContextImpl(
+				new UsernamePasswordAuthenticationToken( SecurityPrincipalId.of( "userPrincipal" ), null, Collections.emptyList() ) );
+		when( securityPrincipalRetrievalStrategy.getPrincipalByName( "userPrincipal" ) ).thenReturn( Optional.of( user ) );
+		mockMvc.perform( get( "/current-user" ) )
+		       .andExpect( status().isUnauthorized() );
+		mockMvc.perform( get( "/current-user" )
+				                 .with( securityContext( securityContext ) ) )
+		       .andExpect( content().string( containsString( "userPrincipal:firstname:lastname" ) ) );
+
+	}
+
+	@Builder
+	@Data
+	public static class User implements SecurityPrincipal
+	{
+		private String principalName;
+		private String firstName;
+		private String lastName;
+
+		@Override
+		public String getPrincipalName() {
+			return principalName;
+		}
+
+		@Override
+		public Collection<? extends GrantedAuthority> getAuthorities() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public String toString() {
+			return principalName;
+		}
 	}
 }

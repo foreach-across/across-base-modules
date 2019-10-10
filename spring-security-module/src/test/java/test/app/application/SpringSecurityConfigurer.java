@@ -54,4 +54,13 @@ public class SpringSecurityConfigurer
 			http.antMatcher( "/thymeleaf-extras" ).authorizeRequests().anyRequest().authenticated().and().httpBasic();
 		}
 	}
+
+	@Configuration
+	static class CurrentUserSecurity implements AcrossWebSecurityConfigurer
+	{
+		@Override
+		public void configure( HttpSecurity http ) throws Exception {
+			http.antMatcher( "/current-user" ).authorizeRequests().anyRequest().authenticated().and().httpBasic().and().securityContext();
+		}
+	}
 }
