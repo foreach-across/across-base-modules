@@ -61,8 +61,8 @@ public class SecurityPrincipalServiceImpl implements SecurityPrincipalService
 
 	@Cacheable(
 			value = SpringSecurityModuleCache.SECURITY_PRINCIPAL,
-			key = "#principalName.get().toLowerCase()",
-			condition = "#principalName.isPresent()",
+			key = "#principalName.toLowerCase()",
+			condition = "#principalName != null",
 			unless = SpringSecurityModuleCache.UNLESS_NULLS_ONLY
 	)
 	@Override
@@ -73,8 +73,8 @@ public class SecurityPrincipalServiceImpl implements SecurityPrincipalService
 
 	@Cacheable(
 			value = SpringSecurityModuleCache.SECURITY_PRINCIPAL,
-			key = "#securityPrincipalId.get().id.toLowerCase()",
-			condition = "#securityPrincipalId.isPresent()",
+			key = "#securityPrincipalId.id.toLowerCase()",
+			condition = "#securityPrincipalId != null",
 			unless = SpringSecurityModuleCache.UNLESS_NULLS_ONLY
 	)
 	@Override
