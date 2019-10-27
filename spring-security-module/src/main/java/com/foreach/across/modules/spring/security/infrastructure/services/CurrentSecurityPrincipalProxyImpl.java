@@ -82,13 +82,26 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 
 	@Override
 	public String getPrincipalName() {
-		SecurityPrincipal principal = getPrincipal();
+		if ( isAuthenticated() ) {
+			Authentication authentication = currentAuthentication();
 
-		if ( principal != null ) {
-			return principal.getPrincipalName();
+			Object principal = authentication.getPrincipal();
+
+			if ( principal instanceof SecurityPrincipalId ) {
+				return principal.toString();
+			}
+
+			// fallback, attempting to load an actual SecurityPrincipal
+			SecurityPrincipal securityPrincipal = getPrincipal();
+
+			if ( securityPrincipal != null ) {
+				return securityPrincipal.getPrincipalName();
+			}
+
+			return authentication.getName();
 		}
 
-		return isAuthenticated() ? currentAuthentication().getName() : null;
+		return null;
 	}
 
 	@Override
