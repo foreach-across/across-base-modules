@@ -16,6 +16,9 @@
 
 package com.foreach.across.modules.spring.security.infrastructure.business;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +37,7 @@ public class TestSecurityPrincipalId
 	@Test
 	public void equalsBasedOnId() {
 		assertEquals( SecurityPrincipalId.of( PRINCIPAL_ID ), SecurityPrincipalId.of( PRINCIPAL_ID ) );
-		assertThat( SecurityPrincipalId.of( "otherUserId" )).isNotEqualTo( SecurityPrincipalId.of( PRINCIPAL_ID ) );
+		assertThat( SecurityPrincipalId.of( "otherUserId" ) ).isNotEqualTo( SecurityPrincipalId.of( PRINCIPAL_ID ) );
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -46,5 +49,27 @@ public class TestSecurityPrincipalId
 	@Test(expected = IllegalArgumentException.class)
 	public void blankStringIsNotAllowed() {
 		SecurityPrincipalId.of( "" );
+	}
+
+	@Test
+	public void testToString() {
+		assertThat( SecurityPrincipalId.of( "123" ).toString() ).isEqualTo( "123" );
+	}
+
+	@Test
+	public void serialization() {
+		SecurityPrincipalId id = SecurityPrincipalId.of( "1@@@john.doe" );
+		byte[] data = SerializationUtils.serialize( id );
+		assertThat( SerializationUtils.<Object>deserialize( data ) ).isEqualTo( id );
+	}
+
+	@Test
+	@SneakyThrows
+	public void jsonSerializedAsString() {
+		SecurityPrincipalId id = SecurityPrincipalId.of( "1@@@john.doe" );
+
+		ObjectMapper om = new ObjectMapper();
+		assertThat( om.writeValueAsString( id ) ).isEqualTo( "\"1@@@john.doe\"" );
+		assertThat( om.readValue( "\"2@@@jane.doe\"", SecurityPrincipalId.class ) ).isEqualTo( SecurityPrincipalId.of( "2@@@jane.doe" ) );
 	}
 }

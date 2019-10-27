@@ -73,22 +73,20 @@ public class SecurityPrincipalServiceImpl implements SecurityPrincipalService
 
 	@Cacheable(
 			value = SpringSecurityModuleCache.SECURITY_PRINCIPAL,
-			key = "#securityPrincipalId.id.toLowerCase()",
+			key = "#securityPrincipalId.toString()",
 			condition = "#securityPrincipalId != null",
 			unless = SpringSecurityModuleCache.UNLESS_NULLS_ONLY
 	)
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends SecurityPrincipal> Optional<T> getPrincipalById( SecurityPrincipalId securityPrincipalId ) {
-		return (Optional<T>) securityPrincipalRetrievalStrategy.getPrincipalByName( securityPrincipalId.getId() );
+		return (Optional<T>) securityPrincipalRetrievalStrategy.getPrincipalByName( securityPrincipalId.toString() );
 	}
 
 	@Override
 	@Transactional
 	public void publishRenameEvent( String oldPrincipalName, String newPrincipalName ) {
-		SecurityPrincipalRenamedEvent renamedEvent = new SecurityPrincipalRenamedEvent( oldPrincipalName,
-		                                                                                newPrincipalName );
-
+		SecurityPrincipalRenamedEvent renamedEvent = new SecurityPrincipalRenamedEvent( oldPrincipalName, newPrincipalName );
 		eventPublisher.publishEvent( renamedEvent );
 	}
 }

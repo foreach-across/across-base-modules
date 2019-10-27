@@ -49,7 +49,8 @@ public interface SecurityPrincipal
 	/**
 	 * Any SecurityPrincipal should return the principal name as
 	 * toString() implementation to ensure maximum compatibility with
-	 * SpringSecurity.
+	 * SpringSecurity. Usually this is the same to calling {@code toString()}
+	 * of the {@link #getSecurityPrincipalId()}.
 	 */
 	@Override
 	String toString();

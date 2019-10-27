@@ -15,6 +15,8 @@
  */
 package com.foreach.across.modules.spring.security.infrastructure.business;
 
+import java.util.Objects;
+
 /**
  * Base implementation of {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal}
  * ensuring the contract where toString() returns the principal name.
@@ -25,6 +27,6 @@ public abstract class AbstractSecurityPrincipal implements SecurityPrincipal
 {
 	@Override
 	public final String toString() {
-		return getPrincipalName();
+		return Objects.toString( getSecurityPrincipalId(), null );
 	}
 }
