@@ -18,7 +18,6 @@ package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.modules.spring.security.AuthenticationUtils;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
-import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalAuthenticationToken;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalHierarchy;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalId;
 import org.slf4j.Logger;
@@ -114,10 +113,6 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 		Authentication authentication = currentAuthentication();
 
 		if ( authentication != null && authentication.isAuthenticated() ) {
-			if ( authentication instanceof SecurityPrincipalAuthenticationToken ) {
-				return ( (SecurityPrincipalAuthenticationToken) authentication ).getPrincipal();
-			}
-
 			Object authenticationPrincipal = authentication.getPrincipal();
 
 			if ( authenticationPrincipal instanceof SecurityPrincipal ) {

@@ -16,6 +16,7 @@
 package test;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalId;
 import com.foreach.across.modules.spring.security.infrastructure.services.*;
 import org.junit.After;
 import org.junit.Test;
@@ -28,9 +29,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Optional;
+
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Arne Vandamme
@@ -59,17 +63,25 @@ public class TestSecurityPrincipalService
 		assertNull( currentPrincipal.getPrincipal() );
 		assertNull( SecurityContextHolder.getContext().getAuthentication() );
 
+		SecurityPrincipalId oneId = SecurityPrincipalId.of( "one" );
+		when( one.getSecurityPrincipalId() ).thenReturn( oneId );
+		SecurityPrincipalId twoId = SecurityPrincipalId.of( "two" );
+		when( two.getSecurityPrincipalId() ).thenReturn( twoId );
+
+		when( securityPrincipalService.getPrincipalById( oneId ) ).thenReturn( Optional.of( one ) );
+		when( securityPrincipalService.getPrincipalById( twoId ) ).thenReturn( Optional.of( two ) );
+
 		CloseableAuthentication auth = securityPrincipalService.authenticate( one );
 		assertSame( one, currentPrincipal.getPrincipal() );
-		assertSame( one, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
+		assertSame( oneId, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
 
-		try (CloseableAuthentication sub = securityPrincipalService.authenticate( two )) {
+		try (CloseableAuthentication ignore = securityPrincipalService.authenticate( two )) {
 			assertSame( two, currentPrincipal.getPrincipal() );
-			assertSame( two, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
+			assertSame( twoId, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
 		}
 
 		assertSame( one, currentPrincipal.getPrincipal() );
-		assertSame( one, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
+		assertSame( oneId, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
 
 		auth.close();
 		assertNull( currentPrincipal.getPrincipal() );

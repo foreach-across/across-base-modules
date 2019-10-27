@@ -28,7 +28,8 @@ public interface SecurityPrincipalService
 	/**
 	 * Creates an {@link org.springframework.security.core.Authentication} for the
 	 * {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal} and sets it
-	 * as the security context for the current thread.
+	 * as the security context for the current thread. This will apply the default authorities returned by
+	 * {@link SecurityPrincipal#getAuthorities()} to the authenticated scope.
 	 *
 	 * @param principal Principal that should authenticate.
 	 * @return instance that can be used to reset to the previous authentication upon closing
