@@ -17,6 +17,7 @@ package test;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalId;
+import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import com.foreach.across.modules.spring.security.infrastructure.services.*;
 import org.junit.After;
 import org.junit.Test;
@@ -24,6 +25,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -99,6 +101,13 @@ public class TestSecurityPrincipalService
 		@Bean
 		public CurrentSecurityPrincipalProxy currentSecurityPrincipalProxy() {
 			return new CurrentSecurityPrincipalProxyImpl();
+		}
+
+		@Bean
+		public SecurityInfrastructure securityInfrastructure() {
+			SecurityInfrastructure securityInfrastructure = mock( SecurityInfrastructure.class );
+			when( securityInfrastructure.authenticationTrustResolver() ).thenReturn( mock( AuthenticationTrustResolver.class ) );
+			return securityInfrastructure;
 		}
 	}
 }

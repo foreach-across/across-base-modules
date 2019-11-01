@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package test;
+package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalId;
-import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
-import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxyImpl;
-import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalService;
+import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -45,20 +43,24 @@ import static org.mockito.Mockito.*;
 /**
  * @author Arne Vandamme
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@DirtiesContext
-@ContextConfiguration(classes = TestCurrentSecurityPrincipalProxy.Config.class)
+@RunWith(MockitoJUnitRunner.class)
 public class TestCurrentSecurityPrincipalProxy
 {
-	@Autowired
+	@Mock(lenient = true)
 	private SecurityPrincipalService securityPrincipalService;
 
-	@Autowired
-	private CurrentSecurityPrincipalProxy currentPrincipal;
+	@Mock(lenient = true)
+	private SecurityInfrastructure securityInfrastructure;
+
+	@Mock
+	private AuthenticationTrustResolver trustResolver;
+
+	@InjectMocks
+	private CurrentSecurityPrincipalProxy currentPrincipal = new CurrentSecurityPrincipalProxyImpl();
 
 	@Before
 	public void before() {
-		reset( securityPrincipalService );
+		when( securityInfrastructure.authenticationTrustResolver() ).thenReturn( trustResolver );
 	}
 
 	@After
@@ -73,7 +75,6 @@ public class TestCurrentSecurityPrincipalProxy
 
 		Authentication auth = mock( Authentication.class );
 		when( auth.getPrincipal() ).thenReturn( principal );
-		when( auth.getName() ).thenReturn( "principal" );
 		when( auth.isAuthenticated() ).thenReturn( true );
 
 		SecurityContextHolder.getContext().setAuthentication( auth );
@@ -89,6 +90,8 @@ public class TestCurrentSecurityPrincipalProxy
 	@Test
 	public void principalIdIsNullIfPrincipalNameIsNotPresent() {
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
+		doCallRealMethod().when( principal ).getSecurityPrincipalId();
+
 		when( principal.getPrincipalName() ).thenReturn( "" );
 		assertNull( principal.getSecurityPrincipalId() );
 		when( principal.getPrincipalName() ).thenReturn( null );
@@ -149,12 +152,8 @@ public class TestCurrentSecurityPrincipalProxy
 		authorities.add( new SimpleGrantedAuthority( "some authority" ) );
 
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
-		when( principal.getPrincipalName() ).thenReturn( "principal" );
-		when( principal.getAuthorities() ).thenReturn( authorities );
 
 		Authentication auth = mock( Authentication.class );
-		when( auth.getPrincipal() ).thenReturn( principal );
-		when( auth.getName() ).thenReturn( "principal" );
 		when( auth.getAuthorities() ).thenReturn( authorities );
 		when( auth.isAuthenticated() ).thenReturn( true );
 
@@ -168,11 +167,9 @@ public class TestCurrentSecurityPrincipalProxy
 	@Test
 	public void typedPrincipalIsOnlyReturnedIfTypeMatches() {
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
-		when( principal.getPrincipalName() ).thenReturn( "principal" );
 
 		Authentication auth = mock( Authentication.class );
 		when( auth.getPrincipal() ).thenReturn( principal );
-		when( auth.getName() ).thenReturn( "principal" );
 		when( auth.isAuthenticated() ).thenReturn( true );
 
 		SecurityContextHolder.getContext().setAuthentication( auth );
@@ -182,24 +179,20 @@ public class TestCurrentSecurityPrincipalProxy
 		assertNull( currentPrincipal.getPrincipal( SpecificPrincipal.class ) );
 	}
 
+	@Test
+	public void notAuthenticatedIfTrustResolverClaimsAnonymous() {
+		Authentication auth = new AnonymousAuthenticationToken( "key", "anonymousUser", AuthorityUtils.createAuthorityList( "ROLE_ANONYMOUS" ) );
+		when( trustResolver.isAnonymous( auth ) ).thenReturn( true );
+
+		SecurityContextHolder.getContext().setAuthentication( auth );
+
+		assertFalse( currentPrincipal.isAuthenticated() );
+		assertEquals( "anonymousUser", currentPrincipal.getPrincipalName() );
+		assertEquals( "anonymousUser", currentPrincipal.toString() );
+	}
+
 	interface SpecificPrincipal extends SecurityPrincipal
 	{
 
-	}
-
-	// Has authority
-
-	@Configuration
-	protected static class Config
-	{
-		@Bean
-		public SecurityPrincipalService securityPrincipalService() {
-			return mock( SecurityPrincipalService.class );
-		}
-
-		@Bean
-		public CurrentSecurityPrincipalProxy currentSecurityPrincipalProxy() {
-			return new CurrentSecurityPrincipalProxyImpl();
-		}
 	}
 }
