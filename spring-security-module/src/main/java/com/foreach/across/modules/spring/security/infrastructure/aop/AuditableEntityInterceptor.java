@@ -18,6 +18,7 @@ package com.foreach.across.modules.spring.security.infrastructure.aop;
 import com.foreach.across.modules.hibernate.aop.EntityInterceptorAdapter;
 import com.foreach.across.modules.hibernate.business.Auditable;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalId;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.TypeDescriptor;
@@ -72,6 +73,9 @@ public class AuditableEntityInterceptor extends EntityInterceptorAdapter<Auditab
 		}
 		else if ( auditorType.isAssignableFrom( SecurityPrincipal.class ) ) {
 			createdBy = currentPrincipal.getPrincipal();
+		}
+		else if ( auditorType.isAssignableFrom( SecurityPrincipalId.class ) ) {
+			createdBy = currentPrincipal.getSecurityPrincipalId();
 		}
 
 		return createdBy;
