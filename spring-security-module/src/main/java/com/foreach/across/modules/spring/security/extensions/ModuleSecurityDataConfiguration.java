@@ -17,7 +17,6 @@
 package com.foreach.across.modules.spring.security.extensions;
 
 import com.foreach.across.core.annotations.ModuleConfiguration;
-import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import org.springframework.boot.autoconfigure.security.SecurityDataConfiguration;
 import org.springframework.context.annotation.Import;
 
@@ -25,7 +24,7 @@ import org.springframework.context.annotation.Import;
  * @author Arne Vandamme
  * @since 3.0.0
  */
-@ModuleConfiguration
+@ModuleConfiguration(optional = true)
 @Import(SecurityDataConfiguration.class)
 class ModuleSecurityDataConfiguration
 {

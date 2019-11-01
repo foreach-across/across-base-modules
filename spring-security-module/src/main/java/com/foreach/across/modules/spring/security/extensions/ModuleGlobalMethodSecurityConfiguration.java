@@ -29,7 +29,7 @@ import org.springframework.security.config.annotation.method.configuration.Globa
  * Enables Spring method security in modules, ensuring that the same AuthenticationManager is being used.
  * This exposes an AuthenticationManager delegate in every module.
  */
-@ModuleConfiguration(exclude = "SpringSecurityAclModule")
+@ModuleConfiguration(exclude = "SpringSecurityAclModule", optional = true)
 @ConditionalOnBean(SecurityInfrastructure.class)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
