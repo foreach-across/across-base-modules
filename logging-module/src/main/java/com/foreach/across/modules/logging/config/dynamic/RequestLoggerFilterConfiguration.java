@@ -19,13 +19,13 @@ package com.foreach.across.modules.logging.config.dynamic;
 import com.foreach.across.core.AcrossException;
 import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.core.annotations.Exposed;
-import com.foreach.across.core.annotations.Module;
 import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.request.LogHandlerAndViewNameInterceptor;
 import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
 import com.foreach.across.modules.logging.request.RequestLoggerFilter;
 import com.foreach.common.spring.context.ApplicationInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -108,12 +108,11 @@ public class RequestLoggerFilterConfiguration implements EnvironmentAware
 	 */
 	@Configuration
 	@SuppressWarnings("all")
-	@ConditionalOnAcrossModule("ApplicationInfoModule")
+	@ConditionalOnSingleCandidate(ApplicationInfo.class)
 	public static class ApplicationInstanceLogConfiguration
 	{
 		@Autowired
-		public void registerApplicationInfo( RequestLoggerFilter requestLoggerFilter,
-		                                     @Module("ApplicationInfoModule") ApplicationInfo applicationInfo ) {
+		public void registerApplicationInfo( RequestLoggerFilter requestLoggerFilter, ApplicationInfo applicationInfo ) {
 			requestLoggerFilter.setInstanceId( applicationInfo.getInstanceId() );
 		}
 	}
