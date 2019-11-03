@@ -16,7 +16,6 @@
 
 package com.foreach.across.modules.ehcache.handlers;
 
-import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.ehcache.config.EhcacheClientModuleConfig;
 import org.springframework.context.event.EventListener;
@@ -31,7 +30,6 @@ public class RegisterClientModuleConfigHandler
 {
 	@EventListener
 	public void registerEhCacheClientModule( AcrossModuleBeforeBootstrapEvent event ) {
-		event.getBootstrapConfig().addApplicationContextConfigurer(
-				new AnnotatedClassConfigurer( EhcacheClientModuleConfig.class ) );
+		event.getBootstrapConfig().addApplicationContextConfigurer( true, EhcacheClientModuleConfig.class );
 	}
 }

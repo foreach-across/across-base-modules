@@ -61,7 +61,10 @@ public class DebugEhcacheController
 
 	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {
-		event.builder().item( "/ehcache", "Cache overview" );
+		event.builder()
+		     .group( "/cache/ehcache", "Ehcache" )
+		     .and()
+		     .item( "/cache/ehcache/overview", "Ehcache managers", "/ehcache" );
 	}
 
 	@ModelAttribute
