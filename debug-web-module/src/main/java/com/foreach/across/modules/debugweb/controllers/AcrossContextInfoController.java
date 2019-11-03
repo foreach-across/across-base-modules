@@ -23,15 +23,14 @@ import com.foreach.across.modules.debugweb.config.PropertyMaskingProperties;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.debugweb.util.ContextDebugInfo;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -47,16 +46,12 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @DebugWebController
-public class AcrossInfoController
+class AcrossContextInfoController
 {
-	@Autowired
-	private AcrossContextInfo acrossContext;
-	@Autowired
-	private ApplicationEventPublisher publisher;
-
-	@Autowired
-	private PropertyMaskingProperties propertyMaskingProperties;
+	private final AcrossContextInfo acrossContext;
+	private final PropertyMaskingProperties propertyMaskingProperties;
 
 	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {

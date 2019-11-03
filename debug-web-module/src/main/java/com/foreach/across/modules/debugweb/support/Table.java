@@ -19,7 +19,7 @@ package com.foreach.across.modules.debugweb.support;
 /**
  * @author Stijn Vanhoof
  */
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +32,7 @@ import java.util.*;
 public class Table
 {
 	private String title;
+	private String subTitle;
 	private TableHeader header;
 	private Collection<TableRow> rows = new LinkedList<>();
 

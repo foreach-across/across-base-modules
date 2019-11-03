@@ -15,6 +15,8 @@
  */
 package com.foreach.across.modules.debugweb.mvc;
 
+import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
+import com.foreach.across.modules.debugweb.DebugWebModule;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
@@ -23,6 +25,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component
+@ConditionalOnAcrossModule(DebugWebModule.NAME)
 public @interface DebugWebController
 {
 }

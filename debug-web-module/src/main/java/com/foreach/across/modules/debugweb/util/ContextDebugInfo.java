@@ -81,6 +81,21 @@ public class ContextDebugInfo
 		this.contextInfo = contextInfo;
 	}
 
+	public String getLabelColor() {
+		if ( moduleInfo == null ) {
+			return "info";
+		}
+
+		switch ( moduleInfo.getBootstrapStatus() ) {
+			case Skipped:
+				return "warning";
+			case Bootstrapped:
+				return "success";
+			default:
+				return "danger";
+		}
+	}
+
 	/**
 	 * Gathers all debug info for an entire AcrossContext.
 	 */
@@ -105,9 +120,11 @@ public class ContextDebugInfo
 	}
 
 	private static ContextDebugInfo createForModule( AcrossModuleInfo moduleInfo ) {
-		ContextDebugInfo debugInfo = new ContextDebugInfo( moduleInfo.getName(), moduleInfo.getApplicationContext() );
+		ApplicationContext applicationContext = moduleInfo.isBootstrapped() ? moduleInfo.getApplicationContext() : null;
+
+		ContextDebugInfo debugInfo = new ContextDebugInfo( moduleInfo.getName(), applicationContext );
 		debugInfo.setModuleInfo( moduleInfo );
-		debugInfo.setEnabled( moduleInfo.isEnabled() );
+		debugInfo.setEnabled( moduleInfo.isBootstrapped() );
 
 		return debugInfo;
 	}
