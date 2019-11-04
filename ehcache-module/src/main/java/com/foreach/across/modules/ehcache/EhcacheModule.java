@@ -20,9 +20,11 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.AcrossRole;
 import com.foreach.across.core.context.AcrossModuleRole;
-import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
+import com.foreach.across.core.context.bootstrap.AcrossBootstrapConfig;
+import com.foreach.across.core.context.bootstrap.AcrossBootstrapConfigurer;
+import com.foreach.across.core.context.bootstrap.ModuleBootstrapConfig;
 import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
-import com.foreach.across.modules.ehcache.config.EhcacheModuleConfig;
+import com.foreach.across.core.context.configurer.PropertySourcesConfigurer;
 
 import java.util.Set;
 
@@ -51,17 +53,23 @@ public class EhcacheModule extends AcrossModule
 	 */
 	@Override
 	public String getDescription() {
-		return "Registers an Ehcache cachemanager and ensures all other modules use it as well.";
+		return "Extension module: Registers an Ehcache cachemanager and ensures all other modules use it as well.";
 	}
 
-	/**
-	 * Register the default ApplicationContextConfigurers for this module.
-	 *
-	 * @param contextConfigurers Set of existing configurers to add to.
-	 */
 	@Override
 	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
-		contextConfigurers.add( new AnnotatedClassConfigurer( EhcacheModuleConfig.class ) );
+		// don't bootstrap anything yourself
 	}
 
+	@Override
+	public void prepareForBootstrap( ModuleBootstrapConfig currentModule, AcrossBootstrapConfig contextConfig ) {
+		// attach property sources to the context infrastructure module
+		contextConfig.extendModule(
+				AcrossBootstrapConfigurer.CONTEXT_INFRASTRUCTURE_MODULE,
+				currentModule.getApplicationContextConfigurers()
+				             .stream()
+				             .filter( PropertySourcesConfigurer.class::isInstance )
+				             .toArray( ApplicationContextConfigurer[]::new )
+		);
+	}
 }

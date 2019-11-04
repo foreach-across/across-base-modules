@@ -14,33 +14,30 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.ehcache.config;
+package com.foreach.across.modules.ehcache.extensions;
 
+import com.foreach.across.core.annotations.ModuleConfiguration;
 import com.foreach.across.core.cache.AcrossCompositeCacheManager;
+import com.foreach.across.core.context.bootstrap.AcrossBootstrapConfigurer;
 import com.foreach.across.modules.ehcache.EhcacheModuleSettings;
-import com.foreach.across.modules.ehcache.handlers.RegisterClientModuleConfigHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.foreach.across.modules.ehcache.config.AcrossEhCacheManagerFactoryBean;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 /**
- * Declares the cache manager instance that is shared between all modules.
+ * @author Arne Vandamme
+ * @since 2.0.0
  */
-@Configuration
-@ComponentScan("com.foreach.across.modules.ehcache.controllers")
-public class EhcacheModuleConfig
+@RequiredArgsConstructor
+@ModuleConfiguration(AcrossBootstrapConfigurer.CONTEXT_INFRASTRUCTURE_MODULE)
+@EnableConfigurationProperties(EhcacheModuleSettings.class)
+class AcrossContextInfrastructureExtension
 {
-	@Autowired
-	private AcrossCompositeCacheManager acrossCompositeCacheManager;
-
-	@Autowired
-	private EhcacheModuleSettings ehcacheModuleSettings;
-
 	@Bean
-	public AcrossEhCacheManagerFactoryBean acrossEhCacheManagerFactoryBean() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+	public AcrossEhCacheManagerFactoryBean acrossEhCacheManagerFactoryBean( EhcacheModuleSettings ehcacheModuleSettings ) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
 		AcrossEhCacheManagerFactoryBean ehCacheManagerFactoryBean = new AcrossEhCacheManagerFactoryBean();
 		ehCacheManagerFactoryBean.setCacheManagerName( ehcacheModuleSettings.getCacheManagerName() );
 		ehCacheManagerFactoryBean.setShared( ehcacheModuleSettings.getCacheManagerIsShared() );
@@ -57,16 +54,12 @@ public class EhcacheModuleConfig
 	}
 
 	@Bean
-	public CacheManager ehCacheManager( net.sf.ehcache.CacheManager ehCacheCacheManager ) {
+	public CacheManager ehCacheManager( net.sf.ehcache.CacheManager ehCacheCacheManager,
+	                                    AcrossCompositeCacheManager acrossCompositeCacheManager ) {
 		EhCacheCacheManager cacheManager = new EhCacheCacheManager();
 		cacheManager.setCacheManager( ehCacheCacheManager );
 		// add ourselves to the global across cache manager
 		acrossCompositeCacheManager.addCacheManager( cacheManager );
 		return cacheManager;
-	}
-
-	@Bean
-	public RegisterClientModuleConfigHandler registerClientModuleConfigHandler() {
-		return new RegisterClientModuleConfigHandler();
 	}
 }

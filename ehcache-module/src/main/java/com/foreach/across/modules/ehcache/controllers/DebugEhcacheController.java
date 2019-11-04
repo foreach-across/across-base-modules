@@ -16,14 +16,13 @@
 
 package com.foreach.across.modules.ehcache.controllers;
 
-import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.core.annotations.Refreshable;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.resource.WebResource;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
 import com.foreach.across.modules.web.resource.WebResourceRule;
+import lombok.RequiredArgsConstructor;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -33,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -47,17 +45,12 @@ import java.rmi.RemoteException;
 import java.util.*;
 
 @DebugWebController
-@Refreshable
-@AcrossDepends(required = "DebugWebModule")
-public class DebugEhcacheController
+@RequiredArgsConstructor
+class DebugEhcacheController
 {
 	private static final Logger LOG = LoggerFactory.getLogger( DebugEhcacheController.class );
 
-	@Autowired
-	private CacheManager cacheManager;
-
-	@Autowired(required = false)
-	private DebugWeb debugWeb;
+	private final DebugWeb debugWeb;
 
 	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {
@@ -172,44 +165,6 @@ public class DebugEhcacheController
 		return "th/ehcache/cacheHeapDetail";
 	}
 
-	private static class CacheHeapInfo
-	{
-		private Cache cache;
-		private Number size, percentageOfTotal, estimatedMax;
-
-		public void setCache( Cache cache ) {
-			this.cache = cache;
-		}
-
-		public void setSize( Number size ) {
-			this.size = size;
-		}
-
-		public void setPercentageOfTotal( Number percentageOfTotal ) {
-			this.percentageOfTotal = percentageOfTotal;
-		}
-
-		public void setEstimatedMax( Number estimatedMax ) {
-			this.estimatedMax = estimatedMax;
-		}
-
-		public Cache getCache() {
-			return cache;
-		}
-
-		public Number getSize() {
-			return size;
-		}
-
-		public Number getPercentageOfTotal() {
-			return percentageOfTotal;
-		}
-
-		public Number getEstimatedMax() {
-			return estimatedMax;
-		}
-	}
-
 	@RequestMapping(value = "/ehcache/flush", method = RequestMethod.GET)
 	public String flushCache( @ModelAttribute("cacheManager") CacheManager cacheManager,
 	                          @RequestParam(value = "cache", required = false) String cacheName,
@@ -287,6 +242,44 @@ public class DebugEhcacheController
 		}
 
 		return "th/ehcache/cacheDetail";
+	}
+
+	private static class CacheHeapInfo
+	{
+		private Cache cache;
+		private Number size, percentageOfTotal, estimatedMax;
+
+		public Cache getCache() {
+			return cache;
+		}
+
+		public void setCache( Cache cache ) {
+			this.cache = cache;
+		}
+
+		public Number getSize() {
+			return size;
+		}
+
+		public void setSize( Number size ) {
+			this.size = size;
+		}
+
+		public Number getPercentageOfTotal() {
+			return percentageOfTotal;
+		}
+
+		public void setPercentageOfTotal( Number percentageOfTotal ) {
+			this.percentageOfTotal = percentageOfTotal;
+		}
+
+		public Number getEstimatedMax() {
+			return estimatedMax;
+		}
+
+		public void setEstimatedMax( Number estimatedMax ) {
+			this.estimatedMax = estimatedMax;
+		}
 	}
 
 	private static class CacheEntry

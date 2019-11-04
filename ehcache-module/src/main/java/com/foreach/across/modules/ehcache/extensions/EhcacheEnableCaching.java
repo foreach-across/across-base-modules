@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.ehcache.config;
+package com.foreach.across.modules.ehcache.extensions;
 
+import com.foreach.across.core.annotations.ModuleConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
 /**
  * Dummy configuration class that enables caching in any ApplicationContext where it is loaded.
  */
-@Configuration
-@EnableCaching(order = EhcacheClientModuleConfig.INTERCEPT_ORDER)
-public class EhcacheClientModuleConfig
+@ModuleConfiguration(optional = true)
+@EnableCaching(order = EhcacheEnableCaching.INTERCEPT_ORDER)
+public class EhcacheEnableCaching
 {
 	/**
 	 * Order for the AOP interceptor.
