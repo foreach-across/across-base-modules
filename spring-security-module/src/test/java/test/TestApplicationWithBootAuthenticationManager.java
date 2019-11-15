@@ -45,7 +45,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -68,6 +67,7 @@ public class TestApplicationWithBootAuthenticationManager
 {
 	@Autowired
 	private MockMvc mockMvc;
+
 	@MockBean
 	private SecurityPrincipalRetrievalStrategy securityPrincipalRetrievalStrategy;
 
@@ -120,15 +120,12 @@ public class TestApplicationWithBootAuthenticationManager
 
 	@Test
 	@SneakyThrows
-	public void currentSecurityPrincipalShouldThrowAnExceptionWithSpringSecurityUserDetails() {
+	public void currentSecurityPrincipalShouldBeUnknownWithRegularSpringSecurityUserDetails() {
 		mockMvc.perform( get( "/current-user" ) )
 		       .andExpect( status().isUnauthorized() );
 
-		assertThatThrownBy( () ->
-				                    mockMvc.perform( get( "/current-user" ).with( httpBasic( "user", "mypwd" ) ) )
-				                           .andExpect( status().isInternalServerError() ) )
-				.hasMessageContaining(
-						"EL1004E: Method call: Method getPrincipalById(org.springframework.security.core.userdetails.User) cannot be found on type" );
+		mockMvc.perform( get( "/current-user" ).with( httpBasic( "user", "mypwd" ) ) )
+		       .andExpect( content().string( containsString( "unknown" ) ) );
 	}
 
 	@Test

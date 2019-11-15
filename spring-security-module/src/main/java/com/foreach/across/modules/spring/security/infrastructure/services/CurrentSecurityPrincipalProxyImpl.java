@@ -23,8 +23,6 @@ import com.foreach.across.modules.spring.security.infrastructure.business.Securi
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -46,24 +44,23 @@ import java.util.Collections;
  * </p>
  *
  * @author Arne Vandamme
+ * @see AuthenticationSecurityPrincipalResolver
  */
 @Service
 @RequiredArgsConstructor
 public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincipalProxy, SecurityPrincipalHierarchy
 {
-	private static final Logger LOG = LoggerFactory.getLogger( CurrentSecurityPrincipalProxyImpl.class );
-
-	private SecurityPrincipalService securityPrincipalService;
 	private SecurityInfrastructure securityInfrastructure;
-
-	@Autowired
-	protected void setSecurityPrincipalService( @NonNull SecurityPrincipalService securityPrincipalService ) {
-		this.securityPrincipalService = securityPrincipalService;
-	}
+	private AuthenticationSecurityPrincipalResolver authenticationSecurityPrincipalResolver;
 
 	@Autowired
 	protected void setSecurityInfrastructure( @NonNull SecurityInfrastructure securityInfrastructure ) {
 		this.securityInfrastructure = securityInfrastructure;
+	}
+
+	@Autowired
+	protected void setAuthenticationSecurityPrincipalResolver( @NonNull AuthenticationSecurityPrincipalResolver authenticationSecurityPrincipalResolver ) {
+		this.authenticationSecurityPrincipalResolver = authenticationSecurityPrincipalResolver;
 	}
 
 	@Override
@@ -105,8 +102,7 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 				return principal.toString();
 			}
 
-
-			if ( securityInfrastructure.authenticationTrustResolver().isAnonymous( authentication )) {
+			if ( securityInfrastructure.authenticationTrustResolver().isAnonymous( authentication ) ) {
 				return authentication.getName();
 			}
 
@@ -145,25 +141,7 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 		Authentication authentication = currentAuthentication();
 
 		if ( authentication != null && authentication.isAuthenticated() ) {
-			Object authenticationPrincipal = authentication.getPrincipal();
-
-			if ( authenticationPrincipal instanceof SecurityPrincipal ) {
-				return (SecurityPrincipal) authenticationPrincipal;
-			}
-
-			if ( authenticationPrincipal instanceof SecurityPrincipalId ) {
-				LOG.debug( "Loading SecurityPrincipal with securityPrincipalId {}", authenticationPrincipal );
-				return securityPrincipalService.getPrincipalById( (SecurityPrincipalId) authenticationPrincipal ).orElse( null );
-			}
-
-			if ( authenticationPrincipal instanceof String ) {
-				LOG.debug( "Loading SecurityPrincipal with name {}", authenticationPrincipal );
-				return securityPrincipalService.getPrincipalByName( (String) authenticationPrincipal ).orElse( null );
-
-			}
-
-			LOG.debug( "Loading SecurityPrincipal with name {}", authentication.getName() );
-			return securityPrincipalService.getPrincipalByName( authentication.getName() ).orElse( null );
+			return authenticationSecurityPrincipalResolver.resolveSecurityPrincipal( authentication ).orElse( null );
 		}
 
 		return null;

@@ -24,14 +24,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation which can be used to wire the current {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal}
+ * Annotation which can be used to wire the current {@link com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal}.
  *
  * @author Marc Vanbrabant
  * @since 4.0.0
+ * @see com.foreach.across.modules.spring.security.infrastructure.services.AuthenticationSecurityPrincipalResolver
  */
 @Target({ ElementType.PARAMETER, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@AuthenticationPrincipal(expression = "@securityPrincipalService.getPrincipalById(#this).orElse(null)")
+@AuthenticationPrincipal(expression = "@authenticationSecurityPrincipalResolver.resolveSecurityPrincipal(#this).orElse(null)")
 public @interface CurrentSecurityPrincipal
 {
 }

@@ -47,7 +47,7 @@ import static org.mockito.Mockito.*;
 public class TestCurrentSecurityPrincipalProxy
 {
 	@Mock(lenient = true)
-	private SecurityPrincipalService securityPrincipalService;
+	private AuthenticationSecurityPrincipalResolver authenticationSecurityPrincipalResolver;
 
 	@Mock(lenient = true)
 	private SecurityInfrastructure securityInfrastructure;
@@ -69,25 +69,6 @@ public class TestCurrentSecurityPrincipalProxy
 	}
 
 	@Test
-	public void principalNotLoadedIfOfTypeSecurityPrincipal() {
-		SecurityPrincipal principal = mock( SecurityPrincipal.class );
-		when( principal.getPrincipalName() ).thenReturn( "principal" );
-
-		Authentication auth = mock( Authentication.class );
-		when( auth.getPrincipal() ).thenReturn( principal );
-		when( auth.isAuthenticated() ).thenReturn( true );
-
-		SecurityContextHolder.getContext().setAuthentication( auth );
-
-		assertEquals( "principal", currentPrincipal.getPrincipalName() );
-		assertEquals( SecurityPrincipalId.of( "principal" ), currentPrincipal.getSecurityPrincipalId() );
-		assertSame( principal, currentPrincipal.getPrincipal() );
-		assertSame( principal, currentPrincipal.getPrincipal() );
-
-		verify( securityPrincipalService, never() ).getPrincipalByName( anyString() );
-	}
-
-	@Test
 	public void principalIdIsNullIfPrincipalNameIsNotPresent() {
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
 		doCallRealMethod().when( principal ).getSecurityPrincipalId();
@@ -103,23 +84,21 @@ public class TestCurrentSecurityPrincipalProxy
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
 
 		Authentication auth = mock( Authentication.class );
-		when( auth.getName() ).thenReturn( "principal" );
 		when( auth.isAuthenticated() ).thenReturn( true );
 
 		SecurityContextHolder.getContext().setAuthentication( auth );
 
-		when( securityPrincipalService.getPrincipalByName( "principal" ) ).thenReturn( Optional.of( principal ) );
+		when( authenticationSecurityPrincipalResolver.resolveSecurityPrincipal( auth ) ).thenReturn( Optional.of( principal ) );
 
 		assertSame( principal, currentPrincipal.getPrincipal() );
 		assertSame( principal, currentPrincipal.getPrincipal() );
 
-		verify( securityPrincipalService, times( 2 ) ).getPrincipalByName( anyString() );
+		verify( authenticationSecurityPrincipalResolver, times( 2 ) ).resolveSecurityPrincipal( auth );
 	}
 
 	@Test
 	public void principalLoadedEvenIfNull() {
 		Authentication auth = mock( Authentication.class );
-		when( auth.getName() ).thenReturn( "principal" );
 		when( auth.isAuthenticated() ).thenReturn( true );
 
 		SecurityContextHolder.getContext().setAuthentication( auth );
@@ -127,20 +106,19 @@ public class TestCurrentSecurityPrincipalProxy
 		assertNull( currentPrincipal.getPrincipal() );
 		assertNull( currentPrincipal.getPrincipal() );
 
-		verify( securityPrincipalService, times( 2 ) ).getPrincipalByName( anyString() );
+		verify( authenticationSecurityPrincipalResolver, times( 2 ) ).resolveSecurityPrincipal( auth );
 	}
 
 	@Test
 	public void principalLoadedWithSecurityPrincipalId() {
 		Authentication auth = mock( Authentication.class );
 		SecurityPrincipalId principalId = SecurityPrincipalId.of( "principal" );
-		when( auth.getPrincipal() ).thenReturn( principalId );
 		when( auth.isAuthenticated() ).thenReturn( true );
 
 		SecurityContextHolder.getContext().setAuthentication( auth );
 		assertNull( currentPrincipal.getPrincipal() );
 
-		verify( securityPrincipalService ).getPrincipalById( principalId );
+		verify( authenticationSecurityPrincipalResolver ).resolveSecurityPrincipal( auth );
 	}
 
 	@Test
@@ -169,10 +147,11 @@ public class TestCurrentSecurityPrincipalProxy
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
 
 		Authentication auth = mock( Authentication.class );
-		when( auth.getPrincipal() ).thenReturn( principal );
 		when( auth.isAuthenticated() ).thenReturn( true );
 
 		SecurityContextHolder.getContext().setAuthentication( auth );
+
+		when( authenticationSecurityPrincipalResolver.resolveSecurityPrincipal( auth ) ).thenReturn( Optional.of( principal ) );
 
 		assertSame( principal, currentPrincipal.getPrincipal() );
 		assertSame( principal, currentPrincipal.getPrincipal( SecurityPrincipal.class ) );

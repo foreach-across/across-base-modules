@@ -47,6 +47,9 @@ import static org.mockito.Mockito.when;
 public class TestSecurityPrincipalService
 {
 	@Autowired
+	private AuthenticationSecurityPrincipalResolver authenticationSecurityPrincipalResolver;
+
+	@Autowired
 	private SecurityPrincipalService securityPrincipalService;
 
 	@Autowired
@@ -70,22 +73,23 @@ public class TestSecurityPrincipalService
 		SecurityPrincipalId twoId = SecurityPrincipalId.of( "two" );
 		when( two.getSecurityPrincipalId() ).thenReturn( twoId );
 
-		when( securityPrincipalService.getPrincipalById( oneId ) ).thenReturn( Optional.of( one ) );
-		when( securityPrincipalService.getPrincipalById( twoId ) ).thenReturn( Optional.of( two ) );
+		try (CloseableAuthentication ignored = securityPrincipalService.authenticate( one )) {
+			when( authenticationSecurityPrincipalResolver.resolveSecurityPrincipal( SecurityContextHolder.getContext().getAuthentication() ) )
+					.thenReturn( Optional.of( one ) );
+			assertSame( one, currentPrincipal.getPrincipal() );
+			assertSame( oneId, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
 
-		CloseableAuthentication auth = securityPrincipalService.authenticate( one );
-		assertSame( one, currentPrincipal.getPrincipal() );
-		assertSame( oneId, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
+			try (CloseableAuthentication ignore = securityPrincipalService.authenticate( two )) {
+				when( authenticationSecurityPrincipalResolver.resolveSecurityPrincipal( SecurityContextHolder.getContext().getAuthentication() ) )
+						.thenReturn( Optional.of( two ) );
+				assertSame( two, currentPrincipal.getPrincipal() );
+				assertSame( twoId, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
+			}
 
-		try (CloseableAuthentication ignore = securityPrincipalService.authenticate( two )) {
-			assertSame( two, currentPrincipal.getPrincipal() );
-			assertSame( twoId, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
+			assertSame( one, currentPrincipal.getPrincipal() );
+			assertSame( oneId, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
 		}
 
-		assertSame( one, currentPrincipal.getPrincipal() );
-		assertSame( oneId, SecurityContextHolder.getContext().getAuthentication().getPrincipal() );
-
-		auth.close();
 		assertNull( currentPrincipal.getPrincipal() );
 		assertNull( SecurityContextHolder.getContext().getAuthentication() );
 	}
@@ -101,6 +105,11 @@ public class TestSecurityPrincipalService
 		@Bean
 		public CurrentSecurityPrincipalProxy currentSecurityPrincipalProxy() {
 			return new CurrentSecurityPrincipalProxyImpl();
+		}
+
+		@Bean
+		public AuthenticationSecurityPrincipalResolver authenticationSecurityPrincipalResolver() {
+			return mock( AuthenticationSecurityPrincipalResolver.class );
 		}
 
 		@Bean

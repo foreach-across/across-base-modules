@@ -69,6 +69,11 @@ public class SecurityPrincipalServiceConfiguration
 	}
 
 	@Bean
+	public AuthenticationSecurityPrincipalResolver authenticationSecurityPrincipalResolver( SecurityPrincipalService securityPrincipalService ) {
+		return new AuthenticationSecurityPrincipalResolver( securityPrincipalService );
+	}
+
+	@Bean
 	public SecurityPrincipalLabelResolverStrategy securityPrincipalLabelResolverStrategy() {
 		SecurityPrincipalLabelResolverStrategy strategy = new SecurityPrincipalLabelResolverStrategy();
 		strategy.setSecurityPrincipalService( securityPrincipalService() );
