@@ -26,6 +26,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 /**
  * @author Arne Vandamme
@@ -61,5 +62,14 @@ class AcrossContextInfrastructureExtension
 		// add ourselves to the global across cache manager
 		acrossCompositeCacheManager.addCacheManager( cacheManager );
 		return cacheManager;
+	}
+
+	/**
+	 * Re-register the primary {@link AcrossCompositeCacheManager} to ensure it is being used.
+	 */
+	@Bean
+	@Primary
+	public CacheManager primaryCacheManager( AcrossCompositeCacheManager acrossCompositeCacheManager ) {
+		return acrossCompositeCacheManager;
 	}
 }
