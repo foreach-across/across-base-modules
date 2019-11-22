@@ -40,6 +40,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -101,7 +102,7 @@ public class TestInterceptorTargetClassProxying
 
 		userRepository.create( new User( 1010, "another user" ) );
 
-		assertEquals( Arrays.asList( allInterceptor, userInterceptor ), called );
+		assertEquals( Collections.emptyList(), called );
 	}
 
 	@Test

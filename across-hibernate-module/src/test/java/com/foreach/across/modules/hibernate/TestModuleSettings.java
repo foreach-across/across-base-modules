@@ -17,7 +17,6 @@ package com.foreach.across.modules.hibernate;
 
 import com.foreach.across.core.EmptyAcrossModule;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
-import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.modules.config.EnableTransactionManagementConfiguration;
 import com.foreach.across.modules.hibernate.modules.config.ModuleBasicRepositoryInterceptorConfiguration;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
@@ -61,7 +60,7 @@ public class TestModuleSettings
 					   .size()
 			);
 			assertEquals(
-					1,
+					0,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
 					   .getBeansOfType( ModuleBasicRepositoryInterceptorConfiguration.class )
 					   .size()
