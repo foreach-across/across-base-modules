@@ -225,6 +225,7 @@ public class TestHibernateInterceptors
 		@Override
 		public void configure( AcrossContext context ) {
 			AcrossHibernateModule hibernateModule = new AcrossHibernateModule();
+			hibernateModule.setProperty( AcrossHibernateModuleSettings.REGISTER_REPOSITORY_INTERCEPTOR, true );
 			hibernateModule.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
 			context.addModule( hibernateModule );
 

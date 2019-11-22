@@ -67,7 +67,7 @@ public class AcrossHibernateModuleSettings extends JpaProperties
 	 * This will enable support for {@link com.foreach.across.modules.hibernate.aop.EntityInterceptor} on the entities
 	 * managed by those repositories.
 	 */
-	private boolean registerRepositoryInterceptor = true;
+	private boolean registerRepositoryInterceptor = false;
 
 	public AcrossHibernateModuleSettings() {
 		setOpenInView( true );
