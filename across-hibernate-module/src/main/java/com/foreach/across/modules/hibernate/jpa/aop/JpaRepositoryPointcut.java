@@ -17,6 +17,7 @@ package com.foreach.across.modules.hibernate.jpa.aop;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.Persistable;
@@ -34,29 +35,30 @@ import java.lang.reflect.Method;
 public class JpaRepositoryPointcut extends StaticMethodMatcherPointcut
 {
 	private static final Logger LOG = LoggerFactory.getLogger( JpaRepositoryPointcut.class );
+	private static final ClassFilter CLASS_FILTER = clazz -> JpaRepository.class.isAssignableFrom( ClassUtils.getUserClass( clazz ) );
+
+	@Override
+	public ClassFilter getClassFilter() {
+		return CLASS_FILTER;
+	}
 
 	@Override
 	public boolean matches( Method method, Class<?> targetClass ) {
-		Class<?> userClass = ClassUtils.getUserClass( targetClass );
+		Class entityClass = TypeDescriptor.valueOf( targetClass )
+		                                  .upcast( JpaRepository.class )
+		                                  .getResolvableType()
+		                                  .getGeneric( 0 )
+		                                  .resolve();
 
-		if ( JpaRepository.class.isAssignableFrom( userClass ) ) {
-			Class entityClass = TypeDescriptor.valueOf( targetClass )
-			                                  .upcast( JpaRepository.class )
-			                                  .getResolvableType()
-			                                  .getGeneric( 0 )
-			                                  .resolve();
-
-			if ( !Persistable.class.isAssignableFrom( entityClass ) ) {
-				LOG.warn(
-						"JPA repository {} detected without Persistable type parameter - entity interception is not possible.",
-						targetClass );
-			}
-			else {
-				return isEntityMethod( method );
-			}
+		if ( !Persistable.class.isAssignableFrom( entityClass ) ) {
+			LOG.warn(
+					"JPA repository {} detected without Persistable type parameter - entity interception is not possible.",
+					targetClass );
+			return false;
 		}
-
-		return false;
+		else {
+			return isEntityMethod( method );
+		}
 	}
 
 	static boolean isEntityMethod( Method method ) {
