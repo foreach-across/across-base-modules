@@ -51,6 +51,7 @@ public class PrimaryTransactionManagerTransformer implements ExposedBeanDefiniti
 			beanDefinitions.get( HibernateJpaConfiguration.TRANSACTION_MANAGER ).setPrimary( true );
 			beanDefinitions.get( HibernateJpaConfiguration.TRANSACTION_TEMPLATE ).setPrimary( true );
 			beanDefinitions.get( "hibernateSessionHolder" ).setPrimary( true );
+			beanDefinitions.get( "entityManagerFactory" ).setPrimary( true );
 
 			if ( beanDefinitions.containsKey( "unitOfWork" ) ) {
 				beanDefinitions.get( "unitOfWork" ).setPrimary( true );
