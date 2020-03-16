@@ -104,13 +104,13 @@
                 <td>
                     <strong class="moduleIndex" th:text="${moduleInfoStat.count}"></strong>
                     <span th:text="${moduleInfo.name}"></span></td>
-                <td class="col-sm-3 text-center" th:text="${moduleInfo.moduleRole}"></td>
-                <td class="col-sm-2 text-center" th:text="${moduleInfo.versionInfo.version}"></td>
-                <td class="col-sm-2 text-center">
+                <td class="col-sm-3 axu-text-center" th:text="${moduleInfo.moduleRole}"></td>
+                <td class="col-sm-2 axu-text-center" th:text="${moduleInfo.versionInfo.version}"></td>
+                <td class="col-sm-2 axu-text-center">
 					<span th:if="${moduleInfo.versionInfo.snapshot and moduleInfo.versionInfo.buildTime != null}"
                           th:text="${#dates.format(moduleInfo.versionInfo.buildTime,'dd MMM yyyy HH:mm')}">build date</span>
                 </td>
-                <td class="col-sm-1 text-center">
+                <td class="col-sm-1 axu-text-center">
                     <small>[[${moduleInfo.bootstrapStatus}]]</small>
                 </td>
             </tr>

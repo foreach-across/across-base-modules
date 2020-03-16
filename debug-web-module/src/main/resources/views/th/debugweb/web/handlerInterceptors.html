@@ -32,15 +32,15 @@
 	<table th:unless="${handler.interceptors.isEmpty()}" class="table table-hover table-bordered">
 		<thead>
 		<tr>
-			<th class="text-center">Type</th>
-			<th class="text-center">Mapping</th>
+			<th class="axu-text-center">Type</th>
+			<th class="axu-text-center">Mapping</th>
 			<th>Class</th>
 		</tr>
 		</thead>
 		<tbody>
 		<tr th:each="interceptor : ${handler.interceptors}">
-			<td class="text-center"><small th:text="${interceptor.type}"></small></td>
-			<td class="text-center"><kbd th:text="${interceptor.mapping}"></kbd></td>
+			<td class="axu-text-center"><small th:text="${interceptor.type}"></small></td>
+			<td class="axu-text-center"><kbd th:text="${interceptor.mapping}"></kbd></td>
 			<td>
 				<code th:text="${interceptor.interceptorClass}"></code>
 			</td>

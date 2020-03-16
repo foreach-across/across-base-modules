@@ -30,7 +30,7 @@
         <th>Request matcher</th>
     </tr>
     <tr th:each="filterInfo : ${securityFilters}">
-        <td class="text-center" style="width: 60px"><kbd>[[${filterInfoStat.index}]]</kbd></td>
+        <td class="axu-text-center" style="width: 60px"><kbd>[[${filterInfoStat.index}]]</kbd></td>
         <td>
             <p>[[${filterInfo.requestMatcher}]]</p>
             <a th:href="${'#filters-' + filterInfoStat.index}" data-toggle="collapse">[[${filterInfo.filters.size()}]] security filters</a>
