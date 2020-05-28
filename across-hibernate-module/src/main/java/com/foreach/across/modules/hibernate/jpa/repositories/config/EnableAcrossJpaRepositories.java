@@ -20,6 +20,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
+import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.data.repository.config.DefaultRepositoryBaseClass;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -135,4 +136,9 @@ public @interface EnableAcrossJpaRepositories
 	 * @return whether to enable default transactions, defaults to {@literal true}.
 	 */
 	boolean enableDefaultTransactions() default true;
+
+	BootstrapMode bootstrapMode() default BootstrapMode.DEFAULT;
+
+	char escapeCharacter() default '\\';
+
 }

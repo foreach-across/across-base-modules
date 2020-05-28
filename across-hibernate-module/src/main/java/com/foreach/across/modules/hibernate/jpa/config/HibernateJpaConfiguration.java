@@ -96,7 +96,13 @@ public class HibernateJpaConfiguration
 
 		DataSource dataSource = retrieveDataSource();
 		vendorAdapter.setShowSql( settings.isShowSql() );
-		vendorAdapter.setDatabase( settings.determineDatabase( dataSource ) );
+		if ( settings.getDatabase() != null ) {
+			vendorAdapter.setDatabasePlatform( settings.getDatabasePlatform() );
+			vendorAdapter.setDatabase( settings.getDatabase() );
+		}
+		if ( settings.getDatabasePlatform() != null ) {
+			vendorAdapter.setDatabasePlatform( settings.getDatabasePlatform() );
+		}
 		vendorAdapter.setDatabasePlatform( settings.getDatabasePlatform() );
 		vendorAdapter.setGenerateDdl( settings.isGenerateDdl() );
 

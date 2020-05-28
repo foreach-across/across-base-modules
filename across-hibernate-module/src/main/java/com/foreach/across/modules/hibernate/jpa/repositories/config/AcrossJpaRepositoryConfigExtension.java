@@ -55,7 +55,7 @@ class AcrossJpaRepositoryConfigExtension extends JpaRepositoryConfigExtension
 	@Override
 	public void registerBeansForRoot( BeanDefinitionRegistry registry, RepositoryConfigurationSource config ) {
 		registerIfNotAlreadyRegistered(
-				new RootBeanDefinition( CustomEntityManagerBeanDefinitionRegistrarPostProcessor.class ),
+				() -> new RootBeanDefinition( CustomEntityManagerBeanDefinitionRegistrarPostProcessor.class ),
 				registry, EM_BEAN_DEFINITION_REGISTRAR_POST_PROCESSOR_BEAN_NAME, config.getSource() );
 
 		super.registerBeansForRoot( registry, config );
