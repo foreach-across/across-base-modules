@@ -27,7 +27,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import test.app.SpringSecurityTestApplication;
@@ -42,10 +44,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Arne Vandamme
  * @since 3.0.0
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 @WebAppConfiguration
 @DirtiesContext
 @SpringBootTest(classes = { SpringSecurityTestApplication.class, MockMvcConfiguration.class })
+@TestPropertySource(properties = "server.error.include-message=ALWAYS")
 @ActiveProfiles("custom-auth")
 @ContextConfiguration(initializers = MockAcrossServletContextInitializer.class)
 public class TestApplicationWithCustomAuthenticationManager

@@ -17,6 +17,7 @@
 package com.foreach.across.modules.spring.security.authority;
 
 import org.junit.Test;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 
@@ -24,6 +25,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Arne Vandamme
@@ -52,10 +54,10 @@ public class TestAuthorityMatcher
 		                                                   new SimpleGrantedAuthority( "view groups" ) );
 
 		assertTrue( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
-		assertTrue( matcher.matches( singletonList( new SwitchUserGrantedAuthority( "view groups", null ) ) ) );
+		assertTrue( matcher.matches( singletonList( new SwitchUserGrantedAuthority( "view groups", mock( Authentication.class ) ) ) ) );
 		assertTrue( matcher.matches(
 				asList(
-						new SwitchUserGrantedAuthority( "manage users", null ),
+						new SwitchUserGrantedAuthority( "manage users", mock( Authentication.class ) ),
 						new SimpleGrantedAuthority( "view groups" )
 				)
 		            )
@@ -98,12 +100,12 @@ public class TestAuthorityMatcher
 	@Test
 	public void allOfWithAuthorities() {
 		AuthorityMatcher matcher = AuthorityMatcher.allOf( new SimpleGrantedAuthority( "manage users" ),
-		                                                   new SwitchUserGrantedAuthority( "view groups", null ) );
+		                                                   new SwitchUserGrantedAuthority( "view groups", mock( Authentication.class ) ) );
 
 		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
-		assertFalse( matcher.matches( singletonList( new SwitchUserGrantedAuthority( "view groups", null ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SwitchUserGrantedAuthority( "view groups", mock( Authentication.class ) ) ) ) );
 		assertTrue( matcher.matches( asList(
-				new SwitchUserGrantedAuthority( "manage users", null ), new SimpleGrantedAuthority( "view groups" )
+				new SwitchUserGrantedAuthority( "manage users", mock( Authentication.class ) ), new SimpleGrantedAuthority( "view groups" )
 		            ) )
 		);
 		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );
@@ -142,13 +144,13 @@ public class TestAuthorityMatcher
 	public void noneOfWithAuthorities() {
 		AuthorityMatcher matcher = AuthorityMatcher.noneOf(
 				new SimpleGrantedAuthority( "manage users" ),
-				new SwitchUserGrantedAuthority( "view groups", null )
+				new SwitchUserGrantedAuthority( "view groups", mock( Authentication.class ) )
 		);
 
 		assertFalse( matcher.matches( singletonList( new SimpleGrantedAuthority( "manage users" ) ) ) );
-		assertFalse( matcher.matches( singletonList( new SwitchUserGrantedAuthority( "view groups", null ) ) ) );
+		assertFalse( matcher.matches( singletonList( new SwitchUserGrantedAuthority( "view groups", mock( Authentication.class ) ) ) ) );
 		assertFalse( matcher.matches( asList(
-				new SwitchUserGrantedAuthority( "manage users", null ), new SimpleGrantedAuthority( "view groups" )
+				new SwitchUserGrantedAuthority( "manage users", mock( Authentication.class ) ), new SimpleGrantedAuthority( "view groups" )
 		             ) )
 		);
 		assertTrue( matcher.matches( singletonList( new SimpleGrantedAuthority( "other perm" ) ) ) );

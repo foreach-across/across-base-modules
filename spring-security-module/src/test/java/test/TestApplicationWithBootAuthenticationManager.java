@@ -61,7 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @DirtiesContext
 @SpringBootTest(classes = { SpringSecurityTestApplication.class, MockMvcConfiguration.class })
-@TestPropertySource(properties = { "spring.security.user.password={noop}mypwd" })
+@TestPropertySource(properties = { "spring.security.user.password={noop}mypwd", "server.error.include-message=ALWAYS" })
 @ContextConfiguration(initializers = MockAcrossServletContextInitializer.class)
 public class TestApplicationWithBootAuthenticationManager
 {
