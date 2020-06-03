@@ -22,47 +22,46 @@
 
 	<parent>
 		<groupId>com.foreach.across</groupId>
-		<artifactId>standard-module-bom</artifactId>
-		<version>1.1.2.RELEASE</version>
+		<artifactId>across-standard-module-parent</artifactId>
+		<version>5.0.0.RC1</version>
 	</parent>
 
 	<groupId>com.foreach.across.modules</groupId>
 	<artifactId>ehcache-module-project</artifactId>
-	<version>1.0.1.RELEASE</version>
+	<version>${revision}</version>
 	<packaging>pom</packaging>
 
-	<name>${project.groupId}:${project.artifactId}</name>
 	<description>
 		Activates Ehcache cache management support and provides debug controllers to view and manage the cache.
 	</description>
-	<url>https://foreach.atlassian.net/wiki/display/AX/EhcacheModule</url>
+	<url>https://across.dev/modules/ehcachemodule</url>
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
 
 	<developers>
 		<developer>
-			<name>Arne Vandamme</name>
-			<email>arne@foreach.be</email>
+			<name>Foreach</name>
 			<organization>Foreach</organization>
-			<organizationUrl>http://www.foreach.be</organizationUrl>
+			<organizationUrl>https://www.foreach.be</organizationUrl>
 		</developer>
 	</developers>
 
 	<repositories>
 		<repository>
-			<id>foreach-nexus</id>
-			<name>Foreach repository</name>
-			<url>http://repository.foreach.be/nexus/repository/public</url>
+			<id>across</id>
+			<name>Across Repository</name>
+			<url>https://repository.foreach.be/nexus/repository/public/</url>
 		</repository>
 	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<revision>2.0.0.RC1</revision>
 	</properties>
 
 	<modules>
@@ -75,57 +74,13 @@
 			<dependency>
 				<groupId>com.foreach.across.modules</groupId>
 				<artifactId>debug-web-module</artifactId>
-				<version>1.0.0.RELEASE</version>
+				<version>3.0.0.RC1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.5.5</version>
-				<inherited>false</inherited>
-				<configuration>
-					<finalName>${project.artifactId}</finalName>
-					<descriptors>
-						<descriptor>site.xml</descriptor>
-					</descriptors>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
 	<scm>
-		<connection>scm:git:https://bitbucket.org/beforeach/ehcache-module.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/beforeach/ehcache-module.git</developerConnection>
 		<url>https://bitbucket.org/beforeach/ehcache-module</url>
 	</scm>
-
-	<profiles>
-		<profile>
-			<id>foreach</id>
-			<distributionManagement>
-				<repository>
-					<id>foreach-nexus</id>
-					<name>Foreach nexus</name>
-					<url>http://repository.foreach.be/nexus/repository/releases</url>
-				</repository>
-				<snapshotRepository>
-					<id>foreach-nexus</id>
-					<name>Foreach nexus</name>
-					<url>http://repository.foreach.be/nexus/repository/snapshots</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-	</profiles>
 
 </project>

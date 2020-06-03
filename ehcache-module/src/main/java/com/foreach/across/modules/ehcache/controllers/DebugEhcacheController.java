@@ -16,16 +16,13 @@
 
 package com.foreach.across.modules.ehcache.controllers;
 
-import com.foreach.across.core.annotations.AcrossDepends;
-import com.foreach.across.core.annotations.Event;
-import com.foreach.across.core.annotations.Refreshable;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.web.resource.WebResource;
 import com.foreach.across.modules.web.resource.WebResourceRegistry;
-import com.foreach.across.modules.web.table.Table;
-import com.foreach.across.modules.web.table.TableHeader;
+import com.foreach.across.modules.web.resource.WebResourceRule;
+import lombok.RequiredArgsConstructor;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -35,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,26 +45,25 @@ import java.rmi.RemoteException;
 import java.util.*;
 
 @DebugWebController
-@Refreshable
-@AcrossDepends(required = "DebugWebModule")
-public class DebugEhcacheController
+@RequiredArgsConstructor
+class DebugEhcacheController
 {
 	private static final Logger LOG = LoggerFactory.getLogger( DebugEhcacheController.class );
 
-	@Autowired
-	private CacheManager cacheManager;
+	private final DebugWeb debugWeb;
 
-	@Autowired(required = false)
-	private DebugWeb debugWeb;
-
-	@Event
+	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {
-		event.builder().item( "/ehcache", "Cache overview" );
+		event.builder()
+		     .group( "/cache/ehcache", "Ehcache" )
+		     .and()
+		     .item( "/cache/ehcache/overview", "Ehcache managers", "/ehcache" );
 	}
 
 	@ModelAttribute
 	public void init( WebResourceRegistry registry ) {
-		registry.addWithKey( WebResource.CSS, "EhcacheModule", "/css/ehcache/ehcache.css", WebResource.VIEWS );
+		registry.apply(
+				WebResourceRule.add( WebResource.css( "/css/ehcache/ehcache.css" ) ).toBucket( WebResource.CSS ) );
 	}
 
 	@ModelAttribute
@@ -169,44 +165,6 @@ public class DebugEhcacheController
 		return "th/ehcache/cacheHeapDetail";
 	}
 
-	private static class CacheHeapInfo
-	{
-		private Cache cache;
-		private Number size, percentageOfTotal, estimatedMax;
-
-		public void setCache( Cache cache ) {
-			this.cache = cache;
-		}
-
-		public void setSize( Number size ) {
-			this.size = size;
-		}
-
-		public void setPercentageOfTotal( Number percentageOfTotal ) {
-			this.percentageOfTotal = percentageOfTotal;
-		}
-
-		public void setEstimatedMax( Number estimatedMax ) {
-			this.estimatedMax = estimatedMax;
-		}
-
-		public Cache getCache() {
-			return cache;
-		}
-
-		public Number getSize() {
-			return size;
-		}
-
-		public Number getPercentageOfTotal() {
-			return percentageOfTotal;
-		}
-
-		public Number getEstimatedMax() {
-			return estimatedMax;
-		}
-	}
-
 	@RequestMapping(value = "/ehcache/flush", method = RequestMethod.GET)
 	public String flushCache( @ModelAttribute("cacheManager") CacheManager cacheManager,
 	                          @RequestParam(value = "cache", required = false) String cacheName,
@@ -235,9 +193,7 @@ public class DebugEhcacheController
 	                         Model model ) {
 		Cache cache = cacheManager.getCache( cacheName );
 
-		Table table = new Table();
-		table.setHeader( new TableHeader( "Key", "Data", "Age", "Last accessed", "Hits" ) );
-
+		List<CacheEntry> cacheEntries = new ArrayList<>();
 		for ( Object key : cache.getKeys() ) {
 			Element cacheElement = cache.getQuiet( key );
 
@@ -245,13 +201,18 @@ public class DebugEhcacheController
 				long age = System.currentTimeMillis() - cacheElement.getLatestOfCreationAndUpdateTime();
 				long accessed = System.currentTimeMillis() - cacheElement.getLastAccessTime();
 
-				table.addRow( key, cacheElement.getObjectValue(), DurationFormatUtils.formatDurationHMS( age ),
-				              DurationFormatUtils.formatDurationHMS( accessed ), cacheElement.getHitCount() );
+				CacheEntry cacheEntry = new CacheEntry();
+				cacheEntry.setKey( key.toString() );
+				cacheEntry.setValue( cacheElement.getObjectValue() );
+				cacheEntry.setAge( DurationFormatUtils.formatDurationHMS( age ) );
+				cacheEntry.setLastAccessed( DurationFormatUtils.formatDurationHMS( accessed ) );
+				cacheEntry.setHits( cacheElement.getHitCount() );
+				cacheEntries.add( cacheEntry );
 			}
 		}
 
 		model.addAttribute( "cache", cache );
-		model.addAttribute( "cacheEntries", table );
+		model.addAttribute( "cacheEntries", cacheEntries );
 
 		if ( StringUtils.equalsIgnoreCase( "true", listPeers ) ) {
 			List<String> cachePeers = new ArrayList<>();
@@ -281,5 +242,96 @@ public class DebugEhcacheController
 		}
 
 		return "th/ehcache/cacheDetail";
+	}
+
+	private static class CacheHeapInfo
+	{
+		private Cache cache;
+		private Number size, percentageOfTotal, estimatedMax;
+
+		public Cache getCache() {
+			return cache;
+		}
+
+		public void setCache( Cache cache ) {
+			this.cache = cache;
+		}
+
+		public Number getSize() {
+			return size;
+		}
+
+		public void setSize( Number size ) {
+			this.size = size;
+		}
+
+		public Number getPercentageOfTotal() {
+			return percentageOfTotal;
+		}
+
+		public void setPercentageOfTotal( Number percentageOfTotal ) {
+			this.percentageOfTotal = percentageOfTotal;
+		}
+
+		public Number getEstimatedMax() {
+			return estimatedMax;
+		}
+
+		public void setEstimatedMax( Number estimatedMax ) {
+			this.estimatedMax = estimatedMax;
+		}
+	}
+
+	private static class CacheEntry
+	{
+		private String key;
+		private Object value;
+		private String age;
+		private String lastAccessed;
+		private Long hits;
+
+		public String getKey() {
+			return key;
+		}
+
+		public void setKey( String key ) {
+			this.key = key;
+		}
+
+		public Object getValue() {
+			return value;
+		}
+
+		public void setValue( Object value ) {
+			this.value = value;
+		}
+
+		public boolean isNullValue() {
+			return value == null;
+		}
+
+		public String getAge() {
+			return age;
+		}
+
+		public void setAge( String age ) {
+			this.age = age;
+		}
+
+		public String getLastAccessed() {
+			return lastAccessed;
+		}
+
+		public void setLastAccessed( String lastAccessed ) {
+			this.lastAccessed = lastAccessed;
+		}
+
+		public Long getHits() {
+			return hits;
+		}
+
+		public void setHits( Long hits ) {
+			this.hits = hits;
+		}
 	}
 }
