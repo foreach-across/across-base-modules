@@ -46,12 +46,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = ITCustomMaskedProperties.Config.class)
 @TestPropertySource(
 		properties = {
+				"BASH_FUNCTION=() {  local root=\"${1}\"; }",
 				"my.password.value=passwordvalue",
 				"some.secret=secretvalue",
 				"custom.property=custom.value",
 				"debugWebModule.properties.masks=^custom.*",
 				"debugWebModule.properties.masked-properties=some.secret",
-		        "debugWebModule.security.enabled=false"
+				"debugWebModule.security.enabled=false"
 		}
 )
 public class ITCustomMaskedProperties
@@ -66,6 +67,12 @@ public class ITCustomMaskedProperties
 	@Before
 	public void initMvc() {
 		mockMvc = MockMvcBuilders.webAppContextSetup( wac ).build();
+	}
+
+	@Test
+	public void unknownPlaceHoldersShouldNotBeResolved() throws Exception {
+		mockMvc.perform( get( PROPERTIES_URL ) )
+		       .andExpect( content().string( containsString( "() {  local root=&quot;${1}&quot;; }" ) ) );
 	}
 
 	@Test

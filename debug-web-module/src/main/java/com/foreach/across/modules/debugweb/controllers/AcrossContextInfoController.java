@@ -234,7 +234,18 @@ class AcrossContextInfoController
 		}
 
 		public Object getEnvironmentValue() {
-			return valueMasker.maskIfNecessary( name, environment.getProperty( name, Object.class ) );
+			try {
+				return valueMasker.maskIfNecessary( name, environment.getProperty( name, Object.class ) );
+			}
+			catch ( IllegalArgumentException ex ) {
+				if ( ex.getMessage().contains( "Could not resolve placeholder" ) ) {
+					return getValue();
+				}
+				else {
+					throw ex;
+				}
+			}
+
 		}
 
 		public boolean isActualValue() {
