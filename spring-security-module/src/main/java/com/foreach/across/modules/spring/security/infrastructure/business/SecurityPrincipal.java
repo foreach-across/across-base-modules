@@ -16,6 +16,7 @@
 
 package com.foreach.across.modules.spring.security.infrastructure.business;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -31,6 +32,16 @@ public interface SecurityPrincipal
 	String getPrincipalName();
 
 	/**
+	 * @return a principal of type {@link SecurityPrincipalId} which can be used to be stored in the {@link org.springframework.security.core.Authentication}
+	 */
+	default SecurityPrincipalId getSecurityPrincipalId() {
+		if ( StringUtils.isEmpty( getPrincipalName() ) ) {
+			return null;
+		}
+		return SecurityPrincipalId.of( getPrincipalName() );
+	}
+
+	/**
 	 * @return The collection of authorities that have been granted to this principal.
 	 */
 	Collection<? extends GrantedAuthority> getAuthorities();
@@ -38,7 +49,8 @@ public interface SecurityPrincipal
 	/**
 	 * Any SecurityPrincipal should return the principal name as
 	 * toString() implementation to ensure maximum compatibility with
-	 * SpringSecurity.
+	 * SpringSecurity. Usually this is the same to calling {@code toString()}
+	 * of the {@link #getSecurityPrincipalId()}.
 	 */
 	@Override
 	String toString();

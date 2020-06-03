@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -77,7 +77,7 @@ public class TestSecurityPrincipalLabelResolverStrategy
 	public void securityPrincipalIsFetchedIfString() {
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
 		when( labelResolverTwo.resolvePrincipalLabel( principal ) ).thenReturn( Optional.of( "my principal" ) );
-		when( securityPrincipalService.getPrincipalByName( "principal name" ) ).thenReturn( principal );
+		when( securityPrincipalService.getPrincipalByName( "principal name" ) ).thenReturn( Optional.of( principal ) );
 
 		assertEquals( "my principal", labelResolverStrategy.resolvePrincipalLabel( "principal name" ) );
 	}

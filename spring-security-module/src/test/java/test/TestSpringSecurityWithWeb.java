@@ -20,8 +20,7 @@ import com.foreach.across.core.AcrossContext;
 import com.foreach.across.core.annotations.OrderInModule;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurer;
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
+import com.foreach.across.modules.spring.security.configuration.AcrossWebSecurityConfigurer;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy;
 import com.foreach.across.modules.spring.security.infrastructure.services.SecurityPrincipalRetrievalStrategy;
@@ -45,6 +44,8 @@ import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -85,8 +86,7 @@ public class TestSpringSecurityWithWeb
 
 	@Test
 	public void authenticationManagerBuilderShouldExist() {
-		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME,
-		                                                            AuthenticationManagerBuilder.class ) );
+		assertNotNull( contextBeanRegistry.getBeanOfTypeFromModule( SpringSecurityModule.NAME, AuthenticationManagerBuilder.class ) );
 	}
 
 	@Test
@@ -107,7 +107,7 @@ public class TestSpringSecurityWithWeb
 		when( auth.getPrincipal() ).thenReturn( "principalName" );
 
 		SecurityPrincipal principal = mock( SecurityPrincipal.class );
-		when( principalRetrievalStrategy.getPrincipalByName( "principalName" ) ).thenReturn( principal );
+		when( principalRetrievalStrategy.getPrincipalByName( "principalName" ) ).thenReturn( Optional.of( principal ) );
 
 		SecurityContextHolder.getContext().setAuthentication( auth );
 
@@ -120,7 +120,7 @@ public class TestSpringSecurityWithWeb
 	 */
 	@Configuration
 	@OrderInModule(2)
-	protected static class SimpleSpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
+	protected static class SimpleSpringSecurityConfigurer implements AcrossWebSecurityConfigurer
 	{
 		@Override
 		public void configure( AuthenticationManagerBuilder auth ) throws Exception {
@@ -140,7 +140,7 @@ public class TestSpringSecurityWithWeb
 
 	@Configuration
 	@OrderInModule(1)
-	protected static class OtherSpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
+	protected static class OtherSpringSecurityConfigurer implements AcrossWebSecurityConfigurer
 	{
 		@Override
 		public void configure( HttpSecurity http ) throws Exception {
@@ -158,7 +158,7 @@ public class TestSpringSecurityWithWeb
 		}
 
 		@Bean
-		public SpringSecurityWebConfigurer springSecurityWebConfigurer() {
+		public AcrossWebSecurityConfigurer springSecurityWebConfigurer() {
 			return new SimpleSpringSecurityConfigurer();
 		}
 

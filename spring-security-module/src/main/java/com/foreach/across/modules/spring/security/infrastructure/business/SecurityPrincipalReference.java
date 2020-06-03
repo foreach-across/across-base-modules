@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.spring.security;
+
+package com.foreach.across.modules.spring.security.infrastructure.business;
 
 /**
+ * To be implemented by any principal which represents an actual {@link SecurityPrincipal}.
+ * Any authentication principal which implements this interface will cause
+ * {@link com.foreach.across.modules.spring.security.infrastructure.services.CurrentSecurityPrincipalProxy}
+ * to load the actual target {@link SecurityPrincipal} using the id.
+ *
  * @author Arne Vandamme
+ * @since 4.0.0
+ * @see SecurityPrincipal
+ * @see SecurityPrincipalId
  */
-public interface SpringSecurityModuleCache
+public interface SecurityPrincipalReference
 {
 	/**
-	 * Unless property for {@link org.springframework.cache.annotation.Cacheable} that will ensure only null
-	 * values are cached and otherwise assumes that caching has been performed by a repository.
+	 * @return id of the principal that this instance represents
 	 */
-	String UNLESS_NULLS_ONLY =
-			"true && (#result instanceof T(java.util.Optional) && #result.isPresent() ) || (not (#result instanceof T(java.util.Optional)) && #result != null)";
-
-	String SECURITY_PRINCIPAL = "securityPrincipalCache";
+	SecurityPrincipalId getSecurityPrincipalId();
 }

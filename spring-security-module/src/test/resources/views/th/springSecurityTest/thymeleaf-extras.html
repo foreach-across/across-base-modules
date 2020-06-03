@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright 2014 the original author or authors
   ~
@@ -14,8 +13,15 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<configuration>
-	<include resource="logback-across-test.xml"/>
 
-	<logger name="com.foreach.across.modules.spring.security.configuration.AcrossWebSecurityConfiguration" level="DEBUG" />
-</configuration>
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Test thymeleaf extras</title>
+</head>
+<body>
+<h1 th:text="${#authentication.principal.username}">Should be replaced.</h1>
+<h2 sec:authentication="name">Should be replaced.</h2>
+</body>
+</html>

@@ -16,7 +16,7 @@
 
 package test.app.application;
 
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
+import com.foreach.across.modules.spring.security.configuration.AcrossWebSecurityConfigurer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
@@ -24,11 +24,43 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
  * @author Steven Gentens
  * @since 3.0.0
  */
+// todo if we enable this configurer the default security backs off altogether; tests should be revised
 @Configuration
-public class SpringSecurityConfigurer extends SpringSecurityWebConfigurerAdapter
+public class SpringSecurityConfigurer
 {
-	@Override
-	public void configure( HttpSecurity http ) throws Exception {
-		http.antMatcher( "/blocked" ).authorizeRequests().anyRequest().denyAll();
+	@Configuration
+	static class BlockedSecurity implements AcrossWebSecurityConfigurer
+	{
+		@Override
+		public void configure( HttpSecurity http ) throws Exception {
+			http.antMatcher( "/blocked" ).authorizeRequests().anyRequest().denyAll();
+		}
+	}
+
+	@Configuration
+	static class HelloSecurity implements AcrossWebSecurityConfigurer
+	{
+		@Override
+		public void configure( HttpSecurity http ) throws Exception {
+			http.antMatcher( "/hello" ).authorizeRequests().anyRequest().authenticated().and().httpBasic();
+		}
+	}
+
+	@Configuration
+	static class ThymeleafSecurity implements AcrossWebSecurityConfigurer
+	{
+		@Override
+		public void configure( HttpSecurity http ) throws Exception {
+			http.antMatcher( "/thymeleaf-extras" ).authorizeRequests().anyRequest().authenticated().and().httpBasic();
+		}
+	}
+
+	@Configuration
+	static class CurrentUserSecurity implements AcrossWebSecurityConfigurer
+	{
+		@Override
+		public void configure( HttpSecurity http ) throws Exception {
+			http.antMatcher( "/current-user" ).authorizeRequests().anyRequest().authenticated().and().httpBasic().and().securityContext();
+		}
 	}
 }

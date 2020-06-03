@@ -6,8 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="spring-security-module" />
         <module name="spring-security-module-actuator" />
+        <module name="spring-security-module" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

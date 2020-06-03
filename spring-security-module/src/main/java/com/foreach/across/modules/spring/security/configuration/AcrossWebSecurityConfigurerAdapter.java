@@ -29,29 +29,25 @@ import org.springframework.util.ClassUtils;
 import java.lang.reflect.Method;
 
 /**
- * Wraps a SpringSecurityWebConfigurer into an ordered WebSecurityConfigurerAdapter that Spring security
- * can actually work with.  Reason for this wrapping is that SpringSecurityConfigurers can be defined
- * in other modules, but Spring security only supports WebSecurityConfigurers in its own ApplicationContext.
+ * Adapts a {@link AcrossWebSecurityConfigurer} into an {@link WebSecurityConfigurerAdapter}.
+ * Configurers can be created in their own module, but the a wrapper will be created in
+ * SpringSecurityModule which calls the original configurer when applying the security configuration.
  * <p/>
- * With this approach we allow SpringSecurityWebConfigurer beans to be created in their own module, but the
- * security specific settings (requiring beans from the SpringSecurityModule) will be added to the wrapper
- * that will delegate the extension methods to the SpringSecurityWebConfigurer bean.
- * <p/>
- * Additionally the wrapper can enforce configurer ordering based on the module definition order.
+ * This allows module ordering to be applied to simple security configurations.
  *
  * @author Arne Vandamme
  * @see com.foreach.across.core.registry.RefreshableRegistry
  * @since 1.0.3
  */
-public class WebSecurityConfigurerWrapper extends WebSecurityConfigurerAdapter implements Ordered
+class AcrossWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter implements Ordered
 {
-	private final SpringSecurityWebConfigurer configurer;
+	private final AcrossWebSecurityConfigurer configurer;
 	private final int order;
 
 	private ObjectPostProcessor<Object> objectPostProcessor;
 
-	public WebSecurityConfigurerWrapper( SpringSecurityWebConfigurer configurer, int order ) {
-		super( configurer.isDisableDefaults() );
+	public AcrossWebSecurityConfigurerAdapter( AcrossWebSecurityConfigurer configurer, int order ) {
+		super( false );
 		this.configurer = configurer;
 		this.order = order;
 	}
@@ -126,8 +122,8 @@ public class WebSecurityConfigurerWrapper extends WebSecurityConfigurerAdapter i
 
 	@Override
 	public String toString() {
-		return "WebSecurityConfigurerWrapper{" +
-				"configurer=" + ClassUtils.getUserClass( configurer ) +
+		return "AcrossWebSecurityConfigurerAdapter{" +
+				"configurer=" + ClassUtils.getUserClass( configurer ).getName() +
 				", order=" + order +
 				'}';
 	}

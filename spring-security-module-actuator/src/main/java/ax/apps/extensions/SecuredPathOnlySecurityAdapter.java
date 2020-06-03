@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package com.foreach.across.modules.spring.security.extensions;
+package ax.apps.extensions;
 
 import com.foreach.across.core.annotations.ModuleConfiguration;
-import org.springframework.boot.autoconfigure.security.SecurityDataConfiguration;
-import org.springframework.context.annotation.Import;
+import com.foreach.across.modules.spring.security.SpringSecurityModule;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
  * @author Arne Vandamme
- * @since 3.0.0
+ * @since 4.0.0
  */
-@ModuleConfiguration(optional = true)
-@Import(SecurityDataConfiguration.class)
-class ModuleSecurityDataConfiguration
+@ModuleConfiguration(SpringSecurityModule.NAME)
+public class SecuredPathOnlySecurityAdapter extends WebSecurityConfigurerAdapter
 {
+	@Override
+	protected void configure( HttpSecurity http ) throws Exception {
+		http.antMatcher( "/secured" )
+		    .authorizeRequests().anyRequest().authenticated()
+		    .and()
+		    .httpBasic();
+	}
 }

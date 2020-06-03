@@ -32,4 +32,10 @@ public class HomeController
 	public String hello() {
 		return "hello";
 	}
+
+	@GetMapping("/secured")
+	@ResponseBody
+	public String secured() {
+		return "secured";
+	}
 }

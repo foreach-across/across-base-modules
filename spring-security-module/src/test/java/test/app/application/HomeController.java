@@ -16,9 +16,11 @@
 
 package test.app.application;
 
+import com.foreach.across.modules.spring.security.annotations.CurrentSecurityPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import test.TestApplicationWithBootAuthenticationManager;
 
 /**
  * @author Arne Vandamme
@@ -43,5 +45,21 @@ public class HomeController
 	@ResponseBody
 	public String blocked() {
 		return "should-always-be-refused";
+	}
+
+	@GetMapping("/thymeleaf-extras")
+	public String thymeleafExtras() {
+		return "th/springSecurityTest/thymeleaf-extras";
+	}
+
+	@GetMapping("/current-user")
+	@ResponseBody
+	public String currentUser( @CurrentSecurityPrincipal TestApplicationWithBootAuthenticationManager.User user ) {
+		if ( user == null ) {
+			return "unknown";
+		}
+		else {
+			return user.getPrincipalName() + ":" + user.getFirstName() + ":" + user.getLastName();
+		}
 	}
 }

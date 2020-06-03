@@ -16,6 +16,7 @@
 
 package ax.apps;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,6 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("unsecured")
 public class TestUnsecuredApplication extends AbstractApplicationTest
 {
+	@Ignore
 	@Test
 	public void healthEndpointReturnsDetails() {
 		assertResponseWithStatus( "/health", HttpStatus.OK )
