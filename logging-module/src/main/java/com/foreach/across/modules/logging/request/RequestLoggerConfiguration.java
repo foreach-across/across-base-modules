@@ -16,8 +16,8 @@
 
 package com.foreach.across.modules.logging.request;
 
+import lombok.NonNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -73,8 +73,7 @@ public class RequestLoggerConfiguration
 		return urlFilterMappings;
 	}
 
-	public void setUrlFilterMappings( Collection<String> urlFilterMappings ) {
-		Assert.notNull( urlFilterMappings );
+	public void setUrlFilterMappings( @NonNull Collection<String> urlFilterMappings ) {
 		this.urlFilterMappings = urlFilterMappings;
 	}
 
@@ -82,8 +81,7 @@ public class RequestLoggerConfiguration
 		return servletNameFilterMappings;
 	}
 
-	public void setServletNameFilterMappings( Collection<String> servletNameFilterMappings ) {
-		Assert.notNull( servletNameFilterMappings );
+	public void setServletNameFilterMappings( @NonNull Collection<String> servletNameFilterMappings ) {
 		this.servletNameFilterMappings = servletNameFilterMappings;
 	}
 

@@ -16,11 +16,11 @@
 
 package com.foreach.across.modules.logging.request;
 
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
@@ -178,8 +178,7 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 		return includedPathPatterns;
 	}
 
-	public void setIncludedPathPatterns( Collection<String> includedPathPatterns ) {
-		Assert.notNull( includedPathPatterns );
+	public void setIncludedPathPatterns( @NonNull Collection<String> includedPathPatterns ) {
 		this.includedPathPatterns = new HashSet<>( includedPathPatterns );
 	}
 
@@ -187,8 +186,7 @@ public class RequestLoggerFilter extends OncePerRequestFilter
 		return excludedPathPatterns;
 	}
 
-	public void setExcludedPathPatterns( Collection<String> excludedPathPatterns ) {
-		Assert.notNull( excludedPathPatterns );
+	public void setExcludedPathPatterns( @NonNull Collection<String> excludedPathPatterns ) {
 		this.excludedPathPatterns = new HashSet<>( excludedPathPatterns );
 	}
 

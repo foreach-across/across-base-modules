@@ -22,12 +22,15 @@
 	<parent>
 		<groupId>com.foreach.across.modules</groupId>
 		<artifactId>logging-module-project</artifactId>
-		<version>1.1.0.RELEASE</version>
+		<version>${revision}</version>
 	</parent>
 
 	<artifactId>logging-module</artifactId>
 
-	<name>${project.groupId}:${project.artifactId}</name>
+	<properties>
+		<maven.javadoc.skip>false</maven.javadoc.skip>
+		<maven.deploy.skip>false</maven.deploy.skip>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -64,6 +67,11 @@
 			<artifactId>common-spring</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
 			<groupId>com.foreach.libs</groupId>
 			<artifactId>common-web</artifactId>
 		</dependency>
@@ -77,25 +85,27 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.asciidoctor</groupId>
-				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>1.5.0</version>
-				<configuration>
-					<sourceDirectory>${project.basedir}/src/doc</sourceDirectory>
-					<sourceDocumentName>index.adoc</sourceDocumentName>
-					<outputDirectory>${project.reporting.outputDirectory}/${project.version}/reference</outputDirectory>
-					<backend>html</backend>
-				</configuration>
+				<!-- This defines how a specific module will be flattened -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>output-html</id>
-						<phase>prepare-package</phase>
+						<id>flatten</id>
+						<phase>process-resources</phase>
 						<goals>
-							<goal>process-asciidoc</goal>
+							<goal>flatten</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>flatten.clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
+
 </project>

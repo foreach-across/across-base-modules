@@ -15,8 +15,8 @@
  */
 package com.foreach.across.modules.logging.requestresponse;
 
+import lombok.NonNull;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UrlPathHelper;
 
@@ -55,8 +55,7 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter
 		return includedPathPatterns;
 	}
 
-	public void setIncludedPathPatterns( Collection<String> includedPathPatterns ) {
-		Assert.notNull( includedPathPatterns );
+	public void setIncludedPathPatterns( @NonNull Collection<String> includedPathPatterns ) {
 		this.includedPathPatterns = new HashSet<>( includedPathPatterns );
 	}
 
@@ -64,8 +63,7 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter
 		return excludedPathPatterns;
 	}
 
-	public void setExcludedPathPatterns( Collection<String> excludedPathPatterns ) {
-		Assert.notNull( excludedPathPatterns );
+	public void setExcludedPathPatterns( @NonNull Collection<String> excludedPathPatterns ) {
 		this.excludedPathPatterns = new HashSet<>( excludedPathPatterns );
 	}
 

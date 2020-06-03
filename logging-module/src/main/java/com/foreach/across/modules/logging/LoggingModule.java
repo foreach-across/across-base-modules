@@ -16,14 +16,14 @@
 package com.foreach.across.modules.logging;
 
 import com.foreach.across.core.AcrossModule;
-import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.annotations.AcrossRole;
+import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.core.context.AcrossModuleRole;
 
 /**
  * @author Andy Somers
  */
-@AcrossDepends(optional = { "AcrossWebModule", "DebugWebModule" })
+@ConditionalOnAcrossModule(anyOf = { "AcrossWebModule", "DebugWebModule" })
 @AcrossRole(value = AcrossModuleRole.INFRASTRUCTURE)
 public class LoggingModule extends AcrossModule
 {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="true">
-
+	<include resource="org/springframework/boot/logging/logback/base.xml"/>
 	<appender name="pages" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%level\t%m%n</pattern>
@@ -20,6 +20,4 @@
 	<logger name="com.foreach.across.modules.logging.method.MethodLogger" level="info" additivity="false">
 		<appender-ref ref="methods"/>
 	</logger>
-
-	<root level="warn"/>
 </configuration>
