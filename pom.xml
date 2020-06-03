@@ -20,48 +20,47 @@
 
 	<parent>
 		<groupId>com.foreach.across</groupId>
-		<artifactId>standard-module-bom</artifactId>
-		<version>2.0.0.RELEASE</version>
+		<artifactId>across-standard-module-parent</artifactId>
+		<version>5.0.0.RC1</version>
 	</parent>
 
 	<groupId>com.foreach.across.modules</groupId>
-	<artifactId>debug-web</artifactId>
-	<version>2.0.1-SNAPSHOT</version>
+	<artifactId>debug-web-project</artifactId>
+	<version>${revision}</version>
 	<packaging>pom</packaging>
 
-	<name>${project.groupId}:${project.artifactId}</name>
 	<description>
 		DebugWebModule provides support for @DebugWebControllers in other modules.  The purpose is mainly for
 		technical configuration and debugging.
 	</description>
-	<url>https://foreach.atlassian.net/wiki/display/AX/DebugWebModule</url>
+	<url>https://across.dev/modules/debugwebmodule</url>
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
 
 	<developers>
 		<developer>
-			<name>Arne Vandamme</name>
-			<email>arne@foreach.be</email>
+			<name>Foreach</name>
 			<organization>Foreach</organization>
-			<organizationUrl>http://www.foreach.be</organizationUrl>
+			<organizationUrl>https://www.foreach.be</organizationUrl>
 		</developer>
 	</developers>
 
 	<repositories>
 		<repository>
-			<id>foreach-nexus</id>
-			<name>Foreach repository</name>
-			<url>http://repository.foreach.be/nexus/repository/public</url>
+			<id>across</id>
+			<name>Across Repository</name>
+			<url>https://repository.foreach.be/nexus/repository/public/</url>
 		</repository>
 	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<revision>3.0.0.RC1</revision>
 	</properties>
 
 	<modules>
@@ -69,33 +68,7 @@
 		<module>debug-web-test-web</module>
 	</modules>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.5.5</version>
-				<inherited>false</inherited>
-				<configuration>
-					<finalName>${project.artifactId}</finalName>
-					<descriptors>
-						<descriptor>site.xml</descriptor>
-					</descriptors>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 	<scm>
-		<connection>scm:git:https://bitbucket.org/beforeach/debug-web-module.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/beforeach/debug-web-module.git</developerConnection>
 		<url>https://bitbucket.org/beforeach/debug-web-module</url>
 	</scm>
-
 </project>

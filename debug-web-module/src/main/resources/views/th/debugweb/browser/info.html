@@ -1,19 +1,20 @@
-<!DOCTYPE html>
 <!--
-  Copyright 2014 the original author or authors
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+  ~ Copyright 2014 the original author or authors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
   -->
+
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Context info</title>
@@ -96,17 +97,21 @@
 
     <h5><strong>&nbsp; Modules</strong></h5>
 
-    <div class="col-sm-10">
+    <div class="col-sm-12">
         <table class="moduleList table table-condensed table-bordered table-hover">
-            <tr th:each="moduleInfo : ${selectedContext.contextInfo.configuredModules}" th:classappend="${not moduleInfo.enabled} ? 'danger'">
+            <tr th:each="moduleInfo : ${selectedContext.contextInfo.configuredModules}"
+                th:classappend="${not moduleInfo.enabled ? 'danger' : (not moduleInfo.bootstrapped ? 'warning' : '')}">
                 <td>
                     <strong class="moduleIndex" th:text="${moduleInfoStat.count}"></strong>
                     <span th:text="${moduleInfo.name}"></span></td>
-                <td class="col-sm-3 text-center" th:text="${moduleInfo.moduleRole}"></td>
-                <td class="col-sm-2 text-center" th:text="${moduleInfo.versionInfo.version}"></td>
-                <td class="col-sm-2 text-center">
+                <td class="col-sm-3 axu-text-center" th:text="${moduleInfo.moduleRole}"></td>
+                <td class="col-sm-2 axu-text-center" th:text="${moduleInfo.versionInfo.version}"></td>
+                <td class="col-sm-2 axu-text-center">
 					<span th:if="${moduleInfo.versionInfo.snapshot and moduleInfo.versionInfo.buildTime != null}"
                           th:text="${#dates.format(moduleInfo.versionInfo.buildTime,'dd MMM yyyy HH:mm')}">build date</span>
+                </td>
+                <td class="col-sm-1 axu-text-center">
+                    <small>[[${moduleInfo.bootstrapStatus}]]</small>
                 </td>
             </tr>
         </table>
@@ -117,11 +122,9 @@
 <div class="row moduleInfo" th:if="${selectedContext.isModule()}" th:with="moduleInfo = ${selectedContext.moduleInfo}">
     <p>
     <div class="alert alert-info">
-        This is a
-        <strong th:if="${moduleInfo.enabled}">bootstrapped</strong>
-        <strong th:unless="${moduleInfo.enabled}">disabled</strong>
-        AcrossModule.
-
+        <th:block th:if="${moduleInfo.bootstrapped}">This is a fully <strong>bootstrapped</strong> module.</th:block>
+        <th:block th:unless="${moduleInfo.enabled}">This is a <strong>disabled</strong> module.</th:block>
+        <th:block th:if="${moduleInfo.enabled and !moduleInfo.bootstrapped}">This module bootstrap has been <strong>skipped</strong>.</th:block>
     </div>
     </p>
 
@@ -162,7 +165,8 @@
         <tr>
             <th>Status</th>
             <td>
-                <span th:if="${moduleInfo.enabled}" class="label label-success">bootstrapped</span>
+                <span th:if="${moduleInfo.bootstrapped}" class="label label-success">bootstrapped</span>
+                <span th:if="${not moduleInfo.bootstrapped and moduleInfo.enabled}" class="label label-warning">skipped</span>
                 <span th:unless="${moduleInfo.enabled}" class="label label-danger">disabled</span>
             </td>
         </tr>

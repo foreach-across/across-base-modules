@@ -18,7 +18,7 @@ package com.foreach.across.modules.debugweb.config;
 
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.DebugWebModuleSettings;
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
+import com.foreach.across.modules.spring.security.configuration.AcrossWebSecurityConfigurer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -32,10 +32,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import static com.foreach.across.modules.debugweb.DebugWebModuleSettings.SECURITY_ENABLED;
 
 @Configuration
-@ConditionalOnClass(SpringSecurityWebConfigurerAdapter.class)
+@ConditionalOnClass(AcrossWebSecurityConfigurer.class)
 @ConditionalOnProperty(value = SECURITY_ENABLED, matchIfMissing = true)
 @EnableConfigurationProperties(DebugWebModuleSettings.SecuritySettings.class)
-public class DebugWebSecurityConfiguration extends SpringSecurityWebConfigurerAdapter
+public class DebugWebSecurityConfiguration implements AcrossWebSecurityConfigurer
 {
 	@Autowired
 	private DebugWebModuleSettings.SecuritySettings securitySettings;
@@ -49,7 +49,7 @@ public class DebugWebSecurityConfiguration extends SpringSecurityWebConfigurerAd
 			String password = securitySettings.getPassword();
 			if ( StringUtils.isEmpty( password ) ) {
 				throw new IllegalArgumentException(
-						"debugWebModule.security.password cannot be empty when debugWebModule.security.enabled=true" );
+						"debug-web-module.security.password cannot be empty when debug-web-module.security.enabled=true" );
 			}
 			auth.inMemoryAuthentication()
 			    .withUser( securitySettings.getUsername() )

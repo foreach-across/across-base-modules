@@ -13,19 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.debugweb.mvc;
 
-import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
-import com.foreach.across.modules.debugweb.DebugWebModule;
-import org.springframework.stereotype.Component;
+package com.foreach.across.modules.debugweb.support;
 
-import java.lang.annotation.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Component
-@ConditionalOnAcrossModule(DebugWebModule.NAME)
-public @interface DebugWebController
+/**
+ * @author Stijn Vanhoof
+ */
+public class TableRow
 {
+	private Collection<Object> fields = new LinkedList<Object>();
+
+	public TableRow( Object... fields ) {
+		addFields( fields );
+	}
+
+	public void addField( Object field ) {
+		this.fields.add( field );
+	}
+
+	public void addFields( Object... fields ) {
+		this.fields.addAll( Arrays.asList( fields ) );
+	}
+
+	public Collection<Object> getFields() {
+		return fields;
+	}
 }
+

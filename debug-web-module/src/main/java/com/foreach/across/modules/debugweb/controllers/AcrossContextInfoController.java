@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.debugweb.controllers;
 
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.context.AcrossContextUtils;
 import com.foreach.across.core.context.ExposedBeanDefinition;
 import com.foreach.across.core.context.info.AcrossContextInfo;
@@ -24,14 +23,15 @@ import com.foreach.across.modules.debugweb.config.PropertyMaskingProperties;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.debugweb.util.ContextDebugInfo;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.*;
@@ -46,16 +46,14 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @DebugWebController
-public class AcrossInfoController
+class AcrossContextInfoController
 {
-	@Autowired
-	private AcrossContextInfo acrossContext;
+	private final AcrossContextInfo acrossContext;
+	private final PropertyMaskingProperties propertyMaskingProperties;
 
-	@Autowired
-	private PropertyMaskingProperties propertyMaskingProperties;
-
-	@Event
+	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder()
 		     .group( "/across", "Across" ).and()
@@ -496,7 +494,7 @@ public class AcrossInfoController
 			Method[] declaredMethods = ReflectionUtils.getUniqueDeclaredMethods( value.getClass() );
 
 			for ( Method method : declaredMethods ) {
-				if ( AnnotationUtils.findAnnotation( method, Event.class ) != null ) {
+				if ( AnnotationUtils.findAnnotation( method, EventListener.class ) != null ) {
 					methods.add( method );
 				}
 			}

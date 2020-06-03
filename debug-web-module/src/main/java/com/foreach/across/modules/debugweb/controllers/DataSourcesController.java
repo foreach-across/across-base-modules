@@ -15,16 +15,16 @@
  */
 package com.foreach.across.modules.debugweb.controllers;
 
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.modules.debugweb.DebugWeb;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
-import com.foreach.across.modules.web.table.Table;
+import com.foreach.across.modules.debugweb.support.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
@@ -47,7 +47,7 @@ public class DataSourcesController
 	@Autowired(required = false)
 	private List<DataSource> dataSources;
 
-	@Event
+	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder().group( "/datasources", "DataSources" ).and()
 		     .item( "/datasources/drivers", "Drivers" ).and()

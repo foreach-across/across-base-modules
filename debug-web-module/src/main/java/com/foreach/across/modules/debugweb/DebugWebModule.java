@@ -17,7 +17,11 @@ package com.foreach.across.modules.debugweb;
 
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.context.configurer.ApplicationContextConfigurer;
+import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
 import com.foreach.across.modules.web.AcrossWebModule;
+
+import java.util.Set;
 
 @AcrossDepends(required = AcrossWebModule.NAME)
 public class DebugWebModule extends AcrossModule
@@ -49,6 +53,11 @@ public class DebugWebModule extends AcrossModule
 	@Override
 	public String getDescription() {
 		return "Provides a debug web path and functionality to easily register additional debug controllers.";
+	}
+
+	@Override
+	protected void registerDefaultApplicationContextConfigurers( Set<ApplicationContextConfigurer> contextConfigurers ) {
+		contextConfigurers.add( ComponentScanConfigurer.forAcrossModule( DebugWebModule.class ) );
 	}
 }
 

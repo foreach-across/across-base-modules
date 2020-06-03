@@ -1,4 +1,4 @@
-package com.foreach.across.modules.debugweb.test;/*
+/*
  * Copyright 2014 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,20 +14,15 @@ package com.foreach.across.modules.debugweb.test;/*
  * limitations under the License.
  */
 
-import com.foreach.across.config.AcrossApplication;
-import com.foreach.across.modules.debugweb.DebugWebModule;
-import com.foreach.across.modules.spring.security.SpringSecurityModule;
-import org.springframework.boot.SpringApplication;
+package com.foreach.across.modules.debugweb.support;
 
 /**
- * @author Arne Vandamme
+ * @author Stijn Vanhoof
  */
-@AcrossApplication(modules = { DebugWebModule.NAME, SpringSecurityModule.NAME})
-public class DebugWebRootPathApplication
+public class TableHeader extends TableRow
 {
-	public static void main( String[] args ) {
-		SpringApplication app = new SpringApplication( DebugWebRootPathApplication.class );
-		app.setAdditionalProfiles( "root" );
-		app.run( args );
+	public TableHeader( Object... fields ) {
+		super( fields );
 	}
 }
+

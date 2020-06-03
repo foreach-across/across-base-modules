@@ -62,7 +62,7 @@ public class TestDebugWebSecurity
 	public void debugPathShouldBeProtected() throws Exception {
 		try (AcrossTestWebContext ctx = web().useTestDataSource( false )
 		                                     .modules( DebugWebModule.NAME, SpringSecurityModule.NAME )
-		                                     .property( "debugWebModule.security.password", "hurrah" )
+		                                     .property( "debugWebModule.security.password", "{noop}hurrah" )
 		                                     .property( "debugWebModule.security.ip-addresses", "" )
 		                                     .property( "debugWebModule.root-path", "/custom/path" )
 		                                     .build()) {
@@ -81,7 +81,7 @@ public class TestDebugWebSecurity
 		try (AcrossTestWebContext ctx = web().useTestDataSource( false )
 		                                     .modules( DebugWebModule.NAME, SpringSecurityModule.NAME )
 		                                     .property( "debugWebModule.security.username", "johnny" )
-		                                     .property( "debugWebModule.security.password", "janey" )
+		                                     .property( "debugWebModule.security.password", "{noop}janey" )
 		                                     .property( "debugWebModule.security.ip-addresses", "" )
 		                                     .build()) {
 			ctx.mockMvc()
@@ -115,7 +115,7 @@ public class TestDebugWebSecurity
 	public void protectedByCustomAuthority() throws Exception {
 		try (AcrossTestWebContext ctx = web().useTestDataSource( false )
 		                                     .modules( DebugWebModule.NAME, SpringSecurityModule.NAME )
-		                                     .property( "debugWebModule.security.password", "custompwd" )
+		                                     .property( "debugWebModule.security.password", "{noop}custompwd" )
 		                                     .property( "debugWebModule.security.ip-addresses", "" )
 		                                     .property( "debugWebModule.security.authority", "access debug" )
 		                                     .build()) {
