@@ -69,8 +69,7 @@ public final class AuthenticationUtils
 	public static boolean hasAuthority( Collection<? extends GrantedAuthority> authorities, String authority ) {
 		if ( !CollectionUtils.isEmpty( authorities ) ) {
 			for ( GrantedAuthority grantedAuthority : authorities ) {
-				if ( grantedAuthority != null && StringUtils.equals( grantedAuthority.getAuthority(),
-				                                                     authority ) ) {
+				if ( grantedAuthority != null && StringUtils.equals( grantedAuthority.getAuthority(), authority ) ) {
 					return true;
 				}
 			}

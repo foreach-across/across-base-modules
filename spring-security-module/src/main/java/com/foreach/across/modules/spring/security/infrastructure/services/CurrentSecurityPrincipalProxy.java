@@ -25,7 +25,7 @@ import org.springframework.security.core.GrantedAuthority;
 public interface CurrentSecurityPrincipalProxy extends SecurityPrincipal
 {
 	/**
-	 * @return {@code true} if the there is an authenticated principal attached to the current thread
+	 * @return {@code true} if the there is an authenticated principal attached to the current thread and it is not anonymous
 	 */
 	boolean isAuthenticated();
 

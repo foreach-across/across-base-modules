@@ -30,17 +30,16 @@ import java.util.Collection;
 public class SecurityPrincipalAuthenticationToken extends PreAuthenticatedAuthenticationToken
 {
 	public SecurityPrincipalAuthenticationToken( SecurityPrincipal securityPrincipal ) {
-		super( securityPrincipal, null, securityPrincipal != null ? securityPrincipal.getAuthorities() : null );
+		this( securityPrincipal != null ? securityPrincipal.getSecurityPrincipalId() : null,
+		      securityPrincipal != null ? securityPrincipal.getAuthorities() : null );
 	}
 
-	public SecurityPrincipalAuthenticationToken( SecurityPrincipal securityPrincipal,
-	                                             Object aCredentials,
-	                                             Collection<? extends GrantedAuthority> authorities ) {
-		super( securityPrincipal, aCredentials, authorities );
+	public SecurityPrincipalAuthenticationToken( SecurityPrincipalId securityPrincipalId, Collection<? extends GrantedAuthority> authorities ) {
+		super( securityPrincipalId, null, authorities );
 	}
 
 	@Override
-	public SecurityPrincipal getPrincipal() {
-		return (SecurityPrincipal) super.getPrincipal();
+	public SecurityPrincipalId getPrincipal() {
+		return (SecurityPrincipalId) super.getPrincipal();
 	}
 }

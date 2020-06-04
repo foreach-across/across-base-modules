@@ -18,6 +18,7 @@ package com.foreach.across.modules.spring.security.infrastructure.services;
 import com.foreach.across.modules.spring.security.SpringSecurityModuleCache;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalAuthenticationToken;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalId;
 import com.foreach.across.modules.spring.security.infrastructure.events.SecurityPrincipalRenamedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,6 +26,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 /**
  * @author Arne Vandamme
@@ -64,16 +67,26 @@ public class SecurityPrincipalServiceImpl implements SecurityPrincipalService
 	)
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T extends SecurityPrincipal> T getPrincipalByName( String principalName ) {
-		return (T) securityPrincipalRetrievalStrategy.getPrincipalByName( principalName );
+	public <T extends SecurityPrincipal> Optional<T> getPrincipalByName( String principalName ) {
+		return (Optional<T>) securityPrincipalRetrievalStrategy.getPrincipalByName( principalName );
+	}
+
+	@Cacheable(
+			value = SpringSecurityModuleCache.SECURITY_PRINCIPAL,
+			key = "#securityPrincipalId.toString()",
+			condition = "#securityPrincipalId != null",
+			unless = SpringSecurityModuleCache.UNLESS_NULLS_ONLY
+	)
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T extends SecurityPrincipal> Optional<T> getPrincipalById( SecurityPrincipalId securityPrincipalId ) {
+		return (Optional<T>) securityPrincipalRetrievalStrategy.getPrincipalByName( securityPrincipalId.toString() );
 	}
 
 	@Override
 	@Transactional
 	public void publishRenameEvent( String oldPrincipalName, String newPrincipalName ) {
-		SecurityPrincipalRenamedEvent renamedEvent = new SecurityPrincipalRenamedEvent( oldPrincipalName,
-		                                                                                newPrincipalName );
-
+		SecurityPrincipalRenamedEvent renamedEvent = new SecurityPrincipalRenamedEvent( oldPrincipalName, newPrincipalName );
 		eventPublisher.publishEvent( renamedEvent );
 	}
 }

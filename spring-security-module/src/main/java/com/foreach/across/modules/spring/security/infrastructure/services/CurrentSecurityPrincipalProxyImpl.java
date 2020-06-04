@@ -18,10 +18,11 @@ package com.foreach.across.modules.spring.security.infrastructure.services;
 
 import com.foreach.across.modules.spring.security.AuthenticationUtils;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
-import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalAuthenticationToken;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalHierarchy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalId;
+import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,29 +44,39 @@ import java.util.Collections;
  * </p>
  *
  * @author Arne Vandamme
+ * @see AuthenticationSecurityPrincipalResolver
  */
 @Service
+@RequiredArgsConstructor
 public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincipalProxy, SecurityPrincipalHierarchy
 {
-	private static final Logger LOG = LoggerFactory.getLogger( CurrentSecurityPrincipalProxyImpl.class );
+	private SecurityInfrastructure securityInfrastructure;
+	private AuthenticationSecurityPrincipalResolver authenticationSecurityPrincipalResolver;
 
 	@Autowired
-	private SecurityPrincipalService securityPrincipalService;
+	protected void setSecurityInfrastructure( @NonNull SecurityInfrastructure securityInfrastructure ) {
+		this.securityInfrastructure = securityInfrastructure;
+	}
+
+	@Autowired
+	protected void setAuthenticationSecurityPrincipalResolver( @NonNull AuthenticationSecurityPrincipalResolver authenticationSecurityPrincipalResolver ) {
+		this.authenticationSecurityPrincipalResolver = authenticationSecurityPrincipalResolver;
+	}
 
 	@Override
 	public boolean isAuthenticated() {
 		Authentication currentAuthentication = currentAuthentication();
-		return currentAuthentication != null && currentAuthentication.isAuthenticated();
+		return hasValidAuthentication() && !securityInfrastructure.authenticationTrustResolver().isAnonymous( currentAuthentication );
 	}
 
 	@Override
 	public boolean hasAuthority( String authority ) {
-		return isAuthenticated() && AuthenticationUtils.hasAuthority( currentAuthentication(), authority );
+		return hasValidAuthentication() && AuthenticationUtils.hasAuthority( currentAuthentication(), authority );
 	}
 
 	@Override
 	public boolean hasAuthority( GrantedAuthority authority ) {
-		return isAuthenticated() && AuthenticationUtils.hasAuthority( currentAuthentication(), authority.getAuthority() );
+		return hasValidAuthentication() && AuthenticationUtils.hasAuthority( currentAuthentication(), authority.getAuthority() );
 	}
 
 	@Override
@@ -82,18 +93,35 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 
 	@Override
 	public String getPrincipalName() {
-		SecurityPrincipal principal = getPrincipal();
+		if ( hasValidAuthentication() ) {
+			Authentication authentication = currentAuthentication();
 
-		if ( principal != null ) {
-			return principal.getPrincipalName();
+			Object principal = authentication.getPrincipal();
+
+			if ( principal instanceof SecurityPrincipalId ) {
+				return principal.toString();
+			}
+
+			if ( securityInfrastructure.authenticationTrustResolver().isAnonymous( authentication ) ) {
+				return authentication.getName();
+			}
+
+			// fallback, attempting to load an actual SecurityPrincipal
+			SecurityPrincipal securityPrincipal = getPrincipal();
+
+			if ( securityPrincipal != null ) {
+				return securityPrincipal.getPrincipalName();
+			}
+
+			return authentication.getName();
 		}
 
-		return isAuthenticated() ? currentAuthentication().getName() : null;
+		return null;
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return isAuthenticated() ? currentAuthentication().getAuthorities() : Collections.<GrantedAuthority>emptyList();
+		return hasValidAuthentication() ? currentAuthentication().getAuthorities() : Collections.<GrantedAuthority>emptyList();
 	}
 
 	private Authentication currentAuthentication() {
@@ -113,24 +141,7 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 		Authentication authentication = currentAuthentication();
 
 		if ( authentication != null && authentication.isAuthenticated() ) {
-			if ( authentication instanceof SecurityPrincipalAuthenticationToken ) {
-				return ( (SecurityPrincipalAuthenticationToken) authentication ).getPrincipal();
-			}
-
-			Object authenticationPrincipal = authentication.getPrincipal();
-
-			if ( authenticationPrincipal instanceof SecurityPrincipal ) {
-				return (SecurityPrincipal) authenticationPrincipal;
-			}
-
-			if ( authenticationPrincipal instanceof String ) {
-				LOG.debug( "Loading SecurityPrincipal with name {}", authenticationPrincipal );
-				return securityPrincipalService.getPrincipalByName( (String) authenticationPrincipal );
-
-			}
-
-			LOG.debug( "Loading SecurityPrincipal with name {}", authentication.getName() );
-			return securityPrincipalService.getPrincipalByName( authentication.getName() );
+			return authenticationSecurityPrincipalResolver.resolveSecurityPrincipal( authentication ).orElse( null );
 		}
 
 		return null;
@@ -138,6 +149,11 @@ public class CurrentSecurityPrincipalProxyImpl implements CurrentSecurityPrincip
 
 	@Override
 	public String toString() {
-		return isAuthenticated() ? getPrincipal().toString() : "not-authenticated";
+		return hasValidAuthentication() ? getPrincipalName() : "not-authenticated";
+	}
+
+	private boolean hasValidAuthentication() {
+		Authentication currentAuthentication = currentAuthentication();
+		return currentAuthentication != null && currentAuthentication.isAuthenticated();
 	}
 }

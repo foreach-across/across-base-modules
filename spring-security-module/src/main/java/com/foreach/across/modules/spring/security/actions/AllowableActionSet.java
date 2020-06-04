@@ -15,6 +15,7 @@
  */
 package com.foreach.across.modules.spring.security.actions;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -29,6 +30,10 @@ import java.util.HashSet;
 public class AllowableActionSet extends HashSet<AllowableAction> implements AllowableActions
 {
 	public AllowableActionSet() {
+	}
+
+	public AllowableActionSet( AllowableAction... allowableActions ) {
+		this( Arrays.asList( allowableActions ) );
 	}
 
 	public AllowableActionSet( Collection<? extends AllowableAction> c ) {

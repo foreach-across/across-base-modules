@@ -19,6 +19,7 @@ package test;
 import com.foreach.across.test.support.config.MockAcrossServletContextInitializer;
 import com.foreach.across.test.support.config.MockMvcConfiguration;
 import lombok.SneakyThrows;
+import org.hamcrest.core.StringContains;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,7 +47,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext
 @SpringBootTest(classes = { SpringSecurityTestApplication.class, MockMvcConfiguration.class })
 @ActiveProfiles("custom-auth")
-@TestPropertySource(properties = { "security.basic.enabled=true", "security.ignored=/hello-public", "security.basic.authorize-mode=AUTHENTICATED" })
 @ContextConfiguration(initializers = MockAcrossServletContextInitializer.class)
 public class TestApplicationWithCustomAuthenticationManager
 {
@@ -76,6 +75,16 @@ public class TestApplicationWithCustomAuthenticationManager
 		mockMvc.perform( get( "/hello" ).with( httpBasic( "dashboard", "dashboard" ) ) )
 		       .andExpect( status().isOk() )
 		       .andExpect( content().string( "hello" ) );
+	}
+
+	@Test
+	@SneakyThrows
+	public void thymeleafExtrasShouldBeLoaded() {
+		mockMvc.perform( get( "/thymeleaf-extras" ).with( httpBasic( "dashboard", "dashboard" ) ) )
+		       .andExpect( status().isOk() )
+		       .andExpect( content().string( new StringContains( "<h1>dashboard</h1>" ) ) )
+		       .andExpect( content().string( new StringContains( "<h2>dashboard</h2>" ) ) );
+
 	}
 
 	@Test
