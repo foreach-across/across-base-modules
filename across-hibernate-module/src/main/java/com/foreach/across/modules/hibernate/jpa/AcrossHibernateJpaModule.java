@@ -48,7 +48,7 @@ public class AcrossHibernateJpaModule extends AbstractHibernatePackageModule
 	private String moduleName = NAME;
 
 	public AcrossHibernateJpaModule() {
-		setPropertiesPrefix( NAME.equals( getName() ) ? "acrossHibernate" : null );
+		setPropertiesPrefix( NAME.equals( getName() ) ? "across-hibernate" : null );
 		setPersistenceUnitName( getName() );
 		setHibernateProperty( "hibernate.cache.use_second_level_cache", "false" );
 	}

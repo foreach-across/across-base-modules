@@ -15,13 +15,13 @@
  */
 package com.foreach.across.modules.hibernate.unitofwork;
 
+import lombok.NonNull;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.orm.hibernate5.SessionFactoryUtils;
 import org.springframework.orm.hibernate5.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -33,8 +33,7 @@ public class UnitOfWorkFactoryImpl implements UnitOfWorkFactory
 {
 	private final Collection<SessionFactory> sessionFactories;
 
-	public UnitOfWorkFactoryImpl( Collection<SessionFactory> sessionFactories ) {
-		Assert.notNull( sessionFactories );
+	public UnitOfWorkFactoryImpl( @NonNull Collection<SessionFactory> sessionFactories ) {
 		this.sessionFactories = sessionFactories;
 	}
 

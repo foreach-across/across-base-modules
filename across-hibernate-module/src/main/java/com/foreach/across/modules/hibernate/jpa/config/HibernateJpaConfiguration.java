@@ -41,6 +41,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
@@ -109,7 +110,7 @@ public class HibernateJpaConfiguration
 			factory.setMappingResources( hibernatePackage.getMappingResources() );
 		}
 		factory.setPackagesToScan( hibernatePackage.getPackagesToScan() );
-		factory.getJpaPropertyMap().putAll( settings.getHibernateProperties( dataSource ) );
+		factory.getJpaPropertyMap().putAll( settings.getHibernateProperties( new HibernateSettings() ) );
 
 		Map<String, String> tableAliases = hibernatePackage.getTableAliases();
 
@@ -140,7 +141,8 @@ public class HibernateJpaConfiguration
 			return beanFactory.getBean( DataSource.class );
 		}
 
-		throw new IllegalStateException( "Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
+		throw new IllegalStateException(
+				"Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
 	}
 
 	private Class createTableAliasNamingStrategyClass( Map<String, String> tableAliases ) {
@@ -179,12 +181,14 @@ public class HibernateJpaConfiguration
 		if ( settings.isRegisterRepositoryInterceptor() ) {
 			LOG.trace( "Enabling BasicRepository EntityInterceptor support in module {}",
 			           beforeBootstrapEvent.getModule().getName() );
-			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ModuleBasicRepositoryInterceptorConfiguration.class );
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true,
+			                                                                           ModuleBasicRepositoryInterceptorConfiguration.class );
 		}
 
 		if ( settings.getApplicationModule().isRepositoryScan()
 				&& beforeBootstrapEvent.getModule().getModule() instanceof DynamicAcrossModule.DynamicApplicationModule ) {
-			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ApplicationModuleRepositoryAutoConfiguration.class );
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true,
+			                                                                           ApplicationModuleRepositoryAutoConfiguration.class );
 		}
 
 		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );

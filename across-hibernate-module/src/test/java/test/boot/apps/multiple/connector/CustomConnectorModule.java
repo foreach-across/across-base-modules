@@ -30,7 +30,7 @@ public class CustomConnectorModule extends AcrossHibernateJpaModule
 	public static final String NAME = "CustomConnectorModule";
 
 	public CustomConnectorModule() {
-		setPropertiesPrefix( "customConnector" );
+		setPropertiesPrefix( "custom-connector" );
 		setExposeTransformer( new BeanPrefixingTransformer( "custom" ) );
 	}
 

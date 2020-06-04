@@ -18,11 +18,12 @@ package com.foreach.across.modules.hibernate;
 import com.foreach.across.modules.hibernate.config.PersistenceContextInView;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.autoconfigure.transaction.TransactionProperties;
 import org.springframework.core.Ordered;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,13 +34,14 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class AcrossHibernateModuleSettings extends JpaProperties
 {
-	public static final String HIBERNATE_PROPERTIES = "acrossHibernate.hibernateProperties";
-	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER = "acrossHibernate.persistenceContextInView.handler";
-	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER = "acrossHibernate.persistenceContextInView.order";
-	public static final String CREATE_UNITOFWORK_FACTORY = "acrossHibernate.createUnitOfWorkFactory";
-	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "acrossHibernate.registerRepositoryInterceptor";
+	public static final String HIBERNATE_PROPERTIES = "across-hibernate.hibernate-properties";
+	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER = "across-hibernate.persistence-context-in-view.handler";
+	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER = "across-hibernate.persistence-context-in-view.order";
+	public static final String CREATE_UNITOFWORK_FACTORY = "across-hibernate.create-unit-of-work-factory";
+	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "across-hibernate.register-repository-interceptor";
 
 	private TransactionProperties transactionProperties = new TransactionProperties();
+	private HibernateProperties hibernate = new HibernateProperties();
 	private ApplicationModule applicationModule = new ApplicationModule();
 	private PersistenceContextInViewProperties persistenceContextInView = new PersistenceContextInViewProperties();
 
@@ -65,21 +67,24 @@ public class AcrossHibernateModuleSettings extends JpaProperties
 	 * This will enable support for {@link com.foreach.across.modules.hibernate.aop.EntityInterceptor} on the entities
 	 * managed by those repositories.
 	 */
-	private boolean registerRepositoryInterceptor = true;
+	private boolean registerRepositoryInterceptor = false;
 
-	/**
-	 * Should session/entity manager open in view be registered.
-	 */
-	private boolean openInView = true;
+	public AcrossHibernateModuleSettings() {
+		setOpenInView( true );
+	}
+
+	public boolean isOpenInView() {
+		return Boolean.TRUE.equals( getOpenInView() );
+	}
 
 	/**
 	 * Get the merged set of Hibernate properties for the datasource.
 	 *
-	 * @param dataSource to detect default properties from
+	 * @param hibernateSettings to detect default properties from
 	 * @return merged properties set
 	 */
-	public Map<String, String> getHibernateProperties( DataSource dataSource ) {
-		Map<String, String> hibernateProperties = super.getHibernateProperties( dataSource );
+	public Map<String, Object> getHibernateProperties( HibernateSettings hibernateSettings ) {
+		Map<String, Object> hibernateProperties = getHibernate().determineHibernateProperties( getProperties(), hibernateSettings );
 		hibernateProperties.putAll( getHibernateProperties() );
 		return hibernateProperties;
 	}

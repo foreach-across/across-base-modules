@@ -21,12 +21,15 @@
 	<parent>
 		<groupId>com.foreach.across.modules</groupId>
 		<artifactId>across-hibernate-module-project</artifactId>
-		<version>3.0.0.RELEASE</version>
+		<version>${revision}</version>
 	</parent>
 
 	<artifactId>across-hibernate-module</artifactId>
 
-	<name>${project.groupId}:${project.artifactId}</name>
+	<properties>
+		<maven.javadoc.skip>false</maven.javadoc.skip>
+		<maven.deploy.skip>false</maven.deploy.skip>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -88,19 +91,15 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>test</scope>
+			<groupId>com.foreach.across</groupId>
+			<artifactId>across-autoconfigure</artifactId>
+			<version>2.0.0.RELEASE</version>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc6</artifactId>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-db</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jtds</groupId>
-			<artifactId>jtds</artifactId>
-			<scope>test</scope>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -116,22 +115,22 @@
 				<artifactId>apt-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.asciidoctor</groupId>
-				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>1.5.0</version>
-				<configuration>
-					<sourceDirectory>${project.basedir}/src/doc</sourceDirectory>
-					<sourceDocumentName>index.adoc</sourceDocumentName>
-					<outputDirectory>${project.reporting.outputDirectory}/${project.version}/reference</outputDirectory>
-					<backend>html</backend>
-					<sourceHighlighter>coderay</sourceHighlighter>
-				</configuration>
+				<!-- This defines how a specific module will be flattened -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>output-html</id>
-						<phase>prepare-package</phase>
+						<id>flatten</id>
+						<phase>process-resources</phase>
 						<goals>
-							<goal>process-asciidoc</goal>
+							<goal>flatten</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>flatten.clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
 						</goals>
 					</execution>
 				</executions>

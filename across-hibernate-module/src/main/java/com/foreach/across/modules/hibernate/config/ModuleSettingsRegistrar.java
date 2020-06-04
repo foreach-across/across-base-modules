@@ -35,17 +35,15 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.boot.bind.PropertiesConfigurationFactory;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.core.env.*;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import java.util.Iterator;
 
 /**
  * Creates the {@link com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings} as early as possible,
@@ -110,18 +108,16 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 		private final AcrossContextInfo contextInfo;
 		private final AbstractHibernatePackageModule currentModule;
 		private final Environment environment;
-		private final DefaultConversionService conversionService = new DefaultConversionService();
 
 		@SneakyThrows
 		AcrossHibernateModuleSettings createInstance() {
 			AcrossHibernateModuleSettings moduleSettings = currentModule.createSettings();
 			applyDefaultValues( moduleSettings );
 
-			PropertySources propertySources = createPropertySources( environment );
-
 			if ( isDefaultHibernateModule() ) {
-				bindProperties( propertySources, "spring.jpa", moduleSettings );
-				bindProperties( propertySources, "spring.transaction", moduleSettings.getTransactionProperties() );
+				bindProperties( "spring.jpa", moduleSettings );
+				bindProperties( "spring.jpa.hibernate", moduleSettings.getHibernate() );
+				bindProperties( "spring.transaction", moduleSettings.getTransactionProperties() );
 				moduleSettings.getApplicationModule().setRepositoryScan(
 						environment.getProperty( "spring.data.jpa.repositories.enabled", boolean.class,
 						                         moduleSettings.getApplicationModule().isRepositoryScan() )
@@ -129,23 +125,17 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 			}
 
 			String modulePrefix = currentModule.getPropertiesPrefix();
-			bindProperties( propertySources, modulePrefix, moduleSettings );
-			bindProperties( propertySources, modulePrefix + ".transaction", moduleSettings.getTransactionProperties() );
-			bindProperties( propertySources, modulePrefix + ".application", moduleSettings.getApplicationModule() );
+			bindProperties( modulePrefix, moduleSettings );
+			bindProperties( modulePrefix + ".transaction", moduleSettings.getTransactionProperties() );
+			bindProperties( modulePrefix + ".hibernate", moduleSettings.getHibernate() );
+			bindProperties( modulePrefix + ".application", moduleSettings.getApplicationModule() );
 
 			return moduleSettings;
 		}
 
-		private void bindProperties( PropertySources propertySources, String prefix, Object target ) throws Exception {
-			PropertiesConfigurationFactory<Object> factory = new PropertiesConfigurationFactory<>( target );
-			factory.setPropertySources( propertySources );
-			factory.setConversionService( conversionService );
-			factory.setIgnoreInvalidFields( false );
-			factory.setIgnoreNestedProperties( false );
-			factory.setIgnoreUnknownFields( true );
-			factory.setTargetName( prefix );
-
-			factory.bindPropertiesToTarget();
+		private void bindProperties( String prefix, Object target ) {
+			Binder binder = Binder.get( environment );
+			binder.bind( prefix, Bindable.ofInstance( target ) );
 		}
 
 		/**
@@ -167,8 +157,10 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 				jpaModuleSettings.setPersistenceUnitName( currentModule.getName() );
 
 				if ( isSingleHibernateModule()
-						&& BeanFactoryUtils.beansOfTypeIncludingAncestors( contextInfo.getApplicationContext(), PlatformTransactionManager.class ).isEmpty() ) {
-					LOG.trace( "Switching to default primary as this is the only AcrossHibernateJpaModule and there are no other transaction managers" );
+						&& BeanFactoryUtils.beansOfTypeIncludingAncestors( contextInfo.getApplicationContext(),
+						                                                   PlatformTransactionManager.class ).isEmpty() ) {
+					LOG.trace(
+							"Switching to default primary as this is the only AcrossHibernateJpaModule and there are no other transaction managers" );
 					jpaModuleSettings.setPrimary( true );
 				}
 			}
@@ -184,61 +176,6 @@ public class ModuleSettingsRegistrar implements ImportSelector, BeanFactoryAware
 			                  .map( AcrossModuleInfo::getModule )
 			                  .filter( AbstractHibernatePackageModule.class::isInstance )
 			                  .count() == 1;
-		}
-
-		private PropertySources createPropertySources( Environment environment ) {
-			return new FlatPropertySources( ( (ConfigurableEnvironment) environment ).getPropertySources() );
-		}
-
-		/**
-		 * Convenience class to flatten out a tree of property sources without losing the
-		 * reference to the backing data (which can therefore be updated in the background).
-		 */
-		private static class FlatPropertySources implements PropertySources
-		{
-			private PropertySources propertySources;
-
-			FlatPropertySources( PropertySources propertySources ) {
-				this.propertySources = propertySources;
-			}
-
-			@Override
-			public Iterator<PropertySource<?>> iterator() {
-				MutablePropertySources result = getFlattened();
-				return result.iterator();
-			}
-
-			@Override
-			public boolean contains( String name ) {
-				return get( name ) != null;
-			}
-
-			@Override
-			public PropertySource<?> get( String name ) {
-				return getFlattened().get( name );
-			}
-
-			private MutablePropertySources getFlattened() {
-				MutablePropertySources result = new MutablePropertySources();
-				for ( PropertySource<?> propertySource : this.propertySources ) {
-					flattenPropertySources( propertySource, result );
-				}
-				return result;
-			}
-
-			private void flattenPropertySources( PropertySource<?> propertySource,
-			                                     MutablePropertySources result ) {
-				Object source = propertySource.getSource();
-				if ( source instanceof ConfigurableEnvironment ) {
-					ConfigurableEnvironment environment = (ConfigurableEnvironment) source;
-					for ( PropertySource<?> childSource : environment.getPropertySources() ) {
-						flattenPropertySources( childSource, result );
-					}
-				}
-				else {
-					result.addLast( propertySource );
-				}
-			}
 		}
 	}
 }

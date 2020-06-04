@@ -24,6 +24,7 @@ import com.foreach.across.modules.hibernate.services.HibernateSessionHolderImpl;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.test.AcrossTestContext;
+import com.foreach.across.test.AcrossTestWebContext;
 import org.hibernate.SessionFactory;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -59,7 +60,7 @@ public class TestModuleSettings
 					   .size()
 			);
 			assertEquals(
-					1,
+					0,
 					ctx.contextInfo().getModuleInfo( "client" ).getApplicationContext()
 					   .getBeansOfType( ModuleBasicRepositoryInterceptorConfiguration.class )
 					   .size()
@@ -174,17 +175,19 @@ public class TestModuleSettings
 	@Test
 	public void filterIfWebContext() {
 		try (
-				AcrossTestContext ctx = web()
+				AcrossTestWebContext ctx = web()
 						.property( AcrossHibernateModuleSettings.PERSISTENCE_CONTEXT_VIEW_HANDLER,
 						           PersistenceContextInView.FILTER )
 						.modules( AcrossWebModule.NAME, AcrossHibernateModule.NAME )
 						.build()
 		) {
+
 			ApplicationContext module = ctx.contextInfo().getModuleInfo( AcrossHibernateModule.NAME )
 			                               .getApplicationContext();
 
 			assertEquals( 0, module.getBeansOfType( OpenSessionInViewInterceptor.class ).size() );
 			assertEquals( 1, module.getBeansOfType( OpenSessionInViewFilter.class ).size() );
+			assertNotNull( ctx.getServletContext().getFilterRegistration( AcrossHibernateModule.NAME + ".OpenSessionInViewFilter" ) );
 		}
 	}
 

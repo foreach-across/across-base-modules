@@ -16,6 +16,7 @@
 package com.foreach.across.modules.hibernate.aop;
 
 import com.foreach.across.modules.hibernate.repositories.BasicRepository;
+import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.util.ClassUtils;
 
@@ -28,11 +29,16 @@ import java.lang.reflect.Method;
  */
 public class BasicRepositoryPointcut extends StaticMethodMatcherPointcut
 {
+	private static final ClassFilter CLASS_FILTER = clazz -> BasicRepository.class.isAssignableFrom( ClassUtils.getUserClass( clazz ) );
+
+	@Override
+	public ClassFilter getClassFilter() {
+		return CLASS_FILTER;
+	}
+
 	@Override
 	public boolean matches( Method method, Class<?> targetClass ) {
-		Class<?> userClass = ClassUtils.getUserClass( targetClass );
-
-		return BasicRepository.class.isAssignableFrom( userClass ) && isEntityMethod( method );
+		return isEntityMethod( method );
 	}
 
 	static boolean isEntityMethod( Method method ) {

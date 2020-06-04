@@ -20,7 +20,7 @@ import com.foreach.across.core.database.AcrossSchemaConfiguration;
 import com.foreach.across.modules.hibernate.business.SettableIdBasedEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.MappingException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.enhanced.StandardOptimizerDescriptor;
 import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.service.ServiceRegistry;
@@ -128,7 +128,7 @@ public class AcrossSequenceGenerator extends TableGenerator
 	}
 
 	@Override
-	public Serializable generate( SessionImplementor session, Object object ) {
+	public Serializable generate( SharedSessionContractImplementor session, Object object ) {
 		Serializable id = session.getEntityPersister( entityName, object )
 		                         .getClassMetadata().getIdentifier( object, session );
 

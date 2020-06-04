@@ -205,7 +205,7 @@ public class TestJpaInterceptors
 
 		clientRepository.save( client );
 
-		assertNotNull( clientRepository.findOne( client.getId() ) );
+		assertNotNull( clientRepository.findById( client.getId() ).orElse( null ) );
 		assertNotNull( customerRepository.getByName( "nested customer" ) );
 	}
 
@@ -236,7 +236,7 @@ public class TestJpaInterceptors
 		}
 
 		assertTrue( failed );
-		assertNull( clientRepository.findOne( -7777L ) );
+		assertNull( clientRepository.findById( -7777L ).orElse( null ) );
 		assertNull( customerRepository.getByName( "nested customer 2" ) );
 	}
 
@@ -251,7 +251,7 @@ public class TestJpaInterceptors
 
 		verifyZeroInteractions( clientInterceptor );
 
-		clientRepository.save( clients );
+		clientRepository.saveAll( clients );
 
 		verify( clientInterceptor ).handles( Client.class );
 		verify( clientInterceptor ).beforeCreate( client );
@@ -265,7 +265,7 @@ public class TestJpaInterceptors
 
 		client.setName( "it-client-1-updated" );
 
-		clientRepository.save( clients );
+		clientRepository.saveAll( clients );
 
 		verify( clientInterceptor ).handles( Client.class );
 		verify( clientInterceptor ).beforeUpdate( client );
@@ -277,7 +277,7 @@ public class TestJpaInterceptors
 		reset( clientInterceptor );
 		when( clientInterceptor.handles( Client.class ) ).thenReturn( true );
 
-		clientRepository.delete( clients );
+		clientRepository.deleteAll( clients );
 
 		verify( clientInterceptor ).handles( Client.class );
 		verify( clientInterceptor ).beforeDelete( client );

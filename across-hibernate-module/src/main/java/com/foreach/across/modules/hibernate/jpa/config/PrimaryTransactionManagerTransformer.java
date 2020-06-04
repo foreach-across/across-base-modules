@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * Checks if the transaction manager (and related beans) being exposed should be configured
  * as primary according to the module settings. The standard {@link AcrossHibernateJpaModule} is primary
- * by default unless it has been explicitly disabled with property {@code acrossHibernate.primary=false}.
+ * by default unless it has been explicitly disabled with property {@code across-hibernate.primary=false}.
  *
  * @author Arne Vandamme
  * @since 3.0.0
@@ -51,6 +51,7 @@ public class PrimaryTransactionManagerTransformer implements ExposedBeanDefiniti
 			beanDefinitions.get( HibernateJpaConfiguration.TRANSACTION_MANAGER ).setPrimary( true );
 			beanDefinitions.get( HibernateJpaConfiguration.TRANSACTION_TEMPLATE ).setPrimary( true );
 			beanDefinitions.get( "hibernateSessionHolder" ).setPrimary( true );
+			beanDefinitions.get( "entityManagerFactory" ).setPrimary( true );
 
 			if ( beanDefinitions.containsKey( "unitOfWork" ) ) {
 				beanDefinitions.get( "unitOfWork" ).setPrimary( true );

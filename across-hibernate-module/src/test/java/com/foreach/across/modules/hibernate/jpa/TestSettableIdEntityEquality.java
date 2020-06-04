@@ -75,12 +75,12 @@ public class TestSettableIdEntityEquality
 		unitOfWork.restart();
 
 		// typical equals of non-proxied objects
-		Client oneretrieved = clientRepository.findOne( -10L );
+		Client oneretrieved = clientRepository.findById( -10L ).orElse( null );
 		assertTrue( fixedId.equals( oneretrieved ) );
 		assertTrue( oneretrieved.equals( fixedId ) );
 
 		// equals between non-proxied and proxied object
-		Client linkedClient = clientRepository.findOne( -10L ).getLinkedClient();
+		Client linkedClient = clientRepository.findById( -10L ).orElse( null ).getLinkedClient();
 		assertTrue( autoId.equals( linkedClient ) );
 		assertTrue( linkedClient.equals( autoId ) );
 
