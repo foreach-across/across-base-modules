@@ -17,7 +17,7 @@ package com.foreach.across.modules.hibernate.types;
 
 import com.foreach.across.modules.hibernate.util.HibernateTypeLookup;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.type.AbstractSingleColumnStandardBasicType;
 import org.hibernate.usertype.UserType;
 
@@ -67,7 +67,7 @@ public abstract class HibernateIdLookup<T extends IdLookup<K>, K> implements Use
 	@SuppressWarnings("unchecked")
 	public Object nullSafeGet( ResultSet rs,
 	                           String[] names,
-	                           SessionImplementor session,
+	                           SharedSessionContractImplementor session,
 	                           Object owner ) throws HibernateException, SQLException {
 		K identifier = (K) type.get( rs, names[0], session );
 
@@ -84,11 +84,10 @@ public abstract class HibernateIdLookup<T extends IdLookup<K>, K> implements Use
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void nullSafeSet( PreparedStatement st,
 	                         Object value,
 	                         int index,
-	                         SessionImplementor session ) throws HibernateException, SQLException {
+	                         SharedSessionContractImplementor session ) throws HibernateException, SQLException {
 		try {
 			if ( value != null ) {
 				type.set( st, ( (IdLookup<K>) value ).getId(), index, session );

@@ -19,10 +19,12 @@ package test.boot.apps;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
+import com.foreach.across.test.ExposeForTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.repository.Repository;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
@@ -30,6 +32,7 @@ import test.boot.apps.single.SingleDataSourceApplication;
 import test.boot.apps.single.application.Book;
 import test.boot.apps.single.application.BookRepository;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -48,10 +51,11 @@ import static org.junit.Assert.assertTrue;
 		properties = {
 				"spring.datasource.url=jdbc:hsqldb:mem:single-db",
 				"spring.jpa.show-sql=true",
-				"spring.transaction.default-timeout=25",
+				"spring.transaction.default-timeout=25s",
 				"acrossHibernate.hibernateProperties[hibernate.hbm2ddl.auto]=create-drop"
 		}
 )
+@ExposeForTest(Repository.class)
 public class TestSingleDataSourceApplication
 {
 	@Autowired
@@ -69,7 +73,7 @@ public class TestSingleDataSourceApplication
 				= beanRegistry.getBeanOfTypeFromModule( AcrossHibernateJpaModule.NAME, AcrossHibernateJpaModuleSettings.class );
 
 		assertTrue( moduleSettings.isShowSql() );
-		assertEquals( Integer.valueOf( 25 ), moduleSettings.getTransactionProperties().getDefaultTimeout() );
+		assertEquals( 25, moduleSettings.getTransactionProperties().getDefaultTimeout().getSeconds() );
 	}
 
 	@Test
@@ -81,6 +85,11 @@ public class TestSingleDataSourceApplication
 		assertEquals( 25, tm.get().getDefaultTimeout() );
 
 		assertEquals( Collections.singletonList( tm.get() ), beanRegistry.getBeansOfType( PlatformTransactionManager.class ) );
+	}
+
+	@Test
+	public void onlySingleEntityManagerFactoryShouldExist() {
+		assertEquals( 1, beanRegistry.getBeansOfType( EntityManagerFactory.class, true ).size() );
 	}
 
 	@Test

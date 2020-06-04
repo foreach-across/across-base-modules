@@ -19,10 +19,10 @@ import com.foreach.across.modules.hibernate.unitofwork.CallableUnitOfWork;
 import com.foreach.across.modules.hibernate.unitofwork.RunnableUnitOfWork;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWork;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
+import lombok.NonNull;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -37,8 +37,7 @@ public class JpaUnitOfWorkFactoryImpl implements UnitOfWorkFactory
 {
 	private final Collection<EntityManagerFactory> entityManagerFactories;
 
-	public JpaUnitOfWorkFactoryImpl( Collection<EntityManagerFactory> entityManagerFactories ) {
-		Assert.notNull( entityManagerFactories );
+	public JpaUnitOfWorkFactoryImpl( @NonNull Collection<EntityManagerFactory> entityManagerFactories ) {
 		this.entityManagerFactories = entityManagerFactories;
 	}
 

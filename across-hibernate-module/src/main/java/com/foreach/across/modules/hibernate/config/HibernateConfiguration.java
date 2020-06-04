@@ -38,6 +38,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -94,7 +95,7 @@ public class HibernateConfiguration
 		}
 
 		Properties propertiesToSet = new Properties();
-		propertiesToSet.putAll( settings.getHibernateProperties( dataSource ) );
+		propertiesToSet.putAll( settings.getHibernateProperties( new HibernateSettings() ) );
 
 		sessionFactory.setHibernateProperties( propertiesToSet );
 
@@ -119,7 +120,8 @@ public class HibernateConfiguration
 			return beanFactory.getBean( DataSource.class );
 		}
 
-		throw new IllegalStateException( "Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
+		throw new IllegalStateException(
+				"Was unable to resolve the correct datasource bean to use, bean name: " + settings.getDataSource() );
 	}
 
 	@Bean(name = SESSION_HOLDER)
@@ -141,7 +143,8 @@ public class HibernateConfiguration
 		if ( settings.isRegisterRepositoryInterceptor() ) {
 			LOG.trace( "Enabling BasicRepositoryInterceptor support in module {}",
 			           beforeBootstrapEvent.getModule().getName() );
-			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true, ModuleBasicRepositoryInterceptorConfiguration.class );
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( true,
+			                                                                           ModuleBasicRepositoryInterceptorConfiguration.class );
 		}
 
 		LOG.trace( "Enabling @Transaction support in module {}", beforeBootstrapEvent.getModule().getName() );

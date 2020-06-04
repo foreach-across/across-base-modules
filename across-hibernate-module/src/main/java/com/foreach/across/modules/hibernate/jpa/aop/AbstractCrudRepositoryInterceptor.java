@@ -49,6 +49,7 @@ import java.util.Map;
 public abstract class AbstractCrudRepositoryInterceptor implements MethodInterceptor, BeanFactoryAware
 {
 	static final String SAVE = "save";
+	static final String SAVE_ALL = "saveAll";
 	static final String DELETE = "delete";
 	static final String DELETE_ALL = "deleteAll";
 
@@ -110,14 +111,31 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 		switch ( methodName ) {
 			case DELETE_ALL:
 				return () -> {
-					Collection<EntityInterceptor> interceptorsForDeleteAll
-							= findInterceptorsToApply( entityClass, getInterceptors() );
-					callBeforeDeleteAll( interceptorsForDeleteAll, entityClass );
+					if ( arguments.length == 0 ) {
+						Collection<EntityInterceptor> interceptorsForDeleteAll
+								= findInterceptorsToApply( entityClass, getInterceptors() );
+						callBeforeDeleteAll( interceptorsForDeleteAll, entityClass );
 
-					Object returnValueForDeleteAll = invocation.proceed();
-					callAfterDeleteAll( interceptorsForDeleteAll, entityClass );
+						Object returnValueForDeleteAll = invocation.proceed();
+						callAfterDeleteAll( interceptorsForDeleteAll, entityClass );
 
-					return returnValueForDeleteAll;
+						return returnValueForDeleteAll;
+					}
+					else {
+						Object entityObject = arguments[0];
+
+						Collection<EntityInterceptor> interceptorsForDelete
+								= findInterceptorsToApply( entityClass, getInterceptors() );
+
+						for ( Object o : (Iterable) entityObject ) {
+							callBeforeDelete( interceptorsForDelete, o );
+						}
+						Object returnValueForDelete = invocation.proceed();
+						for ( Object o : (Iterable) entityObject ) {
+							callAfterDelete( interceptorsForDelete, o );
+						}
+						return returnValueForDelete;
+					}
 				};
 			case DELETE:
 				return () -> {
@@ -155,6 +173,7 @@ public abstract class AbstractCrudRepositoryInterceptor implements MethodInterce
 					}
 				};
 			case SAVE:
+			case SAVE_ALL:
 				return () -> {
 					Object objectToSave = arguments[0];
 					Class<?> targetClassToSave = method.getParameterTypes()[0];

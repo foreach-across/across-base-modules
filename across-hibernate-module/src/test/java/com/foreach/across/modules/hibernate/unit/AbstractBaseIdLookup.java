@@ -17,7 +17,7 @@ package com.foreach.across.modules.hibernate.unit;
 
 import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.type.IntegerType;
 import org.hibernate.usertype.UserType;
 
@@ -25,14 +25,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public abstract class AbstractBaseIdLookup
 {
 	protected Object mockResultSetAndTestValue( UserType userType, Integer rowValue ) throws SQLException {
 		ResultSet resultSet = mock( ResultSet.class );
-		SessionImplementor sessionImplementor = mock( SessionImplementor.class );
+		SharedSessionContractImplementor sessionImplementor = mock( SharedSessionContractImplementor.class );
+		doAnswer( invocationOnMock -> invocationOnMock.getArgument( 0 ) ).when( sessionImplementor ).remapSqlTypeDescriptor( any() );
 		SessionFactoryImplementor sessionFactoryImplementor = mock( SessionFactoryImplementor.class );
 		when( sessionImplementor.getFactory() ).thenReturn( sessionFactoryImplementor );
 		when( sessionFactoryImplementor.getDialect() ).thenReturn( new HSQLDialect() );
@@ -50,7 +51,8 @@ public abstract class AbstractBaseIdLookup
 	protected void mockResultSetAndTestValueToInt( UserType userType, Integer expectedValue,
 	                                               Object rowValue ) throws SQLException {
 		PreparedStatement preparedStatement = mock( PreparedStatement.class );
-		SessionImplementor sessionImplementor = mock( SessionImplementor.class );
+		SharedSessionContractImplementor sessionImplementor = mock( SharedSessionContractImplementor.class );
+		doAnswer( invocationOnMock -> invocationOnMock.getArgument( 0 ) ).when( sessionImplementor ).remapSqlTypeDescriptor( any() );
 		SessionFactoryImplementor sessionFactoryImplementor = mock( SessionFactoryImplementor.class );
 		when( sessionImplementor.getFactory() ).thenReturn( sessionFactoryImplementor );
 		when( sessionFactoryImplementor.getDialect() ).thenReturn( new HSQLDialect() );
