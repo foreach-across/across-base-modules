@@ -2,52 +2,9 @@
 <configuration debug="true">
 	<property resource="application.properties" />
 
+	<include resource="org/springframework/boot/logging/logback/base.xml"/>
+
 	<include resource="elk-appenders.xml"/>
-
-	<logger name="com.zaxxer.hikari.pool" level="INFO" additivity="false">
-		<appender-ref ref="hikari"/>
-	</logger>
-
-	<logger name="com.foreach.across.modules.logging.method.MethodLogger" level="INFO" additivity="false">
-		<appender-ref ref="methods"/>
-		<appender-ref ref="elk-methods"/>
-	</logger>
-
-	<!--this can be enabled at runtime via debugweb (/debug/logging/loggers#)-->
-	<logger name="com.foreach.across.modules.logging.request.RequestLogger" level="TRACE" additivity="false">
-		<appender-ref ref="console"/>
-		<appender-ref ref="elk-requests"/>
-		<appender-ref ref="pages"/>
-	</logger>
-
-	<logger name="org.springframework.data" level="WARN" additivity="false"/>
-	<logger name="org.thymeleaf" level="WARN"/>
-	<logger name="liquibase" level="WARN"/>
-
-	<logger name="com.zaxxer.hikari.pool.HikariPool" level="DEBUG" additivity="false" >
-		<appender-ref ref="elk-hikari"/>
-	</logger>
-
-	<logger name="net.sf.ehcache" level="WARN"/>
-
-	<logger name="com.foreach.across" level="INFO" additivity="false">
-		<appender-ref ref="across"/>
-		<appender-ref ref="errors"/>
-		<appender-ref ref="elk-errors"/>
-	</logger>
-
-	<logger name="com.foreach.across.core.context.bootstrap.AcrossBootstrapper" level="INFO" additivity="false">
-		<appender-ref ref="console"/>
-		<appender-ref ref="across"/>
-		<appender-ref ref="errors"/>
-		<appender-ref ref="elk-errors"/>
-	</logger>
-
-	<root level="INFO">
-		<appender-ref ref="console"/>
-		<appender-ref ref="errors"/>
-		<appender-ref ref="elk-errors"/>
-	</root>
 
 	<appender name="pages" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
@@ -110,8 +67,53 @@
 		</encoder>
 	</appender>
 
+	<logger name="com.zaxxer.hikari.pool" level="INFO" additivity="false">
+		<appender-ref ref="hikari"/>
+	</logger>
+
+	<logger name="com.foreach.across.modules.logging.method.MethodLogger" level="INFO" additivity="false">
+		<appender-ref ref="methods"/>
+		<appender-ref ref="elk-methods"/>
+	</logger>
+
+	<!--this can be enabled at runtime via debugweb (/debug/logging/loggers#)-->
+	<logger name="com.foreach.across.modules.logging.request.RequestLogger" level="TRACE" additivity="false">
+		<appender-ref ref="console"/>
+		<appender-ref ref="elk-requests"/>
+		<appender-ref ref="pages"/>
+	</logger>
+
+	<logger name="org.springframework.data" level="WARN" additivity="false"/>
+	<logger name="org.thymeleaf" level="WARN"/>
+	<logger name="liquibase" level="WARN"/>
+
+	<logger name="com.zaxxer.hikari.pool.HikariPool" level="DEBUG" additivity="false" >
+		<appender-ref ref="elk-hikari"/>
+	</logger>
+
+	<logger name="net.sf.ehcache" level="WARN"/>
+
+	<logger name="com.foreach.across" level="INFO" additivity="false">
+		<appender-ref ref="across"/>
+		<appender-ref ref="errors"/>
+		<appender-ref ref="elk-errors"/>
+	</logger>
+
+	<logger name="com.foreach.across.core.context.bootstrap.AcrossBootstrapper" level="INFO" additivity="false">
+		<appender-ref ref="console"/>
+		<appender-ref ref="across"/>
+		<appender-ref ref="errors"/>
+		<appender-ref ref="elk-errors"/>
+	</logger>
+
 	<logger name="com.foreach.across.core.installers.AcrossBootstrapInstallerRegistry" level="DEBUG">
 		<appender-ref ref="console"/>
 	</logger>
+	<root level="INFO">
+		<appender-ref ref="console"/>
+		<appender-ref ref="errors"/>
+		<appender-ref ref="elk-errors"/>
+	</root>
+
 
 </configuration>

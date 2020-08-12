@@ -16,7 +16,7 @@
 
 package com.foreach.across.modules.logging.config;
 
-import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.modules.logging.controllers.LogController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Import;
 public class LoggingModuleConfiguration
 {
 	@Bean
-	@AcrossDepends(required = "DebugWebModule")
+	@ConditionalOnAcrossModule("DebugWebModule")
 	public LogController logController() {
 		return new LogController();
 	}

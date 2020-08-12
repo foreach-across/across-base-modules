@@ -15,13 +15,13 @@
  */
 package com.foreach.across.modules.logging.controllers;
 
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogRegistry;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLoggingFilter;
 import com.foreach.across.modules.web.resource.WebResourceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,7 +41,7 @@ public class RequestResponseLogController
 	@Autowired
 	private RequestResponseLoggingFilter logFilter;
 
-	@Event
+	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {
 		event.builder().group( "/logging/requestResponse", "Request - response" ).and()
 		     .item( "/logging/requestResponse/list", "Overview" ).and()

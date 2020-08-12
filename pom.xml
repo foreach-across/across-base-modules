@@ -21,16 +21,15 @@
 
 	<parent>
 		<groupId>com.foreach.across</groupId>
-		<artifactId>standard-module-bom</artifactId>
-		<version>2.0.0.RELEASE</version>
+		<artifactId>across-standard-module-parent</artifactId>
+		<version>5.0.0.RELEASE</version>
 	</parent>
 
 	<groupId>com.foreach.across.modules</groupId>
 	<artifactId>logging-module-project</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
+	<version>${revision}</version>
 	<packaging>pom</packaging>
 
-	<name>${project.groupId}:${project.artifactId}</name>
 	<description>
 		Provides logging facilities for modules along with debug controllers to configure it.
 	</description>
@@ -44,24 +43,24 @@
 
 	<developers>
 		<developer>
-			<name>Arne Vandamme</name>
-			<email>arne at foreach.be</email>
+			<name>Foreach</name>
 			<organization>Foreach</organization>
-			<organizationUrl>http://www.foreach.be</organizationUrl>
+			<organizationUrl>https://www.foreach.be</organizationUrl>
 		</developer>
 	</developers>
 
 	<repositories>
 		<repository>
 			<id>across</id>
-			<name>Foreach repository</name>
-			<url>http://repository.foreach.be/nexus/repository/public</url>
+			<name>Across Repository</name>
+			<url>https://repository.foreach.be/nexus/repository/public/</url>
 		</repository>
 	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<revision>3.0.0.RELEASE</revision>
 	</properties>
 
 	<modules>
@@ -74,56 +73,13 @@
 			<dependency>
 				<groupId>com.foreach.across.modules</groupId>
 				<artifactId>debug-web-module</artifactId>
-				<version>1.0.0.RELEASE</version>
+				<version>3.0.0.RELEASE</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.5.5</version>
-				<inherited>false</inherited>
-				<configuration>
-					<finalName>${project.artifactId}</finalName>
-					<descriptors>
-						<descriptor>site.xml</descriptor>
-					</descriptors>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
 	<scm>
-		<connection>scm:git:https://bitbucket.org/beforeach/logging-module.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/beforeach/logging-module.git</developerConnection>
 		<url>https://bitbucket.org/beforeach/logging-module</url>
 	</scm>
 
-	<profiles>
-		<profile>
-			<id>across</id>
-			<distributionManagement>
-				<repository>
-					<id>across</id>
-					<name>Across Releases Repository</name>
-					<url>https://repository.foreach.be/nexus/repository/across-releases/</url>
-				</repository>
-				<snapshotRepository>
-					<id>across</id>
-					<name>Across Snapshot Repository</name>
-					<url>https://repository.foreach.be/nexus/repository/across-snapshots/</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-	</profiles>
 </project>

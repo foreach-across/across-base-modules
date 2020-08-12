@@ -16,10 +16,7 @@
 
 package com.foreach.across.modules.logging.config;
 
-import com.foreach.across.core.annotations.AcrossEventHandler;
-import com.foreach.across.core.annotations.Event;
 import com.foreach.across.core.annotations.Exposed;
-import com.foreach.across.core.context.configurer.AnnotatedClassConfigurer;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.core.events.AcrossModuleBootstrappedEvent;
 import com.foreach.across.modules.logging.LoggingModuleSettings;
@@ -31,6 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ClassUtils;
 
@@ -41,7 +39,6 @@ import java.util.Map;
  */
 @Configuration
 @ConditionalOnProperty(LoggingModuleSettings.METHOD_LOG_ENABLED)
-@AcrossEventHandler
 public class MethodLoggingConfiguration implements EnvironmentAware
 {
 	private static final Logger LOG = LoggerFactory.getLogger( MethodLoggingConfiguration.class );
@@ -62,7 +59,7 @@ public class MethodLoggingConfiguration implements EnvironmentAware
 	}
 
 	@SuppressWarnings("unused")
-	@Event
+	@EventListener
 	private void registerMethodLoggingConfiguration( AcrossModuleBeforeBootstrapEvent beforeBootstrapEvent ) throws ClassNotFoundException {
 		// If extension class exists
 		Class moduleClass = beforeBootstrapEvent.getModule().getModule().getClass();
@@ -71,19 +68,18 @@ public class MethodLoggingConfiguration implements EnvironmentAware
 
 		if ( ClassUtils.isPresent( extensionClassName, moduleClass.getClassLoader() ) ) {
 			LOG.info( "Adding method logging {} configuration to module {}",
+			          extensionClassName,
 			          beforeBootstrapEvent.getModule().getName() );
 
 			Class methodLoggingConfigurationClass
 					= ClassUtils.forName( extensionClassName, moduleClass.getClassLoader() );
 
-			beforeBootstrapEvent.addApplicationContextConfigurers(
-					new AnnotatedClassConfigurer( methodLoggingConfigurationClass )
-			);
+			beforeBootstrapEvent.getBootstrapConfig().addApplicationContextConfigurer( methodLoggingConfigurationClass );
 		}
 	}
 
 	@SuppressWarnings("unused")
-	@Event
+	@EventListener
 	private void registerMethodLoggersFromModule( AcrossModuleBootstrappedEvent afterBootstrapEvent ) {
 		Map<String, MethodLogger> methodLoggers = afterBootstrapEvent.getModule()
 		                                                             .getApplicationContext()

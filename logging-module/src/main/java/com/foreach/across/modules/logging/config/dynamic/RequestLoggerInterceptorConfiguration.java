@@ -16,7 +16,7 @@
 
 package com.foreach.across.modules.logging.config.dynamic;
 
-import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.modules.web.config.support.PrefixingHandlerMappingConfigurer;
 import com.foreach.across.modules.web.mvc.InterceptorRegistry;
 import com.foreach.common.web.logging.RequestLogInterceptor;
@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Bean;
 /**
  * @author Andy Somers
  */
-@AcrossDepends(required = "AcrossWebModule")
+@ConditionalOnAcrossModule("AcrossWebModule")
 public class RequestLoggerInterceptorConfiguration implements PrefixingHandlerMappingConfigurer
 {
 	@Autowired

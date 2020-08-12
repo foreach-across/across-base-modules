@@ -1,7 +1,13 @@
 <component name="ArtifactManager">
   <artifact type="war" name="logging-module-test-web:war">
     <output-path>$PROJECT_DIR$/logging-module-test-web/target</output-path>
-    <root id="archive" name="logging-module-test-web-2.0.0-SNAPSHOT.war">
+    <properties id="maven-jee-properties">
+      <options>
+        <module>logging-module-test-web</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="logging-module-test-web-3.0.0-SNAPSHOT.war">
       <element id="artifact" artifact-name="logging-module-test-web:war exploded" />
     </root>
   </artifact>

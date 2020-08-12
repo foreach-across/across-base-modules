@@ -17,7 +17,7 @@
 package com.foreach.across.modules.logging.config;
 
 import com.foreach.across.core.AcrossException;
-import com.foreach.across.core.annotations.AcrossDepends;
+import com.foreach.across.core.annotations.ConditionalOnAcrossModule;
 import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.controllers.RequestResponseLogController;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
@@ -38,7 +38,7 @@ import java.util.Collection;
  * @author Andy Somers
  */
 @Configuration
-@AcrossDepends(required = "AcrossWebModule")
+@ConditionalOnAcrossModule("AcrossWebModule")
 @ConditionalOnProperty(LoggingModuleSettings.REQUEST_RESPONSE_LOG_ENABLED)
 public class RequestResponseLoggingConfiguration implements EnvironmentAware
 {
@@ -65,7 +65,7 @@ public class RequestResponseLoggingConfiguration implements EnvironmentAware
 	}
 
 	@Bean
-	@AcrossDepends(required = "DebugWebModule")
+	@ConditionalOnAcrossModule("DebugWebModule")
 	public RequestResponseLogController requestResponseLogController() {
 		return new RequestResponseLogController();
 	}
@@ -90,7 +90,7 @@ public class RequestResponseLoggingConfiguration implements EnvironmentAware
 
 	@Bean
 	public FilterRegistrationBean requestResponseFilterRegistrationBean( RequestResponseLoggingFilter requestResponseLoggingFilter ) {
-		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+		FilterRegistrationBean<RequestResponseLoggingFilter> filterRegistrationBean = new FilterRegistrationBean<>();
 		filterRegistrationBean.setOrder( Ordered.HIGHEST_PRECEDENCE + 901 ); //SpringSecurityFilterChain = 1000
 		filterRegistrationBean.setFilter( requestResponseLoggingFilter );
 
@@ -102,10 +102,10 @@ public class RequestResponseLoggingConfiguration implements EnvironmentAware
 		}
 
 		if ( !urlFilterMappings.isEmpty() ) {
-			filterRegistrationBean.addUrlPatterns( urlFilterMappings.toArray( new String[urlFilterMappings.size()] ) );
+			filterRegistrationBean.addUrlPatterns( urlFilterMappings.toArray( new String[0] ) );
 		}
 		if ( !servletNameFilterMappings.isEmpty() ) {
-			filterRegistrationBean.addServletNames( servletNameFilterMappings.toArray( new String[servletNameFilterMappings.size()] ) );
+			filterRegistrationBean.addServletNames( servletNameFilterMappings.toArray( new String[0] ) );
 		}
 
 		return filterRegistrationBean;

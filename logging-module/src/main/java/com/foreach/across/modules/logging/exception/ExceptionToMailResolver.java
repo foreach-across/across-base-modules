@@ -18,6 +18,7 @@ package com.foreach.across.modules.logging.exception;
 import com.foreach.across.modules.logging.request.LogHandlerAndViewNameInterceptor;
 import com.foreach.across.modules.logging.request.RequestLoggerFilter;
 import com.foreach.common.spring.context.ApplicationContextInfo;
+import com.foreach.common.spring.context.ApplicationEnvironment;
 import com.foreach.common.spring.mail.MailService;
 import com.foreach.common.web.util.WebUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -194,7 +195,7 @@ public class ExceptionToMailResolver extends SimpleMappingExceptionResolver
 		writeParam( html, "date", readableDate.format( now ) );
 		writeParam( html, "site",
 		            applicationContextInfo.getLabel() + "-" + applicationContextInfo
-				            .getApplicationName() + " (" + applicationContextInfo.getEnvironment() + ")" );
+				            .getApplicationName() + " (" + ApplicationEnvironment.valueOf( applicationContextInfo.getEnvironmentId() ) + ")" );
 		writeParam( html, "build",
 		            "v" + applicationContextInfo.getBuildNumber() + " (build date: " + readableDate.format(
 				            applicationContextInfo.getBuildDate() ) + ")" );

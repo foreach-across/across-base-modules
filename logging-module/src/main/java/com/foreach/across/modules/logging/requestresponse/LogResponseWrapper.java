@@ -48,7 +48,7 @@ public class LogResponseWrapper extends HttpServletResponseWrapper
 		{
 			@Override
 			public boolean isReady() {
-				return true;
+				return false;
 			}
 
 			@Override
