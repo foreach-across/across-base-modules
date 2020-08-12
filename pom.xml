@@ -60,7 +60,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<revision>3.0.0.RELEASE</revision>
+		<revision>3.1.0-SNAPSHOT</revision>
+		<junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
 	</properties>
 
 	<modules>
@@ -74,6 +75,11 @@
 				<groupId>com.foreach.across.modules</groupId>
 				<artifactId>debug-web-module</artifactId>
 				<version>3.0.0.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-api</artifactId>
+				<version>${junit-jupiter-api.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

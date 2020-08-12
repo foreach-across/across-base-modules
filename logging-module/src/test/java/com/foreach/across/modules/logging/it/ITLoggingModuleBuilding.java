@@ -31,7 +31,7 @@ import com.foreach.across.modules.logging.request.RequestLoggerFilter;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConfiguration;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLoggingFilter;
 import com.foreach.across.modules.spring.security.SpringSecurityModule;
-import com.foreach.across.modules.spring.security.configuration.SpringSecurityWebConfigurerAdapter;
+import com.foreach.across.modules.spring.security.configuration.AcrossWebSecurityConfigurer;
 import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.modules.web.servlet.AcrossMultipartFilter;
 import com.foreach.across.test.AcrossTestContext;
@@ -41,7 +41,7 @@ import com.foreach.across.test.support.AcrossTestBuilders;
 import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.web.filter.OrderedCharacterEncodingFilter;
+import org.springframework.boot.web.servlet.filter.OrderedCharacterEncodingFilter;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.resource.ResourceUrlEncodingFilter;
 
@@ -238,8 +238,8 @@ public class ITLoggingModuleBuilding
 			assertEquals( "AcrossMultipartFilter is not 2nd filter", AcrossMultipartFilter.class, orderedFilters.get( 1 ) );
 			assertEquals( "RequestLoggerFilter is not 3rd filter", RequestLoggerFilter.class, orderedFilters.get( 2 ) );
 			assertEquals( "RequestResponseLoggingFilter is not 4th filter", RequestResponseLoggingFilter.class, orderedFilters.get( 3 ) );
-			assertEquals( "springSecurityFilterChain is not 5th filter", "springSecurityFilterChain", new ArrayList<>( filters.keySet() ).get( 4 ) );
-			assertEquals( "ResourceUrlEncodingFilter is not 6th filter", ResourceUrlEncodingFilter.class, orderedFilters.get( 5 ) );
+			assertEquals( "ResourceUrlEncodingFilter is not 8th filter", ResourceUrlEncodingFilter.class, orderedFilters.get( 7 ) );
+			assertEquals( "springSecurityFilterChain is not 9th filter", "springSecurityFilterChain", new ArrayList<>( filters.keySet() ).get( 8 ) );
 		}
 	}
 
@@ -282,11 +282,15 @@ public class ITLoggingModuleBuilding
 			loggingModule.setProperty( LoggingModuleSettings.REQUEST_RESPONSE_LOG_CONFIGURATION, logConfiguration );
 			context.addModule( loggingModule );
 
-			context.addModule( new DebugWebModule() );
+			DebugWebModule debugWebModule = new DebugWebModule();
+			debugWebModule.setProperty( "debug-web-module.security.enabled", false );
+			context.addModule( debugWebModule );
 			context.addModule( new SpringSecurityModule() );
 
 			ConfigurableListableBeanFactory beanFactory = ( (ConfigurableApplicationContext) context.getParentApplicationContext() ).getBeanFactory();
-			beanFactory.registerSingleton( "webSecurityConfigurer", new SpringSecurityWebConfigurerAdapter() );
+			beanFactory.registerSingleton( "webSecurityConfigurer", new AcrossWebSecurityConfigurer()
+			{
+			} );
 
 		}
 	}

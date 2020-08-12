@@ -7,7 +7,7 @@
         <packaging>war</packaging>
       </options>
     </properties>
-    <root id="archive" name="logging-module-test-web-3.0.0-SNAPSHOT.war">
+    <root id="archive" name="logging-module-test-web-3.1.0-SNAPSHOT.war">
       <element id="artifact" artifact-name="logging-module-test-web:war exploded" />
     </root>
   </artifact>

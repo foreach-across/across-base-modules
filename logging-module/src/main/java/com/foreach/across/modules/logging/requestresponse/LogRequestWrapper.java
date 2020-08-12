@@ -53,27 +53,8 @@ public class LogRequestWrapper extends HttpServletRequestWrapper
 			private TeeInputStream tee = new TeeInputStream( LogRequestWrapper.super.getInputStream(), bos );
 
 			@Override
-			public boolean isFinished() {
-				return finished;
-			}
-
-			@Override
-			public boolean isReady() {
-				return true;
-			}
-
-			@Override
-			public void setReadListener( ReadListener readListener ) {
-
-			}
-
-			@Override
 			public int read() throws IOException {
-				int data = tee.read();
-				if ( data == -1 ) {
-					finished = true;
-				}
-				return data;
+				return tee.read();
 			}
 		};
 	}
