@@ -27,6 +27,7 @@ import com.foreach.across.modules.web.AcrossWebModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
@@ -66,7 +67,8 @@ public class LoggingModuleApplication
 		return loggingModule;
 	}
 
-	@Bean
+	@Bean("acrossDataSource")
+	@Primary
 	public DataSource acrossDataSource( ConfigurableEnvironment environment, DataSourceProperties dataSourceProperties ) {
 		return dataSourceProperties.initializeDataSourceBuilder().build();
 	}

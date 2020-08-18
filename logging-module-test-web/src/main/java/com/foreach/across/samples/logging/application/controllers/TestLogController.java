@@ -19,7 +19,6 @@ package com.foreach.across.samples.logging.application.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,6 +32,7 @@ public class TestLogController
 {
 	private Logger LOG = LoggerFactory.getLogger( TestLogController.class );
 
+	@Autowired
 	private DataSource dataSource;
 
 	@ResponseBody
@@ -49,10 +49,5 @@ public class TestLogController
 			statement.execute( "SELECT 1" );
 		}
 		return "OK";
-	}
-
-	@Autowired
-	public void setDataSource( DataSourceProperties dataSourceProperties ) {
-		DataSource dataSource = dataSourceProperties.initializeDataSourceBuilder().build();
 	}
 }

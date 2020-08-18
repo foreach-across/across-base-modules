@@ -136,16 +136,16 @@
 		<appender-ref ref="across"/>
 		<appender-ref ref="errors"/>
 		<appender-ref ref="elk-errors"/>
+		<appender-ref ref="elk-server"/>
 	</logger>
 
 	<logger name="com.foreach.across.core.installers.AcrossBootstrapInstallerRegistry" level="DEBUG">
 		<appender-ref ref="console"/>
 	</logger>
-	<root level="DEBUG">
+	<root level="INFO">
 		<appender-ref ref="console"/>
 		<appender-ref ref="errors"/>
 		<appender-ref ref="elk-errors"/>
-		<appender-ref ref="elk-server"/>
 	</root>
 
 
