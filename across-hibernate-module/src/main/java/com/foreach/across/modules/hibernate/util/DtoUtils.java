@@ -15,12 +15,22 @@
  */
 package com.foreach.across.modules.hibernate.util;
 
+import com.foreach.across.modules.hibernate.business.EntityWithDto;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.ClassUtils;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
 
 /**
  * @author Arne Vandamme
  */
+@Slf4j
 public class DtoUtils
 {
 	private DtoUtils() {
@@ -44,6 +54,11 @@ public class DtoUtils
 			try {
 				T dto = (T) entityType.newInstance();
 				BeanUtils.copyProperties( entity, dto );
+				PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors( entity.getClass() );
+
+				Arrays.stream( propertyDescriptors )
+				      .filter( propertyDescriptor -> !BeanUtils.isSimpleProperty( propertyDescriptor.getPropertyType() ) )
+				      .forEach( pd -> DtoUtils.deepCopy( pd, dto ) );
 
 				return dto;
 			}
@@ -53,5 +68,70 @@ public class DtoUtils
 		}
 
 		return null;
+	}
+
+	private static <T> void deepCopy( PropertyDescriptor propertyDescriptor, T dto ) {
+		try {
+			Class<?> propertyType = propertyDescriptor.getPropertyType();
+			Object currentValue = propertyDescriptor.getReadMethod().invoke( dto );
+			if ( currentValue != null ) {
+				Object newValue = getClonedValue( propertyType, currentValue );
+				if ( newValue != null ) {
+					propertyDescriptor.getWriteMethod().invoke( dto, newValue );
+				}
+			}
+		}
+		catch ( IllegalAccessException | InvocationTargetException | InstantiationException | UnsupportedOperationException e ) {
+			LOG.debug( "Unable to make a better clone for property '{}', type {}", propertyDescriptor.getName(),
+			           propertyDescriptor.getPropertyType().getSimpleName(), e );
+		}
+	}
+
+	private static Object getClonedValue( Class<?> propertyType,
+	                                      Object currentValue ) throws InstantiationException, IllegalAccessException {
+		Object newValue = null;
+
+		if ( propertyType.isArray() ) {
+			Object[] typedValue = (Object[]) currentValue;
+			Object[] clone = ((Object[]) currentValue).clone();
+			Object[] clonedItems = Arrays.stream( typedValue )
+			                             .map( value -> copyValue( propertyType.getComponentType(), value ) )
+			                             .filter( Objects::nonNull )
+			                             .toArray();
+			for ( int i = 0; i < clonedItems.length; i++ ) {
+				clone[i] = clonedItems[i];
+			}
+			if ( clonedItems.length == typedValue.length ) {
+				newValue = clone;
+			}
+		}
+		else if ( Collection.class.isAssignableFrom( propertyType ) ) {
+			Collection<Object> asLinkedList = (Collection<Object>) currentValue.getClass().newInstance();
+			Collection<Object> typedValue = (Collection<Object>) currentValue;
+
+			typedValue.stream()
+			          .map( value -> copyValue( value.getClass(), value ) )
+			          .filter( Objects::nonNull )
+			          .forEach( asLinkedList::add );
+			if ( typedValue.size() == asLinkedList.size() ) {
+				newValue = asLinkedList;
+			}
+		}
+		else {
+			newValue = copyValue( propertyType, currentValue );
+		}
+		return newValue;
+	}
+
+	private static Object copyValue( Class<?> propertyType, Object currentValue ) {
+		Object newValue = null;
+		if ( EntityWithDto.class.isAssignableFrom( propertyType ) ) {
+			EntityWithDto typedValue = (EntityWithDto) currentValue;
+			newValue = typedValue.toDto();
+		}
+		else if ( Cloneable.class.isAssignableFrom( propertyType ) ) {
+			newValue = ObjectUtils.clone( currentValue );
+		}
+		return newValue;
 	}
 }
