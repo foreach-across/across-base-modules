@@ -81,6 +81,12 @@
 				<artifactId>junit-jupiter-api</artifactId>
 				<version>${junit-jupiter-api.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>net.logstash.logback</groupId>
+				<artifactId>logstash-logback-encoder</artifactId>
+				<version>4.9</version>
+				<optional>true</optional>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

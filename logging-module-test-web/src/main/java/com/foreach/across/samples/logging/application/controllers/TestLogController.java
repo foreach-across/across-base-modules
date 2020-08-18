@@ -16,13 +16,10 @@
 
 package com.foreach.across.samples.logging.application.controllers;
 
-import com.foreach.across.database.support.HikariDataSourceHelper;
-import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -55,7 +52,7 @@ public class TestLogController
 	}
 
 	@Autowired
-	public void setDataSource( Environment environment) {
-		this.dataSource = new HikariDataSource( HikariDataSourceHelper.create( "poc", (ConfigurableEnvironment ) environment ) );
+	public void setDataSource( DataSourceProperties dataSourceProperties ) {
+		DataSource dataSource = dataSourceProperties.initializeDataSourceBuilder().build();
 	}
 }

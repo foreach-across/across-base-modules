@@ -105,7 +105,6 @@
 		<dependency>
 			<groupId>net.logstash.logback</groupId>
 			<artifactId>logstash-logback-encoder</artifactId>
-			<version>4.6</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
