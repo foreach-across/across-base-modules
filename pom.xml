@@ -60,12 +60,24 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<revision>4.0.0.RELEASE</revision>
+		<revision>4.0.1-SNAPSHOT</revision>
+		<dozer-spring-boot-starter.version>6.5.0</dozer-spring-boot-starter.version>
 	</properties>
 
 	<modules>
 		<module>across-hibernate-module</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.github.dozermapper</groupId>
+				<artifactId>dozer-spring-boot-starter</artifactId>
+				<version>${dozer-spring-boot-starter.version}</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
 
 	<scm>
 		<url>https://bitbucket.org/beforeach/across-hibernate-module</url>
