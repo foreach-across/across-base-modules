@@ -72,7 +72,7 @@ public class TestDtoUtils
 	@EqualsAndHashCode
 	public static class CollectionEntity implements EntityWithDto<CollectionEntity>
 	{
-		private List<HierarchicalEntity> values;
+		private Collection<HierarchicalEntity> values;
 
 		@Override
 		public CollectionEntity toDto() {
@@ -115,14 +115,7 @@ public class TestDtoUtils
 		child.setParent( parent );
 
 		HierarchicalEntity dto = DtoUtils.createDto( child );
-		assertNotNull( dto );
-		assertNotSame( child, dto );
-		assertEquals( child.getName(), dto.getName() );
-		assertNotSame( child.getParent(), dto.getParent() );
-		assertEquals( child.getParent().getName(), dto.getParent().getName() );
-		assertNull( child.getParent().getParent() );
-		assertNull( dto.getParent().getParent() );
-		assertEquals( child.getParent(), dto.getParent() );
+		assertHierarchicalEntity( child, dto );
 	}
 
 	@Test
@@ -146,12 +139,7 @@ public class TestDtoUtils
 
 		HierarchicalEntity collectionItem = collection.getValues()[0];
 		HierarchicalEntity dtoCollectionItem = dto.getValues()[0];
-		assertNotSame( collectionItem, dtoCollectionItem );
-		assertNotSame( collectionItem.getParent(), dtoCollectionItem.getParent() );
-		assertEquals( collectionItem.getParent().getName(), dtoCollectionItem.getParent().getName() );
-		assertNull( collectionItem.getParent().getParent() );
-		assertNull( dtoCollectionItem.getParent().getParent() );
-		assertEquals( collectionItem.getParent(), dtoCollectionItem.getParent() );
+		assertHierarchicalEntity( collectionItem, dtoCollectionItem );
 	}
 
 	@Test
@@ -170,6 +158,12 @@ public class TestDtoUtils
 		collection.setValues( new ArrayList<>( Collections.singletonList( child ) ) );
 		assertCollectionToDto( collection );
 
+		collection.setValues( new HashSet<>( Collections.singletonList( child ) ) );
+		assertCollectionToDto( collection );
+
+		collection.setValues( new HashSet<>( Arrays.asList( child, child2 ) ) );
+		assertCollectionToDto( collection );
+
 		collection.setValues( Collections.singletonList( child ) );
 		assertCollectionToDto( collection );
 
@@ -185,19 +179,25 @@ public class TestDtoUtils
 		assertEquals( collection.getValues().size(), dto.getValues().size() );
 		assertEquals( collection.getValues(), dto.getValues() );
 
-		List<HierarchicalEntity> originalValues = collection.getValues();
-		List<HierarchicalEntity> clonedValues = dto.getValues();
+		HierarchicalEntity[] originalValues = collection.getValues().toArray( new HierarchicalEntity[0] );
+		HierarchicalEntity[] clonedValues = dto.getValues().toArray( new HierarchicalEntity[0] );
 		for ( int i = 0; i < collection.getValues().size(); i++ ) {
-			assertHierarchicalEntity( originalValues.get( i ), clonedValues.get( i ) );
+			assertHierarchicalEntity( originalValues[i], clonedValues[i] );
 		}
 	}
 
 	private void assertHierarchicalEntity( HierarchicalEntity original, HierarchicalEntity deepCopy ) {
 		assertNotSame( original, deepCopy );
-		assertNotSame( original.getParent(), deepCopy.getParent() );
-		assertEquals( original.getParent().getName(), deepCopy.getParent().getName() );
-		assertNull( original.getParent().getParent() );
-		assertNull( deepCopy.getParent().getParent() );
+		if ( original.getParent() == null ) {
+			assertNull( deepCopy.getParent() );
+		}
+		else {
+			assertNotSame( original.getParent(), deepCopy.getParent() );
+			assertEquals( original.getParent().getName(), deepCopy.getParent().getName() );
+			assertNull( original.getParent().getParent() );
+			assertNull( deepCopy.getParent().getParent() );
+
+		}
 		assertEquals( original.getParent(), deepCopy.getParent() );
 	}
 }
