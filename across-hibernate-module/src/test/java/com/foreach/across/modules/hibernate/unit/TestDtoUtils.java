@@ -24,6 +24,8 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.*;
 
 /**
@@ -88,6 +90,34 @@ public class TestDtoUtils
 
 		@Override
 		public ArrayEntity toDto() {
+			return DtoUtils.createDto( this );
+		}
+	}
+
+	@Setter
+	@Getter
+	@EqualsAndHashCode(of = "id")
+	public static class CampaignAsset implements EntityWithDto<CampaignAsset>
+	{
+		private Long id;
+		private Campaign campain;
+
+		@Override
+		public CampaignAsset toDto() {
+			return DtoUtils.createDto( this );
+		}
+	}
+
+	@Setter
+	@Getter
+	@EqualsAndHashCode(of = "id")
+	public static class Campaign implements EntityWithDto<Campaign>
+	{
+		private Long id;
+		private List<CampaignAsset> assets;
+
+		@Override
+		public Campaign toDto() {
 			return DtoUtils.createDto( this );
 		}
 	}
@@ -166,10 +196,51 @@ public class TestDtoUtils
 
 		collection.setValues( Collections.singletonList( child ) );
 		assertCollectionToDto( collection );
+		assertThatExceptionOfType( UnsupportedOperationException.class )
+				.isThrownBy( () -> collection.getValues().add( child2 ) );
 
 		collection.setValues( Arrays.asList( child, child2 ) );
 		assertCollectionToDto( collection );
+	}
 
+	@Test
+	public void bidirectionalRelationship() {
+		Campaign campaign = new Campaign();
+		campaign.setId( 1L );
+
+		CampaignAsset asset1 = new CampaignAsset();
+		asset1.setId( 1L );
+		asset1.setCampain( campaign );
+
+		CampaignAsset asset2 = new CampaignAsset();
+		asset2.setId( 2L );
+		asset2.setCampain( campaign );
+
+		campaign.setAssets( Arrays.asList( asset1, asset2 ) );
+
+		CampaignAsset dto = asset1.toDto();
+		assertThat( asset1 ).isEqualTo( dto )
+		                    .isNotSameAs( dto );
+		assertThat( asset1.getCampain() ).isEqualTo( dto.getCampain() )
+		                                 .isNotSameAs( dto.getCampain() );
+
+		List<CampaignAsset> originalAssets = asset1.getCampain().getAssets();
+		List<CampaignAsset> clonedAssets = dto.getCampain().getAssets();
+		assertThat( originalAssets )
+				.isEqualTo( clonedAssets )
+				.isNotSameAs( clonedAssets )
+				.containsExactly( clonedAssets.toArray( new CampaignAsset[0] ) );
+
+		assertThat( clonedAssets.get( 0 ) )
+				.isEqualTo( asset1 )
+				.isNotSameAs( asset1 )
+				.isEqualTo( dto )
+				// should dto be the same as the cloned asset in the collection?
+				.isSameAs( dto );
+
+		assertThat( clonedAssets.get( 1 ) )
+				.isEqualTo( asset2 )
+				.isNotSameAs( asset2 );
 	}
 
 	private void assertCollectionToDto( CollectionEntity collection ) {
