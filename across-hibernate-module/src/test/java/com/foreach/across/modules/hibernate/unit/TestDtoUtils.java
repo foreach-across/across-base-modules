@@ -21,6 +21,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.junit.Test;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
 
 import java.util.*;
 
@@ -201,6 +203,24 @@ public class TestDtoUtils
 
 		collection.setValues( Arrays.asList( child, child2 ) );
 		assertCollectionToDto( collection );
+	}
+
+	@Test
+	public void cglibEnhancedType() {
+		HierarchicalEntity child = new HierarchicalEntity();
+		child.setName( "child" );
+
+		HierarchicalEntity parent = new HierarchicalEntity();
+		parent.setName( "parent" );
+		child.setParent( parent );
+
+		Enhancer enhancer = new Enhancer();
+		enhancer.setSuperclass( HierarchicalEntity.class );
+		enhancer.setCallback( (MethodInterceptor) ( obj, method, args, proxy ) -> method.invoke( child, args ) );
+
+		HierarchicalEntity dto = (HierarchicalEntity) DtoUtils.createDto( enhancer.create() );
+		assertThat( dto.getClass() ).isNotEqualTo( HierarchicalEntity.class );
+		assertHierarchicalEntity( child, dto );
 	}
 
 	@Test

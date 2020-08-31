@@ -17,6 +17,7 @@ package com.foreach.across.modules.hibernate.util;
 
 import com.github.dozermapper.core.DozerBeanMapperBuilder;
 import com.github.dozermapper.core.Mapper;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Arne Vandamme
@@ -41,18 +42,8 @@ public class DtoUtils
 	@SuppressWarnings("unchecked")
 	public static <T> T createDto( T entity ) {
 		if ( entity != null ) {
-			return (T) beanMapper.map( entity, entity.getClass() );
-//			Class entityType = ClassUtils.getUserClass( entity );
-//
-//			try {
-//				T dto = (T) entityType.newInstance();
-//				BeanUtils.copyProperties( entity, dto );
-//
-//				return dto;
-//			}
-//			catch ( IllegalAccessException | InstantiationException iae ) {
-//				throw new IllegalArgumentException( "Unable to create a default DTO", iae );
-//			}
+			Class entityType = ClassUtils.getUserClass( entity );
+			return (T) beanMapper.map( entity, entityType );
 		}
 
 		return null;
