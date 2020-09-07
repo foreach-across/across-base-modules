@@ -15,16 +15,18 @@
  */
 package com.foreach.across.modules.hibernate.util;
 
-import com.github.dozermapper.core.DozerBeanMapperBuilder;
 import com.github.dozermapper.core.Mapper;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.util.ClassUtils;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Arne Vandamme
  */
 public class DtoUtils
 {
-	public static final Mapper beanMapper = DozerBeanMapperBuilder.create().build();
+	static Mapper beanMapper;
 
 	private DtoUtils() {
 	}
@@ -43,7 +45,20 @@ public class DtoUtils
 	public static <T> T createDto( T entity ) {
 		if ( entity != null ) {
 			Class entityType = ClassUtils.getUserClass( entity );
-			return (T) beanMapper.map( entity, entityType );
+			if ( beanMapper != null ) {
+
+				return (T) beanMapper.map( entity, entityType );
+			}
+
+			try {
+				T dto = (T) entityType.newInstance();
+				BeanUtils.copyProperties( entity, dto );
+				return dto;
+			}
+			catch ( IllegalAccessException | InvocationTargetException | InstantiationException e ) {
+				e.printStackTrace();
+			}
+
 		}
 
 		return null;
