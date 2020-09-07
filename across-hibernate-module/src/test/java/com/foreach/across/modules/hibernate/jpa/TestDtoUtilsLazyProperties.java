@@ -130,7 +130,6 @@ public class TestDtoUtilsLazyProperties
 
                                              .withBeanMappingsBuilders( new BeanMappingsBuilder()
                                              {
-
 	                                             @Override
 	                                             public List<MappingFileData> build( BeanContainer beanContainer,
 	                                                                                 DestBeanCreator destBeanCreator,

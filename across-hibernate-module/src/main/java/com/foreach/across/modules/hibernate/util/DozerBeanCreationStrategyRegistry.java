@@ -24,40 +24,63 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
+/**
+ * Used as a proxy {@link BeanCreationStrategy} which supports registering custom {@link BeanCreationStrategy}s for mapping DTOs.
+ *
+ * @author Steven Gentens
+ * @see DozerConfiguration
+ * @since 4.0.1
+ */
 @ConditionalOnClass(DozerBeanMapper.class)
 public class DozerBeanCreationStrategyRegistry
 {
-	private Map<String, BeanCreationStrategy> strategies = new ConcurrentHashMap<>();
+	private final Map<String, BeanCreationStrategy> strategies = new ConcurrentHashMap<>();
 
 	BeanCreationStrategy getBeanCreationStrategy() {
+		Function<BeanCreationDirective, Optional<BeanCreationStrategy>> strategyResolver =
+				( directive ) -> strategies.values().stream()
+				                           .filter( bcs -> bcs.isApplicable( directive ) )
+				                           .findFirst();
 		return new BeanCreationStrategy()
 		{
+			// threadlocal? -> remove after create?
 			@Override
 			public boolean isApplicable( BeanCreationDirective directive ) {
-				Optional<BeanCreationStrategy> first = strategies.values().stream()
-				                                                 .filter( bcs -> bcs.isApplicable( directive ) )
-				                                                 .findFirst();
-				return first.isPresent();
+				return strategyResolver.apply( directive ).isPresent();
 			}
 
 			@Override
 			public Object create( BeanCreationDirective directive ) {
-				BeanCreationStrategy beanCreationStrategy = strategies.values().stream()
-				                                                      .filter( bcs -> bcs.isApplicable( directive ) )
-				                                                      .findFirst()
-				                                                      .get();
+				BeanCreationStrategy beanCreationStrategy = strategyResolver.apply( directive )
+				                                                            .get();
 				return beanCreationStrategy.create( directive );
 			}
 		};
 	}
 
+	/**
+	 * Registers a {@link BeanCreationStrategy} under a given name.
+	 *
+	 * @param name     to register the strategy under
+	 * @param strategy to register
+	 */
 	public void add( String name, BeanCreationStrategy strategy ) {
 		strategies.put( name, strategy );
 	}
 
+	/**
+	 * Removes a {@link BeanCreationStrategy} under a given name.
+	 *
+	 * @param name of the strategy to remove
+	 */
 	public void remove( String name ) {
 		strategies.remove( name );
 	}
+
+	// BeanCreationStrategyHolder -> name, strategy, order
+	// ArrayList, sorted on order after each add
+	// synchronized access in add, remove and resolving -> synchronized (strategies) { do shizzle }
 
 }
