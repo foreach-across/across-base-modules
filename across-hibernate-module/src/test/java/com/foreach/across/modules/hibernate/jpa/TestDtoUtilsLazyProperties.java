@@ -28,18 +28,10 @@ import com.foreach.across.test.AcrossTestConfiguration;
 import com.github.dozermapper.core.DozerBeanMapperBuilder;
 import com.github.dozermapper.core.Mapper;
 import com.github.dozermapper.core.MappingException;
-import com.github.dozermapper.core.builder.BeanMappingsBuilder;
-import com.github.dozermapper.core.classmap.MappingFileData;
-import com.github.dozermapper.core.config.BeanContainer;
-import com.github.dozermapper.core.factory.BeanCreationDirective;
-import com.github.dozermapper.core.factory.BeanCreationStrategy;
-import com.github.dozermapper.core.factory.DestBeanCreator;
-import com.github.dozermapper.core.propertydescriptor.PropertyDescriptorFactory;
 import org.assertj.core.api.Condition;
 import org.hibernate.Hibernate;
 import org.hibernate.LazyInitializationException;
 import org.hibernate.Session;
-import org.hibernate.proxy.HibernateProxy;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,8 +45,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -76,7 +66,8 @@ public class TestDtoUtilsLazyProperties
 	}
 
 	@Test
-	public void sessionClosedSkipsLazyProperties() {
+	// todo make configurable?
+	public void sessionClosedSkipsLazyPropertiesIfMarkingNonInitializedPropertiesAsMapped() {
 		Client jef = initializeClientWithLazyProperty();
 
 		Mapper build = DozerBeanMapperBuilder.create()
@@ -90,95 +81,44 @@ public class TestDtoUtilsLazyProperties
 				.isNotNull()
 				.isNotSameAs( jef );
 		assertThat( dto.getName() ).isEqualTo( jef.getName() );
-		assertThat( dto.getLinkedClient() ).isSameAs( jef.getLinkedClient() );
+		assertThat( dto.getLinkedClient() ).isNull();
 	}
-//
-//	public static class ProxyConverter implements CustomConverter, MapperAware
-//	{
-//
-//		@Override
-//		public Object convert( Object existingDestinationFieldValue,
-//		                       Object sourceFieldValue,
-//		                       Class<?> destinationClass,
-//		                       Class<?> sourceClass ) {
-//			return existingDestinationFieldValue;
-//		}
-//	}
 
 	@Test
-	public void initializeViaProxyUponCall() {
+	public void sessionClosedInitializesTargetObjectOnFirstMethodCall() {
 		Client jef = initializeClientWithLazyProperty();
 
 		Mapper build = DozerBeanMapperBuilder.create()
-//		                                     .withMappingBuilder( new BeanMappingBuilder()
-//		                                     {
-//			                                     @Override
-//			                                     protected void configure() {
-//			                                     	Client.class.getFields()
-//				                                     mapping( type(HibernateProxy.class) ).exclude(  )
-//			                                     }
-//		                                     } )
-//		                                     .withCustomFieldMapper( ( source, destination, sourceFieldValue, classMap, fieldMapping ) -> {
-//			                                     if ( Hibernate.isInitialized( sourceFieldValue ) ) {
-//			                                     	fieldMapping.setType( MappingDirection.ONE_WAY );
-//				                                     fieldMapping.setCustomConverter( ProxyConverter.class.getName() );
-//				                                     return true;
-//			                                     }
-//			                                     //if field is initialized, Dozer will continue mapping
-//			                                     return false;
-//		                                     } )
+		                                     .withCustomFieldMapper( ( source, destination, sourceFieldValue, classMap, fieldMapping ) -> {
+			                                     if ( !Hibernate.isInitialized( sourceFieldValue ) ) {
+				                                     Object srcObject = sourceFieldValue;
+				                                     Enhancer enhancer = new Enhancer();
+				                                     enhancer.setSuperclass( destination.getClass() );
 
-                                             .withBeanMappingsBuilders( new BeanMappingsBuilder()
-                                             {
-	                                             @Override
-	                                             public List<MappingFileData> build( BeanContainer beanContainer,
-	                                                                                 DestBeanCreator destBeanCreator,
-	                                                                                 PropertyDescriptorFactory propertyDescriptorFactory ) {
-		                                             destBeanCreator.addPluggedStrategy( new BeanCreationStrategy()
-		                                             {
-			                                             @Override
-			                                             public boolean isApplicable( BeanCreationDirective directive ) {
-				                                             return HibernateProxy.class.isAssignableFrom(
-						                                             directive.getSrcObject().getClass() );
-			                                             }
-
-			                                             @Override
-			                                             public Object create( BeanCreationDirective directive ) {
-				                                             Object srcObject = directive.getSrcObject();
-				                                             Enhancer enhancer = new Enhancer();
-				                                             enhancer.setSuperclass( directive.getTargetClass() );
-
-				                                             enhancer.setCallback( (MethodInterceptor) ( obj, method, args, proxy ) -> {
-					                                             if ( !Hibernate.isInitialized( srcObject ) ) {
-						                                             try (Session session = hibernateSessionHolder.openSession()) {
-							                                             session.update( srcObject );
-							                                             Hibernate.initialize( srcObject );
-						                                             }
-					                                             }
-					                                             return method.invoke( srcObject, args );
-				                                             } );
-				                                             return enhancer;
-			                                             }
-		                                             } );
-		                                             return Collections.emptyList();
-	                                             }
-                                             } )
-                                             .build();
+				                                     enhancer.setCallback( (MethodInterceptor) ( obj, method, args, proxy ) -> {
+					                                     if ( !Hibernate.isInitialized( srcObject ) ) {
+						                                     try (Session session = hibernateSessionHolder.openSession()) {
+							                                     session.update( srcObject );
+							                                     Hibernate.initialize( srcObject );
+						                                     }
+					                                     }
+					                                     return method.invoke( srcObject, args );
+				                                     } );
+				                                     fieldMapping.writeDestValue( destination, enhancer.create() );
+				                                     return true;
+			                                     }
+			                                     // Dozer takes over mapping
+			                                     return false;
+		                                     } )
+		                                     .build();
 		Client dto = build.map( jef, jef.getClass() );
-
-		HibernateProxy proxy = (HibernateProxy) jef.getLinkedClient();
-		if ( !Hibernate.isInitialized( proxy ) ) {
-			try (Session session = hibernateSessionHolder.openSession()) {
-				session.update( proxy );
-				Hibernate.initialize( proxy );
-			}
-		}
 		assertThat( dto )
 				.isNotNull()
 				.isNotSameAs( jef );
 		assertThat( dto.getName() ).isEqualTo( jef.getName() );
-		assertThat( dto.getLinkedClient() ).isEqualTo( jef.getLinkedClient() )
+		assertThat( dto.getLinkedClient() ).isNotNull()
 		                                   .isNotSameAs( jef.getLinkedClient() );
+		assertThat( dto.getLinkedClient().getName() ).isEqualTo( "josh" );
 	}
 
 	@Test

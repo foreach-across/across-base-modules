@@ -38,8 +38,8 @@ import java.util.Collections;
  * @since 4.0.1
  */
 @Configuration
-@ConditionalOnClass(DozerBeanMapper.class)
-class DozerConfiguration
+@ConditionalOnClass(DozerBeanMapperBuilder.class)
+public class DozerConfiguration
 {
 	@Bean
 	public DozerBeanCreationStrategyRegistry registry() {
