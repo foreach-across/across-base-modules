@@ -23,13 +23,19 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
 public class DomainTypesBeanCreationStrategy implements BeanCreationStrategy
 {
 	@Override
 	public boolean isApplicable( BeanCreationDirective directive ) {
-		return Arrays.stream( directive.getActualClass().getDeclaredMethods() ).anyMatch( m -> "of".equals( m.getName() ) );
+		// todo method static / zelfde type cfr ObjectToObjectConverter
+		return Arrays.stream( directive.getActualClass().getDeclaredMethods() ).anyMatch( m -> {
+			boolean hasOfMethod = "of".equals( m.getName() );
+			boolean isStatic = Modifier.isStatic( m.getModifiers() );
+			return hasOfMethod && isStatic;
+		} );
 	}
 
 	@Override

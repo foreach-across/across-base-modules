@@ -27,14 +27,14 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Collections;
 
 /**
- * If Dozer is on the classpath, this configures a {@link DozerBeanMapper} and a {@link DozerBeanCreationStrategyRegistry}.
+ * If Dozer is on the classpath, this configures a {@link DozerBeanMapper} and a {@link DozerMapperCustomizationRegistry}.
  * The resulting {@link Mapper} is then configured for {@link DtoUtils#createDto(Object)} so that complex object hierarchies have a better DTO conversion.
  * This means that instead of properties which reference other objects are copied over, a DTO is created for those properties as well.
  * </p>
  * The {@link Mapper} is created with a proxy {@link com.github.dozermapper.core.factory.BeanCreationStrategy} that supports registering additional application-based strategies.
  *
  * @author Steven Gentens
- * @see DozerBeanCreationStrategyRegistry
+ * @see DozerMapperCustomizationRegistry
  * @since 4.0.1
  */
 @Configuration
@@ -42,17 +42,15 @@ import java.util.Collections;
 public class DozerConfiguration
 {
 	@Bean
-	public DozerBeanCreationStrategyRegistry registry() {
-		DozerBeanCreationStrategyRegistry dozerBeanCreationStrategyRegistry = new DozerBeanCreationStrategyRegistry();
-		dozerBeanCreationStrategyRegistry.add( DomainTypesBeanCreationStrategy.class.getSimpleName(),
-		                                       new DomainTypesBeanCreationStrategy() );
-		return dozerBeanCreationStrategyRegistry;
+	public DozerMapperCustomizationRegistry registry() {
+		return new DozerMapperCustomizationRegistry();
 	}
 
 	@Bean
-	public Mapper dozerBeanMapper( ConfigurableBeanFactory beanFactory, DozerBeanCreationStrategyRegistry registry ) {
+	public Mapper dozerBeanMapper( ConfigurableBeanFactory beanFactory, DozerMapperCustomizationRegistry registry ) {
 		ClassLoader classLoader = beanFactory.getBeanClassLoader();
 		Mapper build = DozerBeanMapperBuilder.create()
+		                                     .withCustomFieldMapper( registry.getCustomFieldMapper() )
 		                                     .withBeanMappingsBuilders(
 				                                     ( beanContainer, destBeanCreator, propertyDescriptorFactory ) -> {
 					                                     // registry

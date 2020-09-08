@@ -173,6 +173,9 @@ public class TestDtoUtilsLazyProperties
 		public void configure( AcrossContext context ) {
 			AcrossHibernateJpaModule hibernateModule = new AcrossHibernateJpaModule();
 			hibernateModule.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
+//			if ( applicationContext instanceof GenericApplicationContext ) {
+//				( (GenericApplicationContext) applicationContext ).setClassLoader( new FilteredClassLoader( "com.github.dozermapper" ) );
+//			}
 			context.addModule( hibernateModule );
 
 			SimpleJpaModule simpleJpaModule = new SimpleJpaModule();
