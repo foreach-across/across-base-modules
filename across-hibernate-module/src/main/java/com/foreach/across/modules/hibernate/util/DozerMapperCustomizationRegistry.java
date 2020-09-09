@@ -95,7 +95,7 @@ public class DozerMapperCustomizationRegistry
 		};
 	}
 
-	public void add( @NonNull DozerCustomizationRegistrar customizationRegistrar ) {
+	public void register( @NonNull DozerCustomizationRegistrar customizationRegistrar ) {
 		Assert.notNull( customizationRegistrar, "Registrar should not be null!" );
 		Assert.notNull( customizationRegistrar.name(), "Registrar requires a name to be filled in!" );
 		Object customization = customizationRegistrar.customization();

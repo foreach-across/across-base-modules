@@ -16,6 +16,7 @@
 
 package com.foreach.across.modules.hibernate.util;
 
+import com.foreach.across.core.annotations.Exposed;
 import com.github.dozermapper.core.DozerBeanMapper;
 import com.github.dozermapper.core.DozerBeanMapperBuilder;
 import com.github.dozermapper.core.Mapper;
@@ -38,15 +39,17 @@ import java.util.Collections;
  * @since 4.0.1
  */
 @Configuration
-@ConditionalOnClass(DozerBeanMapperBuilder.class)
+@ConditionalOnClass(DozerBeanMapper.class)
 public class DozerConfiguration
 {
 	@Bean
+	@Exposed
 	public DozerMapperCustomizationRegistry registry() {
 		return new DozerMapperCustomizationRegistry();
 	}
 
 	@Bean
+	@Exposed
 	public Mapper dozerBeanMapper( ConfigurableBeanFactory beanFactory, DozerMapperCustomizationRegistry registry ) {
 		ClassLoader classLoader = beanFactory.getBeanClassLoader();
 		Mapper build = DozerBeanMapperBuilder.create()

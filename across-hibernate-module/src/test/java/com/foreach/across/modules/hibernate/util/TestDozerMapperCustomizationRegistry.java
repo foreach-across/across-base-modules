@@ -221,10 +221,10 @@ public class TestDozerMapperCustomizationRegistry
 				return new SimpleObject();
 			}
 		};
-		dozerMapperCustomizationRegistry.add( DozerMapperCustomizationRegistry.beanCreationStrategyRegistrar()
-		                                                                      .name( mapperName )
-		                                                                      .customization( beanCreationStrategy )
-		                                                                      .order( defaultOrder ) );
+		dozerMapperCustomizationRegistry.register( DozerMapperCustomizationRegistry.beanCreationStrategyRegistrar()
+		                                                                           .name( mapperName )
+		                                                                           .customization( beanCreationStrategy )
+		                                                                           .order( defaultOrder ) );
 		return testMapper;
 	}
 
@@ -235,10 +235,10 @@ public class TestDozerMapperCustomizationRegistry
 			return true;
 		};
 
-		dozerMapperCustomizationRegistry.add( DozerMapperCustomizationRegistry.customFieldMapperRegistrar()
-		                                                                      .name( mapperName )
-		                                                                      .customization( customFieldMapper )
-		                                                                      .order( defaultOrder ) );
+		dozerMapperCustomizationRegistry.register( DozerMapperCustomizationRegistry.customFieldMapperRegistrar()
+		                                                                           .name( mapperName )
+		                                                                           .customization( customFieldMapper )
+		                                                                           .order( defaultOrder ) );
 		return testMapper;
 	}
 
