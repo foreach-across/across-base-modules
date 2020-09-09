@@ -25,10 +25,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +51,31 @@ public class TestDozerMapperCustomizationRegistry
 				                               ( beanContainer, destBeanCreator, propertyDescriptorFactory ) -> {
 					                               destBeanCreator.addPluggedStrategy(
 							                               dozerMapperCustomizationRegistry.getBeanCreationStrategy() );
+					                               return Collections.emptyList();
+				                               } )
+		                               .build();
+	}
+
+	/**
+	 * Attempts to clean up the plugged strategies which is a static arraylist, and as such shared over instances.
+	 * During these unit tests, we expect a new fresh {@link com.github.dozermapper.core.DozerBeanMapper} to be present each time, without shared state.
+	 */
+	@After
+	public void cleanUpPluggedStrategies() {
+		mapper = DozerBeanMapperBuilder.create()
+		                               .withCustomFieldMapper( dozerMapperCustomizationRegistry.getCustomFieldMapper() )
+		                               .withBeanMappingsBuilders(
+				                               ( beanContainer, destBeanCreator, propertyDescriptorFactory ) -> {
+					                               try {
+						                               Field pluggedStrategies = destBeanCreator.getClass()
+						                                                                        .getDeclaredField( "pluggedStrategies" );
+						                               ReflectionUtils.makeAccessible( pluggedStrategies );
+						                               List o = (List) pluggedStrategies.get( destBeanCreator );
+						                               o.clear();
+					                               }
+					                               catch ( NoSuchFieldException | IllegalAccessException e ) {
+						                               e.printStackTrace();
+					                               }
 					                               return Collections.emptyList();
 				                               } )
 		                               .build();
@@ -149,6 +178,25 @@ public class TestDozerMapperCustomizationRegistry
 		assertThat( customFieldMapper.getTimesCalled() ).isEqualTo( 2 );
 		assertThat( replacedCustomFieldMapper.getTimesCalled() ).isEqualTo( 2 );
 		assertThat( replacedBeanCreationStrategy.getTimesCalled() ).isEqualTo( 3 );
+	}
+
+	@Test
+	public void removeCustomization() {
+		CallsHolder beanCreationStrategy = createAndRegisterBeanCreationStrategy( DozerMapperCustomizationRegistry.DEFAULT_ORDER,
+		                                                                          "testMapper" );
+		CallsHolder customFieldMapper = createAndRegisterCustomFieldMapper( DozerMapperCustomizationRegistry.DEFAULT_ORDER, "testMapper" );
+		SimpleObject so = SimpleObject.builder()
+		                              .name( "myObject" )
+		                              .year( 1990 )
+		                              .build();
+		mapper.map( so, SimpleObject.class );
+		assertThat( beanCreationStrategy.getTimesCalled() ).isEqualTo( 1 );
+		assertThat( customFieldMapper.getTimesCalled() ).isEqualTo( 2 );
+		dozerMapperCustomizationRegistry.removeBeanCreationStrategy( "testMapper" );
+		dozerMapperCustomizationRegistry.removeCustomFieldMapper( "testMapper" );
+		mapper.map( so, SimpleObject.class );
+		assertThat( beanCreationStrategy.getTimesCalled() ).isEqualTo( 1 );
+		assertThat( customFieldMapper.getTimesCalled() ).isEqualTo( 2 );
 	}
 
 	private CallsHolder createAndRegisterBeanCreationStrategy( int defaultOrder, String mapperName ) {
