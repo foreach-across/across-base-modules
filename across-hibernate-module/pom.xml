@@ -84,6 +84,7 @@
 		<dependency>
 			<groupId>com.github.dozermapper</groupId>
 			<artifactId>dozer-spring-boot-starter</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
