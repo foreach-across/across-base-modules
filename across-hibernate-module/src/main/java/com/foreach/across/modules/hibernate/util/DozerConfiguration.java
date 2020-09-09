@@ -22,6 +22,7 @@ import com.github.dozermapper.core.DozerBeanMapperBuilder;
 import com.github.dozermapper.core.Mapper;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,6 +41,7 @@ import java.util.Collections;
  */
 @Configuration
 @ConditionalOnClass(DozerBeanMapper.class)
+@ConditionalOnProperty(value = "across-hibernate.dozer-dto-conversion", havingValue = "true")
 public class DozerConfiguration
 {
 	@Bean
@@ -56,7 +58,6 @@ public class DozerConfiguration
 		                                     .withCustomFieldMapper( registry.getCustomFieldMapper() )
 		                                     .withBeanMappingsBuilders(
 				                                     ( beanContainer, destBeanCreator, propertyDescriptorFactory ) -> {
-					                                     // registry
 					                                     destBeanCreator.addPluggedStrategy( registry.getBeanCreationStrategy() );
 					                                     return Collections.emptyList();
 				                                     } )

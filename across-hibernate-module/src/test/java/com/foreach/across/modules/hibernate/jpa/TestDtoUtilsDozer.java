@@ -32,6 +32,7 @@ import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
@@ -43,6 +44,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 @ContextConfiguration(classes = TestDtoUtilsDozer.Config.class)
+@TestPropertySource(properties = "across-hibernate.dozer-dto-conversion=true")
 public class TestDtoUtilsDozer
 {
 	@Test

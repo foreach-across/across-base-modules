@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 @ContextConfiguration(classes = TestDtoUtilsDozerHibernateEntities.Config.class)
+@TestPropertySource(properties = "across-hibernate.dozer-dto-conversion=true")
 public class TestDtoUtilsDozerHibernateEntities
 {
 	@Autowired
