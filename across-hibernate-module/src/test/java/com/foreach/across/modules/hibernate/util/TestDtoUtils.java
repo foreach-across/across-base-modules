@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.foreach.across.modules.hibernate.unit;
+package com.foreach.across.modules.hibernate.util;
 
 import com.foreach.across.modules.hibernate.business.EntityWithDto;
-import com.foreach.across.modules.hibernate.util.DtoUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
@@ -35,6 +36,19 @@ import static org.junit.Assert.*;
  */
 public class TestDtoUtils
 {
+	private static DtoMapper beforeClass = null;
+
+	@BeforeClass
+	public static void configureMappingFunction() {
+		beforeClass = DtoUtils.dtoMapper;
+		DtoUtils.dtoMapper = DtoUtils::createDto;
+	}
+
+	@AfterClass
+	public static void resetMappingFunction() {
+		DtoUtils.dtoMapper = beforeClass;
+	}
+
 	public static class Entity
 	{
 		private String name;

@@ -47,7 +47,7 @@ public class DtoUtils
 		return null;
 	}
 
-	private static <T> T createDto( Class<T> entityType, T entity ) {
+	static <T> T createDto( Class<T> entityType, T entity ) {
 		try {
 			T dto = entityType.newInstance();
 			org.springframework.beans.BeanUtils.copyProperties( entity, dto );
