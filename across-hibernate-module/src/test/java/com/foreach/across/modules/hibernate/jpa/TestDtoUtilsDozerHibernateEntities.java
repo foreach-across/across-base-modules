@@ -18,6 +18,7 @@ package com.foreach.across.modules.hibernate.jpa;
 
 import com.foreach.across.config.AcrossContextConfigurer;
 import com.foreach.across.core.AcrossContext;
+import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.testmodules.springdata.*;
 import com.foreach.across.modules.hibernate.util.DozerMapperCustomizationRegistry;
@@ -37,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +51,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 @ContextConfiguration(classes = TestDtoUtilsDozerHibernateEntities.Config.class)
-@TestPropertySource(properties = "across-hibernate.dozer-dto-conversion=true")
 public class TestDtoUtilsDozerHibernateEntities
 {
 	@Autowired
@@ -218,6 +217,7 @@ public class TestDtoUtilsDozerHibernateEntities
 		public void configure( AcrossContext context ) {
 			AcrossHibernateJpaModule hibernateModule = new AcrossHibernateJpaModule();
 			hibernateModule.setHibernateProperty( "hibernate.hbm2ddl.auto", "create-drop" );
+			hibernateModule.setProperty( AcrossHibernateModuleSettings.ADVANCED_DTO_CONVERSION, true );
 			context.addModule( hibernateModule );
 
 			SpringDataJpaModule springDataJpaModule = new SpringDataJpaModule();

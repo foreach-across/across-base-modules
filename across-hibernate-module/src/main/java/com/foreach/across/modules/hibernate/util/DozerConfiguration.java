@@ -17,16 +17,18 @@
 package com.foreach.across.modules.hibernate.util;
 
 import com.foreach.across.core.annotations.Exposed;
+import com.foreach.across.modules.hibernate.AcrossHibernateModuleSettings;
 import com.github.dozermapper.core.DozerBeanMapper;
 import com.github.dozermapper.core.DozerBeanMapperBuilder;
 import com.github.dozermapper.core.Mapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
+import java.util.Optional;
 
 /**
  * If Dozer is on the classpath, this configures a {@link DozerBeanMapper} and a {@link DozerMapperCustomizationRegistry}.
@@ -41,18 +43,28 @@ import java.util.Collections;
  */
 @Configuration
 @ConditionalOnClass(DozerBeanMapper.class)
-@ConditionalOnProperty(value = "across-hibernate.dozer-dto-conversion", havingValue = "true")
+@RequiredArgsConstructor
 public class DozerConfiguration
 {
+	private final AcrossHibernateModuleSettings acrossHibernateModuleSettings;
+
 	@Bean
 	@Exposed
 	public DozerMapperCustomizationRegistry registry() {
+		if ( !acrossHibernateModuleSettings.isAdvancedDtoConversion() ) {
+			return null;
+		}
 		return new DozerMapperCustomizationRegistry();
 	}
 
 	@Bean
 	@Exposed
-	public Mapper dozerBeanMapper( ConfigurableBeanFactory beanFactory, DozerMapperCustomizationRegistry registry ) {
+	public Mapper dozerBeanMapper( ConfigurableBeanFactory beanFactory, Optional<DozerMapperCustomizationRegistry> oRegistry ) {
+		if ( !acrossHibernateModuleSettings.isAdvancedDtoConversion() || !oRegistry.isPresent() ) {
+			return null;
+		}
+
+		DozerMapperCustomizationRegistry registry = oRegistry.get();
 		ClassLoader classLoader = beanFactory.getBeanClassLoader();
 		Mapper build = DozerBeanMapperBuilder.create()
 		                                     .withCustomFieldMapper( registry.getCustomFieldMapper() )
@@ -63,7 +75,9 @@ public class DozerConfiguration
 				                                     } )
 		                                     .withClassLoader( classLoader )
 		                                     .build();
+
 		DtoUtils.dtoMapper = ( entityType, entity ) -> build.map( entity, entityType );
+
 		return build;
 	}
 }
