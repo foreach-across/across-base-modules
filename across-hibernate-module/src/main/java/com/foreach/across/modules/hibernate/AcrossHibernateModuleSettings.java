@@ -39,6 +39,7 @@ public class AcrossHibernateModuleSettings extends JpaProperties
 	public static final String PERSISTENCE_CONTEXT_VIEW_HANDLER_ORDER = "across-hibernate.persistence-context-in-view.order";
 	public static final String CREATE_UNITOFWORK_FACTORY = "across-hibernate.create-unit-of-work-factory";
 	public static final String REGISTER_REPOSITORY_INTERCEPTOR = "across-hibernate.register-repository-interceptor";
+	public static final String ADVANCED_DTO_CONVERSION = "across-hibernate.advanced-dto-conversion";
 
 	private TransactionProperties transactionProperties = new TransactionProperties();
 	private HibernateProperties hibernate = new HibernateProperties();
@@ -68,6 +69,14 @@ public class AcrossHibernateModuleSettings extends JpaProperties
 	 * managed by those repositories.
 	 */
 	private boolean registerRepositoryInterceptor = false;
+
+	/**
+	 * Configures a more advanced conversion for {@link com.foreach.across.modules.hibernate.util.DtoUtils#createDto(Object)} using Dozer.
+	 * This will ensure that the entire entity including it's relationships will be deep cloned. Should some relationships be lazy loaded,
+	 * a proxy object will be configured that retrieves the relationship if necessary when accessed. If a lazy related property is never accessed,
+	 * it will not be fetched either.
+	 */
+	private boolean advancedDtoConversion = false;
 
 	public AcrossHibernateModuleSettings() {
 		setOpenInView( true );
