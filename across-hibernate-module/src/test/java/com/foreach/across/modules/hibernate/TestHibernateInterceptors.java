@@ -29,9 +29,9 @@ import com.foreach.across.modules.hibernate.testmodules.hibernate2.Hibernate2Mod
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.User;
 import com.foreach.across.modules.hibernate.testmodules.hibernate2.UserRepository;
 import com.foreach.across.test.AcrossTestConfiguration;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -39,20 +39,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
  * @author Arne Vandamme
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestHibernateInterceptors.Config.class)
 @DirtiesContext
 public class TestHibernateInterceptors
@@ -78,7 +78,7 @@ public class TestHibernateInterceptors
 	@Qualifier("productInterceptor")
 	private EntityInterceptor<Product> productInterceptor;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		reset( userInterceptor, allInterceptor, productInterceptor );
 

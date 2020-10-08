@@ -29,9 +29,9 @@ import com.foreach.across.modules.hibernate.testmodules.springdata.Client;
 import com.foreach.across.modules.hibernate.testmodules.springdata.ClientRepository;
 import com.foreach.across.modules.hibernate.testmodules.springdata.SpringDataJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -39,14 +39,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @DirtiesContext
 @ContextConfiguration(classes = TestJpaInterceptors.Config.class)
 public class TestJpaInterceptors
@@ -73,7 +73,7 @@ public class TestJpaInterceptors
 	private EntityInterceptor<Object> allInterceptor;
 
 	@SuppressWarnings("unchecked")
-	@Before
+	@BeforeEach
 	public void resetMocks() {
 		reset( customerInterceptor, allInterceptor, clientInterceptor );
 

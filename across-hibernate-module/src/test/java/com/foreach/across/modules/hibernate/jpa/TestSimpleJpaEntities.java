@@ -26,20 +26,20 @@ import com.foreach.across.modules.hibernate.testmodules.springdata.Client;
 import com.foreach.across.modules.hibernate.testmodules.springdata.ClientRepository;
 import com.foreach.across.modules.hibernate.testmodules.springdata.SpringDataJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @DirtiesContext
 @ContextConfiguration
 public class TestSimpleJpaEntities

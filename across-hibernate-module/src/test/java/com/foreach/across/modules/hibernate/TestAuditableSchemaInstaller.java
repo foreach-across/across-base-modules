@@ -22,27 +22,27 @@ import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.core.installers.InstallerPhase;
 import com.foreach.across.modules.hibernate.installers.AuditableSchemaInstaller;
 import com.foreach.across.test.AcrossTestConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Marc Vanbrabant
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @DirtiesContext
 @ContextConfiguration
 public class TestAuditableSchemaInstaller

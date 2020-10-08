@@ -20,12 +20,12 @@ import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
 import com.foreach.across.test.ExposeForTest;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.repository.Repository;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import test.boot.apps.single.SingleDataSourceApplication;
@@ -37,14 +37,14 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Arne Vandamme
  * @since 3.0.0
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		classes = SingleDataSourceApplication.class,

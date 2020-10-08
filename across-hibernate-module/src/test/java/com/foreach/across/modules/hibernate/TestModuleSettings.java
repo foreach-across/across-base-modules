@@ -26,7 +26,7 @@ import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.test.AcrossTestContext;
 import com.foreach.across.test.AcrossTestWebContext;
 import org.hibernate.SessionFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.hibernate5.support.OpenSessionInViewFilter;
 import org.springframework.orm.hibernate5.support.OpenSessionInViewInterceptor;
@@ -35,7 +35,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import static com.foreach.across.test.support.AcrossTestBuilders.standard;
 import static com.foreach.across.test.support.AcrossTestBuilders.web;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestModuleSettings
 {

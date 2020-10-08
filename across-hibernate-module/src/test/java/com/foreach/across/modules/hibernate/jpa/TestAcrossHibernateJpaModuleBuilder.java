@@ -16,7 +16,7 @@
 
 package com.foreach.across.modules.hibernate.jpa;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 

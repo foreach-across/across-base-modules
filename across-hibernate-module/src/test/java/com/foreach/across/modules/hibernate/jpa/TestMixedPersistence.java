@@ -31,26 +31,26 @@ import com.foreach.across.modules.hibernate.testmodules.jpa.Customer;
 import com.foreach.across.modules.hibernate.testmodules.jpa.CustomerRepository;
 import com.foreach.across.modules.hibernate.testmodules.jpa.SimpleJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test combining JPA and non-JPA hibernate module,
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @DirtiesContext
 @ContextConfiguration
 public class TestMixedPersistence

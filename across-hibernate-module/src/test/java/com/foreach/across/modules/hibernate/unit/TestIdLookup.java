@@ -17,9 +17,9 @@ package com.foreach.across.modules.hibernate.unit;
 
 import com.foreach.across.modules.hibernate.types.HibernateIdLookup;
 import com.foreach.across.modules.hibernate.types.IdLookup;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestIdLookup extends AbstractBaseIdLookup
 {

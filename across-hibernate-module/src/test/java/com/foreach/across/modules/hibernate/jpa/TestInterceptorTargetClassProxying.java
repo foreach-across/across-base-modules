@@ -26,9 +26,9 @@ import com.foreach.across.modules.hibernate.testmodules.springdata.Client;
 import com.foreach.across.modules.hibernate.testmodules.springdata.ClientRepository;
 import com.foreach.across.modules.hibernate.testmodules.springdata.SpringDataJpaModule;
 import com.foreach.across.test.AcrossTestConfiguration;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -36,14 +36,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -54,7 +54,7 @@ import static org.mockito.Mockito.*;
  *
  * @author Arne Vandamme
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @DirtiesContext
 @ContextConfiguration(classes = TestInterceptorTargetClassProxying.Config.class)
 public class TestInterceptorTargetClassProxying
@@ -77,7 +77,7 @@ public class TestInterceptorTargetClassProxying
 	@Qualifier("clientInterceptor")
 	private EntityInterceptor<Client> clientInterceptor;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		reset( userInterceptor, allInterceptor, clientInterceptor );
 

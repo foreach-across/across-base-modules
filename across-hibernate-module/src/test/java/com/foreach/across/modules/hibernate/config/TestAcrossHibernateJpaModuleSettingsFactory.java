@@ -21,8 +21,8 @@ import com.foreach.across.core.context.info.AcrossModuleInfo;
 import com.foreach.across.modules.hibernate.AbstractHibernatePackageModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModuleSettings;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -55,7 +55,7 @@ public class TestAcrossHibernateJpaModuleSettingsFactory
 			= new ModuleSettingsRegistrar.ModuleSettingsFactory( contextInfo, currentModule, environment );
 	private Map<String, Object> moduleProperties = new HashMap<>();
 
-	@Before
+	@BeforeEach
 	public void reset() {
 		currentModuleInfo = mock( AcrossModuleInfo.class );
 		when( currentModuleInfo.getName() ).thenReturn( AcrossHibernateJpaModule.NAME );

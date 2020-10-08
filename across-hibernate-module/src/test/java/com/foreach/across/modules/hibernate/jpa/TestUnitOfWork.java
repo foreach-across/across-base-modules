@@ -7,18 +7,18 @@ import com.foreach.across.modules.hibernate.testmodules.jpa.CustomerRepository;
 import com.foreach.across.modules.hibernate.testmodules.jpa.SimpleJpaModule;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.test.AcrossTestConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @DirtiesContext
 @ContextConfiguration
 public class TestUnitOfWork

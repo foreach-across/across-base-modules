@@ -26,7 +26,7 @@ import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.test.AcrossTestContext;
 import com.foreach.across.test.AcrossTestWebContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
@@ -37,7 +37,7 @@ import javax.persistence.EntityManagerFactory;
 
 import static com.foreach.across.test.support.AcrossTestBuilders.standard;
 import static com.foreach.across.test.support.AcrossTestBuilders.web;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestJpaModuleSettings
 {
