@@ -33,6 +33,7 @@ import com.foreach.across.modules.hibernate.provider.HibernatePackage;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
+import com.foreach.across.modules.hibernate.util.DozerConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,7 @@ import java.util.Map;
  */
 @Configuration
 @Import({ JpaModuleSettingsRegistrar.class, InterceptorRegistryConfiguration.class, HibernatePackageBuilder.class,
-          PersistenceExceptionTranslationAutoConfiguration.class })
+          PersistenceExceptionTranslationAutoConfiguration.class, DozerConfiguration.class })
 public class HibernateJpaConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "jpaTransactionManager";

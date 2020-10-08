@@ -15,7 +15,6 @@
  */
 package com.foreach.across.modules.hibernate.util;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -23,6 +22,8 @@ import org.springframework.util.ClassUtils;
  */
 public class DtoUtils
 {
+	static DtoMapper dtoMapper = DtoUtils::createDto;
+
 	private DtoUtils() {
 	}
 
@@ -40,18 +41,22 @@ public class DtoUtils
 	public static <T> T createDto( T entity ) {
 		if ( entity != null ) {
 			Class entityType = ClassUtils.getUserClass( entity );
-
-			try {
-				T dto = (T) entityType.newInstance();
-				BeanUtils.copyProperties( entity, dto );
-
-				return dto;
-			}
-			catch ( IllegalAccessException | InstantiationException iae ) {
-				throw new IllegalArgumentException( "Unable to create a default DTO", iae );
-			}
+			return (T) dtoMapper.createDto( entityType, entity );
 		}
 
+		return null;
+	}
+
+	static <T> T createDto( Class<T> entityType, T entity ) {
+		try {
+			T dto = entityType.newInstance();
+			org.springframework.beans.BeanUtils.copyProperties( entity, dto );
+
+			return dto;
+		}
+		catch ( IllegalAccessException | InstantiationException e ) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 }

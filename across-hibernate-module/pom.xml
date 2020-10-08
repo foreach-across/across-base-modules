@@ -25,6 +25,7 @@
 	</parent>
 
 	<artifactId>across-hibernate-module</artifactId>
+	<name>Across Hibernate Module</name>
 
 	<properties>
 		<maven.javadoc.skip>false</maven.javadoc.skip>
@@ -77,6 +78,11 @@
 			<artifactId>querydsl-jpa</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.github.dozermapper</groupId>
+			<artifactId>dozer-spring-boot-starter</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
 			<scope>test</scope>
@@ -91,6 +97,11 @@
 			<artifactId>assertj-db</artifactId>
 			<scope>test</scope>
 			<version>1.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -125,6 +136,15 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<pomElements>
+						<name>keep</name>
+						<description>resolve</description>
+						<developers>resolve</developers>
+						<scm>resolve</scm>
+						<url>resolve</url>
+					</pomElements>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
