@@ -31,14 +31,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Condition;
 import org.hibernate.Hibernate;
 import org.hibernate.LazyInitializationException;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
@@ -48,7 +48,7 @@ import static com.foreach.across.modules.hibernate.util.DozerMapperCustomization
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @DirtiesContext
 @ContextConfiguration(classes = TestDtoUtilsDozerHibernateEntities.Config.class)
 public class TestDtoUtilsDozerHibernateEntities
@@ -68,7 +68,7 @@ public class TestDtoUtilsDozerHibernateEntities
 	@Autowired
 	private Mapper mapper;
 
-	@After
+	@AfterEach
 	public void cleanUp() {
 		businessRepository.deleteAll();
 		clientRepository.deleteAll();

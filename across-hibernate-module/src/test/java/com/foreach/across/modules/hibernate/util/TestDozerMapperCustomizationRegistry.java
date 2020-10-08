@@ -25,9 +25,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -42,7 +42,7 @@ public class TestDozerMapperCustomizationRegistry
 	private DozerMapperCustomizationRegistry dozerMapperCustomizationRegistry;
 	private Mapper mapper;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		dozerMapperCustomizationRegistry = new DozerMapperCustomizationRegistry();
 		mapper = DozerBeanMapperBuilder.create()
@@ -60,7 +60,7 @@ public class TestDozerMapperCustomizationRegistry
 	 * Attempts to clean up the plugged strategies which is a static arraylist, and as such shared over instances.
 	 * During these unit tests, we expect a new fresh {@link com.github.dozermapper.core.DozerBeanMapper} to be present each time, without shared state.
 	 */
-	@After
+	@AfterEach
 	public void cleanUpPluggedStrategies() {
 		mapper = DozerBeanMapperBuilder.create()
 		                               .withCustomFieldMapper( dozerMapperCustomizationRegistry.getCustomFieldMapper() )

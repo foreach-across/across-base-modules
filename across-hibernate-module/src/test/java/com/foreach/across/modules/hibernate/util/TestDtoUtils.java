@@ -19,9 +19,9 @@ import com.foreach.across.modules.hibernate.business.EntityWithDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 
@@ -38,13 +38,13 @@ public class TestDtoUtils
 {
 	private static DtoMapper beforeClass = null;
 
-	@BeforeClass
+	@BeforeAll
 	public static void configureMappingFunction() {
 		beforeClass = DtoUtils.dtoMapper;
 		DtoUtils.dtoMapper = DtoUtils::createDto;
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void resetMappingFunction() {
 		DtoUtils.dtoMapper = beforeClass;
 	}

@@ -26,22 +26,22 @@ import com.foreach.across.test.AcrossTestConfiguration;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @DirtiesContext
 @ContextConfiguration(classes = TestDtoUtilsDozer.Config.class)
 public class TestDtoUtilsDozer
@@ -87,7 +87,7 @@ public class TestDtoUtilsDozer
 		ArrayEntity dto = DtoUtils.createDto( collection );
 		assertNotNull( dto );
 		assertNotSame( collection, dto );
-		assertEquals( collection.getValues(), dto.getValues() );
+		assertThat( collection.getValues() ).isEqualTo( dto.getValues() );
 		assertEquals( collection.getValues().length, dto.getValues().length );
 		assertEquals( 1, collection.getValues().length );
 
