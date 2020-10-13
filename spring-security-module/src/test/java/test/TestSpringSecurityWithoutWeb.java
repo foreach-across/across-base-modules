@@ -23,10 +23,10 @@ import com.foreach.across.modules.spring.security.actions.AllowableAction;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.services.*;
 import com.foreach.across.test.AcrossTestConfiguration;
-import org.junit.After;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,16 +36,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Ignore("Determine if relevant in the future - fails because conditions fail in default security configurer")
-@RunWith(SpringJUnit4ClassRunner.class)
+@Disabled("Determine if relevant in the future - fails because conditions fail in default security configurer")
+@ExtendWith(SpringExtension.class)
 @DirtiesContext
 @ContextConfiguration(classes = TestSpringSecurityWithoutWeb.Config.class)
 public class TestSpringSecurityWithoutWeb
@@ -71,7 +71,7 @@ public class TestSpringSecurityWithoutWeb
 	@Autowired
 	private ConversionService conversionService;
 
-	@After
+	@AfterEach
 	public void clearSecurityContext() {
 		SecurityContextHolder.clearContext();
 	}

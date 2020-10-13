@@ -19,13 +19,13 @@ package com.foreach.across.modules.spring.security.infrastructure.services;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipal;
 import com.foreach.across.modules.spring.security.infrastructure.business.SecurityPrincipalId;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.core.Authentication;
@@ -37,13 +37,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
  * @author Arne Vandamme
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TestCurrentSecurityPrincipalProxy
 {
 	@Mock(lenient = true)
@@ -58,12 +58,12 @@ public class TestCurrentSecurityPrincipalProxy
 	@InjectMocks
 	private CurrentSecurityPrincipalProxy currentPrincipal = new CurrentSecurityPrincipalProxyImpl();
 
-	@Before
+	@BeforeEach
 	public void before() {
 		when( securityInfrastructure.authenticationTrustResolver() ).thenReturn( trustResolver );
 	}
 
-	@After
+	@AfterEach
 	public void after() {
 		SecurityContextHolder.clearContext();
 	}

@@ -19,10 +19,11 @@ package com.foreach.across.modules.spring.security.infrastructure.business;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.SerializationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSecurityPrincipalId
 {
@@ -40,15 +41,18 @@ public class TestSecurityPrincipalId
 		assertThat( SecurityPrincipalId.of( "otherUserId" ) ).isNotEqualTo( SecurityPrincipalId.of( PRINCIPAL_ID ) );
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void nullValueIsNotAllowed() {
-		SecurityPrincipalId.of( null );
-
+		Assertions.assertThrows( IllegalArgumentException.class, () -> {
+			SecurityPrincipalId.of( null );
+		} );
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void blankStringIsNotAllowed() {
-		SecurityPrincipalId.of( "" );
+		Assertions.assertThrows( IllegalArgumentException.class, () -> {
+			SecurityPrincipalId.of( "" );
+		} );
 	}
 
 	@Test

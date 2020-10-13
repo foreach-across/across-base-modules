@@ -21,10 +21,10 @@ import com.foreach.across.modules.spring.security.SpringSecurityModule;
 import com.foreach.across.test.support.config.MockAcrossServletContextInitializer;
 import com.foreach.across.test.support.config.MockMvcConfiguration;
 import lombok.SneakyThrows;
-import org.junit.After;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,13 +36,13 @@ import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import test.app.SpringSecurityTestApplication;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Steven Gentens
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @DirtiesContext
 @SpringBootTest(classes = { SpringSecurityTestApplication.class, MockMvcConfiguration.class })
@@ -77,7 +77,7 @@ public class TestApplicationWithDefaultSecurity
 	@Qualifier("requestDataValueProcessor")
 	private Object requestDataValueProcessor;
 
-	@After
+	@AfterEach
 	public void clearSecurityContext() {
 		SecurityContextHolder.clearContext();
 	}
@@ -103,7 +103,7 @@ public class TestApplicationWithDefaultSecurity
 	}
 
 	@Test
-	@Ignore("As of Boot 2.0 everything is secured by default")
+	@Disabled("As of Boot 2.0 everything is secured by default")
 	@SneakyThrows
 	public void defaultPathsAreNotSecured() {
 		mockMvc.perform( get( "/hello" ) )
@@ -115,7 +115,7 @@ public class TestApplicationWithDefaultSecurity
 	}
 
 	@Test
-	@Ignore("As of Boot 2.0 everything is secured by default")
+	@Disabled("As of Boot 2.0 everything is secured by default")
 	@SneakyThrows
 	public void errorPageShouldNotBeSecured() {
 		mockMvc.perform( get( "/error" ) )

@@ -16,8 +16,8 @@
 
 package ax.apps;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -29,7 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("secured")
 public class TestSecuredApplication extends AbstractApplicationTest
 {
-	@Ignore
+	@Disabled
 	@Test
 	public void healthEndpointDoesNotReturnDetailsIfNotAuthorized() {
 		assertResponseWithStatus( "/health", HttpStatus.OK )
@@ -37,7 +37,7 @@ public class TestSecuredApplication extends AbstractApplicationTest
 				.doesNotContain( "diskSpace" );
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void healthEndpointWithDetailsIfAuthorized() {
 		assertAuthenticatedResponseWithStatus( "/health", HttpStatus.OK )
@@ -45,7 +45,7 @@ public class TestSecuredApplication extends AbstractApplicationTest
 				.contains( "diskSpace" );
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void h2consoleRequiresAuthorization() {
 		assertResponseWithStatus( "/h2-console", HttpStatus.UNAUTHORIZED );
