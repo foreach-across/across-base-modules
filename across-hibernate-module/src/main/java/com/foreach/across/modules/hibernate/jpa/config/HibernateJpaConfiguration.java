@@ -19,6 +19,8 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.DynamicAcrossModule;
 import com.foreach.across.core.annotations.Exposed;
 import com.foreach.across.core.annotations.Module;
+import com.foreach.across.core.context.info.AcrossModuleInfo;
+import com.foreach.across.core.events.AcrossContextBootstrappedEvent;
 import com.foreach.across.core.events.AcrossModuleBeforeBootstrapEvent;
 import com.foreach.across.modules.hibernate.config.HibernatePackageBuilder;
 import com.foreach.across.modules.hibernate.config.InterceptorRegistryConfiguration;
@@ -41,6 +43,7 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.cglib.proxy.Enhancer;
@@ -50,13 +53,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.StopWatch;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Configures a JPA EntityManagerFactory.
@@ -71,6 +79,7 @@ public class HibernateJpaConfiguration
 {
 	public static final String TRANSACTION_MANAGER = "jpaTransactionManager";
 	public static final String TRANSACTION_TEMPLATE = "jpaTransactionTemplate";
+	public static final BootstrapMode DEFAULT_ACROSS_BOOTSTRAP_MODE = BootstrapMode.DEFAULT;
 
 	private static final Logger LOG = LoggerFactory.getLogger( HibernateJpaConfiguration.class );
 
@@ -110,6 +119,9 @@ public class HibernateJpaConfiguration
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter( vendorAdapter );
 		factory.setDataSource( dataSource );
+		ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+		threadPoolTaskExecutor.initialize();
+		factory.setBootstrapExecutor( threadPoolTaskExecutor );
 		factory.setPersistenceUnitName( settings.getPersistenceUnitName() );
 
 		String[] mappingResources = hibernatePackage.getMappingResources();
@@ -204,5 +216,33 @@ public class HibernateJpaConfiguration
 		                                                      EnableTransactionManagementConfiguration.class,
 		                                                      PersistenceExceptionTranslationAutoConfiguration.class
 		                    );
+	}
+
+	/***
+	 * This method will trigger when the spring.data.jpa.repositories.bootstrap-mode is set to deferred.
+	 * The code was originally in {@link org.springframework.data.repository.config.RepositoryConfigurationDelegate}
+	 * but registers the {@link org.springframework.data.repository.config.DeferredRepositoryInitializationListener} in each {@code Beanfactory}
+	 *
+	 * The EventListener below will trigger after {@link com.foreach.across.core.events.AcrossContextBootstrappedEvent}
+	 * and activate the Repositories by calling them once (on the first AcrossHibernateJpaModule) that matches.
+	 */
+	@EventListener
+	@SuppressWarnings("unused")
+	@ConditionalOnProperty(value = "spring.data.jpa.repositories.bootstrap-mode", havingValue = "deferred")
+	public void registerClientModuleRepositoryInterceptors( AcrossContextBootstrappedEvent contextBootstrappedEvent ) {
+		Optional<AcrossModule> first = contextBootstrappedEvent.getContext().getModules().stream()
+		                                                       .filter(
+				                                                       m -> AcrossHibernateJpaModule.class
+						                                                       .isAssignableFrom( m.getModule().getClass() ) )
+		                                                       .map( AcrossModuleInfo::getModule )
+		                                                       .findFirst();
+		if ( first.isPresent() && first.get() == module ) {
+			LOG.info( "Triggering deferred initialization of Spring Data repositories from HibernateJpaConfiguration…" );
+			StopWatch watch = new StopWatch();
+			watch.start();
+			beanFactory.getBeansOfType( Repository.class );
+			watch.stop();
+			LOG.info( "Spring Data repositories initialized in {}ms!", watch.getLastTaskTimeMillis() );
+		}
 	}
 }
