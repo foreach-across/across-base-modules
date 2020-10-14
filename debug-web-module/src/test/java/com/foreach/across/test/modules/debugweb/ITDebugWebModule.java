@@ -24,10 +24,10 @@ import com.foreach.across.modules.web.resource.WebResourcePackageManager;
 import com.foreach.across.modules.web.resource.WebResourceRegistryInterceptor;
 import com.foreach.across.modules.web.template.WebTemplateRegistry;
 import com.foreach.across.test.AcrossTestWebContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.foreach.across.test.support.AcrossTestBuilders.web;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ITDebugWebModule
 {
@@ -47,12 +47,14 @@ public class ITDebugWebModule
 		}
 	}
 
-	@Test(expected = AcrossException.class)
 	public void defaultRequiresPasswordToBeSet() {
-		try (AcrossTestWebContext ignore = web().useTestDataSource( false )
-		                                        .modules( DebugWebModule.NAME, SpringSecurityModule.NAME )
-		                                        .build()) {
-			fail( "Should not have started" );
-		}
+		assertThrows( AcrossException.class, () -> {
+			try (AcrossTestWebContext ignore = web().useTestDataSource( false )
+			                                        .modules( DebugWebModule.NAME, SpringSecurityModule.NAME )
+			                                        .build()) {
+				fail( "Should not have started" );
+			}
+		} );
+
 	}
 }
