@@ -23,11 +23,15 @@ import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.aop.TargetSource;
+import org.springframework.aop.framework.Advised;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.repository.Repository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import test.boot.apps.multiple.MultipleDataSourceApplication;
@@ -53,9 +57,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		classes = MultipleDataSourceApplication.class,
 		properties = {
-				"app.datasource.foo.url=jdbc:hsqldb:mem:foo-db",
-				"app.datasource.bar.url=jdbc:hsqldb:mem:bar-db",
-				"app.datasource.my.url=jdbc:hsqldb:mem:my-db",
+				"app.datasource.foo.url=jdbc:hsqldb:mem:foo-db-lazy",
+				"app.datasource.bar.url=jdbc:hsqldb:mem:bar-db-lazy",
+				"app.datasource.my.url=jdbc:hsqldb:mem:my-db-lazy",
 				"spring.jpa.show-sql=false",
 				"spring.transaction.default-timeout=25",
 				"acrossHibernate.hibernate.ddl-auto=create-drop",
@@ -101,6 +105,11 @@ public class TestMultipleDataSourceApplicationWithLazyRepositories
 
 	@Test
 	public void saveAndFetchBrand() {
+		assertThat( brandRepository ).isInstanceOf( Advised.class );
+		TargetSource targetSource = ( (Advised) brandRepository ).getTargetSource();
+		assertThat( Repository.class ).isAssignableFrom( targetSource.getTargetClass() );
+		assertThat( ReflectionTestUtils.getField( targetSource, "val$dlbf" ) ).isInstanceOf( DefaultListableBeanFactory.class );
+
 		Brand brand = new Brand();
 		brand.setName( "Heineken" );
 		brandRepository.save( brand );

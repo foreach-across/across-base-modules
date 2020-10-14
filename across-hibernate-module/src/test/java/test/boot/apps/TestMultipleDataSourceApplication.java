@@ -23,6 +23,8 @@ import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.target.SingletonTargetSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -100,6 +102,9 @@ public class TestMultipleDataSourceApplication
 
 	@Test
 	public void saveAndFetchBrand() {
+		assertThat( brandRepository ).isInstanceOf( Advised.class );
+		assertThat( ( (Advised) brandRepository ).getTargetSource() ).isInstanceOf( SingletonTargetSource.class );
+
 		Brand brand = new Brand();
 		brand.setName( "Heineken" );
 		brandRepository.save( brand );
