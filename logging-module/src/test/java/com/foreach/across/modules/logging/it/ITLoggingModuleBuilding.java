@@ -32,12 +32,12 @@ import com.foreach.across.modules.logging.requestresponse.RequestResponseLogConf
 import com.foreach.across.modules.web.AcrossWebModule;
 import com.foreach.across.test.AcrossTestContext;
 import com.foreach.across.test.support.AcrossTestBuilders;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Andy Somers
