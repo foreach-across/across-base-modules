@@ -47,6 +47,7 @@ import test.boot.apps.multiple.entities.city.CityRepository;
 import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Arne Vandamme
@@ -104,12 +105,17 @@ public class TestMultipleDataSourceApplicationWithDeferredRepositories
 	private MultipleDataSourceApplication.MyEntityInterceptor interceptor;
 
 	@Test
-	public void saveAndFetchBrand() {
+	public void shouldHaveDefferedInitializerEventListener() {
+		assertTrue( beanRegistry.moduleContainsLocalBean( "AcrossHibernateJpaModule",
+		                                                  "com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration.DeferredRepositoryInitializer" ) );
 		assertThat( brandRepository ).isInstanceOf( Advised.class );
 		TargetSource targetSource = ( (Advised) brandRepository ).getTargetSource();
 		assertThat( Repository.class ).isAssignableFrom( targetSource.getTargetClass() );
 		assertThat( ReflectionTestUtils.getField( targetSource, "val$dlbf" ) ).isInstanceOf( DefaultListableBeanFactory.class );
+	}
 
+	@Test
+	public void saveAndFetchBrand() {
 		Brand brand = new Brand();
 		brand.setName( "Heineken" );
 		brandRepository.save( brand );

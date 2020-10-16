@@ -45,6 +45,7 @@ import test.boot.apps.multiple.entities.city.CityRepository;
 import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author Arne Vandamme
@@ -99,6 +100,12 @@ public class TestMultipleDataSourceApplication
 
 	@Autowired
 	private MultipleDataSourceApplication.MyEntityInterceptor interceptor;
+
+	@Test
+	public void shouldNotHaveDefferedInitializerEventListener() {
+		assertFalse( beanRegistry.moduleContainsLocalBean( "AcrossHibernateJpaModule",
+		                                                   "com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration.DeferredRepositoryInitializer" ) );
+	}
 
 	@Test
 	public void saveAndFetchBrand() {

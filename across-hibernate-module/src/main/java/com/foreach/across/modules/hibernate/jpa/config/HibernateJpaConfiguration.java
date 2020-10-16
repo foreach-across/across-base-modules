@@ -36,6 +36,8 @@ import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
 import com.foreach.across.modules.hibernate.strategy.AbstractTableAliasNamingStrategy;
 import com.foreach.across.modules.hibernate.unitofwork.UnitOfWorkFactory;
 import com.foreach.across.modules.hibernate.util.DozerConfiguration;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,31 +220,41 @@ public class HibernateJpaConfiguration
 		                    );
 	}
 
-	/***
-	 * This method will trigger when the spring.data.jpa.repositories.bootstrap-mode is set to deferred.
-	 * The code was originally in {@link org.springframework.data.repository.config.RepositoryConfigurationDelegate}
-	 * but registers the {@link org.springframework.data.repository.config.DeferredRepositoryInitializationListener} in each {@code Beanfactory}
-	 *
-	 * The EventListener below will trigger after {@link com.foreach.across.core.events.AcrossContextBootstrappedEvent}
-	 * and activate the Repositories by calling them once (on the first AcrossHibernateJpaModule) that matches.
-	 */
-	@EventListener
-	@SuppressWarnings("unused")
+	@Configuration
 	@ConditionalOnProperty(value = "spring.data.jpa.repositories.bootstrap-mode", havingValue = "deferred")
-	public void registerClientModuleRepositoryInterceptors( AcrossContextBootstrappedEvent contextBootstrappedEvent ) {
-		Optional<AcrossModule> first = contextBootstrappedEvent.getContext().getModules().stream()
-		                                                       .filter(
-				                                                       m -> AcrossHibernateJpaModule.class
-						                                                       .isAssignableFrom( m.getModule().getClass() ) )
-		                                                       .map( AcrossModuleInfo::getModule )
-		                                                       .findFirst();
-		if ( first.isPresent() && first.get() == module ) {
-			LOG.info( "Triggering deferred initialization of Spring Data repositories from HibernateJpaConfiguration…" );
-			StopWatch watch = new StopWatch();
-			watch.start();
-			beanFactory.getBeansOfType( Repository.class );
-			watch.stop();
-			LOG.info( "Spring Data repositories initialized in {}ms!", watch.getLastTaskTimeMillis() );
+	@Slf4j
+	@RequiredArgsConstructor
+	public static class DeferredRepositoryInitializer
+	{
+
+		private final @Module(AcrossModule.CURRENT_MODULE)
+		AcrossHibernateJpaModule module;
+		private final ListableBeanFactory beanFactory;
+
+		/***
+		 * This method will trigger when the spring.data.jpa.repositories.bootstrap-mode is set to deferred.
+		 * The code was originally in {@link org.springframework.data.repository.config.RepositoryConfigurationDelegate}
+		 * but registers the {@link org.springframework.data.repository.config.DeferredRepositoryInitializationListener} in each {@code Beanfactory}
+		 *
+		 * The EventListener below will trigger after {@link com.foreach.across.core.events.AcrossContextBootstrappedEvent}
+		 * and activate the Repositories by calling them once (on the first AcrossHibernateJpaModule) that matches.
+		 */
+		@EventListener
+		public void initializeRepositories( AcrossContextBootstrappedEvent contextBootstrappedEvent ) {
+			Optional<AcrossModule> first = contextBootstrappedEvent.getContext().getModules().stream()
+			                                                       .filter(
+					                                                       m -> AcrossHibernateJpaModule.class
+							                                                       .isAssignableFrom( m.getModule().getClass() ) )
+			                                                       .map( AcrossModuleInfo::getModule )
+			                                                       .findFirst();
+			if ( first.isPresent() && first.get() == module ) {
+				LOG.info( "Triggering deferred initialization of Spring Data repositories from HibernateJpaConfiguration…" );
+				StopWatch watch = new StopWatch();
+				watch.start();
+				beanFactory.getBeansOfType( Repository.class );
+				watch.stop();
+				LOG.info( "Spring Data repositories initialized in {}ms!", watch.getLastTaskTimeMillis() );
+			}
 		}
 	}
 }
