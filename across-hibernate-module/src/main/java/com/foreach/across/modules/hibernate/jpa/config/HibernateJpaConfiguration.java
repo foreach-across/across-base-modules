@@ -59,7 +59,6 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StopWatch;
 
 import javax.persistence.EntityManagerFactory;
@@ -121,9 +120,12 @@ public class HibernateJpaConfiguration
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter( vendorAdapter );
 		factory.setDataSource( dataSource );
-		ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-		threadPoolTaskExecutor.initialize();
-		factory.setBootstrapExecutor( threadPoolTaskExecutor );
+		// Disabled async setup of entityManagerFactory as this may cause deadlocks.
+		// See https://github.com/spring-projects/spring-boot/issues/23758
+		//
+		// ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+		// threadPoolTaskExecutor.initialize();
+		// factory.setBootstrapExecutor( threadPoolTaskExecutor );
 		factory.setPersistenceUnitName( settings.getPersistenceUnitName() );
 
 		String[] mappingResources = hibernatePackage.getMappingResources();
