@@ -19,31 +19,30 @@ import com.foreach.across.core.revision.Revision;
 import com.foreach.across.core.revision.RevisionBasedEntity;
 import com.foreach.across.core.revision.RevisionBasedEntityManager;
 import com.foreach.across.modules.hibernate.services.HibernateSessionHolder;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Arne Vandamme
- * @deprecated Because of deprecation of {@link Session#createCriteria(Class)}
- * Please use {@link BasicRevisionBasedJpaRepository} instead which is based on JPA specifiations.
  */
-@Deprecated
-public abstract class BasicRevisionBasedRepository<T extends RevisionBasedEntity<T>, U, R extends Revision<U>>
+public abstract class BasicRevisionBasedJpaRepository<T extends RevisionBasedEntity<T>, U, R extends Revision<U>>
 		extends RevisionBasedEntityManager<T, U, R>
 {
 	private final Class<T> clazz;
-
-	@Autowired
 	private HibernateSessionHolder hibernateSessionHolder;
 
 	@SuppressWarnings("unchecked")
-	public BasicRevisionBasedRepository() {
+	@Autowired
+	public BasicRevisionBasedJpaRepository() {
 		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
 		this.clazz = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
 	}
@@ -93,7 +92,7 @@ public abstract class BasicRevisionBasedRepository<T extends RevisionBasedEntity
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void deleteAllForOwner( U owner ) {
-		List<T> items = (List<T>) addOwnerRestriction( distinct(), owner ).list();
+		Collection<T> items = list( distinct( addOwnerRestriction( owner ) ) );
 
 		for ( T item : items ) {
 			delete( item );
@@ -106,8 +105,7 @@ public abstract class BasicRevisionBasedRepository<T extends RevisionBasedEntity
 	@Override
 	@SuppressWarnings("unchecked")
 	protected Collection<T> getAllForLatestRevision( U owner ) {
-		return (Collection<T>) addOwnerRestriction( revisionSelector( Revision.LATEST ), owner )
-				.list();
+		return list( distinct( addOwnerRestriction( owner ), revisionSelector( Revision.LATEST ) ) );
 	}
 
 	/**
@@ -116,8 +114,7 @@ public abstract class BasicRevisionBasedRepository<T extends RevisionBasedEntity
 	@Override
 	@SuppressWarnings("unchecked")
 	protected Collection<T> getAllForSpecificRevision( U owner, int revisionNumber ) {
-		return (Collection<T>) addOwnerRestriction( revisionSelector( revisionNumber ), owner )
-				.list();
+		return list( distinct( addOwnerRestriction( owner ), revisionSelector( revisionNumber ) ) );
 	}
 
 	/**
@@ -126,53 +123,58 @@ public abstract class BasicRevisionBasedRepository<T extends RevisionBasedEntity
 	@Override
 	@SuppressWarnings("unchecked")
 	protected Collection<T> getAllForDraftRevision( U owner ) {
-		return (Collection<T>) addOwnerRestriction( revisionSelector( Revision.DRAFT ), owner )
-				.list();
+		return list( distinct( addOwnerRestriction( owner ), revisionSelector( Revision.DRAFT ) ) );
+	}
+
+	protected Collection<T> list( CriteriaQuery<T> criteriaQuery ) {
+		return session().createQuery( criteriaQuery ).list();
 	}
 
 	/**
 	 * Add owner restriction to the partically configured criteria.
 	 */
-	protected abstract Criteria addOwnerRestriction( Criteria criteria, U owner );
+	protected abstract Specification<T> addOwnerRestriction( U owner );
 
-	protected Criteria distinct() {
-		return session()
-				.createCriteria( clazz )
-				.setResultTransformer( Criteria.DISTINCT_ROOT_ENTITY );
+	protected CriteriaQuery<T> distinct( Specification<T>... specifications ) {
+		CriteriaBuilder cb = session().getCriteriaBuilder();
+		CriteriaQuery<T> query = cb.createQuery( clazz );
+		Root<T> from = query.from( clazz );
+		Predicate[] predicates = Arrays.stream( specifications ).map( s -> s.toPredicate( from, query, cb ) ).toArray( Predicate[]::new );
+		return query.distinct( true ).where( predicates );
 	}
 
-	protected Criteria revisionSelector( int revisionNumber ) {
-		Criteria cr = distinct();
-
+	protected Specification<T> revisionSelector( int revisionNumber ) {
 		switch ( revisionNumber ) {
 			case Revision.DRAFT:
-				cr.add(
-						Restrictions.or(
-								Restrictions.eq( "firstRevision", Revision.DRAFT ),
-								Restrictions.eq( "removalRevision", 0 )
+				return ( root, query, cb ) -> cb.and(
+						cb.or(
+								cb.equal( root.get( "firstRevision" ), Revision.DRAFT ),
+								cb.equal( root.get( "removalRevision" ), 0 )
 						)
 				);
-				break;
 			case Revision.LATEST:
-				cr.add( Restrictions.ge( "firstRevision", 0 ) );
-				cr.add( Restrictions.eq( "removalRevision", 0 ) );
-				break;
+				return ( root, query, cb ) -> cb.and(
+						cb.ge( root.get( "firstRevision" ), 0 ),
+						cb.equal( root.get( "removalRevision" ), 0 )
+				);
 			default:
-				cr.add( Restrictions.ge( "firstRevision", 0 ) );
-				cr.add( Restrictions.le( "firstRevision", revisionNumber ) );
-				cr.add(
-						Restrictions.or(
-								Restrictions.eq( "removalRevision", 0 ),
-								Restrictions.gt( "removalRevision", revisionNumber )
+				return ( root, query, cb ) -> cb.and(
+						cb.ge( root.get( "firstRevision" ), 0 ),
+						cb.le( root.get( "firstRevision" ), revisionNumber ),
+						cb.or(
+								cb.equal( root.get( "removalRevision" ), 0 ),
+								cb.gt( root.get( "removalRevision" ), revisionNumber )
 						)
 				);
-				break;
 		}
-
-		return cr;
 	}
 
 	protected Session session() {
 		return hibernateSessionHolder.getCurrentSession();
+	}
+
+	@Autowired
+	public void setHibernateSessionHolder( HibernateSessionHolder hibernateSessionHolder ) {
+		this.hibernateSessionHolder = hibernateSessionHolder;
 	}
 }
