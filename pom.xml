@@ -60,7 +60,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<revision>5.0.0-SNAPSHOT</revision>
+		<revision>4.1.0-SNAPSHOT</revision>
 		<dozer-spring-boot-starter.version>6.5.0</dozer-spring-boot-starter.version>
 	</properties>
 
