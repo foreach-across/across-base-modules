@@ -16,6 +16,9 @@
 
 package test.boot.apps;
 
+import com.foreach.across.core.context.AcrossContextUtils;
+import com.foreach.across.core.context.AcrossEntity;
+import com.foreach.across.core.context.AcrossListableBeanFactory;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
 import com.foreach.across.test.ExposeForTest;
@@ -25,13 +28,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.repository.Repository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import test.boot.apps.multiple.MultipleDataSourceApplication;
@@ -104,14 +106,23 @@ public class TestMultipleDataSourceApplicationWithDeferredRepositories
 	@Autowired
 	private MultipleDataSourceApplication.MyEntityInterceptor interceptor;
 
+	@Autowired
+	private BeanFactory beanFactory;
+
 	@Test
 	public void shouldHaveDefferedInitializerEventListener() {
 		assertTrue( beanRegistry.moduleContainsLocalBean( "AcrossHibernateJpaModule",
 		                                                  "com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration.DeferredRepositoryInitializer" ) );
+
+		AcrossListableBeanFactory acrossContext = AcrossContextUtils.getBeanFactory(
+				beanFactory.getBean( "acrossContext", AcrossEntity.class ) );
+		assertTrue( acrossContext.getBeanDefinition( "test.boot.apps.multiple.entities.city.CityRepository" ).isLazyInit() );
+		assertTrue( acrossContext.getBeanDefinition( "test.boot.apps.multiple.application.street.StreetRepository" ).isLazyInit() );
+		assertTrue( acrossContext.getBeanDefinition( "test.boot.apps.multiple.application.brand.BrandRepository" ).isLazyInit() );
+
 		assertThat( brandRepository ).isInstanceOf( Advised.class );
 		TargetSource targetSource = ( (Advised) brandRepository ).getTargetSource();
 		assertThat( Repository.class ).isAssignableFrom( targetSource.getTargetClass() );
-		assertThat( ReflectionTestUtils.getField( targetSource, "val$dlbf" ) ).isInstanceOf( DefaultListableBeanFactory.class );
 	}
 
 	@Test

@@ -16,9 +16,9 @@
 
 package org.springframework.data.repository.config;
 
+import com.foreach.across.core.context.LazyCompositeAutowireCandidateResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.*;
@@ -209,40 +209,26 @@ public class AcrossRepositoryConfigurationDelegate
 		}
 
 		DefaultListableBeanFactory beanFactory = DefaultListableBeanFactory.class.cast( registry );
-		DefaultListableBeanFactory original = beanFactory;
-		BeanFactory parentBeanFactory = null;
-
-		do {
-			overwriteCandidateResolver( configurations, beanFactory );
-			parentBeanFactory = beanFactory.getParentBeanFactory();
-			if ( parentBeanFactory != null ) {
-				if ( DefaultListableBeanFactory.class.isInstance( parentBeanFactory ) ) {
-					beanFactory = (DefaultListableBeanFactory) parentBeanFactory;
-				}
-				else {
-					throw new RuntimeException( "Cannot set candidate resolved in the BeanRegistry structure" );
-				}
-			}
-		}
-		while ( parentBeanFactory != null );
-
+		overwriteCandidateResolver( configurations, beanFactory );
 	}
 
 	private static void overwriteCandidateResolver( Map<String, RepositoryConfiguration<?>> configurations,
 	                                                DefaultListableBeanFactory beanFactory ) {
 		AutowireCandidateResolver resolver = beanFactory.getAutowireCandidateResolver();
 
-		if ( !Arrays.asList( ContextAnnotationAutowireCandidateResolver.class, LazyRepositoryInjectionPointResolver.class )
+		if ( !Arrays.asList( ContextAnnotationAutowireCandidateResolver.class, LazyRepositoryInjectionPointResolver.class,
+		                     LazyCompositeAutowireCandidateResolver.class )
 		            .contains( resolver.getClass() ) ) {
 
-			throw new RuntimeException( String.format( NON_DEFAULT_AUTOWIRE_CANDIDATE_RESOLVER, resolver.getClass().getName() ) );
+			LOG.error( String.format( NON_DEFAULT_AUTOWIRE_CANDIDATE_RESOLVER, resolver.getClass().getName() ) );
+			return;
 		}
 
-		AutowireCandidateResolver newResolver = LazyRepositoryInjectionPointResolver.class.isInstance( resolver ) //
+		ContextAnnotationAutowireCandidateResolver newResolver = LazyRepositoryInjectionPointResolver.class.isInstance( resolver ) //
 				? LazyRepositoryInjectionPointResolver.class.cast( resolver ).withAdditionalConfigurations( configurations ) //
 				: new LazyRepositoryInjectionPointResolver( configurations );
-
-		beanFactory.setAutowireCandidateResolver( newResolver );
+		newResolver.setBeanFactory( beanFactory );
+		LazyCompositeAutowireCandidateResolver.addAdditionalResolver( newResolver );
 	}
 
 	/**

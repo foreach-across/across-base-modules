@@ -16,6 +16,9 @@
 
 package test.boot.apps;
 
+import com.foreach.across.core.context.AcrossContextUtils;
+import com.foreach.across.core.context.AcrossEntity;
+import com.foreach.across.core.context.AcrossListableBeanFactory;
 import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration;
 import com.foreach.across.test.ExposeForTest;
@@ -25,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.target.SingletonTargetSource;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -99,18 +103,28 @@ public class TestMultipleDataSourceApplication
 	private AcrossContextBeanRegistry beanRegistry;
 
 	@Autowired
+	private BeanFactory beanFactory;
+
+	@Autowired
 	private MultipleDataSourceApplication.MyEntityInterceptor interceptor;
 
 	@Test
 	public void shouldNotHaveDefferedInitializerEventListener() {
 		assertFalse( beanRegistry.moduleContainsLocalBean( "AcrossHibernateJpaModule",
 		                                                   "com.foreach.across.modules.hibernate.jpa.config.HibernateJpaConfiguration.DeferredRepositoryInitializer" ) );
+
+		AcrossListableBeanFactory acrossContext = AcrossContextUtils.getBeanFactory(
+				beanFactory.getBean( "acrossContext", AcrossEntity.class ) );
+		assertFalse( acrossContext.getBeanDefinition( "test.boot.apps.multiple.entities.city.CityRepository" ).isLazyInit() );
+		assertFalse( acrossContext.getBeanDefinition( "test.boot.apps.multiple.application.street.StreetRepository" ).isLazyInit() );
+		assertFalse( acrossContext.getBeanDefinition( "test.boot.apps.multiple.application.brand.BrandRepository" ).isLazyInit() );
+
+		assertThat( brandRepository ).isInstanceOf( Advised.class );
+		assertThat( ( (Advised) brandRepository ).getTargetSource() ).isInstanceOf( SingletonTargetSource.class );
 	}
 
 	@Test
 	public void saveAndFetchBrand() {
-		assertThat( brandRepository ).isInstanceOf( Advised.class );
-		assertThat( ( (Advised) brandRepository ).getTargetSource() ).isInstanceOf( SingletonTargetSource.class );
 
 		Brand brand = new Brand();
 		brand.setName( "Heineken" );

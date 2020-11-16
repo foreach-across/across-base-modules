@@ -16,11 +16,18 @@
 
 package com.foreach.across.modules.hibernate.jpa.repositories.config;
 
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.boot.autoconfigure.data.AbstractRepositoryConfigurationSourceSupport;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.data.repository.config.AcrossRepositoryConfigurationDelegate;
+import org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource;
 import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.data.repository.config.RepositoryConfigurationExtension;
+import org.springframework.data.util.Streamable;
 import org.springframework.util.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -38,6 +45,8 @@ public class ApplicationModuleRepositoryAutoConfiguration
 	static class ApplicationModuleRepositoriesRegistrar extends AbstractRepositoryConfigurationSourceSupport
 	{
 		private BootstrapMode bootstrapMode = null;
+		private ResourceLoader resourceLoader = null;
+		private Environment environment = null;
 
 		@Override
 		protected Class<? extends Annotation> getAnnotation() {
@@ -63,6 +72,29 @@ public class ApplicationModuleRepositoryAutoConfiguration
 		public void setEnvironment( Environment environment ) {
 			super.setEnvironment( environment );
 			configureBootstrapMode( environment );
+			this.environment = environment;
+		}
+
+		@Override
+		public void setResourceLoader( ResourceLoader resourceLoader ) {
+			super.setResourceLoader( resourceLoader );
+			this.resourceLoader = resourceLoader;
+		}
+
+		@Override
+		public void registerBeanDefinitions( AnnotationMetadata metadata, BeanDefinitionRegistry registry, BeanNameGenerator generator ) {
+			AnnotationMetadata meta = AnnotationMetadata.introspect( getConfiguration() );
+			AnnotationRepositoryConfigurationSource configurationSource = new AutoConfiguredAnnotationRepositoryConfigurationSource( meta,
+			                                                                                                                         getAnnotation(),
+			                                                                                                                         this.resourceLoader,
+			                                                                                                                         this.environment,
+			                                                                                                                         registry,
+			                                                                                                                         generator )
+			{
+			};
+			AcrossRepositoryConfigurationDelegate delegate = new AcrossRepositoryConfigurationDelegate(
+					configurationSource, this.resourceLoader, this.environment );
+			delegate.registerRepositoriesIn( registry, getRepositoryConfigurationExtension() );
 		}
 
 		private void configureBootstrapMode( Environment environment ) {
@@ -70,6 +102,34 @@ public class ApplicationModuleRepositoryAutoConfiguration
 			if ( StringUtils.hasText( property ) ) {
 				this.bootstrapMode = BootstrapMode.valueOf( property.toUpperCase( Locale.ENGLISH ) );
 			}
+		}
+
+		/**
+		 * An auto-configured {@link AnnotationRepositoryConfigurationSource}.
+		 */
+		private class AutoConfiguredAnnotationRepositoryConfigurationSource
+				extends AnnotationRepositoryConfigurationSource
+		{
+
+			AutoConfiguredAnnotationRepositoryConfigurationSource( AnnotationMetadata metadata,
+			                                                       Class<? extends Annotation> annotation,
+			                                                       ResourceLoader resourceLoader,
+			                                                       Environment environment,
+			                                                       BeanDefinitionRegistry registry,
+			                                                       BeanNameGenerator generator ) {
+				super( metadata, annotation, resourceLoader, environment, registry, generator );
+			}
+
+			@Override
+			public Streamable<String> getBasePackages() {
+				return ApplicationModuleRepositoriesRegistrar.this.getBasePackages();
+			}
+
+			@Override
+			public BootstrapMode getBootstrapMode() {
+				return ApplicationModuleRepositoriesRegistrar.this.getBootstrapMode();
+			}
+
 		}
 
 		@EnableAcrossJpaRepositories
