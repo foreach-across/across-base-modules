@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>com.foreach.across</groupId>
 		<artifactId>across-standard-module-parent</artifactId>
-		<version>5.0.0.RELEASE</version>
+		<version>5.1.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.foreach.across.modules</groupId>
@@ -60,8 +60,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<revision>3.1.0-SNAPSHOT</revision>
-		<junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
+		<revision>3.1.0.RELEASE</revision>
 	</properties>
 
 	<modules>

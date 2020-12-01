@@ -18,8 +18,8 @@ package com.foreach.across.modules.logging.exception;
 import com.foreach.common.spring.context.ApplicationContextInfo;
 import com.foreach.common.spring.context.ApplicationEnvironment;
 import com.foreach.common.spring.mail.MailService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -44,7 +44,7 @@ public class TestExceptionToMailResolver
 	private String toAddress;
 	private String fromAddress;
 
-	@Before
+	@BeforeEach
 	public void prepareForTest() {
 		resolver = new ExceptionToMailResolver();
 
