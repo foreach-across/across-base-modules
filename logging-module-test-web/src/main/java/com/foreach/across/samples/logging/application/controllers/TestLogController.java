@@ -45,8 +45,8 @@ public class TestLogController
 	@ResponseBody
 	@RequestMapping("/test-hikari")
 	public String doDatabaseActions() throws SQLException {
-		try (Statement statement = dataSource.getConnection( "poc", "" ).createStatement()) {
-			statement.execute( "SELECT 1" );
+		try (Statement statement = dataSource.getConnection().createStatement()) {
+			statement.execute("SELECT 1");
 		}
 		return "OK";
 	}

@@ -20,26 +20,23 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.fasterxml.jackson.core.JsonGenerator;
 import net.logstash.logback.composite.AbstractFieldJsonProvider;
 import net.logstash.logback.composite.JsonWritingUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
 /**
  * When logstash is configured this JSON-Provider is used to extend fields we use for our the method logging fields
- * that are being send to logstash
+ * that are being sent to logstash
  */
 public class MethodLoggerJsonProvider extends AbstractFieldJsonProvider<ILoggingEvent>
 {
 	@Override
 	public void writeTo( JsonGenerator generator, ILoggingEvent event ) throws IOException {
 		try {
-			String message = event.getFormattedMessage();
-			String[] split = message.split( "\t" );
-			int methodLevel = Integer.parseInt( split[0] );
-			String method = split[1];
-			int duration = Integer.parseInt( split[2] );
-			JsonWritingUtils.writeNumberField( generator, "methodLevel", methodLevel );
-			JsonWritingUtils.writeStringField( generator, "method", method );
-			JsonWritingUtils.writeNumberField( generator, "duration", duration );
+			String[] split = StringUtils.split(event.getFormattedMessage(), '\t');
+			JsonWritingUtils.writeNumberField(generator, "methodLevel", Integer.parseInt(split[0]));
+			JsonWritingUtils.writeStringField(generator, "method", split[1]);
+			JsonWritingUtils.writeNumberField(generator, "duration", Integer.parseInt(split[2]));
 		}
 		catch ( Exception e ) {
 			throw new IOException( e );

@@ -1,7 +1,7 @@
 target
 .idea/
 *.iml
-
+local-data
 .flattened-pom.xml
 /.idea/artifacts/
 

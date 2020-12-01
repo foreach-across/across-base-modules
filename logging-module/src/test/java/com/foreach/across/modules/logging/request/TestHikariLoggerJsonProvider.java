@@ -30,10 +30,10 @@ public class TestHikariLoggerJsonProvider {
 
 	@Test
 	public void writeTo() throws IOException {
-		when(event.getFormattedMessage()).thenReturn("ABC pool stats my-pool (total=1, inUse=2, avail=3, waiting=4)");
+		when(event.getFormattedMessage()).thenReturn("ABC - my-pool stats (total=1, active=2, idle=3, waiting=4)");
 		jsonProvider.writeTo(generator, event);
-		verify(generator).writeStringField("location", "ABC ");
-		verify(generator).writeStringField("pool", "my-pool");
+		verify(generator).writeStringField("location", "ABC");
+		verify(generator).writeStringField("pool", "my-pool ");
 		verify(generator).writeNumberField("total", 1);
 		verify(generator).writeNumberField("active", 2);
 		verify(generator).writeNumberField("idle", 3);
@@ -42,7 +42,7 @@ public class TestHikariLoggerJsonProvider {
 
 	@Test
 	public void writeToWithExceptionInGenerator() throws IOException {
-		when(event.getFormattedMessage()).thenReturn("ABC pool stats my-pool (total=1, inUse=2, avail=3, waiting=4)");
+		when(event.getFormattedMessage()).thenReturn("ABC - my-pool stats (total=1, active=2, idle=3, waiting=4)");
 		doThrow(new IOException()).when(generator).writeStringField(anyString(), anyString());
 		assertThrows(IOException.class, () -> {
 			jsonProvider.writeTo(generator, event);

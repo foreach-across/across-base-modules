@@ -24,14 +24,7 @@ import com.foreach.across.modules.logging.LoggingModuleSettings;
 import com.foreach.across.modules.logging.method.MethodLogConfiguration;
 import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
 import com.foreach.across.modules.web.AcrossWebModule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
-
-import javax.sql.DataSource;
 
 /**
  * @author Arne Vandamme
@@ -44,9 +37,6 @@ import javax.sql.DataSource;
 public class LoggingModuleApplication
 {
 	public final static String NAME = "LoggingModuleApplication";
-
-	@Autowired
-	private Environment environment;
 
 	public static void main( String[] args ) {
 		AcrossApplicationRunner.run( LoggingModuleApplication.class, args );
@@ -65,11 +55,5 @@ public class LoggingModuleApplication
 		loggingModule.setProperty( LoggingModuleSettings.REQUEST_LOGGER_CONFIGURATION, requestLoggerConfiguration );
 
 		return loggingModule;
-	}
-
-	@Bean("acrossDataSource")
-	@Primary
-	public DataSource acrossDataSource( ConfigurableEnvironment environment, DataSourceProperties dataSourceProperties ) {
-		return dataSourceProperties.initializeDataSourceBuilder().build();
 	}
 }

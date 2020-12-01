@@ -27,29 +27,21 @@ import java.util.regex.Pattern;
 
 /**
  * When logstash is configured this JSON-Provider is used to extend fields we use for our the hikari logging fields
- * that are being send to logstash
+ * that are being sent to logstash
  */
-public class HikariLoggerJsonProvider extends AbstractFieldJsonProvider<ILoggingEvent>
-{
-	private Pattern pattern = Pattern.compile( "(.*)pool stats (.*) \\(total=(\\d+), inUse=(\\d+), avail=(\\d+), waiting=(\\d+)\\)" );
+public class HikariLoggerJsonProvider extends AbstractFieldJsonProvider<ILoggingEvent> {
+	private final Pattern pattern = Pattern.compile("(.*)\\s-\\s(.*)stats \\(total=(\\d+), active=(\\d+), idle=(\\d+), waiting=(\\d+)\\)");
 
 	@Override
-	public void writeTo( JsonGenerator generator, ILoggingEvent event ) throws IOException {
-		String message = event.getFormattedMessage();
-		Matcher matcher = pattern.matcher( message );
-		if(matcher.find()){
-			String hikariMessage = matcher.group( 1);
-			String pool = matcher.group( 2 );
-			int total = Integer.parseInt( matcher.group( 3 ) );
-			int active = Integer.parseInt( matcher.group( 4 ) );
-			int idle = Integer.parseInt( matcher.group( 5 ) );
-			int waiting = Integer.parseInt( matcher.group( 6 ) );
-			JsonWritingUtils.writeStringField( generator, "location", hikariMessage );
-			JsonWritingUtils.writeStringField( generator, "pool", pool );
-			JsonWritingUtils.writeNumberField( generator, "total", total );
-			JsonWritingUtils.writeNumberField( generator, "active", active );
-			JsonWritingUtils.writeNumberField( generator, "idle", idle );
-			JsonWritingUtils.writeNumberField( generator, "waiting", waiting );
+	public void writeTo(JsonGenerator generator, ILoggingEvent event) throws IOException {
+		Matcher matcher = pattern.matcher(event.getFormattedMessage());
+		if (matcher.find()) {
+			JsonWritingUtils.writeStringField(generator, "location", matcher.group(1));
+			JsonWritingUtils.writeStringField(generator, "pool", matcher.group(2));
+			JsonWritingUtils.writeNumberField(generator, "total", Integer.parseInt(matcher.group(3)));
+			JsonWritingUtils.writeNumberField(generator, "active", Integer.parseInt(matcher.group(4)));
+			JsonWritingUtils.writeNumberField(generator, "idle", Integer.parseInt(matcher.group(5)));
+			JsonWritingUtils.writeNumberField(generator, "waiting", Integer.parseInt(matcher.group(6)));
 		}
 	}
 }

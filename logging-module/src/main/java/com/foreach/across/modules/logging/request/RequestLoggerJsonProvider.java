@@ -20,38 +20,29 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.fasterxml.jackson.core.JsonGenerator;
 import net.logstash.logback.composite.AbstractFieldJsonProvider;
 import net.logstash.logback.composite.JsonWritingUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
 /**
  * When logstash is configured this JSON-Provider is used to extend fields we use for our the request logging fields
- * that are being send to logstash
+ * that are being sent to logstash
  */
 public class RequestLoggerJsonProvider extends AbstractFieldJsonProvider<ILoggingEvent>
 {
 	@Override
 	public void writeTo( JsonGenerator generator, ILoggingEvent event ) throws IOException {
 		try {
-			String message = event.getFormattedMessage();
-			String[] split = message.split( "\t" );
-			String remoteAddress = split[0];
-			String method = split[1];
-			String url = split[2];
-			String servletPath = split[3];
-			String requestMapping = split[4];
-			String handlerName = split[5];
-			String viewName = split[6];
-			int status = Integer.parseInt( split[7] );
-			int duration = Integer.parseInt( split[8] );
-			JsonWritingUtils.writeStringField( generator, "remoteAddress", remoteAddress );
-			JsonWritingUtils.writeStringField( generator, "method", method );
-			JsonWritingUtils.writeStringField( generator, "url", url );
-			JsonWritingUtils.writeStringField( generator, "servletPath", servletPath );
-			JsonWritingUtils.writeStringField( generator, "requestMapping", requestMapping );
-			JsonWritingUtils.writeStringField( generator, "handlerName", handlerName );
-			JsonWritingUtils.writeStringField( generator, "viewName", viewName );
-			JsonWritingUtils.writeNumberField( generator, "status", status );
-			JsonWritingUtils.writeNumberField( generator, "duration", duration );
+			String[] split = StringUtils.split(event.getFormattedMessage(), '\t');
+			JsonWritingUtils.writeStringField(generator, "remoteAddress", split[0]);
+			JsonWritingUtils.writeStringField(generator, "method", split[1]);
+			JsonWritingUtils.writeStringField(generator, "url", split[2]);
+			JsonWritingUtils.writeStringField(generator, "servletPath", split[3]);
+			JsonWritingUtils.writeStringField(generator, "requestMapping", split[4]);
+			JsonWritingUtils.writeStringField(generator, "handlerName", split[5]);
+			JsonWritingUtils.writeStringField(generator, "viewName", split[6]);
+			JsonWritingUtils.writeNumberField(generator, "status", Integer.parseInt(split[7]));
+			JsonWritingUtils.writeNumberField(generator, "duration", Integer.parseInt(split[8]));
 		}
 		catch ( Exception e ) {
 			throw new IOException( e );

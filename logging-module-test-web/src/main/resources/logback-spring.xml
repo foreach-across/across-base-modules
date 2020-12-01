@@ -60,7 +60,7 @@
 			<level>ERROR</level>
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${log.dir}/%d{yyyy'/'MM'/'dd'/errors.'yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${LOG_PATH}/%d{yyyy'/'MM'/'dd'/errors.'yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
@@ -68,7 +68,7 @@
 	</appender>
 	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="thymeleaf">
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${log.dir}/%d{yyyy'/'MM'/'dd'/thymeleaf.'yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${LOG_PATH}/%d{yyyy'/'MM'/'dd'/thymeleaf.'yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
@@ -76,7 +76,7 @@
 	</appender>
 	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="application">
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${log.dir}/%d{yyyy'/'MM'/'dd'/application.'yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${LOG_PATH}/%d{yyyy'/'MM'/'dd'/application.'yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
@@ -84,7 +84,7 @@
 	</appender>
 	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="across">
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${log.dir}/%d{yyyy'/'MM'/'dd'/across.'yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${LOG_PATH}/%d{yyyy'/'MM'/'dd'/across.'yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{ISO8601} [%X{requestId}] [%t] %-5p %c - %m%n</pattern>
@@ -92,7 +92,7 @@
 	</appender>
 	<appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="hikari">
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${log.dir}/%d{yyyy'/'MM'/'dd'/hikari.'yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${LOG_PATH}/%d{yyyy'/'MM'/'dd'/hikari.'yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{ISO8601}\t[%X{requestId}]\t%t\t%logger{0}\t%m%n</pattern>
