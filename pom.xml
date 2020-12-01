@@ -76,11 +76,6 @@
 				<version>3.0.0.RELEASE</version>
 			</dependency>
 			<dependency>
-				<groupId>org.junit.jupiter</groupId>
-				<artifactId>junit-jupiter-api</artifactId>
-				<version>${junit-jupiter-api.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>com.foreach.across.modules</groupId>
 				<artifactId>spring-security-module</artifactId>
 				<version>5.0.0-SNAPSHOT</version>

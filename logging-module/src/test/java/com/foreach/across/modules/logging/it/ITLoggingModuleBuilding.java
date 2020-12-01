@@ -228,18 +228,18 @@ public class ITLoggingModuleBuilding
 
 			Map<String, ? extends FilterRegistration> filters = ctx.getServletContext().getFilterRegistrations();
 			List<? extends Class<? extends Filter>> orderedFilters = filters.values()
-			                                                                .stream()
-			                                                                .map( o -> ( (MockFilterRegistration) o ).getFilterClass() )
-			                                                                .collect( Collectors.toList() );
+					.stream()
+					.map(o -> ((MockFilterRegistration) o).getFilterClass())
+					.collect(Collectors.toList());
 
-			assertFalse( "Filters should not be empty", orderedFilters.isEmpty() );
+			assertFalse(orderedFilters.isEmpty(), "Filters should not be empty");
 
-			assertEquals( "OrderedCharacterEncodingFilter is not 1st filter", OrderedCharacterEncodingFilter.class, orderedFilters.get( 0 ) );
-			assertEquals( "AcrossMultipartFilter is not 2nd filter", AcrossMultipartFilter.class, orderedFilters.get( 1 ) );
-			assertEquals( "RequestLoggerFilter is not 3rd filter", RequestLoggerFilter.class, orderedFilters.get( 2 ) );
-			assertEquals( "RequestResponseLoggingFilter is not 4th filter", RequestResponseLoggingFilter.class, orderedFilters.get( 3 ) );
-			assertEquals( "ResourceUrlEncodingFilter is not 8th filter", ResourceUrlEncodingFilter.class, orderedFilters.get( 7 ) );
-			assertEquals( "springSecurityFilterChain is not 9th filter", "springSecurityFilterChain", new ArrayList<>( filters.keySet() ).get( 8 ) );
+			assertEquals(OrderedCharacterEncodingFilter.class, orderedFilters.get(0), "OrderedCharacterEncodingFilter is not 1st filter");
+			assertEquals(AcrossMultipartFilter.class, orderedFilters.get(1), "AcrossMultipartFilter is not 2nd filter");
+			assertEquals(RequestLoggerFilter.class, orderedFilters.get(2), "RequestLoggerFilter is not 3rd filter");
+			assertEquals(RequestResponseLoggingFilter.class, orderedFilters.get(3), "RequestResponseLoggingFilter is not 4th filter");
+			assertEquals(ResourceUrlEncodingFilter.class, orderedFilters.get(6), "ResourceUrlEncodingFilter is not 8th filter");
+			assertEquals("springSecurityFilterChain", new ArrayList<>(filters.keySet()).get(7), "springSecurityFilterChain is not 9th filter");
 		}
 	}
 

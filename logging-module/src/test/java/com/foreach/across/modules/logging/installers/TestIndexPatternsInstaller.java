@@ -1,11 +1,11 @@
 package com.foreach.across.modules.logging.installers;
 
 import com.foreach.across.modules.logging.LoggingModuleSettings;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -19,9 +19,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 /**
  * @author Sander Van Loock
  */
-@RunWith(MockitoJUnitRunner.class)
-public class TestIndexPatternsInstaller
-{
+@ExtendWith(MockitoExtension.class)
+public class TestIndexPatternsInstaller {
 
 	public static final String KIBANA_SERVER = "http://kibana.com";
 	public static final String APPLICATION_NAME = "my-app";
@@ -30,16 +29,16 @@ public class TestIndexPatternsInstaller
 	private IndexPatternsInstaller installer;
 	private MockRestServiceServer mockServer;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
-		when( env.getProperty( LoggingModuleSettings.KIBANA_CONFIGURATION_SERVER ) ).thenReturn( KIBANA_SERVER );
-		when( env.getProperty( LoggingModuleSettings.LOGSTASH_CONFIGURATION_APPLICATION ) ).thenReturn( APPLICATION_NAME );
-		when( env.getActiveProfiles() ).thenReturn( new String[] { "acc" } );
+		when(env.getProperty(LoggingModuleSettings.KIBANA_CONFIGURATION_SERVER)).thenReturn(KIBANA_SERVER);
+		when(env.getProperty(LoggingModuleSettings.LOGSTASH_CONFIGURATION_APPLICATION)).thenReturn(APPLICATION_NAME);
+		when(env.getActiveProfiles()).thenReturn(new String[]{"acc"});
 		installer = new IndexPatternsInstaller();
-		installer.setEnv( env );
+		installer.setEnv(env);
 		RestTemplate restTemplate = new RestTemplate();
-		mockServer = MockRestServiceServer.createServer( restTemplate );
-		setField( installer, "restTemplate", restTemplate );
+		mockServer = MockRestServiceServer.createServer(restTemplate);
+		setField(installer, "restTemplate", restTemplate);
 	}
 
 	@Test
