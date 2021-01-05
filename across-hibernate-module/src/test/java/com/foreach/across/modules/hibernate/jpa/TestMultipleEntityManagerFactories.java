@@ -65,8 +65,7 @@ public class TestMultipleEntityManagerFactories
 	public void hibernateSessionHolderUsesLocalEntityManager() {
 		assertNotNull( hibernateSessionHolder );
 		assertTrue( hibernateSessionHolder instanceof JpaHibernateSessionHolderImpl );
-
-		assertSame( entityManager.unwrap( Session.class ), hibernateSessionHolder.getCurrentSession() );
+		assertEquals( entityManager.unwrap( Session.class ).toString(), hibernateSessionHolder.getCurrentSession().toString() );
 	}
 
 	@Entity
