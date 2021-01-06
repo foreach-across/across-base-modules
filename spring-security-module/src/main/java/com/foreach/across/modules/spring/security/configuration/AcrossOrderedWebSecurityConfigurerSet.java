@@ -25,8 +25,10 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
+import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 
+import javax.servlet.Filter;
 import java.util.*;
 
 /**
@@ -36,7 +38,7 @@ import java.util.*;
  * @author Arne Vandamme
  * @since 4.0.0
  */
-class AcrossOrderedWebSecurityConfigurerSet extends LinkedHashSet<WebSecurityConfigurer>
+class AcrossOrderedWebSecurityConfigurerSet extends LinkedHashSet<WebSecurityConfigurer<? extends SecurityBuilder<Filter>>>
 {
 	private final AcrossListableBeanFactory beanFactory;
 
@@ -57,16 +59,19 @@ class AcrossOrderedWebSecurityConfigurerSet extends LinkedHashSet<WebSecurityCon
 		}
 	}
 
-	private WebSecurityConfigurer createWrapperOrProxy( Object original, int order ) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private WebSecurityConfigurer<? extends SecurityBuilder<Filter>> createWrapperOrProxy( Object original, int order ) {
 		if ( original instanceof AcrossWebSecurityConfigurer ) {
 			return createWrapper( (AcrossWebSecurityConfigurer) original, order );
 		}
 		return createProxy( (WebSecurityConfigurer) original, order );
 	}
 
-	private WebSecurityConfigurerProxy createProxy( WebSecurityConfigurer configurer, int order ) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private WebSecurityConfigurerProxy<? extends SecurityBuilder<Filter>> createProxy( WebSecurityConfigurer<? extends SecurityBuilder<Filter>> configurer,
+	                                                                                   int order ) {
 		InterfaceMaker interfaceMaker = new InterfaceMaker();
-		Class dynamicInterface = interfaceMaker.create();
+		Class<?> dynamicInterface = interfaceMaker.create();
 
 		Enhancer enhancer = new Enhancer();
 		enhancer.setSuperclass( WebSecurityConfigurerProxy.class );
@@ -86,7 +91,7 @@ class AcrossOrderedWebSecurityConfigurerSet extends LinkedHashSet<WebSecurityCon
 	 */
 	private AcrossWebSecurityConfigurerAdapter createWrapper( AcrossWebSecurityConfigurer configurer, int order ) {
 		InterfaceMaker interfaceMaker = new InterfaceMaker();
-		Class dynamicInterface = interfaceMaker.create();
+		Class<?> dynamicInterface = interfaceMaker.create();
 
 		Enhancer enhancer = new Enhancer();
 		enhancer.setSuperclass( AcrossWebSecurityConfigurerAdapter.class );
@@ -125,7 +130,7 @@ class AcrossOrderedWebSecurityConfigurerSet extends LinkedHashSet<WebSecurityCon
 	}
 
 	@SuppressWarnings({ "WeakerAccess" })
-	public List<WebSecurityConfigurer> getWebSecurityConfigurers() {
+	public List<WebSecurityConfigurer<? extends SecurityBuilder<Filter>>> getWebSecurityConfigurers() {
 		return new ArrayList<>( this );
 	}
 }

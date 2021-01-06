@@ -16,28 +16,29 @@
 package com.foreach.across.modules.spring.security.configuration;
 
 import com.foreach.across.core.context.info.AcrossModuleInfo;
-import com.foreach.across.core.context.registry.AcrossContextBeanRegistry;
 import com.foreach.across.core.context.support.AcrossOrderUtils;
 import com.foreach.across.modules.spring.security.infrastructure.config.SecurityInfrastructure;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.util.ClassUtils;
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.Filter;
 import java.util.List;
 
 /**
@@ -46,7 +47,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @EnableWebSecurity
-@Import(AcrossWebSecurityConfiguration.DefaultSpringBootSecurityRemoval.class)
 public class AcrossWebSecurityConfiguration
 {
 	private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring5.SpringTemplateEngine";
@@ -82,26 +82,8 @@ public class AcrossWebSecurityConfiguration
 			}
 
 		}
-
 		return false;
 	}
-
-	/**
-	 * Ignore any configured error controller path from security matching by default.
-	 * TODO: actually security configuration should happen in the post processor module in the future,
-	 * making this obsolete hopefully
-	 */
-//	@Bean
-//	@ConditionalOnBean(ServerProperties.class)
-//	public IgnoredRequestCustomizer ignoreErrorPathRequestCustomizer( ServerProperties serverProperties ) {
-//		return configurer -> {
-//			String result = StringUtils.cleanPath( serverProperties.getError().getPath() );
-//			if ( !result.startsWith( "/" ) ) {
-//				result = "/" + result;
-//			}
-//			configurer.antMatchers( result );
-//		};
-//	}
 
 	/**
 	 * Uses a custom approach to fetch the {@link WebSecurityConfigurer} instances that should be applied.
@@ -119,7 +101,7 @@ public class AcrossWebSecurityConfiguration
 
 		if ( LOG.isDebugEnabled() ) {
 			LOG.debug( "Applying the following WebSecurityConfigurers in order:" );
-			List<WebSecurityConfigurer> list = webSecurityConfigurers.getWebSecurityConfigurers();
+			List<WebSecurityConfigurer<? extends SecurityBuilder<Filter>>> list = webSecurityConfigurers.getWebSecurityConfigurers();
 			list.sort( AnnotationAwareOrderComparator.INSTANCE );
 			list.forEach( cfg -> {
 				              int order = AcrossOrderUtils.findOrder( cfg );
@@ -137,29 +119,27 @@ public class AcrossWebSecurityConfiguration
 	}
 
 	/**
-	 * Removes the default Spring Boot security rules if there is a custom AcrossWebSecurityConfigurer present.
-	 * Done this way because the current implementation of regular Spring security vs Across setup uses separate
-	 * configuration classes and Spring Boot thinks there never is any security configured and applies its default.
+	 * Workaround for the default activation in {@link org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration}
+	 * Previously, SSM would remove the bean definition in that class, it seems more appropriate to let {@link ConditionalOnDefaultWebSecurity} not match.
+	 * <p>
+	 * This method creates a default {@link WebSecurityConfigurerAdapter} bean that allows all requests by default, with lowest precedence.
+	 * You can override it by specifying your own deferred {@link com.foreach.across.core.annotations.ModuleConfiguration} in your application.
+	 * <p>
+	 * This {@code @ModuleConfiguration} should return a {@link WebSecurityConfigurerAdapter} bean with your permission logic.
+	 *
+	 * @since 4.2.0
 	 */
-	static class DefaultSpringBootSecurityRemoval implements BeanDefinitionRegistryPostProcessor
-	{
-		private static final String DEFAULT_SECURITY_CONFIGURATION =
-				"org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration.DefaultConfigurerAdapter";
-
-		@Override
-		public void postProcessBeanDefinitionRegistry( BeanDefinitionRegistry beanDefinitionRegistry ) throws BeansException {
-			if ( beanDefinitionRegistry.containsBeanDefinition( DEFAULT_SECURITY_CONFIGURATION )
-					&& !( (ListableBeanFactory) beanDefinitionRegistry ).getBean( AcrossContextBeanRegistry.class )
-					                                                    .getBeansOfType( AcrossWebSecurityConfigurer.class, true )
-					                                                    .isEmpty() ) {
-				beanDefinitionRegistry.removeBeanDefinition( DEFAULT_SECURITY_CONFIGURATION );
+	@Bean
+	@Order(Ordered.LOWEST_PRECEDENCE)
+	@ConditionalOnMissingBean
+	public WebSecurityConfigurerAdapter springSecurityModuleWebSecurityConfiguration() {
+		return new WebSecurityConfigurerAdapter()
+		{
+			@Override
+			protected void configure( HttpSecurity http ) throws Exception {
+				http.antMatcher( "/**" ).authorizeRequests().anyRequest().permitAll();
 			}
-		}
-
-		@Override
-		public void postProcessBeanFactory( ConfigurableListableBeanFactory configurableListableBeanFactory ) throws BeansException {
-
-		}
+		};
 	}
 }
 
