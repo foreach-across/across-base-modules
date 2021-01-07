@@ -33,6 +33,13 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
  */
 public interface AcrossWebSecurityConfigurer
 {
+	/**
+	 * Overriding this has the same effect as {@link org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#WebSecurityConfigurerAdapter(boolean)}
+	 */
+	default boolean disableDefaults() {
+		return false;
+	}
+
 	default void configure( AuthenticationManagerBuilder auth ) throws Exception {
 	}
 

@@ -30,7 +30,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.util.ClassUtils;
@@ -136,8 +136,11 @@ public class AcrossWebSecurityConfiguration
 		return new WebSecurityConfigurerAdapter()
 		{
 			@Override
-			protected void configure( HttpSecurity http ) throws Exception {
-				http.antMatcher( "/**" ).authorizeRequests().anyRequest().permitAll();
+			public void init( WebSecurity web ) {
+				// Avoid registering any filter chains, since permitAll() still restricts csrf().
+				// Overriding init() here instead of configure() because an empty configure() will still construct getHttp()
+				// getHttp() would override the PrivilegeEvaluator
+				// Basically this empty bean exists but does nothing and only exists to fool SpringBootWebSecurityConfiguration
 			}
 		};
 	}

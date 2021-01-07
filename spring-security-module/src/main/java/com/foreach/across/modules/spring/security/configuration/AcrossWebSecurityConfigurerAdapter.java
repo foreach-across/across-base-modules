@@ -47,7 +47,7 @@ class AcrossWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter im
 	private ObjectPostProcessor<Object> objectPostProcessor;
 
 	public AcrossWebSecurityConfigurerAdapter( AcrossWebSecurityConfigurer configurer, int order ) {
-		super( false );
+		super( configurer.disableDefaults() );
 		this.configurer = configurer;
 		this.order = order;
 	}
