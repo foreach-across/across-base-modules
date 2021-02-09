@@ -66,8 +66,8 @@ public class RequestResponseLoggingConfiguration implements EnvironmentAware
 
 	@Bean
 	@ConditionalOnAcrossModule("DebugWebModule")
-	public RequestResponseLogController requestResponseLogController() {
-		return new RequestResponseLogController();
+	public RequestResponseLogController requestResponseLogController( RequestResponseLogRegistry registry, RequestResponseLoggingFilter filter ) {
+		return new RequestResponseLogController( registry, filter );
 	}
 
 	@Bean
@@ -83,6 +83,14 @@ public class RequestResponseLoggingConfiguration implements EnvironmentAware
 
 		if ( requestResponseLogConfiguration().getExcludedPathPatterns() != null ) {
 			filter.setExcludedPathPatterns( requestResponseLogConfiguration().getExcludedPathPatterns() );
+		}
+
+		if ( requestResponseLogConfiguration().getHttpStatusCode() != null ) {
+			filter.setHttpStatusCode( requestResponseLogConfiguration().getHttpStatusCode() );
+		}
+
+		if ( requestResponseLogConfiguration().getHttpStatusOperator() != null ) {
+			filter.setHttpStatusOperator( requestResponseLogConfiguration().getHttpStatusOperator() );
 		}
 
 		return filter;

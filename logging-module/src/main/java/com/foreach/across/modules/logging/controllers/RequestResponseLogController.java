@@ -17,10 +17,11 @@ package com.foreach.across.modules.logging.controllers;
 
 import com.foreach.across.modules.debugweb.mvc.DebugMenuEvent;
 import com.foreach.across.modules.debugweb.mvc.DebugWebController;
+import com.foreach.across.modules.logging.requestresponse.HttpStatusOperator;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLogRegistry;
 import com.foreach.across.modules.logging.requestresponse.RequestResponseLoggingFilter;
 import com.foreach.across.modules.web.resource.WebResourceUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,13 +34,11 @@ import java.util.List;
 import java.util.UUID;
 
 @DebugWebController
+@RequiredArgsConstructor
 public class RequestResponseLogController
 {
-	@Autowired
-	private RequestResponseLogRegistry logRegistry;
-
-	@Autowired
-	private RequestResponseLoggingFilter logFilter;
+	private final RequestResponseLogRegistry logRegistry;
+	private final RequestResponseLoggingFilter logFilter;
 
 	@EventListener
 	public void buildMenu( DebugMenuEvent event ) {
@@ -67,15 +66,30 @@ public class RequestResponseLogController
 
 	@RequestMapping(value = "/logging/requestResponse/settings")
 	public String settings( Model model,
+	                        HttpServletRequest httpRequest,
+	                        @RequestParam(value = "httpStatusCode", required = false) Integer httpStatusCode,
+	                        @RequestParam(value = "httpStatusOperator", required = false) HttpStatusOperator operator,
 	                        @RequestParam(value = "excludedPathPatterns", required = false) String excludedPathPatterns,
 	                        @RequestParam(value = "includedPathPatterns",
 			                        required = false) String includedPathPatterns ) {
 		model.addAttribute( "logFilter", logFilter );
-		if ( excludedPathPatterns != null ) {
-			logFilter.setExcludedPathPatterns( fromTextArea( excludedPathPatterns ) );
-		}
-		if ( includedPathPatterns != null ) {
-			logFilter.setIncludedPathPatterns( fromTextArea( includedPathPatterns ) );
+		model.addAttribute( "httpStatusOperators", HttpStatusOperator.values() );
+		model.addAttribute( "httpStatusCode", httpStatusCode );
+		if ( httpRequest.getMethod().equals( "POST" ) ) {
+			if ( excludedPathPatterns != null ) {
+				logFilter.setExcludedPathPatterns( fromTextArea( excludedPathPatterns ) );
+			}
+			if ( includedPathPatterns != null ) {
+				logFilter.setIncludedPathPatterns( fromTextArea( includedPathPatterns ) );
+			}
+			if ( httpStatusCode != null ) {
+				logFilter.setHttpStatusOperator( operator );
+				logFilter.setHttpStatusCode( httpStatusCode );
+			}
+			else {
+				logFilter.setHttpStatusOperator( null );
+				logFilter.setHttpStatusCode( null );
+			}
 		}
 		return "th/logging/requestResponse/settings";
 	}

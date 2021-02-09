@@ -38,6 +38,8 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter
 
 	private Collection<String> includedPathPatterns = Collections.emptyList();
 	private Collection<String> excludedPathPatterns = Collections.emptyList();
+	private HttpStatusOperator httpStatusOperator = null;
+	private Integer httpStatusCode = null;
 
 	private boolean paused;
 
@@ -67,6 +69,22 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter
 		this.excludedPathPatterns = new HashSet<>( excludedPathPatterns );
 	}
 
+	public HttpStatusOperator getHttpStatusOperator() {
+		return httpStatusOperator;
+	}
+
+	public void setHttpStatusOperator( HttpStatusOperator httpStatusOperator ) {
+		this.httpStatusOperator = httpStatusOperator;
+	}
+
+	public Integer getHttpStatusCode() {
+		return httpStatusCode;
+	}
+
+	public void setHttpStatusCode( Integer httpStatusCode ) {
+		this.httpStatusCode = httpStatusCode;
+	}
+
 	@Override
 	protected void doFilterInternal( HttpServletRequest request,
 	                                 HttpServletResponse response,
@@ -81,8 +99,10 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter
 				filterChain.doFilter( requestWrapper, responseWrapper );
 			}
 			finally {
-				logRegistry.add( new RequestResponseLogEntry( start, System.currentTimeMillis(), requestWrapper,
-				                                              responseWrapper ) );
+				if ( shouldLogStatusCode( responseWrapper ) ) {
+					logRegistry.add( new RequestResponseLogEntry( start, System.currentTimeMillis(), requestWrapper,
+					                                              responseWrapper ) );
+				}
 			}
 		}
 		else {
@@ -113,6 +133,13 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter
 		}
 
 		return includedPathPatterns.isEmpty();
+	}
+
+	boolean shouldLogStatusCode( LogResponseWrapper response ) {
+		if ( httpStatusOperator == null ) {
+			return false;
+		}
+		return httpStatusOperator.compare( response.getStatus(), httpStatusCode );
 	}
 
 	public boolean isPaused() {

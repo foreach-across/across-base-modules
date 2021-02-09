@@ -17,6 +17,8 @@
 package com.foreach.across.modules.logging.requestresponse;
 
 import com.foreach.across.modules.logging.request.RequestLoggerConfiguration;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Arrays;
@@ -27,6 +29,8 @@ import java.util.Arrays;
  * @author Arne Vandamme
  */
 @ConfigurationProperties("logging.request-response")
+@Getter
+@Setter
 public class RequestResponseLogConfiguration extends RequestLoggerConfiguration
 {
 	/**
@@ -44,32 +48,18 @@ public class RequestResponseLogConfiguration extends RequestLoggerConfiguration
 	 */
 	private boolean enabled = false;
 
+	/**
+	 * Which operator should be use for matching the http status.
+	 */
+	private HttpStatusOperator httpStatusOperator = null;
+
+	/**
+	 * Which HTTP status to filter (in combination with the httpStatusOperator)
+	 */
+	private Integer httpStatusCode = null;
+
 	public RequestResponseLogConfiguration() {
 		setExcludedPathPatterns( Arrays.asList( "/debug/**", "/across/**", "/**/login" ) );
-	}
-
-	public int getMaxEntries() {
-		return maxEntries;
-	}
-
-	public void setMaxEntries( int maxEntries ) {
-		this.maxEntries = maxEntries;
-	}
-
-	public boolean isPaused() {
-		return paused;
-	}
-
-	public void setPaused( boolean paused ) {
-		this.paused = paused;
-	}
-
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled( boolean enabled ) {
-		this.enabled = enabled;
 	}
 
 	public static RequestResponseLogConfiguration allRequests() {

@@ -28,6 +28,15 @@
           <label for="comment">Included path patterns:  (e.g. /login/**)</label>
           <textarea class="form-control" rows="5" id="includedPathPatterns" name="includedPathPatterns" th:field="*{includedPathPatterns}"></textarea>
         </div>
+         <div class="form-group">
+          <label for="comment">Http Status</label>
+          <select class="form-select" id="httpStatusOperator" name="httpStatusOperator">
+              <option value="" th:selected="${logFilter.httpStatusOperator==null}">---</<option>
+              <option th:each="operator : ${httpStatusOperators}" th:selected="${logFilter.httpStatusOperator==operator}" th:value="${operator}" th:text="${operator.humanString}">
+              </option>
+          </select>
+          <input class="form-control" id="httpStatus" name="httpStatusCode" th:field="*{httpStatusCode}"></input>
+        </div>
 		<div class="form-group">
 			<input type="reset" value="Reset" class="btn btn-default"/>
 			<input type="submit" value="Save" class="btn btn-default"/>
