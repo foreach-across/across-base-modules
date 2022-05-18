@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>com.foreach.across</groupId>
 		<artifactId>across-standard-module-parent</artifactId>
-		<version>5.2.0-SNAPSHOT</version>
+		<version>5.2-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.foreach.across.modules</groupId>
@@ -59,7 +59,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<revision>4.2.0-SNAPSHOT</revision>
+		<revision>local-SNAPSHOT</revision>
 	</properties>
 
 	<modules>
