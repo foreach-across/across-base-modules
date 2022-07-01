@@ -64,7 +64,6 @@
 		<dependency>
 			<groupId>com.foreach.across.modules</groupId>
 			<artifactId>spring-security-module</artifactId>
-			<version>4.2-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>

@@ -69,6 +69,16 @@
 		<module>debug-web-test-web</module>
 	</modules>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.foreach.across.modules</groupId>
+				<artifactId>spring-security-module</artifactId>
+				<version>4.2-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<scm>
 		<url>https://bitbucket.org/beforeach/debug-web-module</url>
 	</scm>
