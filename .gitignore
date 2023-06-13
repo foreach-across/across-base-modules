@@ -5,3 +5,11 @@ target
 *.iml
 
 
+
+# Maven:
+.effective-pom.xml
+.dependency-tree.txt
+.foreach-deps.txt
+
+# Emacs:
+*~
