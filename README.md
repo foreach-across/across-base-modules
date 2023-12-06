@@ -1,4 +1,4 @@
-## AcrossHibernateModule
+## AcrossHibernateModule / SpringSecurityModule
 Please refer to the [module wiki][] for all information regarding documentation, issue tracking and support.
 
 ### Contributing
@@ -11,6 +11,11 @@ The source can be built using [Maven][] with JDK 8.
 Licensed under version 2.0 of the [Apache License][].
 
 [module wiki]: https://across.dev/modules/hibernate-jpa-module
+[contributor guidelines]: https://across.dev/contributing
+[Maven]: https://maven.apache.org
+[Apache License]: https://www.apache.org/licenses/LICENSE-2.0
+
+[module wiki]: https://across.dev/modules/spring-security-module
 [contributor guidelines]: https://across.dev/contributing
 [Maven]: https://maven.apache.org
 [Apache License]: https://www.apache.org/licenses/LICENSE-2.0

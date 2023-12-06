@@ -26,15 +26,11 @@
 	</parent>
 
 	<groupId>com.foreach.across.modules</groupId>
-	<artifactId>across-hibernate-module-project</artifactId>
+	<artifactId>across-base-modules-project</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
 
-	<description>
-		Contains AcrossHibernateJpaModule which builds a Hibernate persistence layer
-		that other modules can provide entities for.
-	</description>
-	<url>https://across.dev/modules/hibernate-jpa-module</url>
+	<url>https://across.dev/modules/base-modules</url>
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
@@ -67,6 +63,8 @@
 
 	<modules>
 		<module>across-hibernate-module</module>
+		<module>spring-security-module</module>
+		<module>spring-security-module-actuator</module>
 	</modules>
 
 	<dependencyManagement>
@@ -76,6 +74,13 @@
 				<artifactId>across-autoconfigure</artifactId>
 				<version>2.2.1.RELEASE</version>
 			</dependency>
+			<!--
+			<dependency>
+				<groupId>com.foreach.across</groupId>
+				<artifactId>across-hibernate-module</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			-->
 			<dependency>
 				<groupId>com.github.dozermapper</groupId>
 				<artifactId>dozer-spring-boot-starter</artifactId>
@@ -85,7 +90,7 @@
 	</dependencyManagement>
 
 	<scm>
-		<url>https://bitbucket.org/beforeach/across-hibernate-module</url>
+		<url>https://github.com/foreachos/across-base-modules</url>
 	</scm>
 
 </project>

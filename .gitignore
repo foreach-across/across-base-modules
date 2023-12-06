@@ -1,8 +1,9 @@
 target
-*.iml
 .idea/workspace.xml
 .idea/excludeFromValidation
 .idea/libraries
+*.iml
+.idea/template/template_variable_settings.xml
 
 .flattened-pom.xml
 # Maven:

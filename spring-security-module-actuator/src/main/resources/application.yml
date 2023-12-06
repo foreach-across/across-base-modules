@@ -1,0 +1,8 @@
+spring:
+#  security:
+#    user:
+#      name: john.doe
+#      password: somepwd
+  h2:
+    console:
+      enabled: true
