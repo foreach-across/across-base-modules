@@ -56,7 +56,7 @@
 		<dependency>
 			<groupId>com.foreach.across.modules</groupId>
 			<artifactId>across-hibernate-module</artifactId>
-			<version>${project.version}</version>
+			<version>${revision}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
