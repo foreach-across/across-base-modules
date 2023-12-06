@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>com.foreach.across</groupId>
 		<artifactId>across-standard-module-parent</artifactId>
-		<version>5.2.1.RELEASE</version>
+		<version>5.2.3-gitlab-SNAPSHOT</version>
 		<relativePath/>
 	</parent>
 
