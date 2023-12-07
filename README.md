@@ -1,4 +1,4 @@
-## AcrossHibernateModule / SpringSecurityModule / DebugWebModule
+## AcrossHibernateModule / SpringSecurityModule / DebugWebModule / LoggingModule
 Please refer to the [module wiki][] for all information regarding documentation, issue tracking and support.
 
 ### Contributing
@@ -24,3 +24,7 @@ Licensed under version 2.0 of the [Apache License][].
 [contributor guidelines]: https://across.dev/contributing
 [Maven]: https://maven.apache.org
 [Apache License]: https://www.apache.org/licenses/LICENSE-2.0
+
+[module wiki]: https://foreach.atlassian.net/wiki/display/AX/LoggingModule
+[Maven]: http://maven.apache.org
+[Apache License]: http://www.apache.org/licenses/LICENSE-2.0

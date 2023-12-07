@@ -25,7 +25,6 @@
 	</parent>
 
 	<artifactId>debug-web-module</artifactId>
-	<name>DebugWebModule</name>
 
 	<properties>
 		<maven.javadoc.skip>false</maven.javadoc.skip>
