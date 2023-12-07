@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2014 the original author or authors
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>List ehcache caches</title>
+</head>
+<body th:fragment="content">
+<div class="row">
+	<div class="col-md-12">
+		<ul class="nav nav-pills">
+			<li th:each="manager : ${cacheManagers}" th:classappend="${cacheManager.name eq manager.name} ? 'active'">
+				<a th:href="|?managerName=${manager.name}|" th:text="${manager.name}"></a>
+			</li>
+		</ul>
+
+		<div class="alert alert-success" th:if="${param.flushed}">
+			<span th:text="${param.flushed[0]}">0</span> cache(s) have been flushed.
+		</div>
+
+		<h2>
+			Cache list
+			<small class="pull-right">
+				<a class="btn btn-default" th:href="@{${@debugWeb.path('/ehcache')}(managerName=${cacheManager.name})}"
+				   title="Refresh"><span class="glyphicon glyphicon-refresh"></span></a>
+				<a class="btn btn-default" th:href="@{${@debugWeb.path('/ehcache/heap')}(managerName=${cacheManager.name})}"
+				   title="Calculate heap size"><span class="glyphicon glyphicon-tasks"></span></a>
+
+				<div class="btn-group">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Clear all">
+						<span class="glyphicon glyphicon-trash"></span> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li>
+							<a th:href="@{${@debugWeb.path('/ehcache/flush')}(managerName=${cacheManager.name},replicate=true)}"
+							   onclick="return confirm('Are you sure you want to clear all caches and notify peers about it?');">Notify
+								peers</a></li>
+						<li><a th:href="@{${@debugWeb.path('/ehcache/flush')}(managerName=${cacheManager.name})}"
+						       onclick="return confirm('Are you sure you want to clear all caches?');">Do not notify
+							peers</a></li>
+					</ul>
+				</div>
+				<!--<a class="btn btn-link" href="" title="Clear all"></a>-->
+			</small>
+		</h2>
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+			<tr>
+				<th>Name</th>
+				<th>Items</th>
+				<th>Max</th>
+				<th>Hits</th>
+				<th>Misses</th>
+				<th>Ratio</th>
+				<th>Evictions</th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr th:each="cache : ${cacheList}" th:object="${cache}">
+				<td>
+					<a href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=${cache.name})}" th:text="${cache.name}">cache
+						name</a>
+				</td>
+				<td th:text="*{size}">0</td>
+				<td th:text="*{cacheConfiguration.maxEntriesLocalHeap}">0</td>
+				<td th:text="*{statistics.cacheHitCount()}">0</td>
+				<td th:text="*{statistics.cacheMissCount()}">${stats.cacheMisses}</td>
+				<td th:text="*{#numbers.formatDecimal(((statistics.cacheHitCount() * 1.0) / (statistics.cacheHitCount() + statistics.cacheMissCount())) * 100, 1, 2)} + ' %'">
+					100 %
+				</td>
+				<td th:text="*{statistics.cacheEvictedCount()}">0</td>
+				<td class="text-center">
+					<a class="btn btn-xs btn-link" href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=${cache.name})}">
+						<span class="glyphicon glyphicon-search"></span></a>
+					<a class="btn btn-xs btn-link" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+		<p>Updated: <em th:text="${#dates.format(#dates.createNow(),'dd MMM yyyy - HH:mm:ss')}"></em></p>
+	</div>
+</div>
+<!--/*
+<div class="cache" th:each="cache : ${cacheList}">
+	<table class="cache-details" th:object="${cache}">
+		<tr>
+			<th colspan="2" class="cache-name">
+				<a href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=${cache.name})}" th:text="${cache.name}">cache
+					name</a>
+			</th>
+		</tr>
+		<tr>
+			<th>Items</th>
+			<td th:text="*{size}">0</td>
+		</tr>
+		<tr>
+			<th>Hits</th>
+			<td th:text="*{statistics.cacheHitCount()}">0</td>
+		</tr>
+		<tr>
+			<th>Misses</th>
+			<td th:text="*{statistics.cacheMissCount()}">${stats.cacheMisses}</td>
+		</tr>
+		<tr>
+			<th>Ratio</th>
+			<td th:text="*{#numbers.formatDecimal(((statistics.cacheHitCount() * 1.0) / (statistics.cacheHitCount() + statistics.cacheMissCount())) * 100, 1, 2)} + ' %'">
+				100 %
+			</td>
+		</tr>
+		<tr>
+			<th>Evictions</th>
+			<td th:text="*{statistics.cacheEvictedCount()}">0</td>
+		</tr>
+		<tr th:if="${heapSizes[cache.name] != null}">
+			<th>Heap size</th>
+			<td th:text="${#numbers.formatDecimal(heapSizes[cache.name] / 1024.0,1,2)} + ' KB'">
+				0 KB
+			</td>
+		</tr>
+	</table>
+</div>
+
+*/-->
+
+<div class="row">
+	<div class="col-md-12">
+		<h2>Cache manager providers</h2>
+		<ul>
+			<li class="cachePeer" th:each="cacheManagerProvider : ${cacheManagerProviders}">
+				<span th:text="${cacheManagerProvider}"></span></li>
+		</ul>
+
+		<ul>
+			<li th:each="a : ${cacheManager.cacheManagerEventListenerRegistry.registeredListeners}" th:text="${a.class.name}"></li>
+		</ul>
+	</div>
+</div>
+</body>
+</html>

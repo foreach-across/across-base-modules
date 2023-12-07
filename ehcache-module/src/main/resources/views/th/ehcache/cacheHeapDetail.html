@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2014 the original author or authors
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>List detailed cache</title>
+</head>
+<body th:fragment="content">
+<div class="row">
+	<div class="col-md-12">
+		<ul class="nav nav-pills">
+			<li th:each="manager : ${cacheManagers}" th:classappend="${cacheManager.name eq manager.name} ? 'active'">
+				<a th:href="|?managerName=${manager.name}|" th:text="${manager.name}"></a>
+			</li>
+		</ul>
+
+		<div class="alert alert-success" th:if="${param.flushed}">
+			<span th:text="${param.flushed[0]}">0</span> cache(s) have been flushed.
+		</div>
+
+		<h2>
+			Cache list: heap size
+			<small class="pull-right">
+				<a class="btn btn-default" th:href="@{${@debugWeb.path('/ehcache')}(managerName=${cacheManager.name})}"
+				   title="Refresh"><span class="glyphicon glyphicon-refresh"></span></a>
+				<a class="btn btn-default" th:href="@{${@debugWeb.path('/ehcache/heap')}(managerName=${cacheManager.name})}"
+				   title="Calculate heap size"><span class="glyphicon glyphicon-tasks"></span></a>
+
+				<div class="btn-group">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Clear all">
+						<span class="glyphicon glyphicon-trash"></span> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li>
+							<a th:href="@{${@debugWeb.path('/ehcache/flush')}(managerName=${cacheManager.name},replicate=true)}"
+							   onclick="return confirm('Are you sure you want to clear all caches and notify peers about it?');">Notify
+								peers</a></li>
+						<li><a th:href="@{${@debugWeb.path('/ehcache/flush')}(managerName=${cacheManager.name})}"
+						       onclick="return confirm('Are you sure you want to clear all caches?');">Do not notify
+							peers</a></li>
+					</ul>
+				</div>
+				<!--<a class="btn btn-link" href="" title="Clear all"></a>-->
+			</small>
+		</h2>
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+			<tr>
+				<th>Name</th>
+				<th>Items</th>
+				<th>Max</th>
+				<th>Heap size</th>
+				<th>% total</th>
+				<th>Max heap <sup>1</sup></th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr th:each="heapInfo : ${heapInfoList}" th:object="${heapInfo}">
+				<td>
+					<a href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=*{cache.name})}" th:text="*{cache.name}">cache
+						name</a>
+				</td>
+				<td th:text="*{cache.size}">0</td>
+				<td th:text="*{cache.cacheConfiguration.maxEntriesLocalHeap}">0</td>
+				<td th:if="*{size}" th:text="*{#numbers.formatDecimal(size / 1024.0 / 1024.0,1,2)} + ' MB'">0</td>
+				<td th:unless="*{size}"></td>
+				<td th:unless="*{percentageOfTotal != null and percentageOfTotal != 0}">0</td>
+				<td th:if="*{percentageOfTotal != null and percentageOfTotal != 0}" th:text="*{#numbers.formatDecimal(percentageOfTotal * 100,1,2)} + ' %'">0</td>
+				<td th:unless="*{estimatedMax}"></td>
+				<td th:if="*{estimatedMax}" th:text="*{#numbers.formatDecimal(estimatedMax / 1024.0 / 1024.0,1,2)} + ' MB'">0</td>
+				<td class="text-center">
+					<a class="btn btn-xs btn-link" href="#" th:href="@{${@debugWeb.path('/ehcache/view')}(managerName=${cacheManager.name},cache=*{cache.name})}">
+						<span class="glyphicon glyphicon-search"></span></a>
+					<a class="btn btn-xs btn-link" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+				</td>
+			</tr>
+			<tfoot>
+			<tr>
+				<th></th>
+				<th th:text="${totalItems}">total items</th>
+				<th th:text="${maxItems}">max items</th>
+				<th th:text="*{#numbers.formatDecimal(totalHeap / 1024.0 / 1024.0,1,2)} + ' MB'">total heap size</th>
+				<th></th>
+				<th th:text="*{#numbers.formatDecimal(maxHeap / 1024.0 / 1024.0,1,2)} + ' MB'">max heap size</th>
+				<th></th>
+			</tr>
+			</tfoot>
+			</tbody>
+		</table>
+		<p>Updated: <em th:text="${#dates.format(#dates.createNow(),'dd MMM yyyy - HH:mm:ss')}"></em></p>
+		<p><sup>1</sup> linear calculation based on current heap size and max items</p>
+	</div>
+</div>
+</body>
+</html>

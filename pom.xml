@@ -69,6 +69,8 @@
 		<module>debug-web-test-web</module>
 		<module>logging-module</module>
 		<module>logging-module-test-web</module>
+		<module>ehcache-module</module>
+		<module>ehcache-module-test-web</module>
 	</modules>
 
 	<dependencyManagement>

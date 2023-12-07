@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="ehcache-module-test-web:war">
+    <output-path>$PROJECT_DIR$/ehcache-module-test-web/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>ehcache-module-test-web</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="ehcache-module-test-web-2.0.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="ehcache-module-test-web:war exploded" />
+    </root>
+  </artifact>
+</component>

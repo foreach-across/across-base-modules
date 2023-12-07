@@ -11,8 +11,10 @@
         <module name="across-hibernate-module" />
         <module name="debug-web-module" />
         <module name="debug-web-test-web" />
+        <module name="ehcache-module-test-web" />
         <module name="logging-module" />
         <module name="logging-module-test-web" />
+        <module name="ehcache-module" />
         <module name="spring-security-module" />
       </profile>
     </annotationProcessing>

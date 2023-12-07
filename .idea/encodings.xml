@@ -7,6 +7,12 @@
     <file url="file://$PROJECT_DIR$/debug-web-module/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/debug-web-test-web/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/debug-web-test-web/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ehcache-module" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ehcache-module-test-web" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ehcache-module-test-web/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ehcache-module-test-web/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ehcache-module/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ehcache-module/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/logging-module" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/logging-module-test-web" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/logging-module-test-web/src/main/java" charset="UTF-8" />
