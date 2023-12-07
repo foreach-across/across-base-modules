@@ -65,6 +65,8 @@
 		<module>across-hibernate-module</module>
 		<module>spring-security-module</module>
 		<module>spring-security-module-actuator</module>
+		<module>debug-web-module</module>
+		<module>debug-web-test-web</module>
 	</modules>
 
 	<dependencyManagement>

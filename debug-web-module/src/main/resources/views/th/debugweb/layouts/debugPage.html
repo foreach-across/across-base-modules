@@ -1,0 +1,53 @@
+<!--
+  ~ Copyright 2014 the original author or authors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Debug controller</title>
+	<link rel="stylesheet" type="text/css" th:each="css : ${webResourceRegistry.getResources('css')}" th:href="@{${css.data}}"/>
+	<script th:each="javascript : ${webResourceRegistry.getResources('javascript')}" th:src="@{${javascript.data}}" th:if="${javascript.location != 'inline'}"></script>
+</head>
+<body>
+<div class="container">
+	<div class="row">
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="collapse navbar-collapse">
+				<div class="nav navbar-left">
+					<div class="debug-warning">debug</div>
+				</div>
+
+				<ul th:replace="th/bootstrap/menu :: navbar(${debugMenu})"></ul>
+			</div>
+		</nav>
+	</div>
+
+	<div class="row" th:if="${debugMenu != null and debugMenu.selected}">
+		<ol th:replace="th/bootstrap/menu :: breadcrumb (${debugMenu})"></ol>
+	</div>
+
+	<div th:if="${childPage != '' and childPage != null}">
+		<div th:replace="${childPage} :: content">
+		</div>
+	</div>
+</div>
+
+<p>&nbsp;</p>
+
+<script th:each="javascript : ${webResourceRegistry.getResources('javascript-page-end')}" th:src="@{${javascript.data}}"
+        th:if="${javascript.location == 'external'}"></script>
+</body>
+</html>

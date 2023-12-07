@@ -9,11 +9,10 @@
         <outputRelativeToContentRoot value="true" />
         <module name="spring-security-module-actuator" />
         <module name="across-hibernate-module" />
+        <module name="debug-web-module" />
+        <module name="debug-web-test-web" />
         <module name="spring-security-module" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="across-base-modules" target="1.5" />
-    </bytecodeTargetLevel>
   </component>
 </project>

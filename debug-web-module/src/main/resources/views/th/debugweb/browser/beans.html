@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2014 the original author or authors
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>List registered Spring beans</title>
+</head>
+<body th:fragment="content">
+<div class="row" th:unless="${selectedContext.enabled}">
+	<p>
+		<div class="alert alert-warning">
+			Module has not been bootstrapped, no ApplicationContext is available.
+		</div>
+	</p>
+</div>
+
+<div class="row" th:if="${selectedContext.enabled}">
+	<p>
+		<div class="alert alert-info" th:unless="${selectedContext.isModule()}">
+			<strong th:text="${totalBeanCount}"></strong> beans registered in this ApplicationContext.
+		</div>
+
+		<div class="alert alert-info" th:if="${selectedContext.isModule()}">
+			<strong th:text="${totalBeanCount}"></strong> beans in total,
+			<strong th:text="${exposedBeanCount}"></strong>
+			exposed to the parent context.
+		</div>
+	</p>
+
+	<p>
+		<div class="form-inline">
+			<div class="checkbox">
+				<label><input type="checkbox" id="hide-spring-standard" checked="checked"/> hide default Spring
+					beans &nbsp;</label>
+			</div>
+			<div class="checkbox" th:if="${selectedContext.isModule()}">
+				<label><input type="checkbox" id="hide-non-exposed" checked="checked"/> show only exposed beans</label>
+			</div>
+		</div>
+	</p>
+
+	<table class="table table-bordered table-hover contextBeans" th:if="${contextBeans}">
+		<thead>
+		<tr>
+			<th class="col-sm-5">Bean name</th>
+			<th class="col-sm-1 bean-scope">Scope</th>
+			<th class="col-sm-6">Bean type</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="beanInfo : ${contextBeans}" th:class="${beanInfo.exposed ? 'exposed success' : ''}"
+		    th:attr="data-spring-standard=${beanInfo.standardSpring}">
+			<td class="bean-name">
+				<span th:text="${beanInfo.name}">bean name</span>
+				<sup class="enhanced" th:if="${beanInfo.exposed}" th:title="${beanInfo.exposedInfo}">1</sup>
+				<sup class="enhanced" th:if="${beanInfo.exposedBean}" th:title="${beanInfo.exposedBeanInfo}">2</sup>
+			</td>
+			<td class="bean-scope" th:text="${beanInfo.singleton ? '' : beanInfo.scope}">scope</td>
+			<td class="bean-type">
+				<span th:text="${beanInfo.beanType}">bean type</span>
+				<sup class="enhanced" th:if="${beanInfo.proxiedOrEnhanced}" title="The actual bean is either a proxy or cglib enhanced.">3</sup>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+
+	<p>
+		<h4>Annotations</h4>
+		<ol>
+			<li>This bean is exposed to the parent ApplicationContext.</li>
+			<li>This bean is an exposed bean from an Across module.</li>
+			<li>The actual bean is either a proxy or cglib enhanced</li>
+		</ol>
+	</p>
+
+	<script type="text/javascript">
+		/*<![CDATA[*/
+		$( function ()
+		   {
+			   function toggleBeans()
+			   {
+				   var hideStandard = $( '#hide-spring-standard' ).prop( 'checked' );
+				   var hideNonExposed = $( '#hide-non-exposed' ).prop( 'checked' );
+
+				   $( '.bean-name' ).each( function ()
+				                           {
+					                           var row = $( this ).parent();
+					                           var visible = true;
+
+					                           if ( hideStandard && row.attr( 'data-spring-standard' ) == 'true' ) {
+						                           visible = false;
+					                           }
+					                           if ( hideNonExposed && !row.hasClass( 'exposed' ) ) {
+						                           visible = false;
+					                           }
+
+					                           $( row ).toggleClass( 'hidden', !visible );
+				                           } );
+			   }
+
+			   toggleBeans();
+
+			   $( '#hide-spring-standard' ).on( 'click', toggleBeans );
+			   $( '#hide-non-exposed' ).on( 'click', toggleBeans );
+		   } );
+		/*]]>*/
+	</script>
+</div>
+</body>
+</html>

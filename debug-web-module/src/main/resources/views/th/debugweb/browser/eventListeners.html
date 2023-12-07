@@ -1,0 +1,52 @@
+<!--
+  ~ Copyright 2014 the original author or authors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Event handlers</title>
+</head>
+<body th:fragment="content">
+<div class="row" th:unless="${selectedContext.enabled}">
+	<p>
+		<div class="alert alert-warning">
+			Module has not been bootstrapped, no ApplicationContext is available.
+		</div>
+	</p>
+</div>
+
+<div class="row" th:if="${selectedContext.enabled}">
+	<p>
+		<div class="alert alert-info">
+			<strong th:text="${handlerMethodsByEvent.size()}"></strong> events handled by beans in this ApplicationContext.
+		</div>
+	</p>
+
+	<div th:each="handlersByEvent: ${handlerMethodsByEvent}">
+		<h4>
+			<span th:text="${handlersByEvent.key}">Event handler name</span>
+		</h4>
+
+		<table class="table table-condensed table-bordered table-hover">
+			<tr th:each="method : ${handlersByEvent.value}">
+				<td class="col-sm-12" th:text="|${method.declaringClass.name}#${method.name}()|"></td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+</body>
+</html>

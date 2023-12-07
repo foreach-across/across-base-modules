@@ -1,4 +1,4 @@
-## AcrossHibernateModule / SpringSecurityModule
+## AcrossHibernateModule / SpringSecurityModule / DebugWebModule
 Please refer to the [module wiki][] for all information regarding documentation, issue tracking and support.
 
 ### Contributing
@@ -16,6 +16,11 @@ Licensed under version 2.0 of the [Apache License][].
 [Apache License]: https://www.apache.org/licenses/LICENSE-2.0
 
 [module wiki]: https://across.dev/modules/spring-security-module
+[contributor guidelines]: https://across.dev/contributing
+[Maven]: https://maven.apache.org
+[Apache License]: https://www.apache.org/licenses/LICENSE-2.0
+
+[module wiki]: https://across.dev/modules/debugwebmodule
 [contributor guidelines]: https://across.dev/contributing
 [Maven]: https://maven.apache.org
 [Apache License]: https://www.apache.org/licenses/LICENSE-2.0
