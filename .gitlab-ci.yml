@@ -1,38 +1,10 @@
-# From: https://java.testcontainers.org/supported_docker_environment/continuous_integration/gitlab_ci/
-# DinD service is required for Testcontainers
-#services:
-#  - name: docker:dind
-#    # explicitly disable tls to avoid docker startup interruption
-#    command: ["--tls=false"]
-#
-#variables:
-#  # Instruct Testcontainers to use the daemon of DinD, use port 2375 for non-tls connections.
-#  DOCKER_HOST: "tcp://docker:2375"
-#  # Instruct Docker not to start over TLS.
-#  DOCKER_TLS_CERTDIR: ""
-#  # Improve performance with overlayfs.
-#  DOCKER_DRIVER: overlay2
-
-# To contribute improvements to CI/CD templates, please follow the Development guide at:
-# https://docs.gitlab.com/ee/development/cicd/templates.html
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Maven.gitlab-ci.yml
-
-# Build JAVA applications using Apache Maven (http://maven.apache.org)
-# For docker image tags see https://hub.docker.com/_/maven/
-#
-# For general lifecycle information see https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html
-
-# This template will build and test your projects
-# * Caches downloaded dependencies and plugins between invocation.
-# * Verify but don't deploy merge requests.
-# * Deploy built artifacts from master branch only.
 variables:
 
   MAVEN_REPO_DIR: $CI_PROJECT_DIR/.m2/repository
 
   # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
   MAVEN_OPTS: >-
+    -Xmx256m
     -Dhttps.protocols=TLSv1.2
     -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
     -Dorg.slf4j.simpleLogger.showDateTime=true
@@ -63,6 +35,19 @@ variables:
     GRANT CREATE SESSION, GRANT ANY PRIVILEGE TO axt;
     GRANT UNLIMITED TABLESPACE TO axt;
     GRANT SELECT ON SYS.DBA_RECYCLEBIN TO AXT;
+
+
+# I think this example workflow is exactly what we need:
+# https://docs.gitlab.com/ee/ci/yaml/workflow.html#switch-between-branch-pipelines-and-merge-request-pipelines
+# This runs:
+# - Branch pipelines when a merge request is not open for the branch.
+# - Merge request pipelines when a merge request is open for the branch.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
 
 
 # This template uses the latest Maven 3 release, e.g., 3.8.6, and OpenJDK 8 (LTS)
@@ -106,7 +91,6 @@ after_script:
     reports:
       junit:
         - '**/target/surefire-reports/TEST-*.xml'
-        - '**/target/failsafe-reports/TEST-*.xml'
 #  except:
 #    variables:
 #      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -136,13 +120,12 @@ verify:jdk8:
 #  stage: test
 #  script:
 #    # - 'mvn $MAVEN_CLI_OPTS dependency:purge-local-repository -DmanualInclude=com.foreach -DreResolve=false'
-#    - find $CI_PROJECT_DIR/.m2/repository/com/foreach/ -type d -name "*-SNAPSHOT" | xargs rm -rf
-#    - 'mvn $MAVEN_CLI_OPTS test-compile failsafe:integration-test failsafe:verify -DacrossTest.datasource="$ACROSS_TEST_DATASOURCE" -Dmaven.javadoc.skip=true'
+#    - find $CI_PROJECT_DIR/.m2/repository/com/foreach/ -type d -name "*-SNAPSHOT" | xargs rm -rf || echo "No snapshots to delete"
+#    - 'mvn $MAVEN_CLI_OPTS test-compile failsafe:integration-test failsafe:verify -DacrossTest.datasource="$ACROSS_TEST_DATASOURCE"'
 #  artifacts:
 #    when: always
 #    reports:
 #      junit:
-#        - '**/target/surefire-reports/TEST-*.xml'
 #        - '**/target/failsafe-reports/TEST-*.xml'
 #
 #itest:h2:
@@ -224,12 +207,12 @@ verify:jdk8:
 deploy:foreach:
   stage: deploy
   before_script:
-    - apt update
-    - apt -y install gpg
+    - apt-get update
+    - apt-get -y install gpg
     - gpg --pinentry-mode loopback --passphrase $ACROSS_GPG_PASSPHRASE --import $ACROSS_GPG_PRIVATE_KEY
     - gpg --list-keys
   script:
-    - mvn $MAVEN_CLI_OPTS --settings ci_settings.xml -Pacross deploy -DskipTests
+    - mvn $MAVEN_CLI_OPTS --settings ci_settings.xml --activate-profiles deploy,across deploy -DskipTests
 #  only:
 #    variables:
 #      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
