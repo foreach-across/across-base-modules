@@ -4,7 +4,6 @@ variables:
 
   # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
   MAVEN_OPTS: >-
-    -Xmx256m
     -Dhttps.protocols=TLSv1.2
     -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
     -Dorg.slf4j.simpleLogger.showDateTime=true
