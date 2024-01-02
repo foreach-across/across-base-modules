@@ -97,5 +97,17 @@ com.foreach.across.modules:logging-module:jar:4.3-SNAPSHOT
 +- org.aspectj:aspectjrt:jar:1.9.7:compile
 +- com.foreach.libs:common-web:jar:1.1:compile
 +- org.springframework.boot:spring-boot-configuration-processor:jar:2.4.13:compile
++- com.h2database:h2:jar:1.4.200:test
++- com.oracle.ojdbc:ojdbc8:jar:19.3.0.0:test
+|  +- com.oracle.ojdbc:ucp:jar:19.3.0.0:test
+|  +- com.oracle.ojdbc:oraclepki:jar:19.3.0.0:test
+|  +- com.oracle.ojdbc:osdt_cert:jar:19.3.0.0:test
+|  +- com.oracle.ojdbc:osdt_core:jar:19.3.0.0:test
+|  +- com.oracle.ojdbc:simplefan:jar:19.3.0.0:test
+|  \- com.oracle.ojdbc:ons:jar:19.3.0.0:test
++- com.microsoft.sqlserver:mssql-jdbc:jar:8.4.1.jre8:test
++- mysql:mysql-connector-java:jar:8.0.27:test
++- org.postgresql:postgresql:jar:42.2.24:test
+|  \- org.checkerframework:checker-qual:jar:3.5.0:test
 +- org.projectlombok:lombok:jar:1.18.22:provided
 \- org.assertj:assertj-core:jar:3.18.1:test
