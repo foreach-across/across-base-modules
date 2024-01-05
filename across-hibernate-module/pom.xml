@@ -25,6 +25,8 @@
 	</parent>
 
 	<artifactId>across-hibernate-module</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Across Hibernate Module</description>
 
 	<properties>
 		<maven.javadoc.skip>false</maven.javadoc.skip>

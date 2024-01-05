@@ -25,6 +25,8 @@
 	</parent>
 
 	<artifactId>debug-web-module</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Debug Web Module</description>
 
 	<properties>
 		<maven.javadoc.skip>false</maven.javadoc.skip>

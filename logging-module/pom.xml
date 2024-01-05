@@ -26,6 +26,8 @@
 	</parent>
 
 	<artifactId>logging-module</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Logging Module</description>
 
 	<properties>
 		<maven.javadoc.skip>false</maven.javadoc.skip>

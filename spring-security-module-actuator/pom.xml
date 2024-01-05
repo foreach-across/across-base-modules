@@ -27,6 +27,8 @@
 	</parent>
 
 	<artifactId>spring-security-module-actuator</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Spring Security Module Actuator</description>
 
 	<properties>
 		<sonar.skip>true</sonar.skip>
