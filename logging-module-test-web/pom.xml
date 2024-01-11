@@ -21,7 +21,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>across-base-modules-project</artifactId>
+		<artifactId>across-base-modules</artifactId>
 		<groupId>com.foreach.across.modules</groupId>
 		<version>${revision}</version>
 	</parent>

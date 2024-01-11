@@ -22,7 +22,7 @@
 
 	<parent>
 		<groupId>com.foreach.across.modules</groupId>
-		<artifactId>across-base-modules-project</artifactId>
+		<artifactId>across-base-modules</artifactId>
 		<version>${revision}</version>
 	</parent>
 

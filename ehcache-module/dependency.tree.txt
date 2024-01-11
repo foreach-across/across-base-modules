@@ -1,19 +1,19 @@
-com.foreach.across.modules:ehcache-module:jar:4.4-SNAPSHOT
+com.foreach.across.modules:ehcache-module:jar:4.5-SNAPSHOT
 +- net.sf.ehcache:ehcache:jar:2.10.9.2:compile
 |  \- org.slf4j:slf4j-api:jar:1.7.36:compile
-+- com.foreach.across.modules:debug-web-module:jar:4.4-SNAPSHOT:compile
-|  +- com.foreach.across:across-web:jar:5.4-SNAPSHOT:compile
-|  |  +- org.springframework.boot:spring-boot-starter-web:jar:2.6.15:compile
-|  |  |  +- org.springframework.boot:spring-boot-starter:jar:2.6.15:compile
-|  |  |  |  +- org.springframework.boot:spring-boot-starter-logging:jar:2.6.15:compile
++- com.foreach.across.modules:debug-web-module:jar:4.5-SNAPSHOT:compile
+|  +- com.foreach.across:across-web:jar:5.5-SNAPSHOT:compile
+|  |  +- org.springframework.boot:spring-boot-starter-web:jar:2.7.18:compile
+|  |  |  +- org.springframework.boot:spring-boot-starter:jar:2.7.18:compile
+|  |  |  |  +- org.springframework.boot:spring-boot-starter-logging:jar:2.7.18:compile
 |  |  |  |  |  +- org.apache.logging.log4j:log4j-to-slf4j:jar:2.17.2:compile
 |  |  |  |  |  |  \- org.apache.logging.log4j:log4j-api:jar:2.17.2:compile
 |  |  |  |  |  \- org.slf4j:jul-to-slf4j:jar:1.7.36:compile
 |  |  |  |  \- jakarta.annotation:jakarta.annotation-api:jar:1.3.5:compile
-|  |  |  +- org.springframework.boot:spring-boot-starter-json:jar:2.6.15:compile
+|  |  |  +- org.springframework.boot:spring-boot-starter-json:jar:2.7.18:compile
 |  |  |  |  +- com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar:2.13.5:compile
 |  |  |  |  \- com.fasterxml.jackson.module:jackson-module-parameter-names:jar:2.13.5:compile
-|  |  |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:2.6.15:compile
+|  |  |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:2.7.18:compile
 |  |  |  |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:9.0.84:compile
 |  |  |  |  +- org.apache.tomcat.embed:tomcat-embed-el:jar:9.0.84:compile
 |  |  |  |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:9.0.84:compile
@@ -28,8 +28,8 @@ com.foreach.across.modules:ehcache-module:jar:4.4-SNAPSHOT
 |  |  +- com.fasterxml.jackson.core:jackson-databind:jar:2.13.5:compile
 |  |  |  \- com.fasterxml.jackson.core:jackson-annotations:jar:2.13.5:compile
 |  |  +- com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.13.5:compile
-|  |  +- org.springframework.boot:spring-boot-autoconfigure:jar:2.6.15:compile
-|  |  \- org.yaml:snakeyaml:jar:1.29:compile
+|  |  +- org.springframework.boot:spring-boot-autoconfigure:jar:2.7.18:compile
+|  |  \- org.yaml:snakeyaml:jar:1.30:compile
 |  +- commons-io:commons-io:jar:2.11.0:compile
 |  \- org.slf4j:log4j-over-slf4j:jar:1.7.36:compile
 +- org.springframework:spring-context-support:jar:5.3.31:compile
@@ -39,7 +39,7 @@ com.foreach.across.modules:ehcache-module:jar:4.4-SNAPSHOT
 |  |  \- org.springframework:spring-expression:jar:5.3.31:compile
 |  \- org.springframework:spring-core:jar:5.3.31:compile
 |     \- org.springframework:spring-jcl:jar:5.3.31:compile
-+- com.foreach.across:across-test:jar:5.4-SNAPSHOT:test
++- com.foreach.across:across-test:jar:5.5-SNAPSHOT:test
 |  +- org.junit.vintage:junit-vintage-engine:jar:5.8.2:test
 |  |  +- org.junit.platform:junit-platform-engine:jar:1.8.2:test
 |  |  |  +- org.opentest4j:opentest4j:jar:1.2.0:test
@@ -50,7 +50,7 @@ com.foreach.across.modules:ehcache-module:jar:4.4-SNAPSHOT
 |  |  +- org.junit.jupiter:junit-jupiter-api:jar:5.8.2:test
 |  |  +- org.junit.jupiter:junit-jupiter-params:jar:5.8.2:test
 |  |  \- org.junit.jupiter:junit-jupiter-engine:jar:5.8.2:test
-|  +- com.foreach.across:across-core:jar:5.4-SNAPSHOT:compile
+|  +- com.foreach.across:across-core:jar:5.5-SNAPSHOT:compile
 |  |  +- com.foreach.libs:common-concurrent:jar:1.1:compile
 |  |  +- org.springframework:spring-jdbc:jar:5.3.31:compile
 |  |  +- ch.qos.logback:logback-classic:jar:1.2.12:compile
@@ -65,18 +65,18 @@ com.foreach.across.modules:ehcache-module:jar:4.4-SNAPSHOT
 |  |        \- org.apache.commons:commons-collections4:jar:4.4:compile
 |  +- com.zaxxer:HikariCP:jar:4.0.3:test
 |  +- org.springframework:spring-test:jar:5.3.31:test
-|  +- org.springframework.boot:spring-boot-test:jar:2.6.15:test
-|  |  \- org.springframework.boot:spring-boot:jar:2.6.15:compile
+|  +- org.springframework.boot:spring-boot-test:jar:2.7.18:test
+|  |  \- org.springframework.boot:spring-boot:jar:2.7.18:compile
 |  +- org.springframework:spring-orm:jar:5.3.31:test
 |  |  \- org.springframework:spring-tx:jar:5.3.31:compile
 |  +- org.hsqldb:hsqldb:jar:2.5.2:test
-|  +- org.xmlunit:xmlunit-matchers:jar:2.8.4:test
-|  |  +- org.xmlunit:xmlunit-core:jar:2.8.4:test
+|  +- org.xmlunit:xmlunit-matchers:jar:2.9.1:test
+|  |  +- org.xmlunit:xmlunit-core:jar:2.9.1:test
 |  |  \- org.hamcrest:hamcrest-core:jar:2.2:test
 |  |     \- org.hamcrest:hamcrest:jar:2.2:test
-|  +- org.mockito:mockito-core:jar:4.0.0:test
-|  |  +- net.bytebuddy:byte-buddy:jar:1.11.22:test
-|  |  +- net.bytebuddy:byte-buddy-agent:jar:1.11.22:test
+|  +- org.mockito:mockito-core:jar:4.5.1:test
+|  |  +- net.bytebuddy:byte-buddy:jar:1.12.23:test
+|  |  +- net.bytebuddy:byte-buddy-agent:jar:1.12.23:test
 |  |  \- org.objenesis:objenesis:jar:3.2:test
 |  +- org.testcontainers:testcontainers:jar:1.19.3:test
 |  |  +- org.apache.commons:commons-compress:jar:1.24.0:test
@@ -92,12 +92,12 @@ com.foreach.across.modules:ehcache-module:jar:4.4-SNAPSHOT
 |  +- org.testcontainers:postgresql:jar:1.19.3:test
 |  +- org.testcontainers:mssqlserver:jar:1.19.3:test
 |  \- org.testcontainers:oracle-xe:jar:1.19.3:test
-+- org.springframework.boot:spring-boot-configuration-processor:jar:2.6.15:compile
-+- com.h2database:h2:jar:1.4.200:test
-+- com.oracle.database.jdbc:ojdbc8:jar:21.3.0.0:test
-+- com.microsoft.sqlserver:mssql-jdbc:jar:9.4.1.jre8:test
++- org.springframework.boot:spring-boot-configuration-processor:jar:2.7.18:compile
++- com.h2database:h2:jar:2.1.214:test
++- com.oracle.database.jdbc:ojdbc8:jar:21.5.0.0:test
++- com.microsoft.sqlserver:mssql-jdbc:jar:10.2.3.jre8:test
 +- com.mysql:mysql-connector-j:jar:8.0.33:test
 +- org.postgresql:postgresql:jar:42.3.8:test
 |  \- org.checkerframework:checker-qual:jar:3.5.0:test
-+- org.projectlombok:lombok:jar:1.18.26:provided
-\- org.assertj:assertj-core:jar:3.21.0:test
++- org.projectlombok:lombok:jar:1.18.30:provided
+\- org.assertj:assertj-core:jar:3.22.0:test
