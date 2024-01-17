@@ -28,6 +28,7 @@ import org.springframework.cglib.proxy.NoOp;
 import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.servlet.Filter;
@@ -37,11 +38,11 @@ import java.util.*;
  * @author Davy
  * @since 5.5.0
  */
-class AcrossOrderedHttpSecurityConfigurerSet extends LinkedHashSet<HttpSecurityBuilder<? extends SecurityBuilder<? extends SecurityFilterChain>>>
+class AcrossOrderedHttpSecurityBuilderSet extends LinkedHashSet<SecurityBuilder<? extends SecurityFilterChain>>
 {
 	private final AcrossListableBeanFactory beanFactory;
 
-	AcrossOrderedHttpSecurityConfigurerSet( AcrossModuleInfo currentModule ) {
+	AcrossOrderedHttpSecurityBuilderSet( HttpSecurity http, AcrossModuleInfo currentModule ) {
 		beanFactory = (AcrossListableBeanFactory) currentModule.getApplicationContext().getAutowireCapableBeanFactory();
 
 		AcrossOrderSpecifierComparator comparator = new AcrossOrderSpecifierComparator();
@@ -54,24 +55,22 @@ class AcrossOrderedHttpSecurityConfigurerSet extends LinkedHashSet<HttpSecurityB
 		sortedList.sort( comparator );
 
 		for ( int i = 0; i < sortedList.size(); i++ ) {
-			add( createWrapperOrProxy( sortedList.get( i ), i ) );
+			add( createWrapperOrProxy( http, sortedList.get( i ), i ) );
 		}
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private HttpSecurityBuilder<? extends HttpSecurityBuilder<? extends SecurityFilterChain>> createWrapperOrProxy( Object original, int order ) {
-/*
+	private SecurityBuilder<? extends SecurityFilterChain> createWrapperOrProxy( HttpSecurity http, Object original, int order ) {
 		if ( original instanceof AcrossWebSecurityConfigurer ) {
-			return createWrapper( (AcrossWebSecurityConfigurer) original, order );
+			return createWrapper( http, (AcrossWebSecurityConfigurer) original, order );
 		}
 		throw new IllegalArgumentException( "Not supported: " + original );
 		//return createProxy( (WebSecurityConfigurer) original, order );
-*/
-		throw new UnsupportedOperationException();
+		//throw new UnsupportedOperationException();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private WebSecurityConfigurerProxy<? extends SecurityBuilder<Filter>> createProxy( HttpSecurityBuilder<? extends SecurityBuilder<? extends SecurityFilterChain>> configurer,
+	private WebSecurityConfigurerProxy<? extends SecurityBuilder<Filter>> createProxy( SecurityBuilder<? extends SecurityBuilder<? extends SecurityFilterChain>> configurer,
 	                                                                                   int order ) {
 		InterfaceMaker interfaceMaker = new InterfaceMaker();
 		Class<?> dynamicInterface = interfaceMaker.create();
@@ -92,7 +91,8 @@ class AcrossOrderedHttpSecurityConfigurerSet extends LinkedHashSet<HttpSecurityB
 	 * security, the wrapper MUST be a different class each time.  To achieve that, a dynamically created interface
 	 * is added to every wrapper.
 	 */
-	private AcrossWebSecurityConfigurerAdapter createWrapper( AcrossWebSecurityConfigurer configurer, int order ) {
+	private AcrossHttpSecurityBuilderAdapter createWrapper( HttpSecurity http, AcrossWebSecurityConfigurer configurer, int order ) {
+/*
 		InterfaceMaker interfaceMaker = new InterfaceMaker();
 		Class<?> dynamicInterface = interfaceMaker.create();
 
@@ -109,6 +109,8 @@ class AcrossOrderedHttpSecurityConfigurerSet extends LinkedHashSet<HttpSecurityB
 		beanFactory.autowireBean( wrapper );
 
 		return wrapper;
+*/
+		return new AcrossHttpSecurityBuilderAdapter( http, configurer, order );
 	}
 
 	private void addWebSecurityConfigurers( Class<?> configurerType, Set<Object> list, AcrossOrderSpecifierComparator comparator ) {
@@ -133,7 +135,7 @@ class AcrossOrderedHttpSecurityConfigurerSet extends LinkedHashSet<HttpSecurityB
 	}
 
 	@SuppressWarnings({ "WeakerAccess" })
-	public List<HttpSecurityBuilder<? extends SecurityBuilder<? extends SecurityFilterChain>>> getHttpSecurityBuilders() {
+	public List<SecurityBuilder<? extends SecurityFilterChain>> getHttpSecurityBuilders() {
 		return new ArrayList<>( this );
 	}
 }

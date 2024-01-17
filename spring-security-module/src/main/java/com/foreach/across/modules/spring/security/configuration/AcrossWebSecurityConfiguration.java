@@ -115,6 +115,29 @@ public class AcrossWebSecurityConfiguration
 	}
 
 	@Bean
+	public AcrossOrderedHttpSecurityBuilderSet autowiredHttpSecurityBuildersIgnoreParents( HttpSecurity http, AcrossModuleInfo moduleInfo ) {
+		AcrossOrderedHttpSecurityBuilderSet securityBuilders = new AcrossOrderedHttpSecurityBuilderSet( http, moduleInfo );
+
+		if ( securityBuilders.isEmpty() ) {
+			throw new IllegalStateException(
+					"At least one non-null instance of AcrossWebSecurityConfigurer or WebSecurityConfigurer should be present in the Across context." );
+		}
+
+		if ( LOG.isDebugEnabled() ) {
+			LOG.debug( "Applying the following WebSecurityConfigurers in order:" );
+			List<SecurityBuilder<? extends SecurityFilterChain>> list = securityBuilders.getHttpSecurityBuilders();
+			list.sort( AnnotationAwareOrderComparator.INSTANCE );
+			list.forEach( cfg -> {
+				              int order = AcrossOrderUtils.findOrder( cfg );
+				              LOG.debug( " {} - {}", order, cfg );
+			              }
+			);
+		}
+
+		return securityBuilders;
+	}
+
+	@Bean
 	public AuthenticationTrustResolver authenticationTrustResolver( SecurityInfrastructure securityInfrastructure ) {
 		return securityInfrastructure.authenticationTrustResolver();
 	}
@@ -167,23 +190,23 @@ public class AcrossWebSecurityConfiguration
 		};
 	}
 */
-	@Bean
-	@Order(Ordered.LOWEST_PRECEDENCE)
-	@ConditionalOnMissingBean
-	public SecurityFilterChain filterChain( HttpSecurity http, AcrossOrderedWebSecurityConfigurerSet configurerSet ) throws Exception {
-/*
-		http
-				.authorizeHttpRequests((authz) -> authz
-						.anyRequest().authenticated()
-				)
-				.httpBasic( Customizer.withDefaults());
-*/
-		for ( AcrossWebSecurityConfigurer configurer : configurerSet.getConfigurers() ) {
-			configurer.configure( http );
-		}
-
-		return http.build();
-	}
+//	@Bean
+//	@Order(Ordered.LOWEST_PRECEDENCE)
+//	@ConditionalOnMissingBean
+//	public SecurityFilterChain filterChain( HttpSecurity http, AcrossOrderedWebSecurityConfigurerSet configurerSet ) throws Exception {
+///*
+//		http
+//				.authorizeHttpRequests((authz) -> authz
+//						.anyRequest().authenticated()
+//				)
+//				.httpBasic( Customizer.withDefaults());
+//*/
+//		for ( AcrossWebSecurityConfigurer configurer : configurerSet.getConfigurers() ) {
+//			configurer.configure( http );
+//		}
+//
+//		return http.build();
+//	}
 
 //	@Bean
 //	@Order(Ordered.LOWEST_PRECEDENCE)
@@ -202,6 +225,8 @@ public class AcrossWebSecurityConfiguration
 //
 //		return http.build();
 //	}
+
+
 
 }
 
