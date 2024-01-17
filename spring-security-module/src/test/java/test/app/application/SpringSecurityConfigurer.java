@@ -16,9 +16,11 @@
 
 package test.app.application;
 
-import com.foreach.across.modules.spring.security.configuration.AcrossWebSecurityConfigurer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.DefaultSecurityFilterChain;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * @author Steven Gentens
@@ -29,38 +31,48 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 public class SpringSecurityConfigurer
 {
 	@Configuration
-	static class BlockedSecurity implements AcrossWebSecurityConfigurer
+	public static class BlockedSecurity
 	{
-		@Override
-		public void configure( HttpSecurity http ) throws Exception {
+		@Bean
+		public SecurityFilterChain configure( HttpSecurity http ) throws Exception {
+/*
+			http.antMatcher( "/blocked" ).authorizeRequests().anyRequest().denyAll()
+					.and().antMatcher( "/hello" ).authorizeRequests().anyRequest().authenticated().and().httpBasic()
+					.and().antMatcher( "/thymeleaf-extras" ).authorizeRequests().anyRequest().authenticated().and().httpBasic()
+					.and().antMatcher( "/current-user" ).authorizeRequests().anyRequest().authenticated().and().httpBasic().and().securityContext();
+*/
 			http.antMatcher( "/blocked" ).authorizeRequests().anyRequest().denyAll();
+			return http.build();
 		}
 	}
 
 	@Configuration
-	static class HelloSecurity implements AcrossWebSecurityConfigurer
+	public static class HelloSecurity
 	{
-		@Override
-		public void configure( HttpSecurity http ) throws Exception {
+		@Bean
+		public DefaultSecurityFilterChain configure( HttpSecurity http ) throws Exception {
 			http.antMatcher( "/hello" ).authorizeRequests().anyRequest().authenticated().and().httpBasic();
+			return http.build();
 		}
 	}
 
 	@Configuration
-	static class ThymeleafSecurity implements AcrossWebSecurityConfigurer
+	public static class ThymeleafSecurity
 	{
-		@Override
-		public void configure( HttpSecurity http ) throws Exception {
+		@Bean
+		public DefaultSecurityFilterChain configure( HttpSecurity http ) throws Exception {
 			http.antMatcher( "/thymeleaf-extras" ).authorizeRequests().anyRequest().authenticated().and().httpBasic();
+			return http.build();
 		}
 	}
 
 	@Configuration
-	static class CurrentUserSecurity implements AcrossWebSecurityConfigurer
+	public static class CurrentUserSecurity
 	{
-		@Override
-		public void configure( HttpSecurity http ) throws Exception {
+		@Bean
+		public DefaultSecurityFilterChain configure( HttpSecurity http ) throws Exception {
 			http.antMatcher( "/current-user" ).authorizeRequests().anyRequest().authenticated().and().httpBasic().and().securityContext();
+			return http.build();
 		}
 	}
 }

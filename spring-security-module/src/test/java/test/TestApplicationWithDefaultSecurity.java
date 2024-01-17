@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,6 +41,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import test.app.SpringSecurityTestApplication;
+import test.app.application.SpringSecurityConfigurer;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -56,6 +58,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = { SpringSecurityTestApplication.class, MockMvcConfiguration.class })
 @ContextConfiguration(initializers = MockAcrossServletContextInitializer.class)
 @ActiveProfiles("custom-auth")
+//@Import({
+//		SpringSecurityConfigurer.BlockedSecurity.class,
+//		SpringSecurityConfigurer.HelloSecurity.class,
+//		SpringSecurityConfigurer.CurrentUserSecurity.class,
+//		SpringSecurityConfigurer.ThymeleafSecurity.class,
+//})
 public class TestApplicationWithDefaultSecurity
 {
 	@Autowired

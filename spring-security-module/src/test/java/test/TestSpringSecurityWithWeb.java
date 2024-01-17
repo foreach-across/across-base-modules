@@ -39,6 +39,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator;
 import org.springframework.test.annotation.DirtiesContext;
@@ -128,13 +129,14 @@ public class TestSpringSecurityWithWeb
 		}
 
 		@Override
-		public void configure( HttpSecurity http ) throws Exception {
+		public DefaultSecurityFilterChain configure( HttpSecurity http ) throws Exception {
 			http
 					.authorizeRequests()
 					.anyRequest().authenticated()
 					.and()
 					.formLogin().and()
 					.httpBasic();
+			return null;
 		}
 	}
 
@@ -143,8 +145,9 @@ public class TestSpringSecurityWithWeb
 	protected static class OtherSpringSecurityConfigurer implements AcrossWebSecurityConfigurer
 	{
 		@Override
-		public void configure( HttpSecurity http ) throws Exception {
+		public DefaultSecurityFilterChain configure( HttpSecurity http ) throws Exception {
 			http.antMatcher( "/bla" ).authorizeRequests().anyRequest().denyAll();
+			return null;
 		}
 	}
 

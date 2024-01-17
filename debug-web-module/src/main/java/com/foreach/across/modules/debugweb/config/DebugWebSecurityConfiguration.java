@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 
 import static com.foreach.across.modules.debugweb.DebugWebModuleSettings.SECURITY_ENABLED;
 
@@ -59,7 +60,7 @@ public class DebugWebSecurityConfiguration implements AcrossWebSecurityConfigure
 	}
 
 	@Override
-	public void configure( HttpSecurity http ) throws Exception {
+	public DefaultSecurityFilterChain configure( HttpSecurity http ) throws Exception {
 		String ipAddressesExpression = buildIpAddressExpression();
 		String accessExpression = StringUtils.length(
 				ipAddressesExpression ) > 0 ? ipAddressesExpression + " or " : StringUtils.EMPTY;
@@ -74,6 +75,7 @@ public class DebugWebSecurityConfiguration implements AcrossWebSecurityConfigure
 		    .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS )
 		    .and()
 		    .csrf().disable();
+		return null;
 	}
 
 	private String buildIpAddressExpression() {

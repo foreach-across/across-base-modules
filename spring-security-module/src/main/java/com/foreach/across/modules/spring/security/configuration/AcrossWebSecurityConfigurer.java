@@ -18,6 +18,7 @@ package com.foreach.across.modules.spring.security.configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 
 /**
  * Interface to be implemented in modules that want to use the default SpringSecurityModule configuration
@@ -46,6 +47,7 @@ public interface AcrossWebSecurityConfigurer
 	default void configure( WebSecurity web ) throws Exception {
 	}
 
-	default void configure( HttpSecurity http ) throws Exception {
+	default DefaultSecurityFilterChain configure( HttpSecurity http ) throws Exception {
+		return null;
 	}
 }

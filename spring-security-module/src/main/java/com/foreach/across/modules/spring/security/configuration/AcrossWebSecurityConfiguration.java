@@ -30,9 +30,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.util.ClassUtils;
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -129,6 +130,7 @@ public class AcrossWebSecurityConfiguration
 	 *
 	 * @since 4.2.0
 	 */
+/*
 	@Bean
 	@Order(Ordered.LOWEST_PRECEDENCE)
 	@ConditionalOnMissingBean
@@ -144,5 +146,62 @@ public class AcrossWebSecurityConfiguration
 			}
 		};
 	}
+*/
+
+/*
+	@Bean
+	@Order(Ordered.LOWEST_PRECEDENCE)
+	@ConditionalOnMissingBean
+	public SecurityFilterChain springSecurityModuleHttpSecurityBuilder() {
+		return new SecurityFilterChain()
+		{
+			@Override
+			public boolean matches( HttpServletRequest request ) {
+				return false;
+			}
+
+			@Override
+			public List<Filter> getFilters() {
+				return null;
+			}
+		};
+	}
+*/
+	@Bean
+	@Order(Ordered.LOWEST_PRECEDENCE)
+	@ConditionalOnMissingBean
+	public SecurityFilterChain filterChain( HttpSecurity http, AcrossOrderedWebSecurityConfigurerSet configurerSet ) throws Exception {
+/*
+		http
+				.authorizeHttpRequests((authz) -> authz
+						.anyRequest().authenticated()
+				)
+				.httpBasic( Customizer.withDefaults());
+*/
+		for ( AcrossWebSecurityConfigurer configurer : configurerSet.getConfigurers() ) {
+			configurer.configure( http );
+		}
+
+		return http.build();
+	}
+
+//	@Bean
+//	@Order(Ordered.LOWEST_PRECEDENCE)
+//	@ConditionalOnMissingBean
+//	public SecurityFilterChain filterChain2( HttpSecurity http, AcrossOrderedWebSecurityConfigurerSet configurerSet ) throws Exception {
+///*
+//		http
+//				.authorizeHttpRequests((authz) -> authz
+//						.anyRequest().authenticated()
+//				)
+//				.httpBasic( Customizer.withDefaults());
+//*/
+//		for ( AcrossWebSecurityConfigurer configurer : configurerSet.getConfigurers() ) {
+//			configurer.configure( http );
+//		}
+//
+//		return http.build();
+//	}
+
 }
 

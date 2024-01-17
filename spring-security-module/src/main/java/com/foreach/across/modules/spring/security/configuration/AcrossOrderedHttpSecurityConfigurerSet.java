@@ -26,24 +26,22 @@ import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.InterfaceMaker;
 import org.springframework.cglib.proxy.NoOp;
 import org.springframework.security.config.annotation.SecurityBuilder;
+import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 
 import javax.servlet.Filter;
 import java.util.*;
 
 /**
- * Any {@link AcrossWebSecurityConfigurer} will be wrapped into a {@link AcrossWebSecurityConfigurerAdapter} which will
- * be created entirely inside this module. Any {@link WebSecurityConfigurer} will be wrapped inside a
- *
- * @author Arne Vandamme
- * @since 4.0.0
+ * @author Davy
+ * @since 5.5.0
  */
-class AcrossOrderedWebSecurityConfigurerSet extends LinkedHashSet<WebSecurityConfigurer<? extends SecurityBuilder<Filter>>>
+class AcrossOrderedHttpSecurityConfigurerSet extends LinkedHashSet<HttpSecurityBuilder<? extends SecurityBuilder<? extends SecurityFilterChain>>>
 {
 	private final AcrossListableBeanFactory beanFactory;
-	private final List<AcrossWebSecurityConfigurer> configurers = new ArrayList<>();
 
-	AcrossOrderedWebSecurityConfigurerSet( AcrossModuleInfo currentModule ) {
+	AcrossOrderedHttpSecurityConfigurerSet( AcrossModuleInfo currentModule ) {
 		beanFactory = (AcrossListableBeanFactory) currentModule.getApplicationContext().getAutowireCapableBeanFactory();
 
 		AcrossOrderSpecifierComparator comparator = new AcrossOrderSpecifierComparator();
@@ -61,15 +59,19 @@ class AcrossOrderedWebSecurityConfigurerSet extends LinkedHashSet<WebSecurityCon
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private WebSecurityConfigurer<? extends SecurityBuilder<Filter>> createWrapperOrProxy( Object original, int order ) {
+	private HttpSecurityBuilder<? extends HttpSecurityBuilder<? extends SecurityFilterChain>> createWrapperOrProxy( Object original, int order ) {
+/*
 		if ( original instanceof AcrossWebSecurityConfigurer ) {
 			return createWrapper( (AcrossWebSecurityConfigurer) original, order );
 		}
-		return createProxy( (WebSecurityConfigurer) original, order );
+		throw new IllegalArgumentException( "Not supported: " + original );
+		//return createProxy( (WebSecurityConfigurer) original, order );
+*/
+		throw new UnsupportedOperationException();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private WebSecurityConfigurerProxy<? extends SecurityBuilder<Filter>> createProxy( WebSecurityConfigurer<? extends SecurityBuilder<Filter>> configurer,
+	private WebSecurityConfigurerProxy<? extends SecurityBuilder<Filter>> createProxy( HttpSecurityBuilder<? extends SecurityBuilder<? extends SecurityFilterChain>> configurer,
 	                                                                                   int order ) {
 		InterfaceMaker interfaceMaker = new InterfaceMaker();
 		Class<?> dynamicInterface = interfaceMaker.create();
@@ -115,9 +117,6 @@ class AcrossOrderedWebSecurityConfigurerSet extends LinkedHashSet<WebSecurityCon
 		configurers.forEach( ( beanName, configurer ) -> {
 			comparator.register( configurer, beanFactory.retrieveOrderSpecifier( beanName ) );
 			list.add( configurer );
-			if (configurer instanceof AcrossWebSecurityConfigurer) {
-				this.configurers.add( (AcrossWebSecurityConfigurer) configurer );
-			}
 		} );
 
 		ListableBeanFactory pbf = (ListableBeanFactory) beanFactory.getParentBeanFactory();
@@ -128,21 +127,13 @@ class AcrossOrderedWebSecurityConfigurerSet extends LinkedHashSet<WebSecurityCon
 				                if ( !list.contains( configurer ) ) {
 					                comparator.register( configurer, AcrossOrderSpecifier.forSources( Collections.singletonList( configurer ) ).build() );
 					                list.add( configurer );
-					                if (configurer instanceof AcrossWebSecurityConfigurer) {
-						                this.configurers.add( (AcrossWebSecurityConfigurer) configurer );
-					                }
 				                }
 			                } );
 		}
 	}
 
 	@SuppressWarnings({ "WeakerAccess" })
-	public List<WebSecurityConfigurer<? extends SecurityBuilder<Filter>>> getWebSecurityConfigurers() {
+	public List<HttpSecurityBuilder<? extends SecurityBuilder<? extends SecurityFilterChain>>> getHttpSecurityBuilders() {
 		return new ArrayList<>( this );
-	}
-
-	// This doesn't contain the plain WebSecurityConfigurer, which the original AcrossOrderedWebSecurityConfigurerSet did have ...
-	public List<AcrossWebSecurityConfigurer> getConfigurers() {
-		return configurers;
 	}
 }
