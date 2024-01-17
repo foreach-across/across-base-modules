@@ -129,14 +129,13 @@ public class TestSpringSecurityWithWeb
 		}
 
 		@Override
-		public DefaultSecurityFilterChain configure( HttpSecurity http ) throws Exception {
+		public void configure( HttpSecurity http ) throws Exception {
 			http
 					.authorizeRequests()
 					.anyRequest().authenticated()
 					.and()
 					.formLogin().and()
 					.httpBasic();
-			return null;
 		}
 	}
 
@@ -145,9 +144,8 @@ public class TestSpringSecurityWithWeb
 	protected static class OtherSpringSecurityConfigurer implements AcrossWebSecurityConfigurer
 	{
 		@Override
-		public DefaultSecurityFilterChain configure( HttpSecurity http ) throws Exception {
+		public void configure( HttpSecurity http ) throws Exception {
 			http.antMatcher( "/bla" ).authorizeRequests().anyRequest().denyAll();
-			return null;
 		}
 	}
 

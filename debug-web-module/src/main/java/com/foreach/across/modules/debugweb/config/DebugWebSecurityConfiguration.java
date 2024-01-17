@@ -60,7 +60,7 @@ public class DebugWebSecurityConfiguration implements AcrossWebSecurityConfigure
 	}
 
 	@Override
-	public DefaultSecurityFilterChain configure( HttpSecurity http ) throws Exception {
+	public void configure( HttpSecurity http ) throws Exception {
 		String ipAddressesExpression = buildIpAddressExpression();
 		String accessExpression = StringUtils.length(
 				ipAddressesExpression ) > 0 ? ipAddressesExpression + " or " : StringUtils.EMPTY;
@@ -75,7 +75,6 @@ public class DebugWebSecurityConfiguration implements AcrossWebSecurityConfigure
 		    .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS )
 		    .and()
 		    .csrf().disable();
-		return null;
 	}
 
 	private String buildIpAddressExpression() {

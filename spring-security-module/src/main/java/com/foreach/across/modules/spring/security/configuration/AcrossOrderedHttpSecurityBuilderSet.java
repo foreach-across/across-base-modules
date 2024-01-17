@@ -48,7 +48,7 @@ class AcrossOrderedHttpSecurityBuilderSet extends LinkedHashSet<SecurityBuilder<
 		AcrossOrderSpecifierComparator comparator = new AcrossOrderSpecifierComparator();
 		Set<Object> configurers = new LinkedHashSet<>();
 
-		addWebSecurityConfigurers( WebSecurityConfigurer.class, configurers, comparator );
+		// TODO addWebSecurityConfigurers( WebSecurityConfigurer.class, configurers, comparator );
 		addWebSecurityConfigurers( AcrossWebSecurityConfigurer.class, configurers, comparator );
 
 		List<Object> sortedList = new ArrayList<>( configurers );
@@ -92,25 +92,23 @@ class AcrossOrderedHttpSecurityBuilderSet extends LinkedHashSet<SecurityBuilder<
 	 * is added to every wrapper.
 	 */
 	private AcrossHttpSecurityBuilderAdapter createWrapper( HttpSecurity http, AcrossWebSecurityConfigurer configurer, int order ) {
-/*
 		InterfaceMaker interfaceMaker = new InterfaceMaker();
 		Class<?> dynamicInterface = interfaceMaker.create();
 
 		Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass( AcrossWebSecurityConfigurerAdapter.class );
+		enhancer.setSuperclass( AcrossHttpSecurityBuilderAdapter.class );
 		enhancer.setInterfaces( new Class[] { dynamicInterface } );
 		enhancer.setCallback( NoOp.INSTANCE );
 
-		AcrossWebSecurityConfigurerAdapter wrapper = (AcrossWebSecurityConfigurerAdapter) enhancer.create(
-				new Class[] { AcrossWebSecurityConfigurer.class, int.class },
-				new Object[] { configurer, order }
+		AcrossHttpSecurityBuilderAdapter wrapper = (AcrossHttpSecurityBuilderAdapter) enhancer.create(
+				new Class[] { HttpSecurity.class, AcrossWebSecurityConfigurer.class, int.class },
+				new Object[] { http, configurer, order }
 		);
 
 		beanFactory.autowireBean( wrapper );
 
 		return wrapper;
-*/
-		return new AcrossHttpSecurityBuilderAdapter( http, configurer, order );
+		//return new AcrossHttpSecurityBuilderAdapter( http, configurer, order );
 	}
 
 	private void addWebSecurityConfigurers( Class<?> configurerType, Set<Object> list, AcrossOrderSpecifierComparator comparator ) {

@@ -68,7 +68,8 @@ class AcrossHttpSecurityBuilderAdapter implements Ordered, SecurityBuilder<Secur
 
 	@Override
 	public SecurityFilterChain build() throws Exception {
-		return configurer.configure( httpSecurity );
+		configurer.configure( httpSecurity );
+		return httpSecurity.build();
 	}
 
 /*

@@ -31,6 +31,7 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -47,7 +48,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Slf4j
-@EnableWebSecurity
+//@EnableWebSecurity
 public class AcrossWebSecurityConfiguration
 {
 	private static final String CLASS_THYMELEAF_TEMPLATE_ENGINE = "org.thymeleaf.spring5.SpringTemplateEngine";
@@ -114,6 +115,7 @@ public class AcrossWebSecurityConfiguration
 		return webSecurityConfigurers;
 	}
 
+/*
 	@Bean
 	public AcrossOrderedHttpSecurityBuilderSet autowiredHttpSecurityBuildersIgnoreParents( HttpSecurity http, AcrossModuleInfo moduleInfo ) {
 		AcrossOrderedHttpSecurityBuilderSet securityBuilders = new AcrossOrderedHttpSecurityBuilderSet( http, moduleInfo );
@@ -124,7 +126,7 @@ public class AcrossWebSecurityConfiguration
 		}
 
 		if ( LOG.isDebugEnabled() ) {
-			LOG.debug( "Applying the following WebSecurityConfigurers in order:" );
+			LOG.debug( "Applying the following SecurityBuilder in order:" );
 			List<SecurityBuilder<? extends SecurityFilterChain>> list = securityBuilders.getHttpSecurityBuilders();
 			list.sort( AnnotationAwareOrderComparator.INSTANCE );
 			list.forEach( cfg -> {
@@ -136,6 +138,7 @@ public class AcrossWebSecurityConfiguration
 
 		return securityBuilders;
 	}
+*/
 
 	@Bean
 	public AuthenticationTrustResolver authenticationTrustResolver( SecurityInfrastructure securityInfrastructure ) {
@@ -153,11 +156,10 @@ public class AcrossWebSecurityConfiguration
 	 *
 	 * @since 4.2.0
 	 */
-/*
 	@Bean
 	@Order(Ordered.LOWEST_PRECEDENCE)
 	@ConditionalOnMissingBean
-	public WebSecurityConfigurerAdapter springSecurityModuleWebSecurityConfiguration() {
+	public WebSecurityConfigurerAdapter springSecurityModuleWebSecurityConfiguration( AcrossModuleInfo moduleInfo ) {
 		return new WebSecurityConfigurerAdapter()
 		{
 			@Override
@@ -167,9 +169,21 @@ public class AcrossWebSecurityConfiguration
 				// getHttp() would override the PrivilegeEvaluator
 				// Basically this empty bean exists but does nothing and only exists to fool SpringBootWebSecurityConfiguration
 			}
+
+
+
+/*
+			@Override
+			protected void configure( HttpSecurity http ) throws Exception {
+				// super.configure( http );
+				AcrossOrderedHttpSecurityBuilderSet securityBuilders = new AcrossOrderedHttpSecurityBuilderSet( http, moduleInfo );
+				for ( SecurityBuilder<? extends SecurityFilterChain> securityBuilder : securityBuilders ) {
+					securityBuilder.build(); // TODO the result isn't registered as a bean
+				}
+			}
+*/
 		};
 	}
-*/
 
 /*
 	@Bean
@@ -225,8 +239,6 @@ public class AcrossWebSecurityConfiguration
 //
 //		return http.build();
 //	}
-
-
 
 }
 
